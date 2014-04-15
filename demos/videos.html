@@ -57,13 +57,18 @@
 //Javascript
 
 $('.owl-carousel').owlCarousel({
-	items:4,
+	items:1,
 	merge:true,
 	loop:true,
 	margin:10,
 	video:true,
 	lazyLoad:true,
-	center:true
+	center:true,
+	responsive:{
+		600:{
+			items:4
+		}
+	}
 });
 
 	</code></pre>
@@ -106,13 +111,18 @@ $('.owl-carousel').owlCarousel({
 jQuery(document).ready(function($) {
 
 	$('.owl-carousel').owlCarousel({
-		items:4,
+		items:1,
 		merge:true,
 		loop:true,
 		margin:10,
 		video:true,
 		lazyLoad:true,
-		center:true
+		center:true,
+		responsive:{
+			600:{
+				items:4
+			}
+		}
 	});
 
 });
