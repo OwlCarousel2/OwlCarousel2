@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Owl Carousel 2.0.0-beta.0.1 - Videos demo</title>
+	<link rel="stylesheet" href="../assets/css/foundation.min.css" />
+	<link rel="stylesheet" href="../owlcarousel/owl.carousel.css">
+	<link rel="stylesheet" href="../assets/js/highlight/styles/monokai_sublime.css">
+	<link rel="stylesheet" href="../assets/css/demo.css">
+	
+</head>
+<body>
+<div class="header">
+	<div class="row">
+	  <div class="large-12 columns">
+		<h1>Videos.</h1>
+	  </div>
+	</div>
+</div>
+<div class="video-demo margin-top">
+	
+	<div class="row">
+		<div class="large-12 columns">
+
+			<div class="owl-carousel">
+				<div class="article-video" data-merge="3"><a class="owl-video" href="http://vimeo.com/23924346"></a></div>
+				<div class="article-video" data-merge="1"><a class="owl-video" href="https://www.youtube.com/watch?v=JpxsRwnRwCQ"></a></div>
+				<div class="article-video" data-merge="2"><a class="owl-video" href="http://www.youtube.com/watch?v=FBu_jxT1PkA"></a></div>
+				<div class="article-video" data-merge="1"><a class="owl-video" href="http://www.youtube.com/watch?v=oy18DJwy5lI"></a></div>
+				<div class="article-video" data-merge="2"><a class="owl-video" href="http://www.youtube.com/watch?v=H3jLkJrhHKQ"></a></div>
+				<div class="article-video" data-merge="3"><a class="owl-video" href="http://www.youtube.com/watch?v=dm1FS5PfzAI"></a></div>
+				<div class="article-video" data-merge="1"><a class="owl-video" href="http://www.youtube.com/watch?v=0fhoIate4qI"></a></div>
+				<div class="article-video" data-merge="2"><a class="owl-video" href="https://www.youtube.com/watch?v=EF_kj2ojZaE"></a></div>
+
+			</div>
+
+		</div>
+	</div>
+</div>
+
+<div class="content">
+	<div class="row margin-top">
+		<div class="large-12 columns">
+			<h4>Descriptons</h4>
+			<p>Still in progress. Can use YouTube and Vimeo links. Lazy load on thumbnail works too. There are some additional option for widht and height - will make proper description later.</p>
+			<p>To add video into carousel just put &lt;a class="owl-video" href="_straight_URL_from_youtube_or_vimeo"&gt;&lt;/a&gt;.
+			A tag is not mandatory. Can be any other tag but "owl-video" and href with url link is required.
+			</p>
+		</div>
+	</div>
+
+	<div class="code">
+		<div class="row margin-top">
+			<div class="large-12 columns">
+	<pre><code>
+//Javascript
+
+$('.owl-carousel').owlCarousel({
+	items:4,
+	merge:true,
+	loop:true,
+	margin:10,
+	video:true,
+	lazyLoad:true,
+	center:true
+});
+
+	</code></pre>
+			</div>
+		</div>
+	</div>
+	
+	<div class="demos-buttons margin-top">
+		<div class="row">
+			<div class="large-12 columns">
+				<h3>Demos:</h3>
+				<hr>
+				<a href="responsiveoptions.html" class="button">Responsive options</a>
+				<a href="center.html" class="button">Center</a>
+				<a href="lazyload.html" class="button">Lazy Load</a>
+				<a href="merge.html" class="button">Merge</a>
+				<a href="autowidth.html" class="button">Auto Width</a>
+				<a href="videos.html" class="button">Videos</a>
+				<a href="" class="button">Smart Speed - to do</a>
+				<a href="" class="button">Callbacks - to do</a>
+			</div>
+		</div>
+	</div>
+</div>	
+<div class="footer">
+	<div class="row margin-top">
+		<div class="large-12 columns">
+			<hr>
+			<p>Bartosz Wojciechowski 2014. <a href="mailto:owl@owlgraphic.com">owl@owlgraphic.com</a></p>
+		</div>
+	</div>
+</div>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="../owlcarousel/owl.carousel.js"></script>
+<script src="../assets/js/highlight/highlight.pack.js"></script>
+<script src="../assets/js/app.js"></script>
+
+<script>
+jQuery(document).ready(function($) {
+
+	$('.owl-carousel').owlCarousel({
+		items:4,
+		merge:true,
+		loop:true,
+		margin:10,
+		video:true,
+		lazyLoad:true,
+		center:true
+	});
+
+});
+
+</script>
+
+
+</body>
+</html>

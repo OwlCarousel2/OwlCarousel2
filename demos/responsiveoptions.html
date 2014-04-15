@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Owl Carousel 2.0.0-beta.0.1 - Responsive options demo</title>
+	<link rel="stylesheet" href="../assets/css/foundation.min.css" />
+	<link rel="stylesheet" href="../owlcarousel/owl.carousel.css">
+	<link rel="stylesheet" href="../assets/js/highlight/styles/monokai_sublime.css">
+	<link rel="stylesheet" href="../assets/css/demo.css">
+	
+</head>
+<body>
+<div class="header">
+	<div class="row">
+	  <div class="large-12 columns">
+		<h1>Responsive options.</h1>
+	  </div>
+	</div>
+</div>
+<div class="responsive-demo margin-top">
+
+	<div class="owl-carousel">
+		<div class="article" data-merge="3"><h2>1</h2></div>
+		<div class="article"><h2>2</h2></div>
+		<div class="article"><h2>3</h2></div>
+		<div class="article"><h2>4</h2></div>
+		<div class="article"><h2>6</h2></div>
+		<div class="article"><h2>7</h2></div>
+		<div class="article"><h2>8</h2></div>
+		<div class="article"><h2>9</h2></div>
+		<div class="article"><h2>10</h2></div>
+		<div class="article"><h2>11</h2></div>
+		<div class="article"><h2>12</h2></div>
+		<div class="article"><h2>13</h2></div>
+		<div class="article"><h2>14</h2></div>
+		<div class="article"><h2>15</h2></div>
+	</div>
+
+</div>
+
+<div class="content">
+	<div class="row margin-top">
+		<div class="large-12 columns">
+			<h4>Descriptons</h4>
+			<p>Example of setting up responsive Owl. As not every option is able to use responsive abilities, soon i will provide list of non responsive options.</p>
+		</div>
+	</div>
+
+	<div class="code">
+		<div class="row margin-top">
+			<div class="large-12 columns">
+	<pre><code>
+//Javascript
+
+$('.owl-carousel').owlCarousel({
+	items:1, // In this configuration 1 is falling into &lt;479 screen size 
+	loop:true, // loop is true up to 1199px screen.
+	navigation:true, 
+	merge: true, 
+	margin:10, // margin 10px till 959 breakpoint
+
+	// Object keys can be Numbers (like in this example) or Strings: '480'
+	// Owl has build in sort option so you don need to stick with 'mobile-first' order.
+	// Setting from widest screen to smallest still work as expeted
+
+	responsive:{	
+		480:{
+			items:2, // from 480 to 677 
+			navigation:false // from 480 to max 
+
+		},
+
+		678:{
+			items:4, // from this breakpoint 678 to 959
+			center:true // only within 678 and next - 959
+		},
+
+		960:{
+			items:5, // from this breakpoint 960 to 1199
+			margin:20, // and so on...
+			center:false 
+
+		},
+
+		1200:{
+			items:6,
+			loop:false,
+			margin: 30,
+			merge: false,
+		}
+	}
+});
+
+	</code></pre>
+			</div>
+		</div>
+	</div>
+	
+	<div class="demos-buttons margin-top">
+		<div class="row">
+			<div class="large-12 columns">
+				<h3>Demos:</h3>
+				<hr>
+				<a href="responsiveoptions.html" class="button">Responsive options</a>
+				<a href="center.html" class="button">Center</a>
+				<a href="lazyload.html" class="button">Lazy Load</a>
+				<a href="merge.html" class="button">Merge</a>
+				<a href="autowidth.html" class="button">Auto Width</a>
+				<a href="videos.html" class="button">Videos</a>
+				<a href="" class="button">Smart Speed - to do</a>
+				<a href="" class="button">Callbacks - to do</a>
+			</div>
+		</div>
+	</div>
+</div>	
+<div class="footer">
+	<div class="row margin-top">
+		<div class="large-12 columns">
+			<hr>
+			<p>Bartosz Wojciechowski 2014. <a href="mailto:owl@owlgraphic.com">owl@owlgraphic.com</a></p>
+		</div>
+	</div>
+</div>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="../owlcarousel/owl.carousel.js"></script>
+<script src="../assets/js/highlight/highlight.pack.js"></script>
+<script src="../assets/js/app.js"></script>
+
+<script>
+jQuery(document).ready(function($) {
+
+	$('.owl-carousel').owlCarousel({
+		items:1,
+		loop:true,
+		navigation:true,
+		merge: true,
+		margin:10,
+		responsive:{	
+			480:{
+				items:2,
+				navigation:false,
+
+			},
+
+			678:{
+				items:4,
+				center:true
+			},
+
+			960:{
+				items:5,
+				margin:20,
+				center:false
+
+			},
+
+			1200:{
+				items:6,
+				loop:false,
+				margin: 30,
+				merge: false,
+			}
+		}
+	});
+});
+
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,60 @@
+
+
+body{
+}
+
+h1{
+	//color: #00A8C6;
+
+}
+
+pre {
+	display: block;
+	font-family: monospace;
+	overflow: hidden;
+}
+code.hljs {
+	padding: 1em 2em 2em 2em;
+	font-size: 1.1em;
+	line-height: 1.2
+}
+
+.content{
+	margin-top: 6em
+}
+.margin-top{
+	margin-top: 4em;
+}
+.footer{
+	padding-top: 30px;
+}
+.code{
+	background: #23241f;
+}
+
+.demos-buttons{
+	
+}
+
+/* demos */
+.article{
+	background: #008cba;
+	height: 180px;
+	padding: 10px;
+}
+
+.article-video{
+	height: 180px;
+}
+
+.article h2{
+	color: #FFF;
+}
+
+.article p{
+	color: #FFF;
+}
+
+.video-demo .article-video{
+	height: 300px;
+}

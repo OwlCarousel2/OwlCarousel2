@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Owl Carousel 2.0.0-beta.0.1</title>
+	<link rel="stylesheet" href="assets/css/foundation.min.css" />
+	<link rel="stylesheet" href="owlcarousel/owl.carousel.css">
+	<link rel="stylesheet" href="assets/js/highlight/styles/monokai_sublime.css">
+	<link rel="stylesheet" href="assets/css/demo.css">
+	
+</head>
+<body>
+<div class="header">
+	<div class="row">
+	  <div class="large-12 columns">
+		<h1>Owl Carousel <small>v2.0.0-beta.0.1</span></small></h1>
+		<p>Please note that this is an beta version only for testing purposes. Enjoy!</p>
+		<a href="#" class="button tiny secondary">Download From GitHub</a>
+	  </div>
+	</div>
+</div>
+<div class="row margin-top">
+	<div class="large-12 columns">
+		<div class="owl-carousel">
+
+			<div class="article"><h2>1</h2></div>
+			<div class="article"><h2>2</h2></div>
+			<div class="article"><h2>3</h2></div>
+			<div class="article" data-merge="2"><h2>4</h2><p>Merged Columns</p></div>
+			<div class="article"><h2>6</h2><p>YouTube/Vimeo Supported.</p></div>
+			<div class="article-video" data-merge="2"><a class="owl-video" href="https://www.youtube.com/watch?v=5v4fpOvc0E8"></a></div>
+			<div class="article"><h2>8</h2><p>Fetching video thumbnails and lazyLoad</p></div>
+			<div class="article-video"><a class="owl-video" href="https://www.youtube.com/watch?v=igHACewkX-I"></a></div>
+			<div class="article"><h2>9</h2></div>
+			<div class="article"><h2>10</h2></div>
+			<div class="article"><h2>11</h2></div>
+			<div class="article" data-merge="2"><h2>13</h2></div>
+		</div>
+	</div>
+</div>
+
+<div class="content">
+	<div class="code">
+		<div class="row margin-top">
+			<div class="large-12 columns">
+	<pre><code>
+//Javascript
+$('.owl-carousel').owlCarousel({
+	items: 1,
+	loop: true,
+	margin: 10,
+	lazyLoad: true,
+	merge: true, 
+	video: true,
+	responsive: {	
+		480:{
+			items:2
+		},
+
+		678:{
+			items:2,
+		},
+
+		960:{
+			items:5,
+		}
+	}
+});
+	</code></pre>
+			</div>
+		</div>
+	</div>
+	<div class="row margin-top">
+		<div class="large-12 columns">
+			<h3>New features</h3>
+			<hr>
+			<ul>
+				<li>Brand new code</li>
+				<li>Infinity Loop</li>
+				<li>Center item</li>
+				<li>Smart Speed</li>
+				<li>Stage Padding</li>
+				<li>Item Margin</li>
+				<li>Ability to make almost all option responsive</li>
+				<li>Various Widths</li>
+				<li>Callback Events</li>
+				<li>YouTube/Vimeo support (fetching thumbnails as well)</li>
+				<li>Fixed click delegation issues</li>
+				<li>Anchors navigation</li>
+				<li>Smart Speed</li>
+				<li>Merged Items</li>
+				<li>More to come...</li>
+
+			</ul>
+
+			<h3>To do</h3>
+			<hr>
+			<ul>
+				<li>JSON features</li>
+				<li>Zepto Compatibility (problem with $.data object)</li>
+				<li>Clean the code</li>
+				<li>Inprove CSS</li>
+				<li>Create new Theme</li>
+				<li>Slide by page</li>
+				<li>Mobile performance boost</li>
+				<li>Fix Autoplay</li>
+				<li>Fade transition</li>
+				<li>RTL</li>
+				<li>Video Names</li>
+			</ul>
+
+		</div>
+	</div>
+	<div class="demos-buttons">
+		<div class="row">
+			<div class="large-12 columns">
+				<h3>Demos:</h3>
+				<hr>
+				<a href="demos/responsiveoptions.html" class="button">Responsive options</a>
+				<a href="demos/center.html" class="button">Center</a>
+				<a href="demos/lazyload.html" class="button">Lazy Load</a>
+				<a href="demos/merge.html" class="button">Merge</a>
+				<a href="demos/autowidth.html" class="button">Auto Width</a>
+				<a href="demos/videos.html" class="button">Videos</a>
+				<a href="#" class="button">Smart Speed - to do</a>
+				<a href="#" class="button">Callbacks - to do</a>
+			</div>
+		</div>
+	</div>
+
+	<div class="row margin-top">
+		<div class="large-12 columns">
+		<h3>Instalation:</h3>
+		</div>
+	</div>
+
+	<div class="code">
+		<div class="row ">
+			<div class="large-12 columns">
+	<pre><code>
+&lt;!-- Important Owl stylesheet --&gt;
+&lt;link rel="stylesheet" href="owlcarousel/owl.carousel.css"&gt;
+
+&lt;!-- jQuery 1.7+  --&gt;
+&lt;script src="jquery-1.11.0.min.js"&gt;&lt;/script&gt;
+
+&lt;!-- Include js plugin --&gt;
+&lt;script src="assets/owlcarousel/owl.carousel.js"&gt;&lt;/script&gt;
+
+&lt;!-- Set up your HTML --&gt;
+&lt;!-- You don't need any special markup. All you need is to wrap your divs(owl works with any type element) inside the container element &lt;div class="owl-carousel"&gt;. Class "owl-carousel" is mandatory to apply proper styles that come from owl.carousel.css file. --&gt;
+&lt;div id="owl-example" class="owl-carousel"&gt;
+  &lt;div&gt; Your Content &lt;/div&gt;
+  &lt;div&gt; Your Content &lt;/div&gt;
+  &lt;div&gt; Your Content &lt;/div&gt;
+  &lt;div&gt; Your Content &lt;/div&gt;
+  &lt;div&gt; Your Content &lt;/div&gt;
+  &lt;div&gt; Your Content &lt;/div&gt;
+  &lt;div&gt; Your Content &lt;/div&gt;
+  ...
+&lt;/div&gt;
+
+&lt;!-- Call the plugin --&gt;
+&lt;script&gt;
+$(document).ready(function(){
+  $("#owl-example").owlCarousel();
+});
+&lt;/script&gt;
+	</code></pre>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="row margin-top">
+		<div class="large-12 columns">
+		<h3>Options:</h3>
+		<hr>
+<table>
+				<thead>
+					<tr>
+						<th width="200">Option Name</th>
+						<th>Default</th>
+						<th>Type</th>
+						<th width="500">Description</th>
+						<th>status</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>items</td>
+						<td>3</td>
+						<td>Int</td>
+						<td>How many items you want to see on screen</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>loop</td>
+						<td>false</td>
+						<td>Boolean</td>
+						<td>Inifnity loop</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>center</td>
+						<td>false</td>
+						<td>Boolean</td>
+						<td>Center item. Add .owl-center class</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>lazyLoad</td>
+						<td>false</td>
+						<td>Boolean</td>
+						<td>Lazy load images. data-src and data-src-retina for highres</td>
+						<td></td>
+					</tr>
+
+					<tr>
+						<td>mouseDrag</td>
+						<td>true</td>
+						<td>Boolean</td>
+						<td>Mouse drag enabled</td>
+						<td></td>
+					</tr>
+
+					<tr>
+						<td>touchDrag</td>
+						<td>true</td>
+						<td>Boolean</td>
+						<td>Touch drag enabled</td>
+						<td></td>
+					</tr>
+
+					<tr>
+						<td>margin</td>
+						<td>0</td>
+						<td>Int</td>
+						<td>margin-right(px) on item. </td>
+						<td></td>
+					</tr>
+
+					<tr>
+						<td>stagePadding</td>
+						<td>0</td>
+						<td>Int</td>
+						<td>Padding left and right on stage (can see neighbours).</td>
+						<td></td>
+					</tr>
+
+					<tr>
+						<td>merge</td>
+						<td>false</td>
+						<td>Boolean</td>
+						<td>Merge items. Looking for data-merge="{number}" inside item.</td>
+						<td></td>
+					</tr>
+
+					<tr>
+						<td>mergeFit</td>
+						<td>true</td>
+						<td>Boolean</td>
+						<td>Fit merged items if screen is smaller than items value.</td>
+						<td></td>
+					</tr>
+
+					<tr>
+						<td>autoWidth</td>
+						<td>false</td>
+						<td>Boolean</td>
+						<td>Set non grid content. Try using width style on divs.</td>
+						<td><span class="label alert">Needs test</span></td>
+					</tr>
+
+					<tr>
+						<td>startPosition</td>
+						<td>0</td>
+						<td>Int/string</td>
+						<td>Start position or URL Hash string like '#id'</td>
+						<td><span class="label secondary">Needs test</span></td>
+					</tr>
+
+					<tr>
+						<td>navigation</td>
+						<td>false</td>
+						<td>Boolean</td>
+						<td></td>
+						<td></td>
+					</tr>
+
+					<tr>
+						<td>navText</td>
+						<td>['&#10094;','&#10095;']</td>
+						<td>array</td>
+						<td>Navigation HTML symbols. HTML allowed.</td>
+						<td></td>
+					</tr>
+
+					<tr>
+						<td>slideBy</td>
+						<td>1</td>
+						<td>Int</td>
+						<td>Navigation slide by x</td>
+						<td><span class="label secondary">Needs test</span></td>
+					</tr>
+				
+					<tr>
+						<td>pagination</td>
+						<td>true</td>
+						<td>Boolean</td>
+						<td></td>
+						<td></td>
+					</tr>
+
+					<tr>
+						<td>paginationEach</td>
+						<td>false</td>
+						<td>Int/Boolean</td>
+						<td>Show dots each x item</td>
+						<td></td>
+					</tr>
+
+					<tr>
+						<td>dotsName</td>
+						<td>false</td>
+						<td>String/Boolean</td>
+						<td>Show dots each x item</td>
+						<td><span class="label alert">To finish</span></td>
+					</tr>
+
+					<tr>
+						<td>URLhashListener</td>
+						<td>false</td>
+						<td>Boolean</td>
+						<td></td>
+						<td><span class="label secondary">To test</span></td>
+					</tr>
+
+					<tr>
+						<td>autoplay</td>
+						<td>false</td>
+						<td>Boolean</td>
+						<td>Autoplay</td>
+						<td><span class="label alert">To finish</span></td>
+					</tr>
+
+					<tr>
+						<td>autoplayTimeout</td>
+						<td>5000</td>
+						<td>Int</td>
+						<td>Autoplay interval timout</td>
+						<td></td>
+					</tr> 
+
+					<tr>
+						<td>autoplayHoverPause</td>
+						<td>false</td>
+						<td>Boolean</td>
+						<td>Pause on hover</td>
+						<td></td>
+					</tr> 
+
+					<tr>
+						<td>smartSpeed</td>
+						<td>250</td>
+						<td>Int</td>
+						<td>Speed Calculate. More info to come...</td>
+						<td></td>
+					</tr>
+
+					<tr>
+						<td>fluidSpeed</td>
+						<td>false</td>
+						<td>Int</td>
+						<td>Speed Calculate. More info to come...</td>
+						<td><span class="label alert">To finish</span></td>			
+					</tr>
+
+					<tr>
+						<td>autoplaySpeed</td>
+						<td>false</td>
+						<td>Int/Boolean</td>
+						<td>autoplay speed</td>
+						<td></td>
+					</tr>
+
+					<tr>
+						<td>naviSpeed</td>
+						<td>false</td>
+						<td>Int/Boolean</td>
+						<td>Navigation speed</td>
+						<td></td>
+					</tr>
+
+					<tr>
+						<td>paginationSpeed</td>
+						<td>false</td>
+						<td>Int/Boolean</td>
+						<td>Pagination speed</td>
+						<td></td>
+					</tr>
+
+					<tr>
+						<td>dragEndSpeed</td>
+						<td>false</td>
+						<td>Int/Boolean</td>
+						<td>Drag end speed</td>
+						<td></td>
+					</tr>
+
+					<tr>
+						<td>callbacks</td>
+						<td>false</td>
+						<td>Boolean</td>
+						<td>Enable callbacks</td>
+						<td></td>
+					</tr>
+
+					<tr>
+						<td>responsive</td>
+						<td>empty object</td>
+						<td>object</td>
+						<td>Object containing responsive options</td>
+						<td></td>
+					</tr>
+
+					<tr>
+						<td>responsiveRefreshRate</td>
+						<td>200</td>
+						<td>Int</td>
+						<td>Responsive refresh rate</td>
+						<td></td>
+					</tr>
+
+					<tr>
+						<td>responsiveBaseElement</td>
+						<td>window</td>
+						<td>DOM element</td>
+						<td>Set on any DOM wrapper</td>
+						<td></td>
+					</tr>
+
+					<tr>
+						<td>video</td>
+						<td>false</td>
+						<td>Boolean</td>
+						<td>Enable fetching YouTube/Vimeo videos</td>
+						<td></td>
+					</tr>
+
+					<tr>
+						<td>videoHeight</td>
+						<td>false</td>
+						<td>Int/Boolean</td>
+						<td>Set height for videos</td>
+						<td></td>
+					</tr>
+
+					<tr>
+						<td>videoWidth</td>
+						<td>false</td>
+						<td>Int/Boolean</td>
+						<td>Set width for videos</td>
+						<td></td>
+					</tr>
+
+					<tr>
+						<td>mobileBoost</td>
+						<td>false</td>
+						<td>Boolean</td>
+						<td>Boost performance on mobiles</td>
+						<td></td>
+					</tr>
+
+					<tr>
+						<td>fallbackEasing</td>
+						<td>'swing'</td>
+						<td>string</td>
+						<td>Ease for CSS2 $.animate</td>
+						<td></td>
+					</tr>
+
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td>Many more options for custom clases</td>
+						<td></td>
+					</tr>
+
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<div class="row margin-top">
+		<div class="large-12 columns">
+			<h3>Callbacks and events:</h3>
+
+<pre><code>
+Callback events list:
+
+'onBeforeInit'
+'onAfterInit'
+'onBeforeResponsive'
+'onAfterResponsive'
+'onAnimationStart'
+'onAnimationEnd'
+'onStartTouch'
+'onEndTouch'
+'onChange'
+'onLazyLoaded'
+'onPlayVideo'
+'onStopVideo'
+
+//to do
+'onPlay'
+'onStop'
+
+Custom events list:
+
+'owl.next'
+'owl.prev'
+'owl.goTo'
+'owl.jumpTo'
+'owl.addItem'
+'owl.removeItem'
+'owl.refresh'
+'owl.play'
+'owl.stop'
+'owl.stopVideo'
+
+</code></pre>
+
+		</div>
+	</div>
+<div class="row margin-top">
+	<div class="large-12 columns">
+	<h3>Notes:</h3>
+	<hr>
+	<p>Tested on IE7/8/9/10, Latest Chrome and FF. Latest Android and iOS7. <br>
+		Sorry for any typos in documentation. This is just a early demo and will try to fix everything in a time.
+
+	</p>
+	</div>
+</div>
+
+</div>	
+<div class="footer">
+	<div class="row margin-top">
+		<div class="large-12 columns">
+			<hr>
+			<p>Bartosz Wojciechowski 2014. <a href="mailto:owl@owlgraphic.com">owl@owlgraphic.com</a></p>
+		</div>
+	</div>
+</div>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="owlcarousel/owl.carousel.js"></script>
+<script src="assets/js/highlight/highlight.pack.js"></script>
+<script src="assets/js/app.js"></script>
+
+<script>
+jQuery(document).ready(function($) {
+
+	$('.owl-carousel').owlCarousel({
+		items:1,
+		loop:true,
+		margin:10,
+		lazyLoad:true, //in this example only applied on video thumbnails
+		merge: true, 
+		video: true,
+		responsive:{	
+			480:{
+				items:2
+			},
+
+			678:{
+				items:2
+			},
+
+			960:{
+				items:5
+			}
+		}
+	});
+});
+</script>
+
+
+</body>
+</html>

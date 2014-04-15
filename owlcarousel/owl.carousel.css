@@ -1,0 +1,213 @@
+/* 
+ * 	Core Phenix Carousel CSS File
+ *	v2.0.0
+ */
+
+/* clearfix */
+.owl-carousel .owl-wrapper:after {
+	content: ".";
+	display: block;
+	clear: both;
+	visibility: hidden;
+	line-height: 0;
+	height: 0;
+}
+
+.owl-carousel{
+	display: none;
+	width: 100%;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	/* position relative and z-index fix webkit rendering fonts issue */
+	position: relative;
+	z-index:1;
+}
+
+.owl-carousel .owl-wrapper{
+	position: relative;
+	-ms-touch-action: pan-Y;
+}
+
+.owl-carousel .owl-wrapper-outer{
+	position:relative;
+	overflow: hidden;
+}
+
+.owl-carousel .owl-wrapper-outer.owl-height{
+	-webkit-transition: height 200ms ease-in-out;
+	-moz-transition: height 200ms ease-in-out;
+	-ms-transition: height 200ms ease-in-out;
+	-o-transition: height 200ms ease-in-out;
+	transition: height 200ms ease-in-out;
+}
+
+.owl-carousel .owl-video-wrapper{
+	position: relative;
+	height: 100%;
+	background: #000;
+}
+
+.owl-carousel .owl-video-play-icon{
+	position:absolute;
+	height: 80px;
+	width: 80px;
+	left: 50%;
+	top: 50%;
+	margin-left: -40px;
+	margin-top: -40px;
+	background: url('owl-video-play.png') no-repeat;
+	cursor: pointer;
+	z-index: 1;
+	-webkit-backface-visibility: hidden;
+	transition-property: scale;
+	transition-duration: 100ms;
+	transition-timing-function: ease;
+}
+
+.owl-carousel .owl-video-play-icon:hover{
+	-moz-transform: scale(1.3, 1.3);
+	-ms-transform: scale(1.3, 1.3);
+	-o-transform: scale(1.3, 1.3);
+	-webkit-transform: scale(1.3, 1.3);
+	transform: scale(1.3, 1.3);
+}
+.owl-carousel .owl-video-playing .owl-video-tn,
+.owl-carousel .owl-video-playing .owl-video-play-icon{
+	display: none;
+}
+.owl-carousel .owl-video-tn {
+	opacity: 0;
+	height: 100%;
+	background-position: center center;
+	background-repeat: no-repeat;
+
+	-webkit-background-size: contain;
+	-moz-background-size: contain;
+	-o-background-size: contain;
+	background-size: contain;
+
+	transition-property: opacity;
+  	transition-duration: 400ms;
+  	transition-timing-function: ease;
+}
+
+.owl-carousel .owl-video-frame{
+	position: relative;
+	z-index: 1;
+}
+
+.owl-carousel .owl-refresh .owl-item{
+	display: none;
+}
+
+.owl-carousel .owl-item{
+	position:relative;
+	min-height: 1px;
+	float: left;
+	opacity:1;
+	-webkit-backface-visibility: hidden;
+	-webkit-tap-highlight-color: rgba(0,0,0,0); 
+	-webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.owl-carousel .owl-grab {
+	cursor: move;
+	cursor: -webkit-grab;
+	cursor: -o-grab;
+	cursor: -ms-grab;
+	cursor: grab;
+}
+
+
+/* Sample theme */
+
+.owl-theme .owl-controls{
+	margin-top: 10px;
+	text-align: center;
+	text-align: center;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+
+/* Styling Next and Prev buttons */
+.owl-theme .owl-controls .owl-nav div{
+	color: #FFF;
+	display: inline-block;
+	zoom: 1;
+	opacity: .5;
+	*display: inline;/*IE7 life-saver */
+	margin: 5px;
+	padding: 4px 7px;
+	font-size: 12px;
+	-webkit-border-radius: 30px;
+	-moz-border-radius: 30px;
+	border-radius: 30px;
+	background: #869791;
+	cursor: pointer
+}
+
+/* Clickable class fix problem with hover on touch devices */
+/* Use it for non-touch hover action */
+.owl-theme .owl-controls .owl-nav div:hover{
+	filter: Alpha(Opacity=100);/*IE7 fix*/
+	opacity: 1;
+	text-decoration: none;
+}
+
+/* Styling Pagination*/
+.owl-theme .owl-pagination .owl-dot{
+	display: inline-block;
+	zoom: 1;
+	*display: inline;/*IE7 life-saver */
+}
+.owl-theme .owl-pagination .owl-dot span{
+	display: block;
+	width: 10px;
+	height: 10px;
+	margin: 5px 7px;
+	filter: Alpha(Opacity=50);/*IE7 fix*/
+	opacity: 0.5;
+	-webkit-border-radius: 20px;
+	-moz-border-radius: 20px;
+	border-radius: 20px;
+	background: #869791;
+}
+.owl-theme .owl-pagination .owl-dot.active span,
+.owl-theme .owl-pagination .owl-dot:hover span{
+	filter: Alpha(Opacity=100);/*IE7 fix*/
+	opacity: 1;
+}
+
+/* to do */
+.owl-carousel .owl-wrapper.backfacefix .owl-item{
+	-webkit-backface-visibility: hidden;
+}
+
+.owl-carousel .owl-mobile .owl-item.active{
+	opacity: 1;
+}
+.owl-carousel .owl-mobile .owl-item{
+	opacity: 0;
+}
+
+.owl-carousel .owl-item img.owl-lazy{
+
+	opacity: 0;
+}
+
+.owl-carousel .owl-item img{
+	display: block;
+	width: 100%;
+	transition-property: opacity;
+  	transition-duration: 400ms;
+  	transition-timing-function: ease;
+}
