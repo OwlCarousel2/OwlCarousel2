@@ -51,8 +51,17 @@ code.hljs {
 .video-demo .article-video{
 	height: 300px;
 }
+.owl-carousel .owl-video-tn {
+	opacity: 0;
+	height: 100%;
+	background-position: center center;
+	background-repeat: no-repeat;
 
-
+	-webkit-background-size: initial;
+	-moz-background-size: initial;
+	-o-background-size: initial;
+	background-size: initial;
+}
 
 
 

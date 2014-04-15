@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Owl Carousel 2.0.0-beta - Auto Width demo</title>
+	<title>Owl Carousel 2.0.0-beta - Autoplay demo</title>
 	<link rel="stylesheet" href="../assets/css/foundation.min.css" />
 	<link rel="stylesheet" href="../owlcarousel/owl.carousel.css">
 	<link rel="stylesheet" href="../assets/js/highlight/styles/monokai_sublime.css">
@@ -14,7 +14,7 @@
 <div class="header">
 	<div class="row">
 	  <div class="large-12 columns">
-		<h1>Auto Width.</h1>
+		<h1>Autoplay.</h1>
 	  </div>
 	</div>
 </div>
@@ -24,21 +24,23 @@
 		<div class="large-12 columns">
 
 			<div class="owl-carousel">
-				<div class="article" style="width:300px"><h2>1</h2></div>
-				<div class="article" style="width:200px"><h2>2</h2></div>
-				<div class="article" style="width:500px"><h2>3</h2></div>
-				<div class="article" style="width:100px"><h2>4</h2></div>
-				<div class="article" style="width:50px"><h2>6</h2></div>
-				<div class="article" style="width:250px"><h2>7</h2></div>
-				<div class="article" style="width:120px"><h2>8</h2></div>
-				<div class="article" style="width:420px"><h2>9</h2></div>
-				<div class="article" style="width:120px"><h2>10</h2></div>
-				<div class="article" style="width:300px"><h2>11</h2></div>
-				<div class="article" style="width:450px"><h2>12</h2></div>
-				<div class="article" style="width:220px"><h2>13</h2></div>
-				<div class="article" style="width:150px"><h2>14</h2></div>
-				<div class="article" style="width:600px"><h2>15</h2></div>
+				<div class="article" ><h2>1</h2></div>
+				<div class="article" ><h2>2</h2></div>
+				<div class="article" ><h2>3</h2></div>
+				<div class="article" ><h2>4</h2></div>
+				<div class="article" ><h2>6</h2></div>
+				<div class="article" ><h2>7</h2></div>
+				<div class="article" ><h2>8</h2></div>
+				<div class="article" ><h2>9</h2></div>
+				<div class="article" ><h2>10</h2></div>
+				<div class="article" ><h2>11</h2></div>
+				<div class="article" ><h2>12</h2></div>
+				<div class="article" ><h2>13</h2></div>
+				<div class="article" ><h2>14</h2></div>
+				<div class="article" ><h2>15</h2></div>
 			</div>
+			<a class="button secondary play">Play</a>
+			<a class="button secondary stop">Stop</a>
 
 		</div>
 	</div>
@@ -48,7 +50,8 @@
 	<div class="row margin-top">
 		<div class="large-12 columns">
 			<h4>Descriptons</h4>
-			<p>Still in progress. Use width style on elements for desireable result. If using with infinity loop add option 'items' more than 1. Its all depend from your content width. </p>
+			<p>Example of custom event triggerd by buttons for play and stop. 'owl.play' event has two properties: autoplayTimeout and autplaySpeed. <br>
+				owl.play event notation is owl.trigger('owl.play',[ autoplayTimeout, autoplaySpeed ]) </p>
 		</div>
 	</div>
 
@@ -58,12 +61,24 @@
 	<pre><code>
 //Javascript
 
-$('.owl-carousel').owlCarousel({
+var owl = $('.owl-carousel'); // save reference to variable
+
+owl.owlCarousel({
 	items:4,
-	autoWidth:true,
 	loop:true,
-	margin:10
+	margin:10,
+	//autoplay:true,
+	//autoplayTimeout:1000,
+	autoplayHoverPause:true
 });
+
+$('.play').on('click',function(){
+	owl.trigger('owl.play',1000)
+})
+
+$('.stop').on('click',function(){
+	owl.trigger('owl.stop')
+})
 
 	</code></pre>
 			</div>
@@ -84,6 +99,7 @@ $('.owl-carousel').owlCarousel({
 				<a href="autoplay.html" class="button">Autoplay</a>
 				<a href="" class="button">Smart Speed - to do</a>
 				<a href="" class="button">Callbacks - to do</a>
+
 			</div>
 		</div>
 	</div>
@@ -105,12 +121,23 @@ $('.owl-carousel').owlCarousel({
 <script>
 jQuery(document).ready(function($) {
 
-	$('.owl-carousel').owlCarousel({
+	var owl = $('.owl-carousel');
+	owl.owlCarousel({
 		items:4,
-		autoWidth:true,
 		loop:true,
-		margin:10
+		margin:10,
+		//autoplay:true,
+		//autoplayTimeout:1000,
+		autoplayHoverPause:true
 	});
+
+	$('.play').on('click',function(){
+		owl.trigger('owl.play',1000)
+	})
+
+	$('.stop').on('click',function(){
+		owl.trigger('owl.stop')
+	})
 
 });
 

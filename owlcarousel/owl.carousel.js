@@ -233,8 +233,8 @@ Custom events list:
 		_responsiveCall:null,
 		_goToLoop:		null,
 		_checkVisibile: null,
-		_autoplayInterval:null,
 		_autoplay:		null,
+		_pause:			null,
 		_play:			null,
 		_stop:			null
 	};
@@ -562,7 +562,7 @@ Custom events list:
 	 * @desc Fill empty item container with provided content
 	 * @since 2.0.0
 	 * @param [content] - string/$dom - passed owl-item
-	 * @param [cloneObj] -  -passed clone item
+	 * @param [i] - index in jquery object
 	 * return $ new object
 	 */
 
@@ -575,9 +575,17 @@ Custom events list:
 		return $(emptyItem).append(c);
 	};
 
-	Owl.prototype.traversContent = function(content){
+	/**
+	 * traversContent
+	 * @desc find name for pagination text
+	 * @since 2.0.0
+	 * @param [c] - content
+	 * return $ data attribute
+	 */
+
+	Owl.prototype.traversContent = function(c){
 		if(this.options.dotsName){
-			return content.getAttribute('data-dotname');
+			return c.getAttribute('data-dotname');
 		}
 	}
 
@@ -726,7 +734,7 @@ Custom events list:
 			addThumbnail(path);
 		} else 
 		if(info.type === 'vimeo'){
-			 $.ajax({
+			$.ajax({
 				type:'GET',
 				url: 'http://vimeo.com/api/v2/video/' + info.id + '.json',
 				jsonp: 'callback',
@@ -805,10 +813,6 @@ Custom events list:
 
 			// fill 'owl-item' with content 
 			var item = this.fillItem(content,i);
-
-			// set item index 
-			//item.data('owl-item').index = i;
-			//item.data('owl-item').indexAbs = i;
 
 			// append into wrp 
 			this.dom.$wrp.append(item);
@@ -1307,9 +1311,9 @@ Custom events list:
 		this.e._preventClick =	function(e){this.preventClick(e);		}.bind(this);
 		this.e._goToHash =		function(){this.goToHash();				}.bind(this);
 		this.e._goToPage =		function(e){this.goToPage(e);			}.bind(this);
-		this.e._autoplay = 		function(){this.autoplay();				}.bind(this);
+		this.e._ap = 			function(){this.autoplay();					}.bind(this);
 		this.e._play = 			function(){this.play();					}.bind(this);
-		this.e._stop = 			function(){this.stop();					}.bind(this);
+		this.e._pause = 		function(){this.pause();					}.bind(this);
 		this.e._playVideo = 	function(e){this.playVideo(e);			}.bind(this);
 	};
 
@@ -1323,8 +1327,7 @@ Custom events list:
 		if(this.windowWidth() === this.width.prevWindow){
 			return false;
 		}
-
-		window.clearInterval(this.e._autoplayInterval);
+		window.clearInterval(this.e._autoplay);
 		window.clearTimeout(this.resizeTimer);
 		this.resizeTimer = window.setTimeout(this.e._responsiveCall, this.options.responsiveRefreshRate);
 		this.width.prevWindow = this.windowWidth();
@@ -1369,8 +1372,8 @@ Custom events list:
 
 		if(this.options.autoplayHoverPause){
 			var that = this;
-			this.dom.$wrp.on("mouseover", this.e._stop )
-			this.dom.$wrp.on("mouseleave", this.e._autoplay )
+			this.dom.$wrp.on("mouseover", this.e._pause )
+			this.dom.$wrp.on("mouseleave", this.e._ap )
 		}
 		
 		if(this.options.navigation){
@@ -1680,7 +1683,10 @@ Custom events list:
 		var posX = this.pos.wrp = pos,
 			style = this.dom.wrp.style;
 
-		this.state.inMotion = true;
+		// if speed is 0 the set inMotion to false
+		if(this.speed.current !== 0){
+			this.state.inMotion = true;
+		}
 
 		if(this.support3d){
 			translate = 'translate3d(' + posX + 'px'+',0px, 0px)';
@@ -1778,7 +1784,6 @@ Custom events list:
 		} else{
 			this.speed.css2speed = s;
 		}
-
 		this.speed.current = s;
 		return s;
 	};
@@ -1929,33 +1934,46 @@ Custom events list:
 	};
 
 	/**
-	 * play
-	 * Also update status
+	 * Autoplay
 	 * @since 2.0.0
 	 */
 
 	Owl.prototype.autoplay = function(){
 		if(this.options.autoplay && !this.state.videoPlay){
-			window.clearInterval(this.e._autoplayInterval);
-			this.e._autoplayInterval = window.setInterval(this.e._play, this.options.autoplayTimeout);
+			window.clearInterval(this.e._autoplay);
+			this.e._autoplay = window.setInterval(this.e._play, this.options.autoplayTimeout);
 		} else {
+			window.clearInterval(this.e._autoplay);
 			this.state.autoplay=false;
-			window.clearInterval(this.e._autoplayInterval);
 		}
 	};
 
-	Owl.prototype.play = function(){
+	/**
+	 * play
+	 * @param [timeout] - Integrer
+	 * @param [speed] - Integrer
+	 * @since 2.0.0
+	 */
+
+	Owl.prototype.play = function(timeout, speed){
 
 		// if tab is inactive - doesnt work in <IE10
 		if(this.browser.isPageHidden() === true){return false;}
 
-		if(this.options.autoplay === false || this.state.isTouch || this.state.isScrolling || this.state.isSwiping){
-			window.clearInterval(this.e._autoplayInterval);
+		// overwrite default options (custom options are always priority)
+		if(!this.options.autoplay){
+			this._options.autoplay = this.options.autoplay = true;
+			this._options.autoplayTimeout = this.options.autoplayTimeout = timeout || this.options.autoplayTimeout || 4000;
+			this._options.autoplaySpeed = speed || this.options.autoplaySpeed;
+		}
+
+		if(this.options.autoplay === false || this.state.isTouch || this.state.isScrolling || this.state.isSwiping || this.state.inMotion){
+			window.clearInterval(this.e._autoplay);
 			return false;
 		}
 
 		if(!this.options.loop && this.pos.current >= this.pos.max){
-			window.clearInterval(this.e._autoplayInterval);
+			window.clearInterval(this.e._autoplay);
 			this.goTo(0);
 		} else {
 			this.next(this.options.autoplaySpeed);
@@ -1963,8 +1981,19 @@ Custom events list:
 		this.state.autoplay=true;
 	};
 
+	/**
+	 * stop
+	 * @since 2.0.0
+	 */
+
 	Owl.prototype.stop = function(){
-		window.clearInterval(this.e._autoplayInterval);
+		this._options.autoplay = this.options.autoplay = true;
+		this.state.autoplay = false;
+		window.clearInterval(this.e._autoplay);
+	};
+
+	Owl.prototype.pause = function(){
+		window.clearInterval(this.e._autoplay);
 	};
 
 	/**
@@ -2303,15 +2332,8 @@ Custom events list:
 		this.e.removeItem = function(e,p){this.removeItem(p);}.bind(this);
 		this.e.refresh = function(e){this.refresh();		}.bind(this);
 		this.e.stop = function(){this.stop();				}.bind(this);
-		this.e.play = function(e,s){
-			this._options.autoplay = this.options.autoplay = true;
-			this._options.autoplayInt = s || 5000
-			this.autoplay();
-		}.bind(this);
+		this.e.play = function(e,t,s){this.play(t,s);		}.bind(this);
 
-		//To do 
-		// -play and stop video on current item
-		
 		this.dom.$el.on('owl.next',this.e.next);
 		this.dom.$el.on('owl.prev',this.e.prev);
 		this.dom.$el.on('owl.goTo',this.e.goTo);
@@ -2322,6 +2344,7 @@ Custom events list:
 		this.dom.$el.on('owl.play',this.e.play);
 		this.dom.$el.on('owl.stop',this.e.stop);
 		this.dom.$el.on('owl.stopVideo',this.e.stop);
+	
 	};
 
 	/**
@@ -2560,7 +2583,7 @@ Custom events list:
 
 	Owl.prototype.destroy = function(){
 
-		window.clearInterval(this.e._autoplayInterval);
+		window.clearInterval(this.e._autoplay);
 
 		if(this.options.responsive !== false){
 			this.off(window, 'resize', this.e._resizer);
@@ -2595,7 +2618,7 @@ Custom events list:
 		}
 
 		this.dom.$el.off('owl.next',this.e.next);
-		this.dom.$el.off('owl.next',this.e.prev);
+		this.dom.$el.off('owl.prev',this.e.prev);
 		this.dom.$el.off('owl.goTo',this.e.goTo);
 		this.dom.$el.off('owl.jumpTo',this.e.jumpTo);
 		this.dom.$el.off('owl.addItem',this.e.addItem);
