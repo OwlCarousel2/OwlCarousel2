@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Owl Carousel 2.0.0-beta.0.1</title>
+	<title>Owl Carousel 2.0.0-beta.0.2</title>
 	<link rel="stylesheet" href="assets/css/foundation.min.css" />
 	<link rel="stylesheet" href="owlcarousel/owl.carousel.css">
 	<link rel="stylesheet" href="assets/js/highlight/styles/monokai_sublime.css">
@@ -53,17 +53,17 @@ $('.owl-carousel').owlCarousel({
 	lazyLoad: true,
 	merge: true, 
 	video: true,
-	responsive: {	
+	responsive:{	
 		480:{
 			items:2
 		},
 
 		678:{
-			items:2,
+			items:3
 		},
 
 		960:{
-			items:5,
+			items:5
 		}
 	}
 });
@@ -173,7 +173,7 @@ $(document).ready(function(){
 	</div>
 
 
-	<div class="row margin-top">
+	<div class="row show-for-medium-up margin-top">
 		<div class="large-12 columns">
 		<h3>Options:</h3>
 		<hr>
@@ -291,7 +291,7 @@ $(document).ready(function(){
 
 					<tr>
 						<td>navText</td>
-						<td>['&#10094;','&#10095;']</td>
+						<td>['next','prev']</td>
 						<td>array</td>
 						<td>Navigation HTML symbols. HTML allowed.</td>
 						<td></td>
@@ -325,7 +325,7 @@ $(document).ready(function(){
 						<td>dotsName</td>
 						<td>false</td>
 						<td>String/Boolean</td>
-						<td>Show dots each x item</td>
+						<td>Put item names into pagination dots</td>
 						<td><span class="label alert">To finish</span></td>
 					</tr>
 
@@ -539,7 +539,8 @@ Custom events list:
 	<div class="large-12 columns">
 	<h3>Notes:</h3>
 	<hr>
-	<p>Tested on IE7/8/9/10, Latest Chrome and FF. Latest Android and iOS7. <br>
+	<p>Owl Carousel 2 is not compatibile with previous iterations &lt;2 but has many in common. <br>
+		Tested on IE7/8/9/10, Latest Chrome and FF. Latest Android and iOS6/7. <br>
 		Sorry for any typos in documentation. This is just a early demo and will try to fix everything in a time.
 
 	</p>
@@ -577,7 +578,7 @@ jQuery(document).ready(function($) {
 			},
 
 			678:{
-				items:2
+				items:3
 			},
 
 			960:{

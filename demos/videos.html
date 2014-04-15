@@ -44,7 +44,7 @@
 		<div class="large-12 columns">
 			<h4>Descriptons</h4>
 			<p>Still in progress. Can use YouTube and Vimeo links. Lazy load on thumbnail works too. There are some additional option for widht and height - will make proper description later.</p>
-			<p>To add video into carousel just put &lt;a class="owl-video" href="_straight_URL_from_youtube_or_vimeo"&gt;&lt;/a&gt;.
+			<p>To add video into carousel just put &lt;a class="owl-video" href="_straight URL from youtube or vimeo"&gt;&lt;/a&gt;.
 			A tag is not mandatory. Can be any other tag but "owl-video" and href with url link is required.
 			</p>
 		</div>
@@ -65,6 +65,9 @@ $('.owl-carousel').owlCarousel({
 	lazyLoad:true,
 	center:true,
 	responsive:{
+		480:{
+			items:2
+		},
 		600:{
 			items:4
 		}
@@ -119,6 +122,9 @@ jQuery(document).ready(function($) {
 		lazyLoad:true,
 		center:true,
 		responsive:{
+			480:{
+				items:2
+			},
 			600:{
 				items:4
 			}

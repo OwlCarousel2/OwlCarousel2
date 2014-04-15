@@ -1,11 +1,5 @@
-
-
-body{
-}
-
 h1{
 	//color: #00A8C6;
-
 }
 
 pre {
@@ -18,7 +12,6 @@ code.hljs {
 	font-size: 1.1em;
 	line-height: 1.2
 }
-
 .content{
 	margin-top: 6em
 }
@@ -58,3 +51,12 @@ code.hljs {
 .video-demo .article-video{
 	height: 300px;
 }
+
+
+
+
+
+
+
+
+

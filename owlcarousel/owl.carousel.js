@@ -4,7 +4,7 @@
  * @release 2014
  * Licensed under MIT
  * 
- * @version 2.0.0-beta.0.1
+ * @version 2.0.0-beta.0.2
  * @versionNotes Not compatibile with Owl Carousel <2.0.0
  */
 
@@ -76,7 +76,7 @@ Custom events list:
 
 		startPosition:		0,
 		navigation: 		false,
-		navText: 			['&#10094;','&#10095;'],
+		navText: 			['next','prev'],
 		slideBy:			1,
 		pagination: 		true,
 		paginationEach:		false,
@@ -311,6 +311,7 @@ Custom events list:
 		// Check support 
 		this.support3d = 			this.browser.isTransform3d();
 		this.transformProperty =	this.browser.isTransformProperty();
+		this.state.orientation = 	window.orientation;
 
 		if(this.transformProperty !== false){
 			this.vendorName =  			this.transformProperty.replace(/Transform/i,'');
@@ -439,52 +440,6 @@ Custom events list:
 	        }
 		}
 	};
-
-
-
-
-	// /**
-	//  * sortOptions
-	//  * @desc Sort responsive sizes 
-	//  * @since 2.0.0
-	//  */
-
-	// Owl.prototype.sortOptions = function(){
-
-	// 	if(!(this.options.responsive instanceof Array) || this.options.responsive === false){return false;}
-
-	// 	this.responsiveSorted = [];
-	// 	this.responsiveSorted = this.options.responsive.sort(function (a, b) {
-	// 		return a.breakpoint - b.breakpoint;
-	// 	});
-	// };
-
-	// /**
-	//  * setResponsiveOptions
-	//  * @since 2.0.0
-	//  */
-
-	// Owl.prototype.setResponsiveOptions = function(){
-
-	// 	if(!(this.options.responsive instanceof Array) || this.options.responsive === false){return false;}
-
-	// 	var width = this.windowWidth();
-
-	// 	// overwrite non resposnive options
-	// 	for(var prop in this._options){
-	// 		if(prop !== "responsive"){
-	// 			this.options[prop] = this._options[prop];
-	// 		}
-	// 	}
-
-	// 	for (var i = 0; i < this.responsiveSorted.length; i += 1) {
-	// 		if (this.responsiveSorted[i].breakpoint <= width) {
-	// 			for(var prope in this.responsiveSorted[i].options){
-	// 				this.options[prope] = this.responsiveSorted[i].options[prope];
-	// 			}
-	// 		}
-	// 	}
-	// };
 
 	/**
 	 * optionsLogic
@@ -771,13 +726,19 @@ Custom events list:
 			addThumbnail(path);
 		} else 
 		if(info.type === 'vimeo'){
-			$.get('http://vimeo.com/api/v2/video/' + info.id + '.json', function(data) {
-	            var path = data[0].thumbnail_large;
-	            addThumbnail(path);
-	            if(that.options.loop){
-	            	that.refresh();
-	            }
-	        });
+			 $.ajax({
+				type:'GET',
+				url: 'http://vimeo.com/api/v2/video/' + info.id + '.json',
+				jsonp: 'callback',
+				dataType: 'jsonp',
+				success: function(data){
+					var path = data[0].thumbnail_large;
+					addThumbnail(path);
+					if(that.options.loop){
+						that.refresh();
+					}
+				}
+			});
 		}
 	}
 
@@ -1152,13 +1113,33 @@ Custom events list:
 		var elChanged = this.isElWidthChanged();
 		if(!elChanged){return false;}
 
-		if (document.webkitIsFullScreen || document.mozfullScreen) {
+		// if Vimeo Fullscreen mode
+		var fullscreenElement = document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement;
+		if(fullscreenElement){
+			if($(fullscreenElement.parentNode).hasClass('owl-video-frame')){
+				this.setSpeed(0);
+				this.state.isFullScreen = true;
+			}
+		}
+
+		if(fullscreenElement && this.state.isFullScreen && this.state.videoPlay){
 			return false;
 		}
+
+		// Comming back from fullscreen
+		if(this.state.isFullScreen){
+			this.state.isFullScreen = false;
+			return false;
+		}
+
 		// check full screen mode and window orientation
-		if ((!window.screenTop && !window.screenY) && window.orientation === undefined) {
-			return false;
+		if (this.state.videoPlay) {
+			if(this.state.orientation !== window.orientation){
+				this.state.orientation = window.orientation;
+				return false;
+			}
 		}
+
 		if(this.state.videoPlay){
 			this.stopVideo();
 		}
@@ -1226,6 +1207,8 @@ Custom events list:
 		this.autoplay();
 
 		this.autoHeight();
+
+		this.state.orientation = window.orientation;
 	};
 
 	/**
@@ -1716,10 +1699,7 @@ Custom events list:
 
 		// stopVideo 
 		if(this.state.videoPlay){
-			// dont stop if entered in full screen
-			//if (window.screenTop && window.screenY) {
 			this.stopVideo();
-			//}
 		}
 
 	};
