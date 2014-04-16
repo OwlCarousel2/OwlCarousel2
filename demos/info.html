@@ -119,24 +119,23 @@
 //Javascript
 
 $('.owl-carousel').owlCarousel({
-	items:4,
-	loop:true,
-	margin:10,
-	info: getInfo,
-	responsive:{
-		1200:{
-			items:6,
-			center:false
-		},
-		960:{
-			items:5,
-			center:true
-		},
-		600:{
-			items:3
-		}
+items:2,
+loop:true,
+margin:10,
+info: getInfo,
+responsive:{
+	600:{
+		items:3
+	},			
+	960:{
+		items:5,
+		center:true
+	},
+	1200:{
+		items:6,
+		center:false
 	}
-});
+}
 
 // Insert info into table
 function getInfo(i){
@@ -192,22 +191,23 @@ function getInfo(i){
 jQuery(document).ready(function($) {
 
 	$('.owl-carousel').owlCarousel({
-		items:4,
+		items:2,
 		loop:true,
 		margin:10,
 		info: getInfo,
 		responsive:{
-			1200:{
-				items:6,
-				center:false
-			},
+			600:{
+				items:3
+			},			
 			960:{
 				items:5,
 				center:true
 			},
-			600:{
-				items:3
+			1200:{
+				items:6,
+				center:false
 			}
+			
 		}
 	});
 
