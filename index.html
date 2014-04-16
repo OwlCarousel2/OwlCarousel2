@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Owl Carousel 2.0.0-beta.0.3</title>
+	<title>Owl Carousel 2.0.0-beta.0.4</title>
 	<link rel="stylesheet" href="assets/css/foundation.min.css" />
 	<link rel="stylesheet" href="owlcarousel/owl.carousel.css">
 	<link rel="stylesheet" href="assets/js/highlight/styles/monokai_sublime.css">
@@ -108,10 +108,10 @@ $('.owl-carousel').owlCarousel({
 				<li>Create new Theme</li>
 				<li>Slide by page</li>
 				<li>Mobile performance boost</li>
-				<li>Fix Autoplay</li>
 				<li>Fade transition</li>
 				<li>RTL</li>
 				<li>Video Names</li>
+				<li>Non JS support</li>
 			</ul>
 
 		</div>
@@ -128,8 +128,8 @@ $('.owl-carousel').owlCarousel({
 				<a href="demos/autowidth.html" class="button">Auto Width</a>
 				<a href="demos/videos.html" class="button">Videos</a>
 				<a href="demos/autoplay.html" class="button">Autoplay</a>
-				<a href="#" class="button">Smart Speed - to do</a>
-				<a href="#" class="button">Callbacks - to do</a>
+				<a href="demos/urlhash.html" class="button">URL hash navigation</a>
+				<a href="demos/info.html" class="button">Info callback</a>
 			</div>
 		</div>
 	</div>
@@ -283,7 +283,6 @@ $(document).ready(function(){
 						<td>0</td>
 						<td>Int/string</td>
 						<td>Start position or URL Hash string like '#id'</td>
-						<td><span class="label secondary">Needs test</span></td>
 					</tr>
 
 					<tr>
@@ -307,7 +306,7 @@ $(document).ready(function(){
 						<td>1</td>
 						<td>Int</td>
 						<td>Navigation slide by x</td>
-						<td><span class="label secondary">Needs test</span></td>
+						<td><span class="label alert">Needs test</span></td>
 					</tr>
 				
 					<tr>
@@ -339,7 +338,6 @@ $(document).ready(function(){
 						<td>false</td>
 						<td>Boolean</td>
 						<td></td>
-						<td><span class="label secondary">To test</span></td>
 					</tr>
 
 					<tr>
@@ -347,7 +345,6 @@ $(document).ready(function(){
 						<td>false</td>
 						<td>Boolean</td>
 						<td>Autoplay</td>
-						<td><span class="label alert">To finish</span></td>
 					</tr>
 
 					<tr>
@@ -486,6 +483,22 @@ $(document).ready(function(){
 						<td></td>
 					</tr>
 
+					<tr>
+						<td>info</td>
+						<td>false</td>
+						<td>function</td>
+						<td>Callback to retrieve basic information (current item/pages/widths)</td>
+						<td></td>
+					</tr>
+
+					<tr>
+						<td>createStucture</td>
+						<td>true</td>
+						<td>boolean</td>
+						<td>Create Owl DOM structures yourself!</td>
+						<td><span class="label alert">To do</span></td>
+					</tr>
+					
 					<tr>
 						<td></td>
 						<td></td>

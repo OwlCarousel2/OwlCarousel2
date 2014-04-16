@@ -4,7 +4,7 @@
  * @release 2014
  * Licensed under MIT
  * 
- * @version 2.0.0-beta.0.2
+ * @version 2.0.0-beta.0.4
  * @versionNotes Not compatibile with Owl Carousel <2.0.0
  */
 
@@ -106,7 +106,10 @@ Custom events list:
 		mobileBoost: 		false,
 		fallbackEasing:		'swing',
 
+		createStucture:		true,
+
 		//Classes and Names
+		clonedClasses:		false,
 		themeClass: 		'owl-theme',
 		baseClass:			'owl-carousel',
 		itemClass:			'owl-item',
@@ -179,7 +182,7 @@ Custom events list:
 		prev:		0,
 		current:	0,
 		currentAbs:	0,
-		currentPage:1,
+		currentPage:0,
 		wrp:		0,
 		items:		[]
 	};
@@ -246,8 +249,8 @@ Custom events list:
 		element.owlCarousel = {
 			'name':		'Owl Carousel',
 			'author':	'Bartosz Wojciechowski',
-			'version':	'2.0.0-beta.0.1',
-			'released':	'28.03.2014'
+			'version':	'2.0.0-beta.0.4',
+			'released':	'16.04.2014'
 		};
 
 		// Attach variables to object
@@ -266,7 +269,6 @@ Custom events list:
 
 		this.dom.el =		element;
 		this.dom.$el =		$(element);
-
 		this.init();
 	}
 
@@ -309,8 +311,8 @@ Custom events list:
 		}
 
 		// Check support 
-		this.support3d = 			this.browser.isTransform3d();
-		this.transformProperty =	this.browser.isTransformProperty();
+		this.support3d = 			isTransform3d();
+		this.transformProperty =	isTransformProperty();
 		this.state.orientation = 	window.orientation;
 
 		if(this.transformProperty !== false){
@@ -338,11 +340,13 @@ Custom events list:
 		// iOS safari likes to trigger unnecessary resize event
 		this.width.prevWindow = this.windowWidth();
 
-		// create wrp object
-		this.createWrp();
+		if(this.options.createStucture){
+			// create wrp object
+			this.createWrp();
 
-		// Append local content 
-		this.appendLocalItems();
+			// Append local content 
+			this.appendLocalItems();
+		}
 
 		// Check options
 		this.optionsLogic();
@@ -545,7 +549,8 @@ Custom events list:
 			page:		false,
 			hasVideo:	false,
 			playVideo:	false,
-			dotName:	dotName || false
+			dotName:	dotName || false,
+			hash:		false
 		};
 
 		// copy itemData to cloned item 
@@ -603,7 +608,14 @@ Custom events list:
 
 		// update index on original items
 		for(var k = 0; k<this.num.oItems; k++){
-			this.dom.$oItems.eq(k).data('owl-item').index = k;
+			var item = this.dom.$oItems.eq(k);
+			item.data('owl-item').index = k;
+
+			// update URL hash
+			if(this.options.URLhashListener){
+				var hash = item.find('[data-hash]').data('hash');
+				item.data('owl-item').hash = hash;
+			}
 		}
 
 	};
@@ -984,7 +996,6 @@ Custom events list:
 			if(this.options.center){
 				this.pos.items[i] -= (iWidth/2 );
 			}
-
 		}
 
 		if(this.options.autoWidth){
@@ -1257,7 +1268,7 @@ Custom events list:
 					item.data('owl-item').loaded = true;
 				}
 
-				if(this.options.loop && this.options.lazyLoad){
+				if(this.options.loop && (this.options.lazyLoad || this.options.center)){
 					this.updateClonedItemsState(item.data('owl-item').index);
 				}
 			}
@@ -1277,21 +1288,30 @@ Custom events list:
 
 	/**
 	 * updateClonedItemsState
+	 * @desc Set current state on sibilings items for lazyLoad and center
 	 * @since 2.0.0
 	 */
 
 	Owl.prototype.updateClonedItemsState = function(activeIndex){
 
-		var mobileBoost = this.options.mobileBoost;
-		this.dom.$items.each(function(i,el){
-			var $el = $(el);
+		//find cloned center
+		if(this.options.center){
+			var center = this.dom.$items.eq(this.pos.currentAbs).data('owl-item').index;
+		}
+
+		for(var i = 0; i<this.num.items; i++){
+			var $el = this.dom.$items.eq(i);
 			if( $el.data('owl-item').index === activeIndex ){
 				$el.data('owl-item').current = true;
-				if(mobileBoost){
+
+				if(this.options.mobileBoost){
 					$el.addClass(this.options.activeClass);
 				}
+				if($el.data('owl-item').index === center ){
+					$el.addClass(this.options.centerClass);
+				}
 			}
-		});
+		}
 	}
 
 	/**
@@ -1340,8 +1360,8 @@ Custom events list:
 	 */
 
 	Owl.prototype.internalEvents = function(){
-		var isTouch = this.browser.isTouchSupport();
-		var isTouchIE = this.browser.isTouchSupportIE();
+		var isTouch = isTouchSupport();
+		var isTouchIE = isTouchSupportIE();
 
 		if(isTouch && !isTouchIE){
 			this.dragType = ["touchstart","touchmove","touchend","touchcancel"];
@@ -1382,7 +1402,7 @@ Custom events list:
 		}
 
 		// Catch transitionEnd event
-		this.transitionType = this.browser.isTransitionEnd();
+		this.transitionType = isTransitionEnd();
 		if(this.transitionType){
 			this.on(this.dom.wrp, this.transitionType, this.e._transitionEnd, false);
 		}
@@ -1680,13 +1700,15 @@ Custom events list:
 	 */
 
 	Owl.prototype.wrpMoveTo = function(pos){
-		var posX = this.pos.wrp = pos,
-			style = this.dom.wrp.style;
 
 		// if speed is 0 the set inMotion to false
 		if(this.speed.current !== 0){
+			this.fireCallback('onAnimationStart');
 			this.state.inMotion = true;
 		}
+
+		var posX = this.pos.wrp = pos,
+			style = this.dom.wrp.style;
 
 		if(this.support3d){
 			translate = 'translate3d(' + posX + 'px'+',0px, 0px)';
@@ -1699,15 +1721,7 @@ Custom events list:
 			}.bind(this));
 		}
 
-		if(!this.state.isTouch && !this.state.jumpToLoop && !this.state.responsive ){
-			this.onChange();
-		}
-
-		// stopVideo 
-		if(this.state.videoPlay){
-			this.stopVideo();
-		}
-
+		this.onChange();
 	};
 
 	/**
@@ -1889,10 +1903,6 @@ Custom events list:
 	Owl.prototype.initPosition = function(){
 		var pos = this.options.startPosition;
 
-		// if(this.options.center){
-		// 	pos = this.options.items % 2 == 1 ? Math.round(-this.options.items/2) : 0;
-		// }
-
 		if(this.options.startPosition === 'URLHash'){
 			pos = this.hashPosition();
 		} else if(typeof this.options.startPosition !== Number && !this.options.center){
@@ -1910,6 +1920,9 @@ Custom events list:
 
 	Owl.prototype.goToHash = function(){
 		var pos = this.hashPosition();
+		if(pos === false){
+			pos = 0;
+		}
 		this.dom.oWrp.scrollLeft = 0;
 		this.goTo(pos,this.options.naviSpeed);
 	};
@@ -1922,16 +1935,25 @@ Custom events list:
 	 */
 
 	Owl.prototype.hashPosition = function(){
-
 		var hash = window.location.hash.substring(1);
-		if(hash === ""){return 0;}
+		if(hash === ""){return false;}
 
-		var hashItem = this.dom.$oItems.find('#'+hash);
-		if(hashItem.length === 0){return 0;}
-
-		var hashPos = hashItem.closest('.owl-item').data('owl-item').index;
+		for(var i=0;i<this.num.oItems; i++){
+			if(hash === this.dom.$oItems.eq(i).data('owl-item').hash){
+				var hashPos = i;
+			}
+		}
 		return hashPos;
 	};
+
+	// Owl.prototype.updateHash = function(){
+	// 	var hashItem = this.dom.$oItems.eq(this.pos.current).data('owl-item').hash;
+	// 	if(hashItem){
+	// 		this.state.updateHash = true;
+	// 		window.location.hash = hashItem;
+	// 	}
+	// };
+
 
 	/**
 	 * Autoplay
@@ -1958,7 +1980,7 @@ Custom events list:
 	Owl.prototype.play = function(timeout, speed){
 
 		// if tab is inactive - doesnt work in <IE10
-		if(this.browser.isPageHidden() === true){return false;}
+		if(isPageHidden() === true){return false;}
 
 		// overwrite default options (custom options are always priority)
 		if(!this.options.autoplay){
@@ -1987,7 +2009,7 @@ Custom events list:
 	 */
 
 	Owl.prototype.stop = function(){
-		this._options.autoplay = this.options.autoplay = true;
+		this._options.autoplay = this.options.autoplay = false;
 		this.state.autoplay = false;
 		window.clearInterval(this.e._autoplay);
 	};
@@ -1999,13 +2021,10 @@ Custom events list:
 	/**
 	 * transitionEnd
 	 * @desc event used by css3 animation end and $.animate callback like transitionEnd,responsive etc.
-	 * Also update status
 	 * @since 2.0.0
 	 */
 
 	Owl.prototype.transitionEnd = function(event){
-		this.fireCallback('onAnimationStart');
-
 		// if css2 animation then event object is undefined 
 		if(event !== undefined){
 			event.stopPropagation();
@@ -2021,10 +2040,7 @@ Custom events list:
 		this.updateItemState();
 		
 		this.autoplay();
-		
-		// set Status to do
-		this.status = $.extend( {}, width={"width":this.width}, num={"num":this.num}, pos={"pos":this.pos}, drag={"drag":this.drag}, state={"state":this.state});
-		
+			
 		this.fireCallback('onAnimationEnd');
 	};
 
@@ -2227,13 +2243,13 @@ Custom events list:
 		if(!this.options.loop && !this.options.center){
 			for(var j = this.num.nav.length-1; j >= 0; j--){
 				last += this.num.nav[j];
-				this.dom.$oItems.eq(j).data('owl-item').page = roundPages-1 ;
+				this.dom.$oItems.eq(j).data('owl-item').page = roundPages-1;
 				if(last >= each){
 					break;
 				}
 			}
 		}
-
+		this.num.allPages = roundPages-1;
 	};
 
 	/**
@@ -2250,6 +2266,7 @@ Custom events list:
 			var dotData = dots.eq(i).data('goToPage');
 
 			if(dotData===itemIndex){
+				this.pos.currentPage = i;
 				dots.eq(i).addClass('active');
 			}else{
 				dots.eq(i).removeClass('active');
@@ -2386,7 +2403,7 @@ Custom events list:
 
 	Owl.prototype.fireCallback = function(event, data){
 		if(!this.options.callbacks){return;}
-			
+
 		if(this.dom.el.dispatchEvent){
 
 			// dispatch event
@@ -2429,70 +2446,58 @@ Custom events list:
 		}
 	};
 
-	// To test 
-	Owl.prototype.browser = {
-
-		isTransitionEnd : function(){
-			var t;
-			var el = document.createElement('fake');
-			var transitions = {
-			  'transition':			'transitionend',
-			  'OTransition':		'oTransitionEnd',
-			  'MozTransition':		'transitionend',
-			  'WebkitTransition':	'webkitTransitionEnd'
-			};
-			for(t in transitions){
-				if( el.style[t] !== undefined ){
-					return transitions[t];
-				}
-			}
-			el = null;
-		},
-		isTransformProperty : function() {
-			var node = document.createElement('fake');
-			var properties = ['WebkitTransform','msTransform','OTransform','transform','MozTransform'];
-			var p;
-			while (p = properties.shift()) {
-				if (typeof node.style[p] !== 'undefined') {
-					node = null;
-					return p;
-				}
-			}
-			return false;
-		},
-		isTransform3d : function(){
-			var d = document.createElement('fake').style;
-			var test = ('webkitPerspective' in d || 'MozPerspective' in d || 'OPerspective' in d || 'MsPerspective' in d || 'perspective' in d);
-			d = null;
-			return test;
-		},
-		isTouchSupport : function(){
-			return 'ontouchstart' in window || !!(navigator.msMaxTouchPoints);
-		},
-		isTouchSupportIE: function(){
-			return window.navigator.msPointerEnabled;
-		},
-		isPageHidden: function(){
-		    return document.hidden;
-		},
-		isRetina: function(){
-			return window.devicePixelRatio > 1;
-		} 
-	};
-
 	/**
 	 * onChange
 	 * @since 2.0.0
 	 */
 
 	Owl.prototype.onChange = function(){
-		this.fireCallback('onChange');
 
-		if (this.options.navigation || this.options.pagination) {
-			this.updateControls();
+		if(!this.state.isTouch && !this.state.jumpToLoop && !this.state.responsive ){
+			
+			if (this.options.navigation || this.options.pagination) {
+				this.updateControls();
+			}
+
+			this.autoHeight();
+
+			this.fireCallback('onChange');
 		}
 
-		this.autoHeight();
+		if(!this.state.isTouch && !this.state.jumpToLoop){
+
+			// set Status to do
+			this.storeInfo();
+
+			// stopVideo 
+			if(this.state.videoPlay){
+				this.stopVideo();
+			}
+		}
+	}
+
+	/**
+	 * storeInfo
+	 * store basic information about current states
+	 * @since 2.0.0
+	 */
+
+	Owl.prototype.storeInfo = function(){
+
+		this.info = {	
+			items: 			this.options.items,
+			allItems:		this.num.oItems,
+			currentPosition:this.pos.current,
+			currentPage:	this.pos.currentPage,
+			allPages:		this.num.allPages,
+			autoplay:		this.state.autoplay,
+			windowWidth:	this.width.window,
+			stageWidth:		this.width.stage
+		}
+
+		if (typeof this.options.info === "function") {
+			this.options.info.apply(this,[this.info]);
+		}
 	}
 
 	/**
@@ -2525,14 +2530,14 @@ Custom events list:
 	 */
 
 	Owl.prototype.lazyLoad = function(){
-		var attr = this.browser.isRetina() ? "data-src-retina" : "data-src";
-		var src, img, type;
+		var attr = isRetina() ? "data-src-retina" : "data-src";
+		var src, img, type, i;
 
-		this.dom.$items.each(function(i,el){
-			var $item = $(el).data('owl-item');
+		for(i = 0; i < this.num.items; i++){
+			var $item = this.dom.$items.eq(i);
 
-			if( $item.current === true && $item.loaded === false){
-				img = $(el).find('.owl-lazy, .owl-lazy-background');
+			if( $item.data('owl-item').current === true && $item.data('owl-item').loaded === false){
+				img = $item.find('.owl-lazy, .owl-lazy-background');
 
 				if(img.hasClass('owl-lazy-background')){
 					type='bg';
@@ -2545,7 +2550,7 @@ Custom events list:
 					this.preload(img,$item,type);
 				}
 			}
-		}.bind(this));
+		}
 	};
 
 	/**
@@ -2642,6 +2647,62 @@ Custom events list:
 		this.dom = null;
 	};
 
+	// Pivate methods 
+
+	function isTransitionEnd(){
+		var t;
+		var el = document.createElement('fake');
+		var transitions = {
+		  'transition':			'transitionend',
+		  'OTransition':		'oTransitionEnd',
+		  'MozTransition':		'transitionend',
+		  'WebkitTransition':	'webkitTransitionEnd'
+		};
+		for(t in transitions){
+			if( el.style[t] !== undefined ){
+				return transitions[t];
+			}
+		}
+		el = null;
+	};
+
+	function isTransformProperty() {
+		var node = document.createElement('fake');
+		var properties = ['WebkitTransform','msTransform','OTransform','transform','MozTransform'];
+		var p;
+		while (p = properties.shift()) {
+			if (typeof node.style[p] !== 'undefined') {
+				node = null;
+				return p;
+			}
+		}
+		return false;
+	};
+
+	function isTransform3d(){
+		var d = document.createElement('fake').style;
+		var test = ('webkitPerspective' in d || 'MozPerspective' in d || 'OPerspective' in d || 'MsPerspective' in d || 'perspective' in d);
+		d = null;
+		return test;
+	};
+
+	function isTouchSupport(){
+		return 'ontouchstart' in window || !!(navigator.msMaxTouchPoints);
+	};
+
+	function isTouchSupportIE(){
+		return window.navigator.msPointerEnabled;
+	};
+
+	function isPageHidden(){
+		return document.hidden;
+	};
+
+	function isRetina(){
+		return window.devicePixelRatio > 1;
+	};
+
+
 	$.fn.owlCarousel = function ( options ) {
 		return this.each(function () {
 			if (!$(this).data('owlCarousel')) {
@@ -2649,8 +2710,8 @@ Custom events list:
 				new Owl( this, options ));
 			}
 		});
-	};
 
+	};
 
 })( window.Zepto || window.jQuery, window,  document );
 

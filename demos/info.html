@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Owl Carousel 2.0.0-beta - Center demo</title>
+	<title>Owl Carousel 2.0.0-beta - Info callback - Retrive basic info demo</title>
 	<link rel="stylesheet" href="../assets/css/foundation.min.css" />
 	<link rel="stylesheet" href="../owlcarousel/owl.carousel.css">
 	<link rel="stylesheet" href="../assets/js/highlight/styles/monokai_sublime.css">
@@ -14,7 +14,7 @@
 <div class="header">
 	<div class="row">
 	  <div class="large-12 columns">
-		<h1 class="left">Center.</h1>
+		<h1 class="left">Info callback.</h1>
 		<a href="https://github.com/OwlFonk/OwlCarousel2" class="button tiny right show-for-medium-up">Download From GitHub</a>
 	  </div>
 	</div>
@@ -23,45 +23,79 @@
 	
 	<div class="row">
 		<div class="large-12 columns">
-			<h4>Center with loop</h4>
 
-			<div class="owl-carousel loop">
+			<div class="owl-carousel">
 				<div class="article"><h2>1</h2></div>
 				<div class="article"><h2>2</h2></div>
 				<div class="article"><h2>3</h2></div>
 				<div class="article"><h2>4</h2></div>
-				<div class="article" data-merge="3"><h2>6</h2></div>
+				<div class="article"><h2>5</h2></div>
+				<div class="article"><h2>6</h2></div>
 				<div class="article"><h2>7</h2></div>
 				<div class="article"><h2>8</h2></div>
-				<div class="article"><h2>9</h2></div>
+				<div class="article"><h2>8</h2></div>
 				<div class="article"><h2>10</h2></div>
 				<div class="article"><h2>11</h2></div>
 				<div class="article"><h2>12</h2></div>
 				<div class="article"><h2>13</h2></div>
-				<div class="article"><h2>14</h2></div>
-				<div class="article"><h2>15</h2></div>
-			</div>
-
-			<h4 class="margin-top">Center without loop</h4>
-
-	
-			<div class="owl-carousel nonloop">
-				<div class="article"><h2>1</h2></div>
-				<div class="article"><h2>2</h2></div>
-				<div class="article"><h2>3</h2></div>
-				<div class="article"><h2>4</h2></div>
-				<div class="article" data-merge="3"><h2>6</h2></div>
-				<div class="article"><h2>7</h2></div>
-				<div class="article"><h2>8</h2></div>
-				<div class="article"><h2>9</h2></div>
-				<div class="article"><h2>10</h2></div>
-				<div class="article"><h2>11</h2></div>
-				<div class="article"><h2>12</h2></div>
-				<div class="article"><h2>13</h2></div>
-				<div class="article"><h2>14</h2></div>
-				<div class="article"><h2>15</h2></div>
 			</div>
 		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="large-12 columns">
+		<table>
+		  <thead>
+			<tr>
+				<th>Variable</th>
+				<th>Value</th>
+			</tr>
+		  </thead>
+		  <tbody>
+
+			<tr>
+				<td>items</td>
+				<td class="items"></td>
+			</tr>
+
+			 <tr>
+				<td>allItems</td>
+				<td class="allItems"></td>
+			</tr>
+
+			<tr>
+				<td>currentPosition</td>
+				<td class="currentPosition"></td>
+			</tr>
+
+			<tr>
+				<td>currentPage</td>
+				<td class="currentPage"></td>
+			</tr>
+
+			<tr>
+				<td>allPages</td>
+				<td class="allPages"></td>
+			</tr>
+
+			<tr>
+				<td>autoplay</td>
+				<td class="autoplay"></td>
+			</tr>
+
+			<tr>
+				<td>windowWidth</td>
+				<td class="windowWidth"></td>
+			</tr>
+
+			<tr>
+				<td>stageWidth</td>
+				<td class="stageWidth"></td>
+			</tr>
+
+		  </tbody>
+		</table>
 	</div>
 </div>
 
@@ -69,7 +103,12 @@
 	<div class="row margin-top">
 		<div class="large-12 columns">
 			<h4>Descriptons</h4>
-			<p>Works fine with odd and even items on screen</p>
+			<p>'info' option is the only function callback in Owl Carousel 2 and doesnt need to be activated by option callback:true.
+				Can be used to obtain basic information about items/pages/widths etc.
+				<br><strong>Note that Item and page positions are zero based values.</strong>
+				If you need more specific variables there just let me know.
+			</p>
+
 		</div>
 	</div>
 
@@ -79,31 +118,38 @@
 	<pre><code>
 //Javascript
 
-$('.loop').owlCarousel({
-	center: true,
-	items:3,
+$('.owl-carousel').owlCarousel({
+	items:4,
 	loop:true,
 	margin:10,
-	merge:true,
+	info: getInfo,
 	responsive:{
+		1200:{
+			items:6,
+			center:false
+		},
+		960:{
+			items:5,
+			center:true
+		},
 		600:{
-			items:4
+			items:3
 		}
 	}
 });
 
-$('.nonloop').owlCarousel({
-	center: true,
-	items:3,
-	loop:false,
-	margin:10,
-	merge:true,
-	responsive:{
-		600:{
-			items:4
+// Insert info into table
+function getInfo(i){
+	var owlInfo = i,prop,value,name;
+
+	for(prop in owlInfo){
+		if(owlInfo.hasOwnProperty(prop)){
+			value = owlInfo[prop];
+			name = prop;
+			$('.'+name).text(value);
 		}
 	}
-});
+}
 
 	</code></pre>
 			</div>
@@ -145,31 +191,37 @@ $('.nonloop').owlCarousel({
 <script>
 jQuery(document).ready(function($) {
 
-	$('.loop').owlCarousel({
-		center: true,
-		items:3,
+	$('.owl-carousel').owlCarousel({
+		items:4,
 		loop:true,
 		margin:10,
-		merge:true,
+		info: getInfo,
 		responsive:{
+			1200:{
+				items:6,
+				center:false
+			},
+			960:{
+				items:5,
+				center:true
+			},
 			600:{
-				items:4
+				items:3
 			}
 		}
 	});
 
-	$('.nonloop').owlCarousel({
-		center: true,
-		items:3,
-		loop:false,
-		margin:10,
-		merge:true,
-		responsive:{
-			600:{
-				items:4
+	function getInfo(i){
+		var owlInfo = i,prop,value,name;
+
+		for(prop in owlInfo){
+			if(owlInfo.hasOwnProperty(prop)){
+				value = owlInfo[prop];
+				name = prop;
+				$('.'+name).text(value);
 			}
 		}
-	});
+	}
 });
 
 </script>

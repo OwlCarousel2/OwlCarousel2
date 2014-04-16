@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Owl Carousel 2.0.0-beta - Center demo</title>
+	<title>Owl Carousel 2.0.0-beta - Hash position demo</title>
 	<link rel="stylesheet" href="../assets/css/foundation.min.css" />
 	<link rel="stylesheet" href="../owlcarousel/owl.carousel.css">
 	<link rel="stylesheet" href="../assets/js/highlight/styles/monokai_sublime.css">
@@ -14,53 +14,40 @@
 <div class="header">
 	<div class="row">
 	  <div class="large-12 columns">
-		<h1 class="left">Center.</h1>
+		<h1 class="left">Hash position.</h1>
 		<a href="https://github.com/OwlFonk/OwlCarousel2" class="button tiny right show-for-medium-up">Download From GitHub</a>
 	  </div>
 	</div>
 </div>
-<div class="margin-top">
+<div class="hash margin-top">
 	
 	<div class="row">
 		<div class="large-12 columns">
-			<h4>Center with loop</h4>
 
-			<div class="owl-carousel loop">
-				<div class="article"><h2>1</h2></div>
-				<div class="article"><h2>2</h2></div>
-				<div class="article"><h2>3</h2></div>
-				<div class="article"><h2>4</h2></div>
-				<div class="article" data-merge="3"><h2>6</h2></div>
-				<div class="article"><h2>7</h2></div>
-				<div class="article"><h2>8</h2></div>
-				<div class="article"><h2>9</h2></div>
-				<div class="article"><h2>10</h2></div>
-				<div class="article"><h2>11</h2></div>
-				<div class="article"><h2>12</h2></div>
-				<div class="article"><h2>13</h2></div>
-				<div class="article"><h2>14</h2></div>
-				<div class="article"><h2>15</h2></div>
+			<div class="owl-carousel">
+				<div class="article" data-hash="zero"><h2>0</h2></div>
+				<div class="article" data-hash="one" ><h2>1</h2></div>
+				<div class="article" data-hash="two" ><h2>2</h2></div>
+				<div class="article" data-hash="three" ><h2>3</h2></div>
+				<div class="article" data-hash="four"><h2>4</h2></div>
+				<div class="article" data-hash="five" ><h2>5</h2></div>
+				<div class="article" data-hash="six"><h2>6</h2></div>
+				<div class="article" data-hash="seven" ><h2>7</h2></div>
+				<div class="article" data-hash="eight" ><h2>8</h2></div>
+				<div class="article" data-hash="nine" ><h2>9</h2></div>
+				<div class="article" data-hash="ten" ><h2>10</h2></div>
+				<div class="article" data-hash="eleven" ><h2>11</h2></div>
+				<div class="article" data-hash="tweleve" ><h2>12</h2></div>
+				<div class="article" data-hash="thirteen" ><h2>13</h2></div>
+				<div class="article" data-hash="fourteen" ><h2>14</h2></div>
+				<div class="article" data-hash="fifteen" ><h2>15</h2></div>
 			</div>
-
-			<h4 class="margin-top">Center without loop</h4>
-
-	
-			<div class="owl-carousel nonloop">
-				<div class="article"><h2>1</h2></div>
-				<div class="article"><h2>2</h2></div>
-				<div class="article"><h2>3</h2></div>
-				<div class="article"><h2>4</h2></div>
-				<div class="article" data-merge="3"><h2>6</h2></div>
-				<div class="article"><h2>7</h2></div>
-				<div class="article"><h2>8</h2></div>
-				<div class="article"><h2>9</h2></div>
-				<div class="article"><h2>10</h2></div>
-				<div class="article"><h2>11</h2></div>
-				<div class="article"><h2>12</h2></div>
-				<div class="article"><h2>13</h2></div>
-				<div class="article"><h2>14</h2></div>
-				<div class="article"><h2>15</h2></div>
-			</div>
+			<hr>
+			<a class="button secondary url" href="#zero">zero</a>
+			<a class="button secondary url" href="#three">three</a>
+			<a class="button secondary url" href="#five">five</a>
+			<a class="button secondary url" href="#seven">seven</a>
+			<a class="button secondary url" href="#ten">ten</a>
 		</div>
 	</div>
 </div>
@@ -69,7 +56,9 @@
 	<div class="row margin-top">
 		<div class="large-12 columns">
 			<h4>Descriptons</h4>
-			<p>Works fine with odd and even items on screen</p>
+			<p>URLhashListener option is listening for url hash change and is looking for slide with the same data name e.g. data-hash="zero"</p>
+			<p>Also startPosition option accept string: 'URLHash'. This will load coresponding item on startup.
+			Browser history back button is also affected.</p>
 		</div>
 	</div>
 
@@ -79,30 +68,15 @@
 	<pre><code>
 //Javascript
 
-$('.loop').owlCarousel({
-	center: true,
-	items:3,
-	loop:true,
-	margin:10,
-	merge:true,
-	responsive:{
-		600:{
-			items:4
-		}
-	}
-});
+var owl = $('.owl-carousel'); // save reference to variable
 
-$('.nonloop').owlCarousel({
-	center: true,
-	items:3,
-	loop:false,
+owl.owlCarousel({
+	items:4,
+	loop:true,
+	center:true,
 	margin:10,
-	merge:true,
-	responsive:{
-		600:{
-			items:4
-		}
-	}
+	URLhashListener:true,
+	startPosition: 'URLHash'
 });
 
 	</code></pre>
@@ -110,7 +84,7 @@ $('.nonloop').owlCarousel({
 		</div>
 	</div>
 	
-	<div class="demos-buttons margin-top">
+	<div class="margin-top">
 		<div class="row">
 			<div class="large-12 columns">
 				<h3>Demos:</h3>
@@ -124,6 +98,7 @@ $('.nonloop').owlCarousel({
 				<a href="autoplay.html" class="button">Autoplay</a>
 				<a href="urlhash.html" class="button">URL hash navigation</a>
 				<a href="info.html" class="button">Info callback</a>
+
 			</div>
 		</div>
 	</div>
@@ -145,31 +120,17 @@ $('.nonloop').owlCarousel({
 <script>
 jQuery(document).ready(function($) {
 
-	$('.loop').owlCarousel({
-		center: true,
-		items:3,
+	var owl = $('.owl-carousel');
+
+	owl.owlCarousel({
+		items:4,
 		loop:true,
+		center:true,
 		margin:10,
-		merge:true,
-		responsive:{
-			600:{
-				items:4
-			}
-		}
+		URLhashListener:true,
+		startPosition: 'URLHash'
 	});
 
-	$('.nonloop').owlCarousel({
-		center: true,
-		items:3,
-		loop:false,
-		margin:10,
-		merge:true,
-		responsive:{
-			600:{
-				items:4
-			}
-		}
-	});
 });
 
 </script>
