@@ -112,7 +112,7 @@ owl.owlCarousel({
 	</div>
 </div>
 
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="../assets/js/jquery-1.11.0.min.js"></script>
 <script src="../owlcarousel/owl.carousel.js"></script>
 <script src="../assets/js/highlight/highlight.pack.js"></script>
 <script src="../assets/js/app.js"></script>
@@ -120,14 +120,14 @@ owl.owlCarousel({
 <script>
 jQuery(document).ready(function($) {
 
-	var owl = $('.owl-carousel');
-
-	owl.owlCarousel({
+	$('.owl-carousel').owlCarousel({
 		items:4,
-		loop:true,
+		loop:false,
 		center:true,
 		margin:10,
+		callbacks:true,
 		URLhashListener:true,
+		autoplayHoverPause:true,
 		startPosition: 'URLHash'
 	});
 

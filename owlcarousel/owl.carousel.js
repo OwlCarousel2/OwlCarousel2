@@ -4,7 +4,7 @@
  * @release 2014
  * Licensed under MIT
  * 
- * @version 2.0.0-beta.0.4
+ * @version 2.0.0-beta.0.5
  * @versionNotes Not compatibile with Owl Carousel <2.0.0
  */
 
@@ -47,12 +47,15 @@ Callback events list:
 Custom events list:
 
 :owl.next
-:owl.next
+:owl.prev
 :owl.goTo
 :owl.jumpTo
 :owl.addItem
 :owl.removeItem
 :owl.refresh
+:owl.play
+:owl.stop
+:owl.stopVideo
 
 */
 
@@ -76,7 +79,7 @@ Custom events list:
 
 		startPosition:		0,
 		navigation: 		false,
-		navText: 			['next','prev'],
+		navText: 			['prev','next'],
 		slideBy:			1,
 		pagination: 		true,
 		paginationEach:		false,
@@ -106,8 +109,6 @@ Custom events list:
 		mobileBoost: 		false,
 		fallbackEasing:		'swing',
 
-		createStucture:		true,
-
 		//Classes and Names
 		clonedClasses:		false,
 		themeClass: 		'owl-theme',
@@ -121,7 +122,10 @@ Custom events list:
 		pagiDotClass: 		'owl-dot',
 		pagiClass:			'owl-pagination',
 		mobileBoostClass:	'owl-mobile',
-		autoHeightClass:	'owl-height'
+		autoHeightClass:	'owl-height',
+
+		itemElement:		'div',
+		stageElement:		'div'
 
 	};
 
@@ -131,10 +135,10 @@ Custom events list:
 	var dom = {
 		el:			null,	// main element 
 		$el:		null,	// jQuery main element 
-		wrp:		null,	// wrapper
-		$wrp:		null,	// jQuery wrapper
-		oWrp:		null,	// outer wrp
-		$oWrp:		null,	// outer wrp
+		stage:		null,	// stage
+		$stage:		null,	// jQuery stage
+		oStage:		null,	// outer stage
+		$oStage:	null,	// $ outer stage
 		$items:		null,	// all items, clones and originals included 
 		$oItems:	null,	// original items
 		$cItems:	null,	// cloned items only
@@ -156,7 +160,7 @@ Custom events list:
 
 	var width = {
 		el:			0,
-		wrp:		0,
+		stage:		0,
 		item:		0,
 		prevWindow:	0,
 		cloneLast:  0
@@ -183,7 +187,7 @@ Custom events list:
 		current:	0,
 		currentAbs:	0,
 		currentPage:0,
-		wrp:		0,
+		stage:		0,
 		items:		[]
 	};
 
@@ -249,8 +253,8 @@ Custom events list:
 		element.owlCarousel = {
 			'name':		'Owl Carousel',
 			'author':	'Bartosz Wojciechowski',
-			'version':	'2.0.0-beta.0.4',
-			'released':	'16.04.2014'
+			'version':	'2.0.0-beta.0.5',
+			'released':	'17.04.2014'
 		};
 
 		// Attach variables to object
@@ -310,15 +314,8 @@ Custom events list:
 			this.dom.$el.addClass(this.options.themeClass);
 		}
 
-		// Check support 
-		this.support3d = 			isTransform3d();
-		this.transformProperty =	isTransformProperty();
-		this.state.orientation = 	window.orientation;
-
-		if(this.transformProperty !== false){
-			this.vendorName =  			this.transformProperty.replace(/Transform/i,'');
-			this.vendorName = 			this.vendorName !== '' ? '-'+this.vendorName.toLowerCase()+'-' : '';
-		}
+		// Check support
+		this.browserSupport();
 
 		// Sort responsive items in array
 		this.sortOptions();
@@ -340,13 +337,11 @@ Custom events list:
 		// iOS safari likes to trigger unnecessary resize event
 		this.width.prevWindow = this.windowWidth();
 
-		if(this.options.createStucture){
-			// create wrp object
-			this.createWrp();
+		// create stage object
+		this.createStage();
 
-			// Append local content 
-			this.appendLocalItems();
-		}
+		// Append local content 
+		this.appendLocalItems();
 
 		// Check options
 		this.optionsLogic();
@@ -406,7 +401,9 @@ Custom events list:
 		for (i in resOpt){
 		    keys.push(i);
 		}
-		keys.sort();
+
+		keys = keys.sort(function (a, b) {return a - b;});
+
 		for (j = 0; j < keys.length; j++){
 		    k = keys[j];
 		    this.responsiveSorted[k] = resOpt[k];
@@ -453,7 +450,7 @@ Custom events list:
 
 	Owl.prototype.optionsLogic = function(){
 		// Toggle Center class
-		this.dom.$wrp.toggleClass('owl-center',this.options.center);
+		this.dom.$stage.toggleClass('owl-center',this.options.center);
 
 		// Scroll per - 'page' option will scroll per visible items number
 		// You can set this to any other number below visible items.
@@ -468,48 +465,47 @@ Custom events list:
 		}
 
 		if(this.options.mobileBoost){
-			this.dom.$wrp.addClass(this.options.mobileBoostClass);
+			this.dom.$stage.addClass(this.options.mobileBoostClass);
 		} else {
-			this.dom.$wrp.removeClass(this.options.mobileBoostClass);
+			this.dom.$stage.removeClass(this.options.mobileBoostClass);
 		}
 
 		if(this.options.autoHeight){
-			this.dom.$oWrp.addClass(this.options.autoHeightClass);
+			this.dom.$oStage.addClass(this.options.autoHeightClass);
 		} else {
-			this.dom.$oWrp.removeClass(this.options.autoHeightClass).css('height','');
+			this.dom.$oStage.removeClass(this.options.autoHeightClass).css('height','');
 		}
 
 		if(this.options.autoWidth){
 			this.options.stagePadding = false;
 			this.options.paginationEach = 1;
 			this.options.merge = false;
-			//this.options.lazyLoad = false;
 		}
 	};
 
 	/**
-	 * createWrp
-	 * @desc Create wrapper and Outer-wrapper divs
+	 * createStage
+	 * @desc Create stage and Outer-stage elements
 	 * @since 2.0.0
 	 */
 
-	Owl.prototype.createWrp = function(){
-		var outerWrp = document.createElement('div');
-		var wrp = document.createElement('div');
+	Owl.prototype.createStage = function(){
+		var oStage = document.createElement('div');
+		var stage = document.createElement(this.options.stageElement);
 
-		outerWrp.className = 'owl-wrapper-outer';
-		wrp.className = 'owl-wrapper';
+		oStage.className = 'owl-stage-outer';
+		stage.className = 'owl-stage';
 
-		outerWrp.appendChild(wrp);
-		this.dom.el.appendChild(outerWrp);
+		oStage.appendChild(stage);
+		this.dom.el.appendChild(oStage);
 
-		this.dom.oWrp =	outerWrp;
-		this.dom.$oWrp = $(outerWrp);
-		this.dom.wrp = 	wrp;
-		this.dom.$wrp = $(wrp);
+		this.dom.oStage = oStage;
+		this.dom.$oStage = $(oStage);
+		this.dom.stage = stage;
+		this.dom.$stage = $(stage);
 
-		outerWrp = null;
-		wrp = null;
+		oStage = null;
+		stage = null;
 	};
 
 	/**
@@ -519,7 +515,7 @@ Custom events list:
 	 */
 
 	Owl.prototype.createItem = function(){
-		var item = document.createElement('div');
+		var item = document.createElement(this.options.itemElement);
 		item.className = this.options.itemClass;
 		return item;
 	};
@@ -600,7 +596,7 @@ Custom events list:
 	 */
 
 	Owl.prototype.updateLocalContent = function(){
-		this.dom.$oItems = this.dom.$wrp.children('.owl-item').filter(function(){
+		this.dom.$oItems = this.dom.$stage.children('.owl-item').filter(function(){
 			return $(this).data('owl-item').clone === false;
 		});
 
@@ -793,7 +789,7 @@ Custom events list:
 		var id = item.data('owl-item').videoId;
 
 		var width = item.data('owl-item').videoWidth || Math.floor(item.data('owl-item').width - this.options.margin);
-		var height = item.data('owl-item').videoHeight || this.dom.$wrp.height();
+		var height = item.data('owl-item').videoHeight || this.dom.$stage.height();
 
 		if(videoType === 'youtube'){
 			var videoLink = "<iframe width=\""+ width +"\" height=\""+ height +"\" src=\"http://www.youtube.com/embed/" + id + "?autoplay=1&v=" + id + "\" frameborder=\"0\" allowfullscreen></iframe>";
@@ -812,13 +808,13 @@ Custom events list:
 
 	/**
 	 * appendLocalItems
-	 * @desc Append local items into wrapper
+	 * @desc Append local items into stage
 	 * @since 2.0.0
 	 */
 
 	Owl.prototype.appendLocalItems = function(){
 		// get local data information (children etc.)
-		var content	= this.dom.$el.children().not(".owl-wrapper-outer");
+		var content	= this.dom.$el.children().not(".owl-stage-outer");
 		this.num.oItems = content.length;
 
 		for(var i = 0; i < this.num.oItems; i++){
@@ -826,8 +822,8 @@ Custom events list:
 			// fill 'owl-item' with content 
 			var item = this.fillItem(content,i);
 
-			// append into wrp 
-			this.dom.$wrp.append(item);
+			// append into stage 
+			this.dom.$stage.append(item);
 		}
 
 		// remove local content references
@@ -869,13 +865,13 @@ Custom events list:
 			firstClone.data('owl-item').clone = true;
 			lastClone.data('owl-item').clone = true;
 
-			this.dom.$wrp.append(firstClone);
-			this.dom.$wrp.prepend(lastClone);
+			this.dom.$stage.append(firstClone);
+			this.dom.$stage.prepend(lastClone);
 
 			firstClone = lastClone = null;
 		}
 
-		this.dom.$cItems = this.dom.$wrp.children('.owl-item').filter(function(){
+		this.dom.$cItems = this.dom.$stage.children('.owl-item').filter(function(){
 			return $(this).data('owl-item').clone === true;
 		});
 	};
@@ -916,7 +912,7 @@ Custom events list:
 		this.width.el = this.dom.$el.width() - (this.options.stagePadding*2);
 
 		//to check
-		this.width.stage = this.dom.$el.width();
+		this.width.view = this.dom.$el.width();
 
 		// calculate width minus addition margins 
 		var elMinusMargin = this.width.el - (this.options.margin * (this.options.items === 1 ? 0 : this.options.items -1));
@@ -925,7 +921,7 @@ Custom events list:
 		this.width.el =  	this.width.el + this.options.margin;
 		this.width.item = 	Math.floor(elMinusMargin / this.options.items) + this.options.margin;
 
-		this.dom.$items = 	this.dom.$wrp.find('.owl-item');
+		this.dom.$items = 	this.dom.$stage.find('.owl-item');
 		this.num.items = 	this.dom.$items.length;
 
 		//change to autoWidths
@@ -941,7 +937,7 @@ Custom events list:
 		// item distances
 		dist = this.options.center ? (this.width.el)/2 : 0;
 		
-		this.width.mergeWrp = 0;
+		this.width.mergeStage = 0;
 
 		// Calculate items positions
 		for(i = 0; i<this.num.items; i++){
@@ -954,7 +950,7 @@ Custom events list:
 					mergeNumber = this.options.items;
 				}
 				this.num.merged.push(parseInt(mergeNumber));
-				this.width.mergeWrp += this.width.item * this.num.merged[i];
+				this.width.mergeStage += this.width.item * this.num.merged[i];
 			} else {
 				this.num.merged.push(1)
 			}
@@ -999,9 +995,9 @@ Custom events list:
 		}
 
 		if(this.options.autoWidth){
-			this.width.wrp = this.options.center ? Math.abs(fullWidth) : Math.abs(dist);
+			this.width.stage = this.options.center ? Math.abs(fullWidth) : Math.abs(dist);
 		} else {
-			this.width.wrp = Math.abs(fullWidth);
+			this.width.stage = Math.abs(fullWidth);
 		}
 
 		// update indexAbs on all items 
@@ -1052,11 +1048,11 @@ Custom events list:
 		//Max for autoWidth content 
 		if((!this.options.loop && !this.options.center && this.options.autoWidth) || (this.options.merge && !this.options.center) ){
 			for (i = 0; i < this.pos.items.length; i++) {
-				if( (this.pos.items[i] * -1) < this.width.wrp-this.width.el ){
+				if( (this.pos.items[i] * -1) < this.width.stage-this.width.el ){
 					this.pos.max = i+1;
 				}
 			}
-			this.pos.maxValue = -(this.width.wrp-this.width.el);
+			this.pos.maxValue = -(this.width.stage-this.width.el);
 			this.pos.items[this.pos.max] = this.pos.maxValue
 		}
 
@@ -1084,17 +1080,17 @@ Custom events list:
 
 		// show neighbours 
 		if(this.options.stagePadding !== false){
-			this.dom.oWrp.style.paddingLeft = 	this.options.stagePadding + 'px';
-			this.dom.oWrp.style.paddingRight = 	this.options.stagePadding + 'px';
+			this.dom.oStage.style.paddingLeft = 	this.options.stagePadding + 'px';
+			this.dom.oStage.style.paddingRight = 	this.options.stagePadding + 'px';
 		}
 
 
-		if(this.width.wrpPrev > this.width.wrp){
+		if(this.width.stagePrev > this.width.stage){
 			window.setTimeout(function(){
-				this.dom.wrp.style.width = this.width.wrp + 'px';
+				this.dom.stage.style.width = this.width.stage + 'px';
 			}.bind(this),0);
 		} else{
-			this.dom.wrp.style.width = this.width.wrp + 'px';
+			this.dom.stage.style.width = this.width.stage + 'px';
 		}
 
 		for(var i=0; i<this.num.items; i++){
@@ -1112,8 +1108,8 @@ Custom events list:
 
 		}
 
-		// save prev wrapper size 
-		this.width.wrpPrev = this.width.wrp;
+		// save prev stage size 
+		this.width.stagePrev = this.width.stage;
 	};
 
 	/**
@@ -1191,8 +1187,8 @@ Custom events list:
 		if(this.num.oItems === 0){return false;}
 
 		// Hide and Show methods helps here to set a proper widths.
-		// This prevents Scrollbar to be calculated in wrapper width
-		this.dom.$wrp.addClass('owl-refresh');
+		// This prevents Scrollbar to be calculated in stage width
+		this.dom.$stage.addClass('owl-refresh');
 		
 		// Remove clones and generate new ones
 		this.reClone();
@@ -1201,7 +1197,7 @@ Custom events list:
 		this.calculate();
 
 		//aaaand show.
-		this.dom.$wrp.removeClass('owl-refresh');
+		this.dom.$stage.removeClass('owl-refresh');
 		// update internal position information
 		//this.updatePosition(this.pos.current);
 
@@ -1251,13 +1247,11 @@ Custom events list:
 
 				item = this.dom.$items.eq(j);
 				ipos = item.data('owl-item').posLeft;
-
-
 				iwidth = item.data('owl-item').width-2;
-				wpos = this.pos.wrp;
-				stage = -this.width.stage;
+				wpos = this.pos.stage;
+				view = -this.width.view;
 
-			if((ipos <= wpos && ipos > wpos + stage) || (ipos - iwidth < wpos && ipos - iwidth > wpos + stage)){
+			if((ipos <= wpos && ipos > wpos + view) || (ipos - iwidth < wpos && ipos - iwidth > wpos + view)){
 				this.num.active++;
 
 				item.data('owl-item').active = true;
@@ -1331,10 +1325,13 @@ Custom events list:
 		this.e._preventClick =	function(e){this.preventClick(e);		}.bind(this);
 		this.e._goToHash =		function(){this.goToHash();				}.bind(this);
 		this.e._goToPage =		function(e){this.goToPage(e);			}.bind(this);
-		this.e._ap = 			function(){this.autoplay();					}.bind(this);
+		this.e._naviNext =		function(e){this.next();				}.bind(this);
+		this.e._naviPrev =		function(e){this.prev();				}.bind(this);
+		this.e._ap = 			function(){this.autoplay();				}.bind(this);
 		this.e._play = 			function(){this.play();					}.bind(this);
-		this.e._pause = 		function(){this.pause();					}.bind(this);
+		this.e._pause = 		function(){this.pause();				}.bind(this);
 		this.e._playVideo = 	function(e){this.playVideo(e);			}.bind(this);
+
 	};
 
 	/**
@@ -1377,14 +1374,14 @@ Custom events list:
 
 		} else {
 			// firefox startdrag fix - addeventlistener doesnt work here :/
-			this.dom.$wrp.on("dragstart", function() {return false;});
+			this.dom.$stage.on("dragstart", function() {return false;});
 
 			//disable text select
-			this.dom.wrp.onselectstart = function(){return false;};
+			this.dom.stage.onselectstart = function(){return false;};
 		}
 
 		// Video Play Button event delegation
-		this.dom.$wrp.on('click', '.owl-video-play-icon',this.e._playVideo);
+		this.dom.$stage.on('click', '.owl-video-play-icon',this.e._playVideo);
 
 		if(this.options.URLhashListener){
 			this.on(window, 'hashchange', this.e._goToHash, false);
@@ -1392,19 +1389,13 @@ Custom events list:
 
 		if(this.options.autoplayHoverPause){
 			var that = this;
-			this.dom.$wrp.on("mouseover", this.e._pause )
-			this.dom.$wrp.on("mouseleave", this.e._ap )
-		}
-		
-		if(this.options.navigation){
-			this.e.next =	function(e){this.next();}.bind(this);
-			this.e.prev =	function(e){this.prev();}.bind(this);
+			this.dom.$stage.on("mouseover", this.e._pause )
+			this.dom.$stage.on("mouseleave", this.e._ap )
 		}
 
 		// Catch transitionEnd event
-		this.transitionType = isTransitionEnd();
-		if(this.transitionType){
-			this.on(this.dom.wrp, this.transitionType, this.e._transitionEnd, false);
+		if(this.transitionEndVendor){
+			this.on(this.dom.stage, this.transitionEndVendor, this.e._transitionEnd, false);
 		}
 		
 		// Responsive
@@ -1423,13 +1414,13 @@ Custom events list:
 	Owl.prototype.updateEvents = function(){
 
 		if(this.options.touchDrag && (this.dragType[0] === "touchstart" || this.dragType[0] === "MSPointerDown")){
-			this.on(this.dom.wrp, this.dragType[0], this.e._onDragStart,false);
+			this.on(this.dom.stage, this.dragType[0], this.e._onDragStart,false);
 
 		} else if(this.options.mouseDrag && this.dragType[0] === "mousedown"){
-			this.on(this.dom.wrp, this.dragType[0], this.e._onDragStart,false);
+			this.on(this.dom.stage, this.dragType[0], this.e._onDragStart,false);
 
 		} else {
-			this.off(this.dom.wrp, this.dragType[0], this.e._onDragStart);
+			this.off(this.dom.stage, this.dragType[0], this.e._onDragStart);
 		}
 	}
 
@@ -1447,7 +1438,7 @@ Custom events list:
 		}
 
 		if(this.dragType[0] === 'mousedown'){
-			this.dom.$wrp.addClass('owl-grab');
+			this.dom.$stage.addClass('owl-grab');
 		}
 
 		this.fireCallback("onStartTouch");
@@ -1463,15 +1454,17 @@ Custom events list:
 		var pageX = isTouchEvent ? event.targetTouches[0].pageX : (ev.pageX || ev.clientX);
 		var pageY = isTouchEvent ? event.targetTouches[0].pageY : (ev.pageY || ev.clientY);
 
-		//get wrp position left
-		this.drag.offsetX = this.dom.$wrp.position().left - this.options.stagePadding;
-		this.drag.offsetY = this.dom.$wrp.position().top;
+		//get stage position left
+		this.drag.offsetX = this.dom.$stage.position().left - this.options.stagePadding;
+		this.drag.offsetY = this.dom.$stage.position().top;
 
 		//catch position // ie to fix
 		if(this.state.inMotion && this.support3d ){
 			var animatedPos = this.getTransformProperty();
 			this.drag.offsetX = animatedPos;
-			this.wrpMoveTo(animatedPos);
+			this.animStage(animatedPos);
+		} else if(this.state.inMotion){
+			return false;
 		}
 		
 		this.drag.startX = pageX - this.drag.offsetX;
@@ -1528,7 +1521,7 @@ Custom events list:
 
 			if(this.drag.currentX > this.pos.minValue && this.state.direction === "right" ){
 				this.drag.currentX -= this.pos.loop;
-			}else if(this.drag.currentX < this.pos.maxValue && this.state.direction === "left" ){//-this.width.wrp - neighbourItemWidth + (2*this.width.el)
+			}else if(this.drag.currentX < this.pos.maxValue && this.state.direction === "left" ){//-this.width.stage - neighbourItemWidth + (2*this.width.el)
 				this.drag.currentX += this.pos.loop;
 			}
 			
@@ -1557,7 +1550,7 @@ Custom events list:
 			 this.drag.updatedX = this.drag.start;
 		}
 		
-		this.wrpMoveTo(this.drag.updatedX);
+		this.animStage(this.drag.updatedX);
 	};
 
 	/**
@@ -1571,7 +1564,7 @@ Custom events list:
 			return;
 		}
 		if(this.dragType[0] === 'mousedown'){
-			this.dom.$wrp.removeClass('owl-grab');
+			this.dom.$stage.removeClass('owl-grab');
 		}
 
 		//prevent links and images dragging;
@@ -1603,7 +1596,7 @@ Custom events list:
 
 		this.setSpeed(this.options.dragEndSpeed, false, true);
 
-		this.wrpMoveTo(this.pos.items[closest]);
+		this.animStage(this.pos.items[closest]);
 		this.drag.distance = 0;
 
 		this.off(document, this.dragType[1], this.e._onDragMove);
@@ -1642,13 +1635,13 @@ Custom events list:
 
 	/**
 	 * getTransformProperty
-	 * @desc catch wrapper position while animate (only css3)
+	 * @desc catch stage position while animate (only css3)
 	 * @since 2.0.0
 	 */
 
 	Owl.prototype.getTransformProperty = function(){
-		var transform = window.getComputedStyle(this.dom.wrp, null).getPropertyValue(this.vendorName + 'transform');
-		//var transform = this.dom.$wrp.css(this.vendorName + 'transform')
+		var transform = window.getComputedStyle(this.dom.stage, null).getPropertyValue(this.vendorName + 'transform');
+		//var transform = this.dom.$stage.css(this.vendorName + 'transform')
 		transform = transform.replace(/matrix(3d)?\(|\)/g, '').split(',');
 		var matrix3d = transform.length === 16;
 
@@ -1693,13 +1686,13 @@ Custom events list:
 	};
 
 	/**
-	 * wrpMoveTo
-	 * @desc animate wrapper position (both css3/css2)
+	 * animStage
+	 * @desc animate stage position (both css3/css2) and perform onChange functions/events
 	 * @since 2.0.0
 	 * @param [x] - curent position in pixels
 	 */
 
-	Owl.prototype.wrpMoveTo = function(pos){
+	Owl.prototype.animStage = function(pos){
 
 		// if speed is 0 the set inMotion to false
 		if(this.speed.current !== 0){
@@ -1707,16 +1700,16 @@ Custom events list:
 			this.state.inMotion = true;
 		}
 
-		var posX = this.pos.wrp = pos,
-			style = this.dom.wrp.style;
+		var posX = this.pos.stage = pos,
+			style = this.dom.stage.style;
 
 		if(this.support3d){
 			translate = 'translate3d(' + posX + 'px'+',0px, 0px)';
-			style[this.transformProperty] = translate;
+			style[this.transformVendor] = translate;
 		} else if(this.state.isTouch){
 			style.left = posX+'px';
 		} else {
-			this.dom.$wrp.animate({left: posX},this.speed.css2speed, this.options.fallbackEasing, function(){
+			this.dom.$stage.animate({left: posX},this.speed.css2speed, this.options.fallbackEasing, function(){
 				this.transitionEnd();
 			}.bind(this));
 		}
@@ -1773,7 +1766,7 @@ Custom events list:
 
 			//Double check this
 			// var nextPx = this.pos.items[nextPos];
-			// var currPx = this.pos.wrp 
+			// var currPx = this.pos.stage 
 			// var diff = Math.abs(nextPx-currPx);
 			// var s = diff/1
 			// if(s>1000){
@@ -1793,7 +1786,7 @@ Custom events list:
 		if(s === 0){s=0;};
 
 		if(this.support3d){
-			var style = this.dom.wrp.style;
+			var style = this.dom.stage.style;
 			style.webkitTransitionDuration = style.MsTransitionDuration = style.msTransitionDuration = style.MozTransitionDuration = style.OTransitionDuration = style.transitionDuration = (s / 1000) + 's';
 		} else{
 			this.speed.css2speed = s;
@@ -1813,7 +1806,7 @@ Custom events list:
 
 		this.updatePosition(pos);
 		this.setSpeed(0);
-		this.wrpMoveTo(this.pos.items[this.pos.currentAbs]);
+		this.animStage(this.pos.items[this.pos.currentAbs]);
 		if(update !== true){
 			this.updateItemState();
 		}
@@ -1831,7 +1824,7 @@ Custom events list:
 	Owl.prototype.goTo = function(pos,speed,naviloop){
 		this.updatePosition(pos,naviloop);
 		this.setSpeed(speed,this.pos.currentAbs);
-		this.wrpMoveTo(this.pos.items[this.pos.currentAbs]);
+		this.animStage(this.pos.items[this.pos.currentAbs]);
 	};
 
 	/**
@@ -1909,7 +1902,7 @@ Custom events list:
 			this.options.startPosition = 0;
 		}
 
-		this.dom.oWrp.scrollLeft = 0;
+		this.dom.oStage.scrollLeft = 0;
 		this.goTo(pos,0);
 	};
 
@@ -1923,7 +1916,7 @@ Custom events list:
 		if(pos === false){
 			pos = 0;
 		}
-		this.dom.oWrp.scrollLeft = 0;
+		this.dom.oStage.scrollLeft = 0;
 		this.goTo(pos,this.options.naviSpeed);
 	};
 
@@ -1980,7 +1973,7 @@ Custom events list:
 	Owl.prototype.play = function(timeout, speed){
 
 		// if tab is inactive - doesnt work in <IE10
-		if(isPageHidden() === true){return false;}
+		if(document.hidden === true){return false;}
 
 		// overwrite default options (custom options are always priority)
 		if(!this.options.autoplay){
@@ -2025,22 +2018,21 @@ Custom events list:
 	 */
 
 	Owl.prototype.transitionEnd = function(event){
+
 		// if css2 animation then event object is undefined 
 		if(event !== undefined){
 			event.stopPropagation();
 
-			// Catch only owl-wrapper transitionEnd event
+			// Catch only owl-stage transitionEnd event
 			var eventTarget = event.target || event.srcElement || event.originalTarget;
-			if(eventTarget !== this.dom.wrp){ // may try eventTarget.className !== 'owl-wrapper'
+			if(eventTarget !== this.dom.stage){ 
 				return false;
 			}
 		}
 
 		this.state.inMotion = false;
 		this.updateItemState();
-		
 		this.autoplay();
-			
 		this.fireCallback('onAnimationEnd');
 	};
 
@@ -2152,8 +2144,8 @@ Custom events list:
 		this.dom.$navNext = $(navNext).html(this.options.navText[1]);
 
 		// add events to do
-		this.on(navPrev, this.dragType[2], this.e.prev, false);
-		this.on(navNext, this.dragType[2], this.e.next, false);
+		this.on(navPrev, this.dragType[2], this.e._naviPrev, false);
+		this.on(navNext, this.dragType[2], this.e._naviNext, false);
 	};
 
 	/**
@@ -2173,7 +2165,7 @@ Custom events list:
 		this.dom.$page = $(page);
 
 		// add events
-		this.on(this.dom.$page[0], this.dragType[2], this.e._goToPage, false);
+		this.on(page, this.dragType[2], this.e._goToPage, false);
 
 		// build dots
 		this.rebuildDots();
@@ -2186,8 +2178,7 @@ Custom events list:
 	 */
 
 	Owl.prototype.goToPage = function(event){
-		var target = event ? event.target : window.event.srcElement;
-
+		var target = event.target || event.srcElement;
 		// if you click on span then take parant as target
 		if ( target.nodeName.toLowerCase() === 'span' ){
 			target = target.parentNode
@@ -2312,7 +2303,7 @@ Custom events list:
 
 		// if carousel is empty then append item
 		if(this.dom.$oItems.length === 0){
-			this.dom.$wrp.append(item);
+			this.dom.$stage.append(item);
 		} else {
 			// append item
 			var it = this.dom.$oItems.eq(pos);
@@ -2509,13 +2500,13 @@ Custom events list:
 		if(!this.options.autoHeight){return false;}
 
 		var loaded = this.dom.$items.eq(this.pos.currentAbs);
-		var wrp = this.dom.$oWrp;
+		var stage = this.dom.$oStage;
 		var iterations = 0;
 
 		var isLoaded = window.setInterval(function() {
 			iterations += 1;
 			if(loaded.data('owl-item').loaded){
-				wrp.height(loaded.height() + 'px');
+				stage.height(loaded.height() + 'px');
 				clearInterval(isLoaded);
 			} else if(iterations === 500){
 				clearInterval(isLoaded);
@@ -2573,7 +2564,7 @@ Custom events list:
 				}
 				
 				$el.css('opacity',1);
-				$el.removeClass('owl-lazy');
+				//$el.removeClass('owl-lazy');
 				that.fireCallback('onLazyLoaded');
 			};
 			img.src = $el.attr("data-src") || $el.attr("data-src-retina");
@@ -2594,18 +2585,18 @@ Custom events list:
 			this.off(window, 'resize', this.e._resizer);
 		}
 
-		if(this.transitionType){
-			this.off(this.dom.wrp, this.transitionType, this.e._transitionEnd);
+		if(this.transitionEndVendor){
+			this.off(this.dom.stage, this.transitionEndVendor, this.e._transitionEnd);
 		}
 
 		if(this.options.mouseDrag || this.options.touchDrag){
-			this.off(this.dom.wrp, this.dragType[0], this.e._onDragStart);
+			this.off(this.dom.stage, this.dragType[0], this.e._onDragStart);
 			if(this.options.mouseDrag){
 				this.off(document, this.dragType[3], this.e._onDragStart);
 			}
 			if(this.options.mouseDrag){
-				this.dom.$wrp.off("dragstart", function() {return false;});
-				this.dom.wrp.onselectstart = function(){};
+				this.dom.$stage.off("dragstart", function() {return false;});
+				this.dom.stage.onselectstart = function(){};
 			}
 		}
 
@@ -2629,7 +2620,7 @@ Custom events list:
 		this.dom.$el.off('owl.addItem',this.e.addItem);
 		this.dom.$el.off('owl.removeItem',this.e.removeItem);
 		this.dom.$el.off('owl.refresh',this.e.refresh);	
-		this.dom.$wrp.off('click',this.e._playVideo);
+		this.dom.$stage.off('click',this.e._playVideo);
 
 		if(this.dom.$cc !== null){
 			this.dom.$cc.remove();
@@ -2641,49 +2632,57 @@ Custom events list:
 		this.dom.$el.data('owlCarousel',null);
 		delete this.dom.el.owlCarousel;
 
-		this.dom.$wrp.unwrap();
+		this.dom.$stage.unwrap();
 		this.dom.$items.unwrap()
 		this.dom.$items.contents().unwrap();
 		this.dom = null;
 	};
 
+	Owl.prototype.browserSupport = function(){
+
+		this.support3d = isPerspective();
+
+		if(this.support3d){
+			this.transformVendor = isTransform();
+
+			// take transitionend event name by detecting transition
+			var endVendors = ['transitionend','webkitTransitionEnd','transitionend','oTransitionEnd']
+			this.transitionEndVendor = endVendors[isTransition()];
+
+			// take vendor name from transform name
+			this.vendorName = this.transformVendor.replace(/Transform/i,'');
+			this.vendorName = this.vendorName !== '' ? '-'+this.vendorName.toLowerCase()+'-' : '';
+		}
+
+		this.state.orientation = window.orientation;
+	}
+
 	// Pivate methods 
 
-	function isTransitionEnd(){
-		var t;
-		var el = document.createElement('fake');
-		var transitions = {
-		  'transition':			'transitionend',
-		  'OTransition':		'oTransitionEnd',
-		  'MozTransition':		'transitionend',
-		  'WebkitTransition':	'webkitTransitionEnd'
-		};
-		for(t in transitions){
-			if( el.style[t] !== undefined ){
-				return transitions[t];
+	// CSS detection;
+	function isStyleSupported(array){
+		var p,s,fake = document.createElement('div'),list = array;
+		for(p in list){
+			s = list[p]; 
+			if(typeof fake.style[s] !== 'undefined'){
+				//console.log(s);
+				fake = null;
+				return [s,p];
 			}
 		}
-		el = null;
+		return [false]
 	};
 
-	function isTransformProperty() {
-		var node = document.createElement('fake');
-		var properties = ['WebkitTransform','msTransform','OTransform','transform','MozTransform'];
-		var p;
-		while (p = properties.shift()) {
-			if (typeof node.style[p] !== 'undefined') {
-				node = null;
-				return p;
-			}
-		}
-		return false;
+	function isTransition(){
+		return isStyleSupported(['transition','WebkitTransition','MozTransition','OTransition'])[1];
+	};
+ 
+	function isTransform() {
+		return isStyleSupported(['transform','WebkitTransform','MozTransform','OTransform','msTransform'])[0];
 	};
 
-	function isTransform3d(){
-		var d = document.createElement('fake').style;
-		var test = ('webkitPerspective' in d || 'MozPerspective' in d || 'OPerspective' in d || 'MsPerspective' in d || 'perspective' in d);
-		d = null;
-		return test;
+	function isPerspective(){
+		return isStyleSupported(['perspective','webkitPerspective','MozPerspective','OPerspective','MsPerspective'])[0];
 	};
 
 	function isTouchSupport(){
@@ -2692,10 +2691,6 @@ Custom events list:
 
 	function isTouchSupportIE(){
 		return window.navigator.msPointerEnabled;
-	};
-
-	function isPageHidden(){
-		return document.hidden;
 	};
 
 	function isRetina(){
