@@ -219,3 +219,8 @@
 	display: block;
 	width: 100%;
 }
+
+
+.owl-rtl .owl-item {
+	float:right;
+}

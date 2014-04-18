@@ -4,7 +4,7 @@
  * @release 2014
  * Licensed under MIT
  * 
- * @version 2.0.0-beta.0.5
+ * @version 2.0.0-beta.0.6
  * @versionNotes Not compatibile with Owl Carousel <2.0.0
  */
 
@@ -23,7 +23,6 @@ To do:
 * prevent animationend bubling
 * itemsScaleUp 
 * Test Zepto
-* autoplay pause //on hover
 
 Callback events list:
 
@@ -253,8 +252,8 @@ Custom events list:
 		element.owlCarousel = {
 			'name':		'Owl Carousel',
 			'author':	'Bartosz Wojciechowski',
-			'version':	'2.0.0-beta.0.5',
-			'released':	'17.04.2014'
+			'version':	'2.0.0-beta.0.6',
+			'released':	'18.04.2014'
 		};
 
 		// Attach variables to object
@@ -312,6 +311,11 @@ Custom events list:
 		//Add theme class
 		if(!this.dom.$el.hasClass(this.options.themeClass)){
 			this.dom.$el.addClass(this.options.themeClass);
+		}
+
+		//Add theme class
+		if(this.options.rtl){
+			this.dom.$el.addClass('owl-rtl');
 		}
 
 		// Check support
@@ -602,7 +606,8 @@ Custom events list:
 
 		this.num.oItems = this.dom.$oItems.length;
 
-		// update index on original items
+		//update index on original items
+
 		for(var k = 0; k<this.num.oItems; k++){
 			var item = this.dom.$oItems.eq(k);
 			item.data('owl-item').index = k;
@@ -613,7 +618,6 @@ Custom events list:
 				item.data('owl-item').hash = hash;
 			}
 		}
-
 	};
 
 	/**
@@ -935,7 +939,11 @@ Custom events list:
 		this.num.nav = 		[];
 
 		// item distances
-		dist = this.options.center ? (this.width.el)/2 : 0;
+		if(this.options.rtl){
+			dist = this.options.center ? -((this.width.el)/2) : 0;
+		} else {
+			dist = this.options.center ? (this.width.el)/2 : 0;
+		}
 		
 		this.width.mergeStage = 0;
 
@@ -971,27 +979,30 @@ Custom events list:
 				iWidth = this.dom.$items.eq(i).width() + this.options.margin;
 				this.dom.$items[i].style.marginRight = this.options.margin + 'px';
 			}
-
 			// push item position into array
-
 			this.pos.items.push(dist);
 
 			// update item data
-
 			this.dom.$items.eq(i).data('owl-item').posLeft = posLeft;
 			this.dom.$items.eq(i).data('owl-item').width = iWidth;
 
 			// dist starts from middle of stage if center
 			// posLeft always starts from 0
+			if(this.options.rtl){
+				dist += iWidth;
+				posLeft += iWidth;
+			} else{
+				dist -= iWidth;
+				posLeft -= iWidth;
+			}
 
-			dist -= iWidth;
-			posLeft -= iWidth;
 			fullWidth -= Math.abs(iWidth);
 
 			// update position if center
 			if(this.options.center){
-				this.pos.items[i] -= (iWidth/2 );
+				this.pos.items[i] = !this.options.rtl ? this.pos.items[i] - (iWidth/2) : this.pos.items[i] + (iWidth/2);
 			}
+
 		}
 
 		if(this.options.autoWidth){
@@ -1000,8 +1011,10 @@ Custom events list:
 			this.width.stage = Math.abs(fullWidth);
 		}
 
-		// update indexAbs on all items 
-		for(j = 0; j< this.num.oItems + this.num.cItems; j++){
+		//update indexAbs on all items 
+		var allItems = this.num.oItems + this.num.cItems;
+
+		for(j = 0; j< allItems; j++){
 			this.dom.$items.eq(j).data('owl-item').indexAbs = j;
 		}
 
@@ -1012,6 +1025,7 @@ Custom events list:
 		this.setSizes();
 
 	};
+
 
 	/**
 	 * setMinMax
@@ -1047,12 +1061,13 @@ Custom events list:
 
 		//Max for autoWidth content 
 		if((!this.options.loop && !this.options.center && this.options.autoWidth) || (this.options.merge && !this.options.center) ){
+			var revert = this.options.rtl ? 1 : -1;
 			for (i = 0; i < this.pos.items.length; i++) {
-				if( (this.pos.items[i] * -1) < this.width.stage-this.width.el ){
+				if( (this.pos.items[i] * revert) < this.width.stage-this.width.el ){
 					this.pos.max = i+1;
 				}
 			}
-			this.pos.maxValue = -(this.width.stage-this.width.el);
+			this.pos.maxValue = this.options.rtl ? this.width.stage-this.width.el : -(this.width.stage-this.width.el);
 			this.pos.items[this.pos.max] = this.pos.maxValue
 		}
 
@@ -1069,7 +1084,6 @@ Custom events list:
 		}
 	}
 
-
 	/**
 	 * setSizes
 	 * @desc Set sizes on elements (from collectData function)
@@ -1084,14 +1098,20 @@ Custom events list:
 			this.dom.oStage.style.paddingRight = 	this.options.stagePadding + 'px';
 		}
 
+		// Doublecheck this!
+		//if(this.width.stagePrev > this.width.stage){
+			//window.setTimeout(function(){
+				//this.dom.stage.style.width = this.width.stage + 'px';
+			//}.bind(this),0);
+		//} else{
+		this.dom.stage.style.width = this.width.stage + 'px';
 
-		if(this.width.stagePrev > this.width.stage){
-			window.setTimeout(function(){
-				this.dom.stage.style.width = this.width.stage + 'px';
-			}.bind(this),0);
-		} else{
-			this.dom.stage.style.width = this.width.stage + 'px';
+		// RTL - move stage to left
+		if(this.options.rtl && this.support3d){
+			this.dom.stage.style.left = -(this.width.stage-this.width.el) + 'px';
 		}
+
+		//}
 
 		for(var i=0; i<this.num.items; i++){
 
@@ -1198,8 +1218,6 @@ Custom events list:
 
 		//aaaand show.
 		this.dom.$stage.removeClass('owl-refresh');
-		// update internal position information
-		//this.updatePosition(this.pos.current);
 
 		this.updateItemState();
 
@@ -1229,7 +1247,7 @@ Custom events list:
 	 */
 
 	Owl.prototype.updateItemState = function(){
-		var i,j,item,ipos,iwidth,wpos,stage;
+		var i,j,item,ipos,iwidth,wpos,stage,outsideView;
 
 		// clear states
 		for(i = 0; i<this.num.items; i++){
@@ -1242,16 +1260,20 @@ Custom events list:
 		}
 
 		this.num.active = 0;
+		stageX = this.pos.stage;
+		view = this.options.rtl ? this.width.view : -this.width.view;
 
-		for(j = 0; j<this.pos.items.length-1; j++){
+		for(j = 0; j<this.num.items; j++){
 
 				item = this.dom.$items.eq(j);
 				ipos = item.data('owl-item').posLeft;
-				iwidth = item.data('owl-item').width-2;
-				wpos = this.pos.stage;
-				view = -this.width.view;
+				iwidth = item.data('owl-item').width;
+				outsideView = this.options.rtl ? ipos + iwidth : ipos - iwidth;
 
-			if((ipos <= wpos && ipos > wpos + view) || (ipos - iwidth < wpos && ipos - iwidth > wpos + view)){
+			if( (this.op(ipos,'<=',stageX) && (this.op(ipos,'>',stageX + view))) || 
+				(this.op(outsideView,'<',stageX) && this.op(outsideView,'>',stageX + view)) 
+				){
+
 				this.num.active++;
 
 				item.data('owl-item').active = true;
@@ -1458,6 +1480,10 @@ Custom events list:
 		this.drag.offsetX = this.dom.$stage.position().left - this.options.stagePadding;
 		this.drag.offsetY = this.dom.$stage.position().top;
 
+		if(this.options.rtl){
+			this.drag.offsetX = this.dom.$stage.position().left + this.width.stage - this.width.el;
+		}
+
 		//catch position // ie to fix
 		if(this.state.inMotion && this.support3d ){
 			var animatedPos = this.getTransformProperty();
@@ -1511,23 +1537,23 @@ Custom events list:
 
 		// Check move direction 
 		if (this.drag.distance < 0) {
-			this.state.direction = "left";
+			this.state.direction = this.options.rtl ? "right" : "left";
 		} else if(this.drag.distance > 0){
-			this.state.direction = "right";
+			this.state.direction = this.options.rtl ? "left" : "right";
 		}
 
 		// Loop
 		if(this.options.loop){
-
-			if(this.drag.currentX > this.pos.minValue && this.state.direction === "right" ){
+			if(this.op(this.drag.currentX, '>', this.pos.minValue) && this.state.direction === "right" ){
 				this.drag.currentX -= this.pos.loop;
-			}else if(this.drag.currentX < this.pos.maxValue && this.state.direction === "left" ){//-this.width.stage - neighbourItemWidth + (2*this.width.el)
+			}else if(this.op(this.drag.currentX, '<', this.pos.maxValue) && this.state.direction === "left" ){
 				this.drag.currentX += this.pos.loop;
 			}
-			
 		} else {
-			// Strain 
-			this.drag.currentX = Math.max(Math.min(this.drag.currentX, this.pos.minValue + this.drag.distance / 5), this.pos.maxValue + this.drag.distance / 5);
+			// Strain
+			var minValue = this.options.rtl ? this.pos.maxValue : this.pos.minValue;
+			var maxValue = this.options.rtl ? this.pos.minValue : this.pos.maxValue;
+			this.drag.currentX = Math.max(Math.min(this.drag.currentX, minValue + this.drag.distance / 5), maxValue + this.drag.distance / 5);
 		}
 
 		// Lock browser if swiping horizontal
@@ -1549,7 +1575,7 @@ Custom events list:
 			 this.state.isScrolling = true;
 			 this.drag.updatedX = this.drag.start;
 		}
-		
+
 		this.animStage(this.drag.updatedX);
 	};
 
@@ -1591,7 +1617,6 @@ Custom events list:
 		if(distanceAbs > 3 || compareTimes > 300){
 			this.removeClick(this.drag.targetEl);
 		}
-
 		var closest = this.closest(this.drag.updatedX);
 
 		this.setSpeed(this.options.dragEndSpeed, false, true);
@@ -1664,19 +1689,19 @@ Custom events list:
 		for(var i = 0; i< this.num.items; i++){
 			if(x > this.pos.items[i]-pull && x < this.pos.items[i]+pull){
 				newX = i;
-			} else if(x < this.pos.items[i] && x > this.pos.items[i+1 || this.pos.items[i] - this.width.el]){
+			}else if(this.op(x,'<',this.pos.items[i]) && this.op(x,'>',this.pos.items[i+1 || this.pos.items[i] - this.width.el]) ){
 				newX = this.state.direction === "left" ? i+1 : i;
 			}
 		}
+
 		//non loop boundries
 		if(!this.options.loop){
-			if(x > this.pos.minValue ){
+			if(this.op(x,'>',this.pos.minValue)){
 				newX = this.pos.min;
-			} else if(x < this.pos.maxValue){
+			} else if(this.op(x,'<',this.pos.maxValue)){
 				newX = this.pos.max;
 			}
 		}
-
 		// set positions
 		this.pos.currentAbs = newX;
 		this.pos.current = this.dom.$items.eq(newX).data('owl-item').index;
@@ -1703,6 +1728,10 @@ Custom events list:
 		var posX = this.pos.stage = pos,
 			style = this.dom.stage.style;
 
+		if(this.options.rtl && !this.support3d){
+			posX -= this.width.stage-this.width.el;
+		}
+
 		if(this.support3d){
 			translate = 'translate3d(' + posX + 'px'+',0px, 0px)';
 			style[this.transformVendor] = translate;
@@ -1725,7 +1754,7 @@ Custom events list:
 	 */
 
 	Owl.prototype.updatePosition = function(pos){
-		
+
 		// if no items then stop 
 		if(this.num.oItems === 0){return false;}
 		if(pos === undefined){return false;}
@@ -1742,9 +1771,10 @@ Custom events list:
 
 		if(!this.options.loop){
 			nextPos = nextPos > this.pos.max ? this.pos.max : (nextPos <= 0 ? 0 : nextPos);
+		} else {
+			nextPos = nextPos > this.num.oItems ? this.num.oItems-1 : nextPos;
 		}
 		
-
 		this.pos.current = this.dom.$oItems.eq(nextPos).data('owl-item').index;
 		this.pos.currentAbs = this.dom.$oItems.eq(nextPos).data('owl-item').indexAbs;
 	};
@@ -1762,7 +1792,7 @@ Custom events list:
 		var s = speed,
 			nextPos = pos;
 
-		if(s === false && s !== 0 && drag !== true){
+		if((s === false && s !== 0 && drag !== true) || s === undefined){
 
 			//Double check this
 			// var nextPx = this.pos.items[nextPos];
@@ -2136,8 +2166,13 @@ Custom events list:
 		navPrev.className = this.options.navClass[0];
 		navNext.className = this.options.navClass[1];
 
-		nav.appendChild(navPrev);
-		nav.appendChild(navNext);
+		if(this.options.rtl){
+			nav.appendChild(navNext);
+			nav.appendChild(navPrev);
+		} else {
+			nav.appendChild(navPrev);
+			nav.appendChild(navNext);
+		}
 
 		this.dom.$nav = $(nav);
 		this.dom.$navPrev = $(navPrev).html(this.options.navText[0]);
@@ -2219,7 +2254,8 @@ Custom events list:
 				dot.appendChild(span);
 				$(dot).data('page',page);
 				$(dot).data('goToPage',roundPages);
-				this.dom.$page.append(dot);
+
+				if(this.options.rtl){ this.dom.$page.prepend(dot);}else{this.dom.$page.append(dot);}
 
 				counter = 0;
 				roundPages++;
@@ -2287,8 +2323,6 @@ Custom events list:
 			}
 		}
 	}
-
-
 
 	/**
 	 * addItem - Add an item
@@ -2638,8 +2672,38 @@ Custom events list:
 		this.dom = null;
 	};
 
-	Owl.prototype.browserSupport = function(){
+	/**
+	 * Opertators 
+	 * @desc Used to calculate RTL
+	 * @param [a] - Number - left side
+	 * @param [o] - String - operator 
+	 * @param [b] - Number - right side
+	 * @since 2.0.0
+	 */
 
+	Owl.prototype.op = function(a,o,b){
+		var rtl = this.options.rtl;
+        switch(o) {
+            case "<":
+                return rtl ? a > b : a < b;
+            case ">":
+                return rtl ? a < b : a > b;
+            case ">=":
+                return rtl ? a <= b : a >= b;
+            case "<=":
+                return rtl ? a >= b : a <= b;
+            default:
+            	break;
+        }
+	};
+
+	/**
+	 * Opertators 
+	 * @desc Used to calculate RTL
+	 * @since 2.0.0
+	 */
+
+	Owl.prototype.browserSupport = function(){
 		this.support3d = isPerspective();
 
 		if(this.support3d){
@@ -2665,7 +2729,6 @@ Custom events list:
 		for(p in list){
 			s = list[p]; 
 			if(typeof fake.style[s] !== 'undefined'){
-				//console.log(s);
 				fake = null;
 				return [s,p];
 			}
