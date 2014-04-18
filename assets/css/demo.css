@@ -82,6 +82,9 @@ code.hljs {
 	transform: scale(1);
 }
 
+.owl-rtl .article{
+	text-align: right;
+}
 
 
 
