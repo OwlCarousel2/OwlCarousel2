@@ -4,7 +4,7 @@
  * @release 2014
  * Licensed under MIT
  * 
- * @version 2.0.0-beta.0.7
+ * @version 2.0.0-beta.0.8
  * @versionNotes Not compatibile with Owl Carousel <2.0.0
  */
 
@@ -252,7 +252,7 @@ Custom events list:
 		element.owlCarousel = {
 			'name':		'Owl Carousel',
 			'author':	'Bartosz Wojciechowski',
-			'version':	'2.0.0-beta.0.6',
+			'version':	'2.0.0-beta.0.8',
 			'released':	'18.04.2014'
 		};
 
@@ -977,7 +977,12 @@ Custom events list:
 			// autoWidth item size
 			if(this.options.autoWidth){
 				iWidth = this.dom.$items.eq(i).width() + this.options.margin;
-				this.dom.$items[i].style.marginRight = this.options.margin + 'px';
+				if(this.options.rtl){
+					this.dom.$items[i].style.marginLeft = this.options.margin + 'px';
+				} else {
+					this.dom.$items[i].style.marginRight = this.options.margin + 'px';
+				}
+				
 			}
 			// push item position into array
 			this.pos.items.push(dist);
@@ -1023,7 +1028,6 @@ Custom events list:
 
 		// Recalculate grid 
 		this.setSizes();
-
 	};
 
 
@@ -1120,12 +1124,15 @@ Custom events list:
 				this.dom.$items[i].style.width = this.width.item - (this.options.margin) + 'px';
 			}
 			// add margin
-			this.dom.$items[i].style.marginRight = this.options.margin + 'px';
-
+			if(this.options.rtl){
+				this.dom.$items[i].style.marginLeft = this.options.margin + 'px';
+			} else {
+				this.dom.$items[i].style.marginRight = this.options.margin + 'px';
+			}
+			
 			if(this.num.merged[i] !== 1 && !this.options.autoWidth){
 				this.dom.$items[i].style.width = (this.width.item * this.num.merged[i]) - (this.options.margin) + 'px';
 			}
-
 		}
 
 		// save prev stage size 
@@ -1481,7 +1488,7 @@ Custom events list:
 		this.drag.offsetY = this.dom.$stage.position().top;
 
 		if(this.options.rtl){
-			this.drag.offsetX = this.dom.$stage.position().left + this.width.stage - this.width.el;
+			this.drag.offsetX = this.dom.$stage.position().left + this.width.stage - this.width.el + this.options.margin;
 		}
 
 		//catch position // ie to fix
@@ -1575,7 +1582,6 @@ Custom events list:
 			 this.state.isScrolling = true;
 			 this.drag.updatedX = this.drag.start;
 		}
-
 		this.animStage(this.drag.updatedX);
 	};
 
