@@ -122,6 +122,7 @@ Custom events list:
 		pagiClass:			'owl-pagination',
 		mobileBoostClass:	'owl-mobile',
 		autoHeightClass:	'owl-height',
+		nestedItemSelector:	false,
 
 		itemElement:		'div',
 		stageElement:		'div'
@@ -600,7 +601,7 @@ Custom events list:
 	 */
 
 	Owl.prototype.updateLocalContent = function(){
-		this.dom.$oItems = this.dom.$stage.children('.owl-item').filter(function(){
+		this.dom.$oItems = this.dom.$stage.find('.'+this.options.itemClass).filter(function(){
 			return $(this).data('owl-item').clone === false;
 		});
 
@@ -818,7 +819,13 @@ Custom events list:
 
 	Owl.prototype.appendLocalItems = function(){
 		// get local data information (children etc.)
-		var content	= this.dom.$el.children().not(".owl-stage-outer");
+		var content;
+		if(this.options.nestedItemSelector){
+			content	= this.dom.$el.find('.'+this.options.nestedItemSelector);
+		} else {
+			content	= this.dom.$el.children();
+		}
+		content = content.not(".owl-stage-outer");
 		this.num.oItems = content.length;
 
 		for(var i = 0; i < this.num.oItems; i++){
@@ -875,7 +882,7 @@ Custom events list:
 			firstClone = lastClone = null;
 		}
 
-		this.dom.$cItems = this.dom.$stage.children('.owl-item').filter(function(){
+		this.dom.$cItems = this.dom.$stage.find('.'+this.options.itemClass).filter(function(){
 			return $(this).data('owl-item').clone === true;
 		});
 	};
