@@ -4,7 +4,7 @@
  * @release 2014
  * Licensed under MIT
  * 
- * @version 2.0.0-beta.0.6
+ * @version 2.0.0-beta.0.7
  * @versionNotes Not compatibile with Owl Carousel <2.0.0
  */
 
@@ -1098,19 +1098,19 @@ Custom events list:
 			this.dom.oStage.style.paddingRight = 	this.options.stagePadding + 'px';
 		}
 
-		// Doublecheck this!
+		// CRAZY FIX!!! Doublecheck this!
 		//if(this.width.stagePrev > this.width.stage){
-			//window.setTimeout(function(){
-				//this.dom.stage.style.width = this.width.stage + 'px';
-			//}.bind(this),0);
-		//} else{
-		this.dom.stage.style.width = this.width.stage + 'px';
-
-		// RTL - move stage to left
-		if(this.options.rtl && this.support3d){
-			this.dom.stage.style.left = -(this.width.stage-this.width.el) + 'px';
+		if(this.options.rtl){
+			window.setTimeout(function(){
+				this.dom.stage.style.width = this.width.stage + 'px';
+			}.bind(this),0);
+		} else{
+			this.dom.stage.style.width = this.width.stage + 'px';
 		}
 
+		// RTL - move stage to left
+		//if(this.options.rtl && this.support3d){
+			//this.dom.stage.style.left = -(this.width.stage-this.width.el) + 'px';
 		//}
 
 		for(var i=0; i<this.num.items; i++){
@@ -1728,9 +1728,9 @@ Custom events list:
 		var posX = this.pos.stage = pos,
 			style = this.dom.stage.style;
 
-		if(this.options.rtl && !this.support3d){
-			posX -= this.width.stage-this.width.el;
-		}
+		// if(this.options.rtl && !this.support3d){
+		// 	posX -= this.width.stage-this.width.el;
+		// }
 
 		if(this.support3d){
 			translate = 'translate3d(' + posX + 'px'+',0px, 0px)';
@@ -2166,13 +2166,8 @@ Custom events list:
 		navPrev.className = this.options.navClass[0];
 		navNext.className = this.options.navClass[1];
 
-		if(this.options.rtl){
-			nav.appendChild(navNext);
-			nav.appendChild(navPrev);
-		} else {
-			nav.appendChild(navPrev);
-			nav.appendChild(navNext);
-		}
+		nav.appendChild(navPrev);
+		nav.appendChild(navNext);
 
 		this.dom.$nav = $(nav);
 		this.dom.$navPrev = $(navPrev).html(this.options.navText[0]);
@@ -2255,7 +2250,7 @@ Custom events list:
 				$(dot).data('page',page);
 				$(dot).data('goToPage',roundPages);
 
-				if(this.options.rtl){ this.dom.$page.prepend(dot);}else{this.dom.$page.append(dot);}
+				this.dom.$page.append(dot);
 
 				counter = 0;
 				roundPages++;
