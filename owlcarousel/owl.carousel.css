@@ -220,7 +220,14 @@
 	width: 100%;
 }
 
+.owl-rtl{
+	direction: rtl;
+}
 
 .owl-rtl .owl-item {
 	float:right;
 }
+
+
+
+

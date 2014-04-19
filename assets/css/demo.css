@@ -25,7 +25,6 @@ code.hljs {
 	background: #23241f;
 }
 
-
 /* demos */
 .article{
 	background: #008cba;
@@ -81,12 +80,6 @@ code.hljs {
 	-o-transform: scale(1);
 	transform: scale(1);
 }
-
-.owl-rtl .article{
-	text-align: right;
-}
-
-
 
 
 
