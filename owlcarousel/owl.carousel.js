@@ -4,7 +4,7 @@
  * @release 2014
  * Licensed under MIT
  * 
- * @version 2.0.0-beta.0.8
+ * @version 2.0.0-beta.0.9
  * @versionNotes Not compatibile with Owl Carousel <2.0.0
  */
 
@@ -18,8 +18,6 @@ To do:
 
 * Lazy Load Icon
 * Text navigation 
-* Responsive images 
-* Thumbnail images
 * prevent animationend bubling
 * itemsScaleUp 
 * Test Zepto
@@ -66,6 +64,9 @@ Custom events list:
 		loop:				false,
 		center:				false,
 		lazyLoad:			false,
+
+		lightweightStructure:false,
+
 		mouseDrag:			true,
 		touchDrag:			true,
 
@@ -105,7 +106,6 @@ Custom events list:
 		videoHeight:		false,
 		videoWidth:			false,
 
-		mobileBoost: 		false,
 		fallbackEasing:		'swing',
 
 		//Classes and Names
@@ -120,7 +120,6 @@ Custom events list:
 		controlsClass:		'owl-controls',
 		pagiDotClass: 		'owl-dot',
 		pagiClass:			'owl-pagination',
-		mobileBoostClass:	'owl-mobile',
 		autoHeightClass:	'owl-height',
 		nestedItemSelector:	false,
 
@@ -146,7 +145,8 @@ Custom events list:
 		$navPrev:	null,
 		$navNext:	null,
 		$page:		null,
-		$nav:		null
+		$nav:		null,
+		$content:	null,
 	};
 
 	/**
@@ -174,7 +174,8 @@ Custom events list:
 		cItems:				0,
 		active:				0,
 		merged:				[],
-		nav:				[]
+		nav:				[],
+		allPages:			0
 	};
 
 	// Positions
@@ -188,7 +189,8 @@ Custom events list:
 		currentAbs:	0,
 		currentPage:0,
 		stage:		0,
-		items:		[]
+		items:		[],
+		lsCurrent:	0
 	};
 
 	// Drag/Touches
@@ -253,8 +255,8 @@ Custom events list:
 		element.owlCarousel = {
 			'name':		'Owl Carousel',
 			'author':	'Bartosz Wojciechowski',
-			'version':	'2.0.0-beta.0.8',
-			'released':	'18.04.2014'
+			'version':	'2.0.0-beta.0.9',
+			'released':	'21.04.2014'
 		};
 
 		// Attach variables to object
@@ -346,7 +348,17 @@ Custom events list:
 		this.createStage();
 
 		// Append local content 
-		this.appendLocalItems();
+		this.findLocalContent();
+
+		if(this.options.lightweightStructure && this.num.oItems >= this.options.items*3){
+			this.options.lightweightStructure = true;
+			this.dom.$el.data('owl-structure','lightweight');
+			this.createLightweightStructure();
+		} else {
+			this.options.lightweightStructure = false;
+			this.dom.$el.data('owl-structure','normal');
+			this.createNormalStructure();
+		}
 
 		// Check options
 		this.optionsLogic();
@@ -465,14 +477,8 @@ Custom events list:
 			this.options.slideBy = this.options.items;
 		}
 
-		if(this.num.oItems <= this.options.items){
+		if(this.num.oItems < this.options.items){
 			this.options.loop = false;
-		}
-
-		if(this.options.mobileBoost){
-			this.dom.$stage.addClass(this.options.mobileBoostClass);
-		} else {
-			this.dom.$stage.removeClass(this.options.mobileBoostClass);
 		}
 
 		if(this.options.autoHeight){
@@ -485,6 +491,14 @@ Custom events list:
 			this.options.stagePadding = false;
 			this.options.paginationEach = 1;
 			this.options.merge = false;
+		}
+		if(this.dom.$el.data('owl-structure') === 'lightweight'){
+			this.options.loop = false;
+			this.options.merge = false;
+			this.options.pagination = false;
+			this.options.lightweightStructure = true;
+		} else {
+			this.options.lightweightStructure = false;
 		}
 	};
 
@@ -526,41 +540,57 @@ Custom events list:
 	};
 
 	/**
-	 * setData
-	 * @desc Set item jQuery Data 
+	 * findLocalContent
 	 * @since 2.0.0
-	 * @param [item] - dom - passed owl-item
-	 * @param [cloneObj] - $dom - passed clone item
 	 */
 
+	Owl.prototype.findLocalContent = function(){
+		// get local data information (children etc.)
+		var content;
+		if(this.options.nestedItemSelector){
+			this.dom.$content= this.dom.$el.find('.'+this.options.nestedItemSelector).not(".owl-stage-outer");
+		} else {
+			this.dom.$content= this.dom.$el.children().not(".owl-stage-outer");
+		}
+		this.num.oItems = this.dom.$content.length;
+	};
 
-	Owl.prototype.setData = function(item,cloneObj,dotName){
+	/**
+	 * createNormalStructure
+	 * @desc Create normal structure for small/mid weight content
+	 * @since 2.0.0
+	 */
 
-		var itemData = {
-			index:		false,
-			indexAbs:	false,
-			posLeft:	false,
-			clone:		false,
-			active:		false,
-			loaded:		false,
-			lazyLoad:	false,
-			current:	false,
-			width:		false,
-			center:		false,
-			page:		false,
-			hasVideo:	false,
-			playVideo:	false,
-			dotName:	dotName || false,
-			hash:		false
-		};
+	Owl.prototype.createNormalStructure = function(){
+		for(var i = 0; i < this.num.oItems; i++){
+			// fill 'owl-item' with content 
+			var item = this.fillItem(this.dom.$content,i);
+			// append into stage 
+			this.dom.$stage.append(item);
+		}
+		this.dom.$content = null;
+	};
 
-		// copy itemData to cloned item 
+	/**
+	 * createLightweightStructure
+	 * @desc Create lightweight structure for large content and better mobile experience
+	 * @since 2.0.0
+	 */
 
-		if(cloneObj){
-			itemData = $.extend({}, itemData, cloneObj.data('owl-item'));
+	Owl.prototype.createLightweightStructure = function(){
+		if(this.dom.$el.data('owl-structure') !== 'lightweight'){return false;}
+		// remove stage
+		this.dom.$content.remove();
+		this.dom.$stage.empty();
+
+		for(var i = 0; i < this.options.items*3; i++){
+			var emptyItem = this.createItem();
+			var item = $(emptyItem);
+			this.setData(item,false);
+			item.data('owl-item').boostPage = i;
+			this.dom.$stage.append(item);
 		}
 
-		$(item).data('owl-item', itemData);
 	};
 
 	/**
@@ -593,7 +623,47 @@ Custom events list:
 		if(this.options.dotsName){
 			return c.getAttribute('data-dotname');
 		}
-	}
+	};
+
+
+	/**
+	 * setData
+	 * @desc Set item jQuery Data 
+	 * @since 2.0.0
+	 * @param [item] - dom - passed owl-item
+	 * @param [cloneObj] - $dom - passed clone item
+	 */
+
+
+	Owl.prototype.setData = function(item,cloneObj,dotName){
+
+		var itemData = {
+			index:		false,
+			indexAbs:	false,
+			posLeft:	false,
+			clone:		false,
+			active:		false,
+			loaded:		false,
+			lazyLoad:	false,
+			current:	false,
+			width:		false,
+			center:		false,
+			page:		false,
+			hasVideo:	false,
+			playVideo:	false,
+			dotName:	dotName || false,
+			hash:		false,
+			boostPage:	false
+		};
+
+		// copy itemData to cloned item 
+
+		if(cloneObj){
+			itemData = $.extend({}, itemData, cloneObj.data('owl-item'));
+		}
+
+		$(item).data('owl-item', itemData);
+	};
 
 	/**
 	 * updateLocalContent
@@ -810,37 +880,6 @@ Custom events list:
 		target.after(videoWrap);
 	};
 
-
-	/**
-	 * appendLocalItems
-	 * @desc Append local items into stage
-	 * @since 2.0.0
-	 */
-
-	Owl.prototype.appendLocalItems = function(){
-		// get local data information (children etc.)
-		var content;
-		if(this.options.nestedItemSelector){
-			content	= this.dom.$el.find('.'+this.options.nestedItemSelector);
-		} else {
-			content	= this.dom.$el.children();
-		}
-		content = content.not(".owl-stage-outer");
-		this.num.oItems = content.length;
-
-		for(var i = 0; i < this.num.oItems; i++){
-
-			// fill 'owl-item' with content 
-			var item = this.fillItem(content,i);
-
-			// append into stage 
-			this.dom.$stage.append(item);
-		}
-
-		// remove local content references
-		content = null;
-	};
-
 	/**
 	 * loopClone
 	 * @desc Make a clones for infinity loop
@@ -848,7 +887,7 @@ Custom events list:
 	 */
 
 	Owl.prototype.loopClone = function(){
-		if(!this.options.loop){return false;}
+		if(!this.options.loop || this.dom.$el.data('owl-structure') === 'lightweight'){return false;}
 
 		var firstClone,	lastClone, i,
 			num	=		this.options.items, 
@@ -1119,11 +1158,6 @@ Custom events list:
 			this.dom.stage.style.width = this.width.stage + 'px';
 		}
 
-		// RTL - move stage to left
-		//if(this.options.rtl && this.support3d){
-			//this.dom.stage.style.left = -(this.width.stage-this.width.el) + 'px';
-		//}
-
 		for(var i=0; i<this.num.items; i++){
 
 			// Set items width
@@ -1211,14 +1245,21 @@ Custom events list:
 		// udpate options
 		this.optionsLogic();
 
+		this.createLightweightStructure();
+
 		// update info about local content
 		this.updateLocalContent();
 
+		// if no items then stop 
+		if(this.num.oItems === 0){
+			if(this.dom.$page !== null){
+				this.dom.$page.hide();
+			}
+			return false;
+		}
+
 		//Check for videos ( YouTube and Vimeo currently supported)
 		this.checkVideoLinks();
-
-		// if no items then stop 
-		if(this.num.oItems === 0){return false;}
 
 		// Hide and Show methods helps here to set a proper widths.
 		// This prevents Scrollbar to be calculated in stage width
@@ -1235,8 +1276,10 @@ Custom events list:
 
 		this.updateItemState();
 
-		// jump to last position 		
-		this.jumpTo(this.pos.current,false); // fix that 
+		// jump to last position 
+		if(this.dom.$el.data('owl-structure') === 'normal'){
+			this.jumpTo(this.pos.current,false); // fix that 
+		}
 
 		// Update controls
 		this.rebuildDots();
@@ -1261,16 +1304,31 @@ Custom events list:
 	 */
 
 	Owl.prototype.updateItemState = function(){
-		var i,j,item,ipos,iwidth,wpos,stage,outsideView;
 
+		if(this.dom.$el.data('owl-structure') === 'normal'){
+			this.updateActiveItems();
+		} else {
+			this.updateLightweightItems();
+		}
+
+		if(this.options.center){
+			this.dom.$items.eq(this.pos.currentAbs)
+			.addClass(this.options.centerClass)
+			.data('owl-item').center = true;
+		}
+
+		if(this.options.lazyLoad){
+			this.lazyLoad();
+		}
+	};
+
+	Owl.prototype.updateActiveItems = function(){
+		var i,j,item,ipos,iwidth,wpos,stage,outsideView;
 		// clear states
 		for(i = 0; i<this.num.items; i++){
 			this.dom.$items.eq(i).data('owl-item').active = false;
 			this.dom.$items.eq(i).data('owl-item').current = false;
 			this.dom.$items.eq(i).removeClass(this.options.activeClass).removeClass(this.options.centerClass);
-			if(this.options.mobileBoost){
-				this.dom.$items.eq(i).removeClass('active');
-			}
 		}
 
 		this.num.active = 0;
@@ -1297,23 +1355,11 @@ Custom events list:
 				if(!this.options.lazyLoad){
 					item.data('owl-item').loaded = true;
 				}
-
 				if(this.options.loop && (this.options.lazyLoad || this.options.center)){
 					this.updateClonedItemsState(item.data('owl-item').index);
 				}
 			}
 		}
-
-		if(this.options.center){
-			this.dom.$items.eq(this.pos.currentAbs)
-			.addClass(this.options.centerClass)
-			.data('owl-item').center = true;
-		}
-
-		if(this.options.lazyLoad){
-			this.lazyLoad();
-		}
-
 	};
 
 	/**
@@ -1333,16 +1379,94 @@ Custom events list:
 			var $el = this.dom.$items.eq(i);
 			if( $el.data('owl-item').index === activeIndex ){
 				$el.data('owl-item').current = true;
-
-				if(this.options.mobileBoost){
-					$el.addClass(this.options.activeClass);
-				}
 				if($el.data('owl-item').index === center ){
 					$el.addClass(this.options.centerClass);
 				}
 			}
 		}
 	}
+
+	/**
+	 * updateLightweightItems
+	 * @since 2.0.0
+	 */
+
+	Owl.prototype.updateLightweightItems = function(){
+		var jumpTo = this.pos.goToLightweight || 0;
+
+		var direction;
+		var pos = this.pos.currentAbs;
+
+		this.pos.current = this.pos.currentAbs = this.options.items;
+
+		if(this.options.items < pos ){
+			this.pos.lsCurrent += pos - this.options.items;
+			direction = 'right'
+		} else if(this.options.items > pos ){
+			this.pos.lsCurrent -= this.options.items - pos;
+			direction = 'left'
+		}
+
+		var movedBy = Math.abs(this.options.items - pos);
+
+		if(direction !== false){
+			for(var i = 0; i<movedBy; i++){
+				if(direction === "right"){
+					var item = this.dom.$stage.find('.owl-item').eq(0) //.appendTo(this.dom.$stage);
+					item.appendTo(this.dom.$stage);
+				}
+				if(direction === "left"){
+					var item = this.dom.$stage.find('.owl-item').eq(-1);
+					item.prependTo(this.dom.$stage)
+				}
+				item.data('owl-item').active = false;
+			}
+		}
+		
+		this.pos.lsCurrent = jumpTo !== 0 ? jumpTo : this.pos.lsCurrent;
+
+		// recollect 
+		this.dom.$items = this.dom.$stage.find('.owl-item');
+		
+		if(this.pos.lsCurrent >= this.dom.$content.length){
+			this.pos.lsCurrent = this.pos.lsCurrent-this.dom.$content.length;
+		} else if(this.pos.lsCurrent < -this.dom.$content.length+1){
+			this.pos.lsCurrent = this.pos.lsCurrent+this.dom.$content.length;
+		}
+
+		for(var j = 0; j<this.num.items; j++){
+			this.dom.$items.eq(j).removeClass(this.options.centerClass);
+
+			// get Content 
+			var contentPos = this.pos.lsCurrent + j - this.options.items + this.options.startPosition;
+
+			if(contentPos >= this.dom.$content.length){
+				contentPos = contentPos - this.dom.$content.length;
+			}
+			if(contentPos < -this.dom.$content.length){
+				contentPos = contentPos + this.dom.$content.length;
+			}
+			
+			var content = this.dom.$content.eq(contentPos);
+
+			var freshItem = this.dom.$items.eq(j);
+			var freshData = freshItem.data('owl-item');
+
+			if(freshData.active === false || jumpTo !== 0){
+
+				freshItem.empty();
+				freshItem.append(content);
+				freshData.active = true;
+				freshData.current = true;
+			}
+		}
+		var currentAbs = this.pos.lsCurrent + this.options.startPosition;
+		this.pos.currentLight = currentAbs = currentAbs < 0 ? currentAbs+this.dom.$content.length : currentAbs;
+
+		this.pos.goToLightweight = 0;
+		this.setSpeed(0);
+		this.animStage(this.pos.items[this.options.items]);
+	};
 
 	/**
 	 * eventsCall
@@ -1361,12 +1485,21 @@ Custom events list:
 		this.e._preventClick =	function(e){this.preventClick(e);		}.bind(this);
 		this.e._goToHash =		function(){this.goToHash();				}.bind(this);
 		this.e._goToPage =		function(e){this.goToPage(e);			}.bind(this);
-		this.e._naviNext =		function(e){this.next();				}.bind(this);
-		this.e._naviPrev =		function(e){this.prev();				}.bind(this);
 		this.e._ap = 			function(){this.autoplay();				}.bind(this);
 		this.e._play = 			function(){this.play();					}.bind(this);
 		this.e._pause = 		function(){this.pause();				}.bind(this);
 		this.e._playVideo = 	function(e){this.playVideo(e);			}.bind(this);
+
+		this.e._naviNext = function(e){
+			//prevent double-click zoom on mobile
+			e.preventDefault();
+			this.next();				
+		}.bind(this);
+
+		this.e._naviPrev = function(e){
+			e.preventDefault();
+			this.prev();
+		}.bind(this);
 
 	};
 
@@ -1499,14 +1632,15 @@ Custom events list:
 		}
 
 		//catch position // ie to fix
-		if(this.state.inMotion && this.support3d ){
+		if(this.state.inMotion && this.support3d){
 			var animatedPos = this.getTransformProperty();
 			this.drag.offsetX = animatedPos;
 			this.animStage(animatedPos);
-		} else if(this.state.inMotion){
+		} else if(this.state.inMotion && !this.support3d ){
+			this.state.inMotion = false;
 			return false;
 		}
-		
+
 		this.drag.startX = pageX - this.drag.offsetX;
 		this.drag.startY = pageY - this.drag.offsetY;
 
@@ -1615,6 +1749,7 @@ Custom events list:
 		this.state.isScrolling = false;
 		this.state.isSwiping = false;
 
+		//to check
 		if(this.drag.distance === 0 && this.state.inMotion !== true){
 			this.state.inMotion = false;
 			return false;
@@ -1715,10 +1850,10 @@ Custom events list:
 				newX = this.pos.max;
 			}
 		}
+
 		// set positions
 		this.pos.currentAbs = newX;
 		this.pos.current = this.dom.$items.eq(newX).data('owl-item').index;
-
 
 		return newX;
 	};
@@ -1752,7 +1887,9 @@ Custom events list:
 			style.left = posX+'px';
 		} else {
 			this.dom.$stage.animate({left: posX},this.speed.css2speed, this.options.fallbackEasing, function(){
-				this.transitionEnd();
+				if(this.state.inMotion){
+					this.transitionEnd();
+				}
 			}.bind(this));
 		}
 
@@ -1846,6 +1983,9 @@ Custom events list:
 	 */
 
 	Owl.prototype.jumpTo = function(pos,update){
+		if(this.dom.$el.data('owl-structure') === 'lightweight'){
+			this.pos.goToLightweight = pos;
+		}
 
 		this.updatePosition(pos);
 		this.setSpeed(0);
@@ -1861,11 +2001,10 @@ Custom events list:
 	 * @param [pos] - number
 	 * @param [speed] - speed in ms
 	 * @param [speed] - speed in ms
-	 * @param [naviLoop] - boolean - if loop is enabled then calculate position by all items including cloned - used by navigation
 	 */
 
-	Owl.prototype.goTo = function(pos,speed,naviloop){
-		this.updatePosition(pos,naviloop);
+	Owl.prototype.goTo = function(pos,speed){
+		this.updatePosition(pos);
 		this.setSpeed(speed,this.pos.currentAbs);
 		this.animStage(this.pos.items[this.pos.currentAbs]);
 	};
@@ -1940,11 +2079,13 @@ Custom events list:
 		var pos = this.options.startPosition;
 
 		if(this.options.startPosition === 'URLHash'){
-			pos = this.hashPosition();
+			pos = this.options.startPosition = this.hashPosition();
 		} else if(typeof this.options.startPosition !== Number && !this.options.center){
 			this.options.startPosition = 0;
 		}
-
+		if(this.dom.$el.data('owl-structure') === 'lightweight'){
+			pos = this.options.items;
+		}
 		this.dom.oStage.scrollLeft = 0;
 		this.goTo(pos,0);
 	};
@@ -1981,15 +2122,6 @@ Custom events list:
 		}
 		return hashPos;
 	};
-
-	// Owl.prototype.updateHash = function(){
-	// 	var hashItem = this.dom.$oItems.eq(this.pos.current).data('owl-item').hash;
-	// 	if(hashItem){
-	// 		this.state.updateHash = true;
-	// 		window.location.hash = hashItem;
-	// 	}
-	// };
-
 
 	/**
 	 * Autoplay
@@ -2187,8 +2319,12 @@ Custom events list:
 		this.dom.$navNext = $(navNext).html(this.options.navText[1]);
 
 		// add events to do
-		this.on(navPrev, this.dragType[2], this.e._naviPrev, false);
-		this.on(navNext, this.dragType[2], this.e._naviNext, false);
+		//this.on(navPrev, this.dragType[2], this.e._naviPrev, false);
+		//this.on(navNext, this.dragType[2], this.e._naviNext, false);
+
+		//FF fix?
+		this.dom.$nav.on(this.dragType[2], '.'+this.options.navClass[0], this.e._naviPrev);
+		this.dom.$nav.on(this.dragType[2], '.'+this.options.navClass[1], this.e._naviNext);
 	};
 
 	/**
@@ -2208,8 +2344,17 @@ Custom events list:
 		this.dom.$page = $(page);
 
 		// add events
-		this.on(page, this.dragType[2], this.e._goToPage, false);
+		//this.on(page, this.dragType[2], this.e._goToPage, false);
 
+		// FF fix? To test!
+		var that = this;
+		this.dom.$page.on(this.dragType[2], '.'+this.options.pagiDotClass, goToPage);
+
+		function goToPage(e){
+			e.preventDefault();
+			var page = $(this).data('page');
+			that.goTo(page,that.options.paginationSpeed);
+		};
 		// build dots
 		this.rebuildDots();
 	};
@@ -2220,17 +2365,12 @@ Custom events list:
 	 * @since 2.0.0
 	 */
 
-	Owl.prototype.goToPage = function(event){
-		var target = event.target || event.srcElement;
-		// if you click on span then take parant as target
-		if ( target.nodeName.toLowerCase() === 'span' ){
-			target = target.parentNode
-		}
-		// if is loop then add option items to page number (problem with duplicated elements here)
-		var page = $(target).data('page')//this.options.loop ? $(target).data('page') + this.options.items : $(target).data('page');
-		this.goTo(page,this.options.paginationSpeed);
-		return false;
-	};
+	// Owl.prototype.goToPage = function(e){
+	// 	console.log(e.taget);
+	// 	var page = $(e.currentTarget).data('page')
+	// 	this.goTo(page,this.options.paginationSpeed);
+	// 	return false;
+	// };
 
 	/**
 	 * rebuildDots
@@ -2293,7 +2433,6 @@ Custom events list:
 	 */
 
 	Owl.prototype.updatePagination = function(){
-
 		var dots = this.dom.$page.children();
 		var itemIndex = this.dom.$oItems.eq(this.pos.current).data('owl-item').page;
 		
@@ -2340,6 +2479,14 @@ Custom events list:
 	 */
 
 	Owl.prototype.addItem = function(content,pos){
+
+		if(this.dom.$el.data('owl-structure') === 'lightweight'){
+			
+			this.dom.$content = this.dom.$content.add($(content));
+			this.refresh();
+			return false;
+		}
+
 		// wrap content
 		var item = this.fillItem(content);
 
@@ -2516,16 +2663,18 @@ Custom events list:
 	 */
 
 	Owl.prototype.storeInfo = function(){
-
+		var currentPosition = this.options.lightweightStructure ? this.pos.currentLight : this.pos.current;
+		var allItems = this.options.lightweightStructure ? this.dom.$content.length-1 : this.num.oItems;
+		
 		this.info = {	
 			items: 			this.options.items,
-			allItems:		this.num.oItems,
-			currentPosition:this.pos.current,
+			allItems:		allItems,
+			currentPosition:currentPosition,
 			currentPage:	this.pos.currentPage,
 			allPages:		this.num.allPages,
 			autoplay:		this.state.autoplay,
 			windowWidth:	this.width.window,
-			stageWidth:		this.width.stage
+			elWidth:		this.width.el
 		}
 
 		if (typeof this.options.info === "function") {
@@ -2606,7 +2755,7 @@ Custom events list:
 				}
 				
 				$el.css('opacity',1);
-				//$el.removeClass('owl-lazy');
+				$el.removeClass('owl-lazy');
 				that.fireCallback('onLazyLoaded');
 			};
 			img.src = $el.attr("data-src") || $el.attr("data-src-retina");
@@ -2622,6 +2771,10 @@ Custom events list:
 	Owl.prototype.destroy = function(){
 
 		window.clearInterval(this.e._autoplay);
+
+		if(this.dom.$el.hasClass(this.options.themeClass)){
+			this.dom.$el.removeClass(this.options.themeClass);
+		}
 
 		if(this.options.responsive !== false){
 			this.off(window, 'resize', this.e._resizer);
@@ -2646,22 +2799,16 @@ Custom events list:
 			this.off(window, 'hashchange', this.e._goToHash);
 		}
 
-		if(this.options.navigation){
-			this.off(this.dom.$navPrev[0], this.dragType[2], this.e.prev);
-			this.off(this.dom.$navNext[0], this.dragType[2], this.e.next);
-		}
-
-		if(this.options.pagination){
-			this.off(this.dom.$page[0], this.dragType[2], this.e._goToPage);
-		}
-
 		this.dom.$el.off('owl.next',this.e.next);
 		this.dom.$el.off('owl.prev',this.e.prev);
 		this.dom.$el.off('owl.goTo',this.e.goTo);
 		this.dom.$el.off('owl.jumpTo',this.e.jumpTo);
 		this.dom.$el.off('owl.addItem',this.e.addItem);
 		this.dom.$el.off('owl.removeItem',this.e.removeItem);
-		this.dom.$el.off('owl.refresh',this.e.refresh);	
+		this.dom.$el.off('owl.refresh',this.e.refresh);
+		this.dom.$el.off('owl.play',this.e.play);
+		this.dom.$el.off('owl.stop',this.e.stop);
+		this.dom.$el.off('owl.stopVideo',this.e.stop);
 		this.dom.$stage.off('click',this.e._playVideo);
 
 		if(this.dom.$cc !== null){

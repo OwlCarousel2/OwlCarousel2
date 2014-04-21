@@ -126,6 +126,7 @@
 /* Sample theme */
 
 .owl-theme .owl-controls{
+
 	margin-top: 10px;
 	text-align: center;
 	-webkit-user-select: none;
@@ -139,6 +140,7 @@
 .owl-controls .owl-dot{
 	cursor: pointer;
 	cursor: hand;
+
 }
 
 
@@ -146,9 +148,6 @@
 .owl-theme .owl-controls .owl-nav div{
 	color: #FFF;
 	display: inline-block;
-	zoom: 1;
-	opacity: .5;
-	*display: inline;/*IE7 life-saver */
 	margin: 5px;
 	padding: 4px 7px;
 	font-size: 12px;
@@ -200,24 +199,20 @@
 	-webkit-backface-visibility: hidden;
 }
 
-.owl-carousel .owl-mobile .owl-item.active{
-	opacity: 1;
-}
-
-.owl-carousel .owl-mobile .owl-item{
-	opacity: 0;
-}
-
 .owl-carousel .owl-item img.owl-lazy{
-	transition-property: opacity;
-  	transition-duration: 400ms;
-  	transition-timing-function: ease;
 	opacity: 0;
+
 }
 
 .owl-carousel .owl-item img{
+	opacity: 1;
 	display: block;
 	width: 100%;
+	-webkit-transform-style: preserve-3d;
+	transform-style: preserve-3d;
+	transition-property: opacity;
+  	transition-duration: 400ms;
+  	transition-timing-function: ease;
 }
 
 .owl-rtl{
