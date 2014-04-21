@@ -103,7 +103,7 @@
 <div class="content">
 	<div class="row margin-top">
 		<div class="large-12 columns">
-			<h4>Descriptons</h4>
+			<h4>Descripton</h4>
 			<p>'nestedItemSelector' options accept class name (without dot '.'). See source for structure. </p>
 		</div>
 	</div>
@@ -115,40 +115,27 @@
 //Javascript
 
 $('.owl-carousel').owlCarousel({
-	items:1, // In this configuration 1 is falling into &lt;479 screen size 
-	loop:true, // loop is true up to 1199px screen.
-	navigation:true, 
-	merge: true, 
-	margin:10, // margin 10px till 959 breakpoint
-
-	// Object keys can be Numbers (like in this example) or Strings: '480'
-	// Owl has build in sort option so you don need to stick with 'mobile-first' order.
-	// Setting from widest screen to smallest still work as expeted
-
+	items:1,
+	loop:true,
+	navigation:true,
+	nestedItemSelector: 'nestedItem',
+	margin:10,
 	responsive:{	
 		480:{
-			items:2, // from 480 to 677 
-			navigation:false // from 480 to max 
-
+			items:2
 		},
 
 		678:{
-			items:4, // from this breakpoint 678 to 959
-			center:true // only within 678 and next - 959
+			items:4
 		},
 
 		960:{
-			items:5, // from this breakpoint 960 to 1199
-			margin:20, // and so on...
-			center:false 
-
+			items:5
 		},
 
 		1200:{
-			items:6,
-			loop:false,
-			margin: 30,
-			merge: false,
+			items:6
+
 		}
 	}
 });
@@ -173,7 +160,9 @@ $('.owl-carousel').owlCarousel({
 				<a href="urlhash.html" class="button">URL hash navigation</a>
 				<a href="info.html" class="button">Info callback</a>
 				<a href="rtl.html" class="button">Right to left</a>
-			</div>
+				<a href="lightweight.html" class="button">Thousands Items</a>
+				<a href="manipulations.html" class="button">Manipulation</a>
+				<a href="nestedItemSelector.html" class="button">Nested Item Selector</a>			</div>
 		</div>
 	</div>
 </div>	
@@ -206,22 +195,16 @@ jQuery(document).ready(function($) {
 			},
 
 			678:{
-				items:4,
-				center:true
+				items:4
 			},
 
 			960:{
-				items:5,
-				margin:20,
-				center:false
-
+				items:5
 			},
 
 			1200:{
-				items:6,
-				loop:false,
-				margin: 30,
-				merge: false
+				items:6
+
 			}
 		}
 	});

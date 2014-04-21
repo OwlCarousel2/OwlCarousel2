@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Owl Carousel 2.0.0-beta - Videos demo</title>
+	<title>Owl Carousel 2.0.0-beta - Add/Remove Items</title>
 	<link rel="stylesheet" href="../assets/css/foundation.min.css" />
 	<link rel="stylesheet" href="../owlcarousel/owl.carousel.css">
 	<link rel="stylesheet" href="../assets/js/highlight/styles/monokai_sublime.css">
@@ -14,28 +14,22 @@
 <div class="header">
 	<div class="row">
 	  <div class="large-12 columns">
-		<h1 class="left">Videos.</h1>
+		<h1 class="left">Add/Remove Items.</h1>
 		<a href="https://github.com/OwlFonk/OwlCarousel2" class="button tiny right show-for-medium-up">Download From GitHub</a>
 	  </div>
 	</div>
 </div>
-<div class="video-demo margin-top">
+<div class="margin-top">
 	
 	<div class="row">
 		<div class="large-12 columns">
 
 			<div class="owl-carousel">
-				<div class="article-video" data-merge="3"><a class="owl-video" href="http://vimeo.com/23924346"></a></div>
-				<div class="article-video" data-merge="1"><a class="owl-video" href="https://www.youtube.com/watch?v=JpxsRwnRwCQ"></a></div>
-				<div class="article-video" data-merge="2"><a class="owl-video" href="http://www.youtube.com/watch?v=FBu_jxT1PkA"></a></div>
-				<div class="article-video" data-merge="1"><a class="owl-video" href="http://www.youtube.com/watch?v=oy18DJwy5lI"></a></div>
-				<div class="article-video" data-merge="2"><a class="owl-video" href="http://www.youtube.com/watch?v=H3jLkJrhHKQ"></a></div>
-				<div class="article-video" data-merge="3"><a class="owl-video" href="https://www.youtube.com/watch?v=g3J4VxWIM6s"></a></div>
-				<div class="article-video" data-merge="1"><a class="owl-video" href="http://www.youtube.com/watch?v=0fhoIate4qI"></a></div>
-				<div class="article-video" data-merge="2"><a class="owl-video" href="https://www.youtube.com/watch?v=EF_kj2ojZaE"></a></div>
-
+				<div class="article"><h2>Start</h2></div>
 			</div>
-
+			<div class="button add">add</div>
+			<div class="button remove">remove</div>
+			<div class="button destroy">destroy</div>
 		</div>
 	</div>
 </div>
@@ -44,10 +38,14 @@
 	<div class="row margin-top">
 		<div class="large-12 columns">
 			<h4>Descripton</h4>
-			<p>Still in progress. Can use YouTube and Vimeo links. Lazy load on thumbnail works too. There are some additional option for widht and height - will make proper description later.</p>
-			<p>To add video into carousel just put &lt;a class="owl-video" href="_straight URL from youtube or vimeo"&gt;&lt;/a&gt;.
-			A tag is not mandatory. Can be any other tag but "owl-video" and href with url link is required.
-			</p>
+			<p>Owl Carousel manipulation methods:</p>
+			<div class="panel">
+				<ul>
+					<li>.addItem([DOM element,position])</li>
+					<li>.removeItem([position]) </li>
+					<li>.destroy()</li>
+				</ul>
+			</div>
 		</div>
 	</div>
 
@@ -57,22 +55,37 @@
 	<pre><code>
 //Javascript
 
-$('.owl-carousel').owlCarousel({
-	items:1,
-	merge:true,
-	loop:true,
-	margin:10,
-	video:true,
-	lazyLoad:true,
-	center:true,
+var owl = $('.owl-carousel');
+owl.owlCarousel({
 	responsive:{
-		480:{
-			items:2
+		0:{
+			items:1,
+			margin:10
 		},
-		600:{
-			items:4
+		678:{
+			items:2,
+			margin:20
+		},
+		1000:{
+			items:5,
+			margin:30
 		}
 	}
+});
+var counter = 0;
+$('.add').click(function(e){
+	counter++;
+	var content = '&lt;div class="article"&gt;&lt;h2&gt;'+counter+'&lt;/h2&gt;&lt;/div&gt;'
+	owl.data('owlCarousel').addItem(content,0);
+});
+
+$('.remove').click(function(){
+	counter--;
+	owl.data('owlCarousel').removeItem(0);
+});
+
+$('.destroy').click(function(){
+	owl.data('owlCarousel').destroy();
 });
 
 	</code></pre>
@@ -118,22 +131,38 @@ $('.owl-carousel').owlCarousel({
 <script>
 jQuery(document).ready(function($) {
 
-	$('.owl-carousel').owlCarousel({
-		items:1,
-		merge:true,
-		loop:true,
-		margin:10,
-		video:true,
-		lazyLoad:true,
-		center:true,
+	var owl = $('.owl-carousel');
+	owl.owlCarousel({
 		responsive:{
-			480:{
-				items:2
+			0:{
+				items:1,
+				margin:10,
+				loop:true
 			},
-			600:{
-				items:4
+			678:{
+				items:2,
+				margin:20
+			},
+			1000:{
+				items:5,
+				margin:30
 			}
 		}
+	});
+	var counter = 0;
+	$('.add').click(function(e){
+		counter++;
+		var content = '<div class="article"><h2>'+counter+'</h2></div>'
+		owl.data('owlCarousel').addItem(content,0);
+	});
+
+	$('.remove').click(function(){
+		counter--;
+		owl.data('owlCarousel').removeItem(0);
+	});
+
+	$('.destroy').click(function(){
+		owl.data('owlCarousel').destroy();
 	});
 
 });
