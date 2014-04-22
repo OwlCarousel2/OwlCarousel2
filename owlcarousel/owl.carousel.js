@@ -4,7 +4,7 @@
  * @release 2014
  * Licensed under MIT
  * 
- * @version 2.0.0-beta.0.9
+ * @version 2.0.0-beta.1.0
  * @versionNotes Not compatibile with Owl Carousel <2.0.0
  */
 
@@ -256,7 +256,7 @@ Custom events list:
 		element.owlCarousel = {
 			'name':		'Owl Carousel',
 			'author':	'Bartosz Wojciechowski',
-			'version':	'2.0.0-beta.0.9',
+			'version':	'2.0.0-beta.1.0',
 			'released':	'21.04.2014'
 		};
 
@@ -790,6 +790,7 @@ Custom events list:
 		var customTn = videoEl.find('img');
 		var srcType = 'src';
 		var lazyClass = '';
+		var that = this;
 
 		if(this.options.lazyLoad){
 			srcType = 'data-src';
@@ -804,7 +805,6 @@ Custom events list:
 			return false;
 		}
 		
-		var that = this;
 		function addThumbnail(tnPath){
 			icon = '<div class="owl-video-play-icon"></div>';
 
@@ -2785,6 +2785,7 @@ Custom events list:
 				//$el.removeClass('owl-lazy');
 				that.fireCallback('onLazyLoaded');
 			};
+			console.log($el);
 			img.src = $el.attr("data-src") || $el.attr("data-src-retina");
 	 	});
 	 };
