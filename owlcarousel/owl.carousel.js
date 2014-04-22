@@ -2785,7 +2785,6 @@ Custom events list:
 				//$el.removeClass('owl-lazy');
 				that.fireCallback('onLazyLoaded');
 			};
-			console.log($el);
 			img.src = $el.attr("data-src") || $el.attr("data-src-retina");
 	 	});
 	 };
