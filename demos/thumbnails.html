@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en" dir="rtl">
+<html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Owl Carousel 2.0.0-beta - Right to left.</title>
+	<title>Owl Carousel 2.0.0-beta - dotData - thumbnails demo</title>
 	<link rel="stylesheet" href="../assets/css/foundation.min.css" />
 	<link rel="stylesheet" href="../owlcarousel/owl.carousel.css">
 	<link rel="stylesheet" href="../assets/js/highlight/styles/monokai_sublime.css">
@@ -14,7 +14,7 @@
 <div class="header">
 	<div class="row">
 	  <div class="large-12 columns">
-		<h1 class="left">Right To Left.</h1>
+		<h1 class="left">dotData - thumbnails.</h1>
 		<ul class="button-group right">
 			<li><a href="../index.html" class="button secondary tiny button">Home</a></li>
 			<li><a href="https://github.com/OwlFonk/OwlCarousel2" class="button tiny show-for-medium-up">Download From GitHub</a></li>
@@ -22,26 +22,21 @@
 	  </div>
 	</div>
 </div>
-<div class="responsive-demo margin-top">
-	<div class="row margin-top">
+<div class="thumbnails-dot margin-top">
+	
+	<div class="row">
 		<div class="large-12 columns">
+
 			<div class="owl-carousel">
-				<div class="article"><h2>0</h2></div>
-				<div class="article"><h2>1</h2></div>
-				<div class="article"><h2>2</h2></div>
-				<div class="article"><h2>3</h2></div>
-				<div class="article"><h2>4</h2></div>
-				<div class="article"><h2>5</h2></div>
-				<div class="article"><h2>6</h2></div>
-				<div class="article"><h2>7</h2></div>
-				<div class="article"><h2>8</h2></div>
-				<div class="article"><h2>9</h2></div>
-				<div class="article"><h2>10</h2></div>
-				<div class="article"><h2>11</h2></div>
-				<div class="article"><h2>12</h2></div>
-				<div class="article"><h2>13</h2></div>
-				<div class="article"><h2>14</h2></div>
-				<div class="article"><h2>15</h2></div>
+				<div class="article-image" data-dot="<img src='http://placehold.it/50x50/008CBA/FFFFFF/&text=1'>"><img src="http://placehold.it/800x200/008CBA/FFFFFF/&text=1" alt=""></div>
+				<div class="article-image" data-dot="<img src='http://placehold.it/50x50/008CBA/FFFFFF/&text=2'>"><img src="http://placehold.it/800x200/008CBA/FFFFFF/&text=2" alt=""></div>
+				<div class="article-image" data-dot="<img src='http://placehold.it/50x50/008CBA/FFFFFF/&text=3'>"><img src="http://placehold.it/800x200/008CBA/FFFFFF/&text=3" alt=""></div>
+				<div class="article-image" data-dot="<img src='http://placehold.it/50x50/008CBA/FFFFFF/&text=4'>"><img src="http://placehold.it/800x200/008CBA/FFFFFF/&text=4" alt=""></div>
+				<div class="article-image" data-dot="<img src='http://placehold.it/50x50/008CBA/FFFFFF/&text=5'>"><img src="http://placehold.it/800x200/008CBA/FFFFFF/&text=5" alt=""></div>
+				<div class="article-image" data-dot="<img src='http://placehold.it/50x50/008CBA/FFFFFF/&text=6'>"><img src="http://placehold.it/800x200/008CBA/FFFFFF/&text=6" alt=""></div>
+				<div class="article-image" data-dot="<img src='http://placehold.it/50x50/008CBA/FFFFFF/&text=7'>"><img src="http://placehold.it/800x200/008CBA/FFFFFF/&text=7" alt=""></div>
+				<div class="article-image" data-dot="<img src='http://placehold.it/50x50/008CBA/FFFFFF/&text=8'>"><img src="http://placehold.it/800x200/008CBA/FFFFFF/&text=8" alt=""></div>
+				<div class="article-image" data-dot="<img src='http://placehold.it/50x50/008CBA/FFFFFF/&text=9'>"><img src="http://placehold.it/800x200/008CBA/FFFFFF/&text=9" alt=""></div>
 			</div>
 		</div>
 	</div>
@@ -51,7 +46,11 @@
 	<div class="row margin-top">
 		<div class="large-12 columns">
 			<h4>Descripton</h4>
-			<p>Set option 'rtl:true'</p>
+			<p>dotData:true option allow you to put some custom text/img/html into pagination dots.
+				In example above i used little thumbnail images from placehold.it website.
+				<br>
+				Simple, just put your content for dot into data-dot=" "
+			</p>
 		</div>
 	</div>
 
@@ -59,24 +58,28 @@
 		<div class="row margin-top">
 			<div class="large-12 columns">
 	<pre><code>
+
+// html
+&lt;div class="owl-carousel"&gt;
+	&lt;div data-dot="dot_content_here"&gt; item_content &lt;/div&gt;
+	&lt;div data-dot="dot_content_here"&gt; item_content &lt;/div&gt;
+	&lt;div data-dot="dot_content_here"&gt; item_content &lt;/div&gt;
+	&lt;div data-dot="dot_content_here"&gt; item_content &lt;/div&gt;
+	&lt;div data-dot="dot_content_here"&gt; item_content &lt;/div&gt;
+	...
+&lt;/div&gt;
+
 //Javascript
 
+var owl = $('.owl-carousel'); // save reference to variable
+
 $('.owl-carousel').owlCarousel({
-	$('.owl-carousel').owlCarousel({
-		items:1,
-		loop:true,
-		navigation:true,
-		margin:10,
-		rtl: true,
-		responsive:{
-			480:{
-				items:3
-			},
-			960:{
-				items:5
-			}
-		}
-	});
+	items:1,
+	stagePadding:50,
+	loop:true,
+	margin:10,
+	smartSpeed:450,
+	dotData:true,
 });
 
 	</code></pre>
@@ -84,7 +87,7 @@ $('.owl-carousel').owlCarousel({
 		</div>
 	</div>
 	
-	<div class="demos-buttons margin-top">
+	<div class="margin-top">
 		<div class="row">
 			<div class="large-12 columns">
 				<h3>Demos:</h3>
@@ -103,7 +106,8 @@ $('.owl-carousel').owlCarousel({
 				<a href="manipulations.html" class="button">Manipulation</a>
 				<a href="nestedItemSelector.html" class="button">Nested Item Selector</a>
 				<a href="autoHeight.html" class="button">AutoHeight</a>	
-				<a href="thumbnails.html" class="button">Dot Thumbnails</a>				</div>
+				<a href="thumbnails.html" class="button">Dot Thumbnails</a>	
+			</div>
 		</div>
 	</div>
 </div>	
@@ -126,18 +130,11 @@ jQuery(document).ready(function($) {
 
 	$('.owl-carousel').owlCarousel({
 		items:1,
+		stagePadding:50,
 		loop:true,
-		navigation:true,
 		margin:10,
-		rtl: true,
-		responsive:{
-			480:{
-				items:3
-			},
-			960:{
-				items:5
-			}
-		}
+		smartSpeed:450,
+		dotData:true,
 	});
 
 });

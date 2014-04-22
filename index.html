@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Owl Carousel 2.0.0-beta.0.9</title>
+	<title>Owl Carousel 2.0.0-beta.1.0</title>
 	<link rel="stylesheet" href="assets/css/foundation.min.css" />
 	<link rel="stylesheet" href="owlcarousel/owl.carousel.css">
 	<link rel="stylesheet" href="assets/js/highlight/styles/monokai_sublime.css">
@@ -14,7 +14,7 @@
 <div class="header">
 	<div class="row">
 	  <div class="large-12 columns">
-		<h1>Owl Carousel <small>v2.0.0-beta.0.9</span></small></h1>
+		<h1>Owl Carousel <small>v2.0.0-beta.1.0</span></small></h1>
 		<p>Please note that this is a beta version only for testing purposes. Enjoy!</p>
 		<a href="https://github.com/OwlFonk/OwlCarousel2" class="button tiny secondary">Download From GitHub</a>
 	  </div>
@@ -133,7 +133,8 @@ $('.owl-carousel').owlCarousel({
 				<a href="demos/lightweight.html" class="button">Thousands Items</a>
 				<a href="demos/manipulations.html" class="button">Manipulation</a>
 				<a href="demos/nestedItemSelector.html" class="button">Nested Item Selector</a>
-
+				<a href="demos/autoHeight.html" class="button">AutoHeight</a>	
+				<a href="demos/thumbnails.html" class="button">Dot Thumbnails</a>	
 			</div>
 		</div>
 	</div>
@@ -314,7 +315,7 @@ $(document).ready(function(){
 					</tr>
 				
 					<tr>
-						<td>pagination</td>
+						<td>dots</td>
 						<td>true</td>
 						<td>Boolean</td>
 						<td></td>
@@ -322,7 +323,7 @@ $(document).ready(function(){
 					</tr>
 
 					<tr>
-						<td>paginationEach</td>
+						<td>dotsEach</td>
 						<td>false</td>
 						<td>Int/Boolean</td>
 						<td>Show dots each x item</td>
@@ -333,7 +334,7 @@ $(document).ready(function(){
 						<td>dotsName</td>
 						<td>false</td>
 						<td>String/Boolean</td>
-						<td>Put item names into pagination dots</td>
+						<td>Put item names into dots</td>
 						<td><span class="label alert">To finish</span></td>
 					</tr>
 
@@ -400,7 +401,7 @@ $(document).ready(function(){
 					</tr>
 
 					<tr>
-						<td>paginationSpeed</td>
+						<td>dotsSpeed</td>
 						<td>false</td>
 						<td>Int/Boolean</td>
 						<td>Pagination speed</td>

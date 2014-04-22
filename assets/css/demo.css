@@ -81,6 +81,22 @@ code.hljs {
 	transform: scale(1);
 }
 
+.owl-dots:after {
+	content: ".";
+	display: block;
+	clear: both;
+	visibility: hidden;
+	line-height: 0;
+	height: 0;
+}
+.thumbnails-dot .owl-dot{
+	display: block;
+	float:left;
+	overflow: hidden;
+	margin-right: 10px;
+	opacity: 0.7
+}
 
-
-
+.thumbnails-dot .owl-dot.active{
+	opacity: 1
+}
