@@ -76,14 +76,15 @@ Custom events list:
 		merge:				false,
 		mergeFit:			true,
 		autoWidth:			false,
+		autoHeight:			false,
 
 		startPosition:		0,
 		navigation: 		false,
 		navText: 			['prev','next'],
 		slideBy:			1,
-		pagination: 		true,
-		paginationEach:		false,
-		dotsName:			false,
+		dots: 				true,
+		dotsEach:			false,
+		dotData:			false,
 		URLhashListener:	false,
 
 		autoplay:			false,
@@ -94,7 +95,7 @@ Custom events list:
 		fluidSpeed:			false,
 		autoplaySpeed:		false,
 		naviSpeed:			false,
-		paginationSpeed:	false,
+		dotsSpeed:			false,
 		dragEndSpeed:		false,
 		
 		callbacks:			false,
@@ -118,8 +119,8 @@ Custom events list:
 		navContainerClass:	'owl-nav',
 		navClass:			['owl-prev','owl-next'],
 		controlsClass:		'owl-controls',
-		pagiDotClass: 		'owl-dot',
-		pagiClass:			'owl-pagination',
+		dotClass: 			'owl-dot',
+		dotsClass:			'owl-dots',
 		autoHeightClass:	'owl-height',
 		nestedItemSelector:	false,
 
@@ -279,11 +280,12 @@ Custom events list:
 	}
 
 	/**
-	 * init
+	 * preloadAutoWidthImages
+	 * @desc still to test
 	 * @since 2.0.0
 	 */
 
-	Owl.prototype.preloadVariousImages = function(allImgs){
+	Owl.prototype.preloadAutoWidthImages = function(allImgs){
 		var loaded = 0;
 		for(var i = 0; i<allImgs.length;i++){
 	 		var img = new Image();
@@ -298,6 +300,11 @@ Custom events list:
 			img.src = allImgs[i].src;
 	 	}
 	};
+
+	/**
+	 * init
+	 * @since 2.0.0
+	 */
 
 	Owl.prototype.init = function(){
 
@@ -334,7 +341,7 @@ Custom events list:
 			var allImgs = this.dom.$el.find('img');
 			if(allImgs.length){
 				if(this.state.imagesLoaded !== true){
-					this.preloadVariousImages(allImgs);
+					this.preloadAutoWidthImages(allImgs);
 					return false;
 				}
 			}
@@ -352,11 +359,11 @@ Custom events list:
 
 		if(this.options.lightweightStructure && this.num.oItems >= this.options.items*3){
 			this.options.lightweightStructure = true;
-			this.dom.$el.data('owl-structure','lightweight');
+			this.state.lightweight = true;
 			this.createLightweightStructure();
 		} else {
+			this.state.lightweight = false;
 			this.options.lightweightStructure = false;
-			this.dom.$el.data('owl-structure','normal');
 			this.createNormalStructure();
 		}
 
@@ -403,6 +410,7 @@ Custom events list:
 
 		this.fireCallback('onAfterInit');
 	};
+
 	/**
 	 * sortOptions
 	 * @desc Sort responsive sizes 
@@ -467,7 +475,7 @@ Custom events list:
 
 	Owl.prototype.optionsLogic = function(){
 		// Toggle Center class
-		this.dom.$stage.toggleClass('owl-center',this.options.center);
+		this.dom.$el.toggleClass('owl-center',this.options.center);
 
 		// Scroll per - 'page' option will scroll per visible items number
 		// You can set this to any other number below visible items.
@@ -481,21 +489,15 @@ Custom events list:
 			this.options.loop = false;
 		}
 
-		if(this.options.autoHeight){
-			this.dom.$oStage.addClass(this.options.autoHeightClass);
-		} else {
-			this.dom.$oStage.removeClass(this.options.autoHeightClass).css('height','');
-		}
-
 		if(this.options.autoWidth){
 			this.options.stagePadding = false;
-			this.options.paginationEach = 1;
+			this.options.dotsEach = 1;
 			this.options.merge = false;
 		}
-		if(this.dom.$el.data('owl-structure') === 'lightweight'){
+		if(this.state.lightweight){
 			this.options.loop = false;
 			this.options.merge = false;
-			this.options.pagination = false;
+			this.options.dots = false;
 			this.options.lightweightStructure = true;
 		} else {
 			this.options.lightweightStructure = false;
@@ -578,7 +580,7 @@ Custom events list:
 	 */
 
 	Owl.prototype.createLightweightStructure = function(){
-		if(this.dom.$el.data('owl-structure') !== 'lightweight'){return false;}
+		if(!this.state.lightweight){return false;}
 		// remove stage
 		this.dom.$content.remove();
 		this.dom.$stage.empty();
@@ -606,23 +608,31 @@ Custom events list:
 		var emptyItem = this.createItem();
 		var c = content[i] || content;
 		// set item data 
-		var dotName = this.traversContent(c)
-		this.setData(emptyItem,false,dotName);
+		var traversed = this.traversContent(c);
+		this.setData(emptyItem,false,traversed);
 		return $(emptyItem).append(c);
 	};
 
 	/**
 	 * traversContent
-	 * @desc find name for pagination text
 	 * @since 2.0.0
 	 * @param [c] - content
-	 * return $ data attribute
+	 * return object
 	 */
 
 	Owl.prototype.traversContent = function(c){
-		if(this.options.dotsName){
-			return c.getAttribute('data-dotname');
+		var $c = $(c), dotValue, hashValue;
+		if(this.options.dotData){
+			dotValue = $c.find('[data-dot]').andSelf().data('dot');
 		}
+		// update URL hash
+		if(this.options.URLhashListener){
+			hashValue = $c.find('[data-hash]').andSelf().data('hash');
+		}
+		return {
+			dot : dotValue || false,
+			hash : hashValue  || false
+		};
 	};
 
 
@@ -635,8 +645,11 @@ Custom events list:
 	 */
 
 
-	Owl.prototype.setData = function(item,cloneObj,dotName){
-
+	Owl.prototype.setData = function(item,cloneObj,traversed){
+		if(traversed){
+			var dot = traversed['dot'];
+			var hash = traversed['hash'];
+		}
 		var itemData = {
 			index:		false,
 			indexAbs:	false,
@@ -651,8 +664,8 @@ Custom events list:
 			page:		false,
 			hasVideo:	false,
 			playVideo:	false,
-			dotName:	dotName || false,
-			hash:		false,
+			dot:		dot,
+			hash:		hash,
 			boostPage:	false
 		};
 
@@ -682,12 +695,6 @@ Custom events list:
 		for(var k = 0; k<this.num.oItems; k++){
 			var item = this.dom.$oItems.eq(k);
 			item.data('owl-item').index = k;
-
-			// update URL hash
-			if(this.options.URLhashListener){
-				var hash = item.find('[data-hash]').data('hash');
-				item.data('owl-item').hash = hash;
-			}
 		}
 	};
 
@@ -887,7 +894,7 @@ Custom events list:
 	 */
 
 	Owl.prototype.loopClone = function(){
-		if(!this.options.loop || this.dom.$el.data('owl-structure') === 'lightweight'){return false;}
+		if(!this.options.loop || this.state.lightweight){return false;}
 
 		var firstClone,	lastClone, i,
 			num	=		this.options.items, 
@@ -1009,7 +1016,7 @@ Custom events list:
 				this.num.merged.push(1)
 			}
 
-			// Array based on merged items used by pagination and navigation
+			// Array based on merged items used by dots and navigation
 			if(this.options.loop){
 				if(i>=this.num.cItems/2 && i<this.num.cItems/2+this.num.oItems){
 					this.num.nav.push(this.num.merged[i]);
@@ -1075,7 +1082,6 @@ Custom events list:
 		// Recalculate grid 
 		this.setSizes();
 	};
-
 
 	/**
 	 * setMinMax
@@ -1277,7 +1283,7 @@ Custom events list:
 		this.updateItemState();
 
 		// jump to last position 
-		if(this.dom.$el.data('owl-structure') === 'normal'){
+		if(!this.state.lightweight){
 			this.jumpTo(this.pos.current,false); // fix that 
 		}
 
@@ -1305,7 +1311,7 @@ Custom events list:
 
 	Owl.prototype.updateItemState = function(){
 
-		if(this.dom.$el.data('owl-structure') === 'normal'){
+		if(!this.state.lightweight){
 			this.updateActiveItems();
 		} else {
 			this.updateLightweightItems();
@@ -1321,6 +1327,12 @@ Custom events list:
 			this.lazyLoad();
 		}
 	};
+
+	/**
+	 * updateActiveItems
+	 * @since 2.0.0
+	 */
+
 
 	Owl.prototype.updateActiveItems = function(){
 		var i,j,item,ipos,iwidth,wpos,stage,outsideView;
@@ -1458,6 +1470,7 @@ Custom events list:
 				freshItem.append(content);
 				freshData.active = true;
 				freshData.current = true;
+				freshData.loaded = false;
 			}
 		}
 		var currentAbs = this.pos.lsCurrent + this.options.startPosition;
@@ -1983,7 +1996,7 @@ Custom events list:
 	 */
 
 	Owl.prototype.jumpTo = function(pos,update){
-		if(this.dom.$el.data('owl-structure') === 'lightweight'){
+		if(this.state.lightweight){
 			this.pos.goToLightweight = pos;
 		}
 
@@ -2015,10 +2028,11 @@ Custom events list:
 	 */
 
 	Owl.prototype.next = function(optionalSpeed){
+		var s = optionalSpeed || this.options.naviSpeed;
 		if(this.options.loop){
-			this.goToLoop(this.options.slideBy, optionalSpeed || this.options.naviSpeed);
+			this.goToLoop(this.options.slideBy, s);
 		}else{
-			this.goTo(this.pos.current + this.options.slideBy, optionalSpeed || this.options.naviSpeed);
+			this.goTo(this.pos.current + this.options.slideBy, s);
 		}
 	};
 
@@ -2028,10 +2042,11 @@ Custom events list:
 	 */
 
 	Owl.prototype.prev = function(optionalSpeed){
+		var s = optionalSpeed || this.options.naviSpeed;
 		if(this.options.loop){
-			this.goToLoop(-this.options.slideBy, optionalSpeed || this.options.naviSpeed);
+			this.goToLoop(-this.options.slideBy, s);
 		}else{
-			this.goTo(this.pos.current-this.options.slideBy, optionalSpeed || this.options.naviSpeed);
+			this.goTo(this.pos.current-this.options.slideBy, s);
 		}
 	};
 
@@ -2065,7 +2080,7 @@ Custom events list:
 		window.clearTimeout(this.e._goToLoop);
 		this.e._goToLoop = window.setTimeout(function(){
 			this.state.jumpToLoop = false;
-			this.goTo(revert + distance,this.options.naviSpeed);
+			this.goTo(revert + distance, speed);
 			this.state.revert = false
 		}.bind(this), 30);
 	};
@@ -2083,7 +2098,7 @@ Custom events list:
 		} else if(typeof this.options.startPosition !== Number && !this.options.center){
 			this.options.startPosition = 0;
 		}
-		if(this.dom.$el.data('owl-structure') === 'lightweight'){
+		if(this.state.lightweight){
 			pos = this.options.items;
 		}
 		this.dom.oStage.scrollLeft = 0;
@@ -2242,7 +2257,7 @@ Custom events list:
 
 	/**
 	 * Controls
-	 * @desc Calls controls container, navigation and pagination creator
+	 * @desc Calls controls container, navigation and dots creator
 	 * @since 2.0.0
 	 */
 
@@ -2260,7 +2275,7 @@ Custom events list:
 
 	Owl.prototype.updateControls = function(){
 	
-		if(this.dom.$cc === null && (this.options.navigation || this.options.pagination)){
+		if(this.dom.$cc === null && (this.options.navigation || this.options.dots)){
 			this.controls();
 		}
 
@@ -2268,8 +2283,8 @@ Custom events list:
 			this.createNavigation(this.dom.$cc[0]);
 		}
 		
-		if(this.dom.$page === null && this.options.pagination){
-			this.createPagination(this.dom.$cc[0]);
+		if(this.dom.$page === null && this.options.dots){
+			this.createDots(this.dom.$cc[0]);
 		}
 
 		if(this.dom.$nav !== null){
@@ -2282,9 +2297,9 @@ Custom events list:
 		}
 
 		if(this.dom.$page !== null){
-			if(this.options.pagination){
+			if(this.options.dots){
 				this.dom.$page.show();
-				this.updatePagination();
+				this.updateDots();
 			} else {
 				this.dom.$page.hide();
 			}
@@ -2333,11 +2348,11 @@ Custom events list:
 	 * @param [cc] - dom element - Controls Container
 	 */
 
-	Owl.prototype.createPagination = function(cc){
+	Owl.prototype.createDots = function(cc){
 
-		// Create pagination container
+		// Create dots container
 		var page = document.createElement('div');
-		page.className = this.options.pagiClass;
+		page.className = this.options.dotsClass;
 		cc.appendChild(page);
 
 		// save reference
@@ -2348,12 +2363,12 @@ Custom events list:
 
 		// FF fix? To test!
 		var that = this;
-		this.dom.$page.on(this.dragType[2], '.'+this.options.pagiDotClass, goToPage);
+		this.dom.$page.on(this.dragType[2], '.'+this.options.dotClass, goToPage);
 
 		function goToPage(e){
 			e.preventDefault();
 			var page = $(this).data('page');
-			that.goTo(page,that.options.paginationSpeed);
+			that.goTo(page,that.options.dotsSpeed);
 		};
 		// build dots
 		this.rebuildDots();
@@ -2361,20 +2376,19 @@ Custom events list:
 
 	/**
 	 * goToPage
-	 * @desc Event used by pagination dots
+	 * @desc Event used by dots
 	 * @since 2.0.0
 	 */
 
 	// Owl.prototype.goToPage = function(e){
 	// 	console.log(e.taget);
 	// 	var page = $(e.currentTarget).data('page')
-	// 	this.goTo(page,this.options.paginationSpeed);
+	// 	this.goTo(page,this.options.dotsSpeed);
 	// 	return false;
 	// };
 
 	/**
 	 * rebuildDots
-	 * @desc Event used by pagination dots
 	 * @since 2.0.0
 	 */
 
@@ -2382,14 +2396,14 @@ Custom events list:
 		if(this.dom.$page === null){return false;}
 		var each, dot, span, counter = 0, last = 0, i, page=0, roundPages = 0, dotName;
 
-		each = this.options.paginationEach || this.options.items;
+		each = this.options.dotsEach || this.options.items;
 
 		// display full dots if center
-		if(this.options.center){
+		if(this.options.center || this.options.dotData){
 			each = 1;
 		}
 
-		// clear pagination
+		// clear dots
 		this.dom.$page.html('');
 
 		for(i = 0; i < this.num.nav.length; i++){
@@ -2397,24 +2411,31 @@ Custom events list:
 			if(counter >= each || counter === 0){
 
 				dot = document.createElement('div');
-				dot.className = this.options.pagiDotClass;
+				dot.className = this.options.dotClass;
 				span = document.createElement('span');
 				dot.appendChild(span);
-				$(dot).data('page',page);
-				$(dot).data('goToPage',roundPages);
+				var $dot = $(dot);
+
+				if(this.options.dotData){
+					$dot.html(this.dom.$oItems.eq(i).data('owl-item').dot);
+				}
+
+				$dot.data('page',page);
+				$dot.data('goToPage',roundPages);
 
 				this.dom.$page.append(dot);
 
 				counter = 0;
 				roundPages++;
 			}
+
 			this.dom.$oItems.eq(i).data('owl-item').page = roundPages-1;
 
 			//add merged items
 			counter += this.num.nav[i];
 			page++;
 		}
-		// find rest of pagination
+		// find rest of dots
 		if(!this.options.loop && !this.options.center){
 			for(var j = this.num.nav.length-1; j >= 0; j--){
 				last += this.num.nav[j];
@@ -2424,22 +2445,23 @@ Custom events list:
 				}
 			}
 		}
+
 		this.num.allPages = roundPages-1;
 	};
 
 	/**
-	 * updatePagination
+	 * updateDots
 	 * @since 2.0.0
 	 */
 
-	Owl.prototype.updatePagination = function(){
+	Owl.prototype.updateDots = function(){
 		var dots = this.dom.$page.children();
 		var itemIndex = this.dom.$oItems.eq(this.pos.current).data('owl-item').page;
 		
 		for(var i = 0; i < dots.length; i++){
-			var dotData = dots.eq(i).data('goToPage');
+			var dotPage = dots.eq(i).data('goToPage');
 
-			if(dotData===itemIndex){
+			if(dotPage===itemIndex){
 				this.pos.currentPage = i;
 				dots.eq(i).addClass('active');
 			}else{
@@ -2480,8 +2502,7 @@ Custom events list:
 
 	Owl.prototype.addItem = function(content,pos){
 
-		if(this.dom.$el.data('owl-structure') === 'lightweight'){
-			
+		if(this.state.lightweight){
 			this.dom.$content = this.dom.$content.add($(content));
 			this.refresh();
 			return false;
@@ -2528,6 +2549,7 @@ Custom events list:
 		this.e.addItem = function(e,c,p){this.addItem(c,p);	}.bind(this);
 		this.e.removeItem = function(e,p){this.removeItem(p);}.bind(this);
 		this.e.refresh = function(e){this.refresh();		}.bind(this);
+		this.e.autoHeight = function(e){this.autoHeight(true);}.bind(this);
 		this.e.stop = function(){this.stop();				}.bind(this);
 		this.e.play = function(e,t,s){this.play(t,s);		}.bind(this);
 
@@ -2538,6 +2560,7 @@ Custom events list:
 		this.dom.$el.on('owl.addItem',this.e.addItem);
 		this.dom.$el.on('owl.removeItem',this.e.removeItem);
 		this.dom.$el.on('owl.refresh',this.e.refresh);
+		this.dom.$el.on('owl.autoHeight',this.e.autoHeight);
 		this.dom.$el.on('owl.play',this.e.play);
 		this.dom.$el.on('owl.stop',this.e.stop);
 		this.dom.$el.on('owl.stopVideo',this.e.stop);
@@ -2635,10 +2658,9 @@ Custom events list:
 
 		if(!this.state.isTouch && !this.state.jumpToLoop && !this.state.responsive ){
 			
-			if (this.options.navigation || this.options.pagination) {
+			if (this.options.navigation || this.options.dots) {
 				this.updateControls();
 			}
-
 			this.autoHeight();
 
 			this.fireCallback('onChange');
@@ -2687,9 +2709,14 @@ Custom events list:
 	 * @since 2.0.0
 	 */
 
-	Owl.prototype.autoHeight = function(){
-		if(!this.options.autoHeight){return false;}
+	Owl.prototype.autoHeight = function(callback){
+		 if(this.options.autoHeight !== true && callback !== true){
+			return false;
+		}
+		if(!this.dom.$oStage.hasClass(this.options.autoHeightClass)){
+			this.dom.$oStage.addClass(this.options.autoHeightClass);
 
+		}
 		var loaded = this.dom.$items.eq(this.pos.currentAbs);
 		var stage = this.dom.$oStage;
 		var iterations = 0;
@@ -2747,7 +2774,7 @@ Custom events list:
 	 		var img = new Image();
 	 		img.onload = function(){
 				//el.fadeIn(500);
-				$item.loaded = true;
+				$item.data('owl-item').loaded = true;
 				if(type!=='bg'){
 					$el.attr('src',img.src)
 				}else{
@@ -2755,7 +2782,7 @@ Custom events list:
 				}
 				
 				$el.css('opacity',1);
-				$el.removeClass('owl-lazy');
+				//$el.removeClass('owl-lazy');
 				that.fireCallback('onLazyLoaded');
 			};
 			img.src = $el.attr("data-src") || $el.attr("data-src-retina");
@@ -2806,6 +2833,7 @@ Custom events list:
 		this.dom.$el.off('owl.addItem',this.e.addItem);
 		this.dom.$el.off('owl.removeItem',this.e.removeItem);
 		this.dom.$el.off('owl.refresh',this.e.refresh);
+		this.dom.$el.off('owl.autoHeight',this.e.autoHeight);
 		this.dom.$el.off('owl.play',this.e.play);
 		this.dom.$el.off('owl.stop',this.e.stop);
 		this.dom.$el.off('owl.stopVideo',this.e.stop);

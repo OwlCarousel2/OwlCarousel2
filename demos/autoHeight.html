@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Owl Carousel 2.0.0-beta - Responsive options demo</title>
+	<title>Owl Carousel 2.0.0-beta - AutoHeight - demo</title>
 	<link rel="stylesheet" href="../assets/css/foundation.min.css" />
 	<link rel="stylesheet" href="../owlcarousel/owl.carousel.css">
 	<link rel="stylesheet" href="../assets/js/highlight/styles/monokai_sublime.css">
@@ -14,7 +14,7 @@
 <div class="header">
 	<div class="row">
 	  <div class="large-12 columns">
-		<h1 class="left">Responsive options.</h1>
+		<h1 class="left">AutoHeight.</h1>
 		<ul class="button-group right">
 			<li><a href="../index.html" class="button secondary tiny button">Home</a></li>
 			<li><a href="https://github.com/OwlFonk/OwlCarousel2" class="button tiny show-for-medium-up">Download From GitHub</a></li>
@@ -22,32 +22,34 @@
 	  </div>
 	</div>
 </div>
-<div class="responsive-demo margin-top">
+<div class="margin-top">
+	
+	<div class="row">
+		<div class="large-12 columns">
 
-	<div class="owl-carousel">
-		<div class="article"><h2>1</h2></div>
-		<div class="article"><h2>2</h2></div>
-		<div class="article"><h2>3</h2></div>
-		<div class="article"><h2>4</h2></div>
-		<div class="article"><h2>6</h2></div>
-		<div class="article"><h2>7</h2></div>
-		<div class="article"><h2>8</h2></div>
-		<div class="article"><h2>9</h2></div>
-		<div class="article"><h2>10</h2></div>
-		<div class="article"><h2>11</h2></div>
-		<div class="article"><h2>12</h2></div>
-		<div class="article"><h2>13</h2></div>
-		<div class="article"><h2>14</h2></div>
-		<div class="article"><h2>15</h2></div>
+			<div class="owl-carousel">
+				<div class="article" style="height:200px"><h2>1-200px</h2></div>
+				<div class="article" style="height:500px"><h2>2-500px</h2></div>
+				<div class="article" style="height:400px"><h2>3-400px</h2></div>
+				<div class="article" style="height:600px"><h2>4-600px</h2></div>
+				<div class="article" style="height:300px"><h2>5-300px</h2></div>
+				<div class="article" style="height:400px"><h2>6-400px</h2></div>
+				<div class="article" style="height:650px"><h2>7-650px</h2></div>
+				<div class="article" style="height:250px"><h2>8-250px</h2></div>
+				<div class="article" style="height:100px"><h2>8-100px</h2></div>
+				<div class="article" style="height:350px"><h2>10-350px</h2></div>
+				<div class="article" style="height:600px"><h2>11-600px</h2></div>
+				<div class="article" style="height:300px"><h2>12-300px</h2></div>
+				<div class="article" style="height:400px"><h2>13-400px</h2></div>
+			</div>
+		</div>
 	</div>
-
 </div>
-
 <div class="content">
 	<div class="row margin-top">
 		<div class="large-12 columns">
 			<h4>Descripton</h4>
-			<p>Example of setting up responsive Owl. As not every option is able to use responsive abilities, soon i will provide list of non responsive options.</p>
+			<p>autoHeight: true</p>
 		</div>
 	</div>
 
@@ -58,41 +60,11 @@
 //Javascript
 
 $('.owl-carousel').owlCarousel({
-	loop:true, // loop is true up to 1199px screen.
-	navigation:true, // is true across all sizes
-	margin:10, // margin 10px till 960 breakpoint
-
-	// Object keys can be Numbers (like in this example) or Strings: '480'
-	// Owl has build in sort option
-	// Setting from widest screen to smallest still work as expeted
-
-	responsive:{
-		0:{
-			items:1 // In this configuration 1 is enabled from 0px up to 479px screen size 
-		},
-		480:{
-			items:2, // from 480 to 677 
-			navigation:false // from 480 to max 
-		},
-
-		678:{
-			items:4, // from this breakpoint 678 to 959
-			center:true // only within 678 and next - 959
-		},
-
-		960:{
-			items:5, // from this breakpoint 960 to 1199
-			margin:20, // and so on...
-			center:false 
-
-		},
-
-		1200:{
-			items:6,
-			loop:false,
-			margin: 30,
-		}
-	}
+	items:1,
+	loop:true,
+	margin:10,
+	smartSpeed:450,
+	autoHeight:true
 });
 
 	</code></pre>
@@ -119,7 +91,8 @@ $('.owl-carousel').owlCarousel({
 				<a href="manipulations.html" class="button">Manipulation</a>
 				<a href="nestedItemSelector.html" class="button">Nested Item Selector</a>
 				<a href="autoHeight.html" class="button">AutoHeight</a>	
-				<a href="thumbnails.html" class="button">Dot Thumbnails</a>				</div>
+				<a href="thumbnails.html" class="button">Dot Thumbnails</a>	
+			</div>
 		</div>
 	</div>
 </div>	
@@ -139,40 +112,16 @@ $('.owl-carousel').owlCarousel({
 
 <script>
 jQuery(document).ready(function($) {
-
 	$('.owl-carousel').owlCarousel({
-		loop:true,
-		navigation:true,
+		items:1,
+		loop:false,
 		margin:10,
-		responsive:{
-			0:{
-				items:1
-			},
-
-			480:{
-				items:2
-			},
-
-			678:{
-				items:4,
-				center:true
-			},
-
-			960:{
-				items:5,
-				margin:20,
-				center:false
-
-			},
-
-			1200:{
-				items:6,
-				loop:false,
-				margin: 30,
-			}
-		}
+		smartSpeed:450,
+		autoHeight:true
 	});
 });
+
+
 
 </script>
 
