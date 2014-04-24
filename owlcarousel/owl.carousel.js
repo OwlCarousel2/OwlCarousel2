@@ -2615,7 +2615,7 @@ Custom events list:
 
 			//evt.initEvent(event, false, true );
 
-			evt.initCustomEvent(event, false, true, data);
+			evt.initCustomEvent(event, true, true, data);
 			return this.dom.el.dispatchEvent(evt);
 
 		} else if (!this.dom.el.dispatchEvent){
