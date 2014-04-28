@@ -1,4 +1,4 @@
-OwlCarousel 2.0.0-beta.1.0
+OwlCarousel 2.0.0-beta.1.1
 ============
 
 jQuery Responsive Carousel.

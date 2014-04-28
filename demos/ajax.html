@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Owl Carousel 2.0.0-beta - Hash position demo</title>
+	<title>Owl Carousel 2.0.0-beta - Ajax + JSON demo</title>
 	<link rel="stylesheet" href="../assets/css/foundation.min.css" />
 	<link rel="stylesheet" href="../owlcarousel/owl.carousel.css">
 	<link rel="stylesheet" href="../owlcarousel/owl.theme.css">
@@ -15,7 +15,7 @@
 <div class="header">
 	<div class="row">
 	  <div class="large-12 columns">
-		<h1 class="left">Hash position.</h1>
+		<h1 class="left">Ajax + JSON.</h1>
 		<ul class="button-group right">
 			<li><a href="../index.html" class="button secondary tiny button">Home</a></li>
 			<li><a href="https://github.com/OwlFonk/OwlCarousel2" class="button tiny show-for-medium-up">Download From GitHub</a></li>
@@ -23,35 +23,13 @@
 	  </div>
 	</div>
 </div>
-<div class="hash margin-top">
+<div class="margin-top">
 	
 	<div class="row">
 		<div class="large-12 columns">
-
 			<div class="owl-carousel">
-				<div class="article" data-hash="zero"><h2>0</h2></div>
-				<div class="article" data-hash="one" ><h2>1</h2></div>
-				<div class="article" data-hash="two" ><h2>2</h2></div>
-				<div class="article" data-hash="three" ><h2>3</h2></div>
-				<div class="article" data-hash="four"><h2>4</h2></div>
-				<div class="article" data-hash="five" ><h2>5</h2></div>
-				<div class="article" data-hash="six"><h2>6</h2></div>
-				<div class="article" data-hash="seven" ><h2>7</h2></div>
-				<div class="article" data-hash="eight" ><h2>8</h2></div>
-				<div class="article" data-hash="nine" ><h2>9</h2></div>
-				<div class="article" data-hash="ten" ><h2>10</h2></div>
-				<div class="article" data-hash="eleven" ><h2>11</h2></div>
-				<div class="article" data-hash="tweleve" ><h2>12</h2></div>
-				<div class="article" data-hash="thirteen" ><h2>13</h2></div>
-				<div class="article" data-hash="fourteen" ><h2>14</h2></div>
-				<div class="article" data-hash="fifteen" ><h2>15</h2></div>
+
 			</div>
-			<hr>
-			<a class="button secondary url" href="#zero">zero</a>
-			<a class="button secondary url" href="#three">three</a>
-			<a class="button secondary url" href="#five">five</a>
-			<a class="button secondary url" href="#seven">seven</a>
-			<a class="button secondary url" href="#ten">ten</a>
 		</div>
 	</div>
 </div>
@@ -60,9 +38,9 @@
 	<div class="row margin-top">
 		<div class="large-12 columns">
 			<h4>Descripton</h4>
-			<p>URLhashListener option is listening for url hash change and is looking for slide with the same data name e.g. data-hash="zero"</p>
-			<p>Also startPosition option accept string: 'URLHash'. This will load coresponding item on startup.
-			Browser history back button is also affected.</p>
+			<p>If you call Owl without having content then owl will be in 'stand by' mode and then you can use asynchronous ajax call to fill it with new items. To do this you need to trigger 'insertContent.owl' event with content as a second parameter.</p>
+			<p>In this example demo.json is a collection of DOM elements. As you can see im passing it as a plain non-jquery string. However 'insertContent.owl' event accept as a second parameter jQuery elements as well, simply use square brackets around jQuery object - owl.trigger('insertContent.owl',[$(content)]); </p>
+			<p><strong>Note that 'insertContent.owl' replace existence owl items.</strong></p>
 		</div>
 	</div>
 
@@ -72,15 +50,33 @@
 	<pre><code>
 //Javascript
 
-var owl = $('.owl-carousel'); // save reference to variable
+var owl = $('.owl-carousel');
 
 owl.owlCarousel({
-	items:4,
-	loop:true,
-	center:true,
+	navigation:true,
 	margin:10,
-	URLhashListener:true,
-	startPosition: 'URLHash'
+	loop:true,
+	responsive:{
+		0:{
+			items:2
+		},
+		1000:{
+			items:3
+		}
+	}
+});
+
+$.ajax({
+	url: '../demos/JSON/demo.json',
+	dataType: 'json',
+	success: function(data) {
+		var content = '';
+		for (i in data.owl) {
+            content += data.owl[i].item;
+        }
+
+		owl.trigger('insertContent.owl',content);
+	}
 });
 
 	</code></pre>
@@ -88,7 +84,7 @@ owl.owlCarousel({
 		</div>
 	</div>
 	
-	<div class="margin-top">
+	<div class="demos-buttons margin-top">
 		<div class="row">
 			<div class="large-12 columns">
 				<h3>Demos:</h3>
@@ -133,17 +129,33 @@ owl.owlCarousel({
 <script>
 jQuery(document).ready(function($) {
 
-	$('.owl-carousel').owlCarousel({
-		items:4,
-		loop:false,
-		center:true,
+	var owl = $('.owl-carousel');
+	owl.owlCarousel({
+		navigation:true,
 		margin:10,
-		callbacks:true,
-		URLhashListener:true,
-		autoplayHoverPause:true,
-		startPosition: 'URLHash'
+		loop:true,
+		responsive:{
+			0:{
+				items:2
+			},
+			1000:{
+				items:3
+			}
+		}
 	});
 
+	$.ajax({
+		url: '../demos/JSON/demo.json',
+		dataType: 'json',
+		success: function(data) {
+			var content = '';
+			for (i in data.owl) {
+                content += data.owl[i].item;
+            }
+
+			owl.trigger('insertContent.owl',content);
+		}
+	});
 });
 
 </script>

@@ -25,6 +25,21 @@ code.hljs {
 	background: #23241f;
 }
 
+/* Table */
+
+table {
+	margin-bottom: 1.25rem;
+	border: 0px;
+}
+
+table tr td,
+table tr th
+{
+	border-bottom: solid 1px #ddd;
+	background: #FFFFFF;
+	padding: 1em;
+}
+
 /* demos */
 .article{
 	background: #008cba;
@@ -100,3 +115,20 @@ code.hljs {
 .thumbnails-dot .owl-dot.active{
 	opacity: 1
 }
+
+.callbacks div{
+	margin-bottom: 3px;
+}
+.callbacks .label.secondary{
+	color: #e7e7e7;
+}
+.callbacks .label{
+	transition: background-color 300ms ease-out;
+}
+
+
+
+
+
+
+

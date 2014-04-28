@@ -6,6 +6,7 @@
 	<title>Owl Carousel 2.0.0-beta - Responsive options demo</title>
 	<link rel="stylesheet" href="../assets/css/foundation.min.css" />
 	<link rel="stylesheet" href="../owlcarousel/owl.carousel.css">
+	<link rel="stylesheet" href="../owlcarousel/owl.theme.css">
 	<link rel="stylesheet" href="../assets/js/highlight/styles/monokai_sublime.css">
 	<link rel="stylesheet" href="../assets/css/demo.css">
 	
@@ -61,15 +62,17 @@ $('.owl-carousel').owlCarousel({
 	loop:true, // loop is true up to 1199px screen.
 	navigation:true, // is true across all sizes
 	margin:10, // margin 10px till 960 breakpoint
-
+	responsiveClass:true, // Optional helper class. Add 'owl-reponsive-' + 'breakpoint' class to main element.
+						
 	// Object keys can be Numbers (like in this example) or Strings: '480'
 	// Owl has build in sort option
-	// Setting from widest screen to smallest still work as expeted
+	// Setting from widest screen to smallest still work.
 
 	responsive:{
 		0:{
 			items:1 // In this configuration 1 is enabled from 0px up to 479px screen size 
 		},
+
 		480:{
 			items:2, // from 480 to 677 
 			navigation:false // from 480 to max 
@@ -111,15 +114,20 @@ $('.owl-carousel').owlCarousel({
 				<a href="merge.html" class="button">Merge</a>
 				<a href="autowidth.html" class="button">Auto Width</a>
 				<a href="videos.html" class="button">Videos</a>
+				<a href="callbacks.html" class="button">Callbacks</a>
 				<a href="autoplay.html" class="button">Autoplay</a>
 				<a href="urlhash.html" class="button">URL hash navigation</a>
 				<a href="info.html" class="button">Info callback</a>
 				<a href="rtl.html" class="button">Right to left</a>
-				<a href="lightweight.html" class="button">Thousands Items</a>
-				<a href="manipulations.html" class="button">Manipulation</a>
+				<a href="manipulations.html" class="button">Manipulations</a>
+				<a href="ajax.html" class="button">Ajax</a>
 				<a href="nestedItemSelector.html" class="button">Nested Item Selector</a>
 				<a href="autoHeight.html" class="button">AutoHeight</a>	
-				<a href="thumbnails.html" class="button">Dot Thumbnails</a>				</div>
+				<a href="thumbnails.html" class="button">Dot Thumbnails</a>
+				<a href="lazyContent.html" class="button">Lazy Content Structure</a>
+				<a href="ajaxLazyContent.html" class="button">Ajax + Lazy Content</a>
+				<a href="zepto.html" class="button">Zepto Support</a>
+			</div>
 		</div>
 	</div>
 </div>	
@@ -144,6 +152,7 @@ jQuery(document).ready(function($) {
 		loop:true,
 		navigation:true,
 		margin:10,
+		responsiveClass:true,
 		responsive:{
 			0:{
 				items:1

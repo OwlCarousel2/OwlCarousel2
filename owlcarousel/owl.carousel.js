@@ -4,7 +4,7 @@
  * @release 2014
  * Licensed under MIT
  * 
- * @version 2.0.0-beta.1.0
+ * @version 2.0.0-beta.1.1
  * @versionNotes Not compatibile with Owl Carousel <2.0.0
  */
 
@@ -17,42 +17,37 @@
 To do:
 
 * Lazy Load Icon
-* Text navigation 
 * prevent animationend bubling
 * itemsScaleUp 
 * Test Zepto
 
 Callback events list:
 
-:onBeforeInit
-:onAfterInit
-:onBeforeResponsive
-:onAfterResponsive
-:onAnimationStart
-:onAnimationEnd
-:onStartTouch
-:onEndTouch
-:onChange
-:onLazyLoaded
-:onPlayVideo
-:onStopVideo
-
-//to do
-:onPlay
-:onStop
+onInitBefore
+onInitAfter
+onResponsiveBefore
+onResponsiveAfter
+onAnimationStart
+onAnimationEnd
+onTouchStart
+onTouchEnd
+onChangeState
+onLazyLoaded
+onVideoPlay
+onVideoStop
 
 Custom events list:
 
-:owl.next
-:owl.prev
-:owl.goTo
-:owl.jumpTo
-:owl.addItem
-:owl.removeItem
-:owl.refresh
-:owl.play
-:owl.stop
-:owl.stopVideo
+next.owl
+prev.owl
+goTo.owl
+jumpTo.owl
+addItem.owl
+removeItem.owl
+refresh.owl
+play.owl
+stop.owl
+stopVideo.owl
 
 */
 
@@ -63,12 +58,11 @@ Custom events list:
 		items:				3,
 		loop:				false,
 		center:				false,
-		lazyLoad:			false,
-
-		lightweightStructure:false,
 
 		mouseDrag:			true,
 		touchDrag:			true,
+		pullDrag: 			true,
+		freeDrag:			false,
 
 		margin:				0,
 		stagePadding:		0,
@@ -79,16 +73,20 @@ Custom events list:
 		autoHeight:			false,
 
 		startPosition:		0,
+		URLhashListener:	false,
+
 		navigation: 		false,
 		navText: 			['prev','next'],
 		slideBy:			1,
 		dots: 				true,
 		dotsEach:			false,
 		dotData:			false,
-		URLhashListener:	false,
+
+		lazyLoad:			false,
+		lazyContent:		false,
 
 		autoplay:			false,
-		autoplayTimeout:	5000,//ap interval
+		autoplayTimeout:	5000,
 		autoplayHoverPause:	false,
 
 		smartSpeed:			250,
@@ -102,6 +100,7 @@ Custom events list:
 		responsive: 		{},
 		responsiveRefreshRate : 200,
 		responsiveBaseElement: window,
+		responsiveClass:	false,
 
 		video:				false,
 		videoHeight:		false,
@@ -109,8 +108,13 @@ Custom events list:
 
 		fallbackEasing:		'swing',
 
+		info: 				false,
+
+		nestedItemSelector:	false,
+		itemElement:		'div',
+		stageElement:		'div',
+
 		//Classes and Names
-		clonedClasses:		false,
 		themeClass: 		'owl-theme',
 		baseClass:			'owl-carousel',
 		itemClass:			'owl-item',
@@ -122,10 +126,6 @@ Custom events list:
 		dotClass: 			'owl-dot',
 		dotsClass:			'owl-dots',
 		autoHeightClass:	'owl-height',
-		nestedItemSelector:	false,
-
-		itemElement:		'div',
-		stageElement:		'div'
 
 	};
 
@@ -229,7 +229,8 @@ Custom events list:
 		isSwiping:		false,
 		direction:		false,
 		inMotion:		false,
-		autoplay:		false
+		autoplay:		false,
+		lazyContent:	false
 	};
 
 	// Event functions references
@@ -256,8 +257,8 @@ Custom events list:
 		element.owlCarousel = {
 			'name':		'Owl Carousel',
 			'author':	'Bartosz Wojciechowski',
-			'version':	'2.0.0-beta.1.0',
-			'released':	'21.04.2014'
+			'version':	'2.0.0-beta.1.1',
+			'released':	'28.04.2014'
 		};
 
 		// Attach variables to object
@@ -308,7 +309,7 @@ Custom events list:
 
 	Owl.prototype.init = function(){
 
-		this.fireCallback('onBeforeInit');
+		this.fireCallback('onInitBefore');
 
 		// set opacity 0 to main element 
 		this.dom.el.style.opacity = '0';
@@ -355,36 +356,10 @@ Custom events list:
 		this.createStage();
 
 		// Append local content 
-		this.findLocalContent();
-
-		if(this.options.lightweightStructure && this.num.oItems >= this.options.items*3){
-			this.options.lightweightStructure = true;
-			this.state.lightweight = true;
-			this.createLightweightStructure();
-		} else {
-			this.state.lightweight = false;
-			this.options.lightweightStructure = false;
-			this.createNormalStructure();
-		}
-
-		// Check options
-		this.optionsLogic();
-
-		// Update local content
-		this.updateLocalContent();
-
-		//Check for videos ( YouTube and Vimeo currently supported)
-		this.checkVideoLinks();
-
-		// Create clones for infinity loop
-		this.loopClone();
+		this.fetchContent();
 
 		// Zepto require main element to be displayed befor data collection
 		this.dom.el.style.display = 'block';
-
-		// Update item positions in data object
-		this.calculate();
-
 		this.dom.el.style.opacity = '1';
 
 		// attach generic events 
@@ -396,20 +371,11 @@ Custom events list:
 		// attach generic events 
 		this.internalEvents();
 
-		// Set init positions 
-		this.initPosition();
+		this.refresh(true);
 
-		// Find visible/center items 
-		this.updateItemState();
-
-		// play
-		this.autoplay();
-
-		// check if el is visible - handy for hidden content in tabs etc.
-		this.watchVisibility();
-
-		this.fireCallback('onAfterInit');
+		this.fireCallback('onInitAfter');
 	};
+
 
 	/**
 	 * sortOptions
@@ -450,7 +416,7 @@ Custom events list:
 
 		// overwrite non resposnive options
 		for(k in this._options){
-			if(k !== "responsive"){
+			if(k !== 'responsive'){
 				this.options[k] = this._options[k];
 			}
 		}
@@ -463,8 +429,20 @@ Custom events list:
 				for(j in this.responsiveSorted[minWidth]){
 					this.options[j] = this.responsiveSorted[minWidth][j];
 				}
+				
 	        }
 		}
+		this.num.breakpoint = minWidth;
+
+		// Responsive Class
+		if(this.options.responsiveClass){
+			this.dom.$el.attr('class',
+				function(i, c){
+				return c.replace(/\b owl-responsive-\S+/g, '');
+			}).addClass('owl-responsive-'+minWidth);
+		}
+
+
 	};
 
 	/**
@@ -485,8 +463,10 @@ Custom events list:
 			this.options.slideBy = this.options.items;
 		}
 
-		if(this.num.oItems < this.options.items){
+		if(this.options.loop && this.num.oItems <= this.options.items){
 			this.options.loop = false;
+		} else if(this.options.loop){
+			this.options.loop = true;
 		}
 
 		if(this.options.autoWidth){
@@ -494,13 +474,12 @@ Custom events list:
 			this.options.dotsEach = 1;
 			this.options.merge = false;
 		}
-		if(this.state.lightweight){
+		if(this.state.lazyContent){
 			this.options.loop = false;
 			this.options.merge = false;
 			this.options.dots = false;
-			this.options.lightweightStructure = true;
-		} else {
-			this.options.lightweightStructure = false;
+			this.options.freeDrag = false;
+			this.options.lazyContent = true;
 		}
 	};
 
@@ -542,19 +521,58 @@ Custom events list:
 	};
 
 	/**
-	 * findLocalContent
+	 * fetchContent
 	 * @since 2.0.0
 	 */
 
-	Owl.prototype.findLocalContent = function(){
-		// get local data information (children etc.)
-		var content;
-		if(this.options.nestedItemSelector){
-			this.dom.$content= this.dom.$el.find('.'+this.options.nestedItemSelector).not(".owl-stage-outer");
-		} else {
-			this.dom.$content= this.dom.$el.children().not(".owl-stage-outer");
+	Owl.prototype.fetchContent = function(extContent){
+		if(extContent){
+			this.dom.$content = (extContent instanceof jQuery) ? extContent : $(extContent);
 		}
+		else if(this.options.nestedItemSelector){
+			this.dom.$content= this.dom.$el.find('.'+this.options.nestedItemSelector).not('.owl-stage-outer');
+		} 
+		else {
+			this.dom.$content= this.dom.$el.children().not('.owl-stage-outer');
+		}
+		// content length
 		this.num.oItems = this.dom.$content.length;
+
+		// init Structure
+		if(this.num.oItems !== 0){
+			this.initStructure();
+		}
+	};
+
+
+	/**
+	 * initStructure
+	 * @param [refresh] - if refresh and not lazyContent then dont create normal structure
+	 * @since 2.0.0
+	 */
+
+	Owl.prototype.initStructure = function(){
+
+		// lazyContent needs at least 3*items 
+
+		if(this.options.lazyContent && this.num.oItems >= this.options.items*3){
+			this.state.lazyContent = true;
+		} else {
+			this.state.lazyContent = false;
+		}
+
+		if(this.state.lazyContent){
+
+			// start position
+			this.pos.currentAbs = this.options.items;
+
+			//remove lazy content from DOM
+			this.dom.$content.remove();
+
+		} else {
+			// create normal structure
+			this.createNormalStructure();
+		}
 	};
 
 	/**
@@ -574,25 +592,38 @@ Custom events list:
 	};
 
 	/**
-	 * createLightweightStructure
-	 * @desc Create lightweight structure for large content and better mobile experience
+	 * createCustomStructure
 	 * @since 2.0.0
 	 */
 
-	Owl.prototype.createLightweightStructure = function(){
-		if(!this.state.lightweight){return false;}
-		// remove stage
-		this.dom.$content.remove();
-		this.dom.$stage.empty();
-
-		for(var i = 0; i < this.options.items*3; i++){
+	Owl.prototype.createCustomStructure = function(howManyItems){
+		for(var i = 0; i < howManyItems; i++){
 			var emptyItem = this.createItem();
 			var item = $(emptyItem);
+
 			this.setData(item,false);
-			item.data('owl-item').boostPage = i;
 			this.dom.$stage.append(item);
 		}
+	};
 
+	/**
+	 * createLazyContentStructure
+	 * @desc Create lazyContent structure for large content and better mobile experience
+	 * @since 2.0.0
+	 */
+
+	Owl.prototype.createLazyContentStructure = function(refresh){
+		if(!this.state.lazyContent){return false;}
+
+		// prevent recreate - to do
+		if(refresh && this.dom.$stage.children().length === this.options.items*3){
+			return false;
+		}
+		// remove items from stage
+		this.dom.$stage.empty();
+
+		// create custom structure
+		this.createCustomStructure(3*this.options.items);
 	};
 
 	/**
@@ -665,8 +696,7 @@ Custom events list:
 			hasVideo:	false,
 			playVideo:	false,
 			dot:		dot,
-			hash:		hash,
-			boostPage:	false
+			hash:		hash
 		};
 
 		// copy itemData to cloned item 
@@ -689,7 +719,6 @@ Custom events list:
 		});
 
 		this.num.oItems = this.dom.$oItems.length;
-
 		//update index on original items
 
 		for(var k = 0; k<this.num.oItems; k++){
@@ -800,7 +829,7 @@ Custom events list:
 		// Custom thumbnail
 
 		if(customTn.length){
-			addThumbnail(customTn.attr('src'));
+			addThumbnail(customTn.attr(srcType));
 			customTn.remove();
 			return false;
 		}
@@ -846,7 +875,7 @@ Custom events list:
 	 */
 
 	Owl.prototype.stopVideo = function(){
-		this.fireCallback('onStopVideo');
+		this.fireCallback('onVideoStop');
 		var item = this.dom.$items.eq(this.state.videoPlayIndex);
 		item.find('.owl-video-frame').remove();
 		item.removeClass('owl-video-playing');
@@ -859,7 +888,7 @@ Custom events list:
 	 */
 
 	Owl.prototype.playVideo = function(ev){
-		this.fireCallback('onPlayVideo');
+		this.fireCallback('onVideoPlay');
 
 		if(this.state.videoPlay){
 			this.stopVideo();
@@ -894,7 +923,7 @@ Custom events list:
 	 */
 
 	Owl.prototype.loopClone = function(){
-		if(!this.options.loop || this.state.lightweight){return false;}
+		if(!this.options.loop || this.state.lazyContent || this.num.oItems <= this.options.items){return false;}
 
 		var firstClone,	lastClone, i,
 			num	=		this.options.items, 
@@ -940,9 +969,8 @@ Custom events list:
 	 */
 
 	Owl.prototype.reClone = function(){
-
 		// remove cloned items 
-		if(this.dom.$cItems !== null){
+		if(this.dom.$cItems !== null){ // && (this.num.oItems !== 0 && this.num.oItems <= this.options.items)){
 			this.dom.$cItems.remove();
 			this.dom.$cItems = null;
 			this.num.cItems = 0;
@@ -1060,7 +1088,6 @@ Custom events list:
 			if(this.options.center){
 				this.pos.items[i] = !this.options.rtl ? this.pos.items[i] - (iWidth/2) : this.pos.items[i] + (iWidth/2);
 			}
-
 		}
 
 		if(this.options.autoWidth){
@@ -1135,8 +1162,9 @@ Custom events list:
 		}
 
 		//if is less items
-		if(this.num.oItems < this.options.items){
+		if(this.num.oItems <= this.options.items && !this.options.center){
 			this.pos.max = 0;
+			this.pos.maxValue = this.pos.items[0];
 		}
 	}
 
@@ -1194,6 +1222,7 @@ Custom events list:
 
 	Owl.prototype.responsive = function(){
 
+		if(!this.num.oItems){return false}
 		// If El width hasnt change then stop responsive 
 		var elChanged = this.isElWidthChanged();
 		if(!elChanged){return false;}
@@ -1229,11 +1258,11 @@ Custom events list:
 			this.stopVideo();
 		}
 
-		this.fireCallback('onBeforeResponsive');
+		this.fireCallback('onResponsiveBefore');
 		this.state.responsive = true;
 		this.refresh();
 		this.state.responsive = false;
-		this.fireCallback('onAfterResponsive');
+		this.fireCallback('onResponsiveAfter');
 	};
 
 	/**
@@ -1242,19 +1271,20 @@ Custom events list:
 	 * @since 2.0.0
 	 */
 
-	Owl.prototype.refresh = function(){
+	Owl.prototype.refresh = function(init){
 		this.watchVisibility();
 
 		// Update Options for given width
 		this.setResponsiveOptions();
 
-		// udpate options
-		this.optionsLogic();
-
-		this.createLightweightStructure();
+		//set lazy structure
+		this.createLazyContentStructure(true);
 
 		// update info about local content
 		this.updateLocalContent();
+
+		// udpate options
+		this.optionsLogic();
 
 		// if no items then stop 
 		if(this.num.oItems === 0){
@@ -1280,12 +1310,19 @@ Custom events list:
 		//aaaand show.
 		this.dom.$stage.removeClass('owl-refresh');
 
-		this.updateItemState();
+		// lazyContent last position on refresh
+		if(this.state.lazyContent){
+			this.pos.currentAbs = this.options.items;
+		}
+
+		this.initPosition(init);
 
 		// jump to last position 
-		if(!this.state.lightweight){
+		if(!this.state.lazyContent && !init){
 			this.jumpTo(this.pos.current,false); // fix that 
 		}
+
+		this.updateItemState();
 
 		// Update controls
 		this.rebuildDots();
@@ -1309,12 +1346,12 @@ Custom events list:
 	 * @since 2.0.0
 	 */
 
-	Owl.prototype.updateItemState = function(){
+	Owl.prototype.updateItemState = function(update){
 
-		if(!this.state.lightweight){
+		if(!this.state.lazyContent){
 			this.updateActiveItems();
 		} else {
-			this.updateLightweightItems();
+			this.updateLazyContent(update);
 		}
 
 		if(this.options.center){
@@ -1335,7 +1372,7 @@ Custom events list:
 
 
 	Owl.prototype.updateActiveItems = function(){
-		var i,j,item,ipos,iwidth,wpos,stage,outsideView;
+		var i,j,item,ipos,iwidth,wpos,stage,outsideView,foundCurrent;
 		// clear states
 		for(i = 0; i<this.num.items; i++){
 			this.dom.$items.eq(i).data('owl-item').active = false;
@@ -1359,6 +1396,12 @@ Custom events list:
 				){
 
 				this.num.active++;
+
+				if(this.options.freeDrag && !foundCurrent){
+					foundCurrent = true;
+					this.pos.current = item.data('owl-item').index;
+					this.pos.currentAbs = item.data('owl-item').indexAbs;
+				}
 
 				item.data('owl-item').active = true;
 				item.data('owl-item').current = true;
@@ -1396,61 +1439,86 @@ Custom events list:
 				}
 			}
 		}
-	}
+	};
 
 	/**
-	 * updateLightweightItems
+	 * updateLazyPosition
+	 * @desc Set current state on sibilings items for lazyLoad and center
 	 * @since 2.0.0
 	 */
 
-	Owl.prototype.updateLightweightItems = function(){
-		var jumpTo = this.pos.goToLightweight || 0;
+	Owl.prototype.updateLazyPosition = function(){
+		var jumpTo = this.pos.goToLazyContent || 0;
 
-		var direction;
-		var pos = this.pos.currentAbs;
+		this.pos.lcMovedBy = Math.abs(this.options.items - this.pos.currentAbs);
 
-		this.pos.current = this.pos.currentAbs = this.options.items;
-
-		if(this.options.items < pos ){
-			this.pos.lsCurrent += pos - this.options.items;
-			direction = 'right'
-		} else if(this.options.items > pos ){
-			this.pos.lsCurrent -= this.options.items - pos;
-			direction = 'left'
+		if(this.options.items < this.pos.currentAbs ){
+			this.pos.lcCurrent += this.pos.currentAbs - this.options.items;
+			this.state.lcDirection = 'right'
+		} else if(this.options.items > this.pos.currentAbs ){
+			this.pos.lcCurrent -= this.options.items - this.pos.currentAbs;
+			this.state.lcDirection = 'left'
 		}
 
-		var movedBy = Math.abs(this.options.items - pos);
+		this.pos.lcCurrent = jumpTo !== 0 ? jumpTo : this.pos.lcCurrent;
 
-		if(direction !== false){
-			for(var i = 0; i<movedBy; i++){
-				if(direction === "right"){
+		if(this.pos.lcCurrent >= this.dom.$content.length){
+			this.pos.lcCurrent = this.pos.lcCurrent-this.dom.$content.length;
+		} else if(this.pos.lcCurrent < -this.dom.$content.length+1){
+			this.pos.lcCurrent = this.pos.lcCurrent+this.dom.$content.length;
+		}
+
+		if(this.options.startPosition>0){
+			this.pos.lcCurrent = this.options.startPosition;
+			this._options.startPosition = this.options.startPosition = 0;
+		}
+
+		this.pos.lcCurrentAbs = this.pos.lcCurrent < 0 ? this.pos.lcCurrent+this.dom.$content.length : this.pos.lcCurrent;
+
+	};
+
+	/**
+	 * updateLazyContent
+	 * @param [update] - boolean - update call by content manipulations
+	 * @since 2.0.0
+	 */
+
+	Owl.prototype.updateLazyContent = function(update){
+
+		if(this.pos.lcCurrent === undefined){
+			this.pos.lcCurrent = 0;
+			this.pos.current = this.pos.currentAbs = this.options.items;
+		}
+
+		if(!update){
+			this.updateLazyPosition();
+		}
+
+		if(this.state.lcDirection !== false){
+			for(var i = 0; i<this.pos.lcMovedBy; i++){
+
+				if(this.state.lcDirection === 'right'){
 					var item = this.dom.$stage.find('.owl-item').eq(0) //.appendTo(this.dom.$stage);
 					item.appendTo(this.dom.$stage);
 				}
-				if(direction === "left"){
+				if(this.state.lcDirection === 'left'){
 					var item = this.dom.$stage.find('.owl-item').eq(-1);
-					item.prependTo(this.dom.$stage)
+					item.prependTo(this.dom.$stage);
 				}
 				item.data('owl-item').active = false;
 			}
 		}
-		
-		this.pos.lsCurrent = jumpTo !== 0 ? jumpTo : this.pos.lsCurrent;
 
 		// recollect 
 		this.dom.$items = this.dom.$stage.find('.owl-item');
-		
-		if(this.pos.lsCurrent >= this.dom.$content.length){
-			this.pos.lsCurrent = this.pos.lsCurrent-this.dom.$content.length;
-		} else if(this.pos.lsCurrent < -this.dom.$content.length+1){
-			this.pos.lsCurrent = this.pos.lsCurrent+this.dom.$content.length;
-		}
 
 		for(var j = 0; j<this.num.items; j++){
+
+			// to do
 			this.dom.$items.eq(j).removeClass(this.options.centerClass);
 
 			// get Content 
-			var contentPos = this.pos.lsCurrent + j - this.options.items + this.options.startPosition;
+			var contentPos = this.pos.lcCurrent + j - this.options.items;// + this.options.startPosition;
 
 			if(contentPos >= this.dom.$content.length){
 				contentPos = contentPos - this.dom.$content.length;
@@ -1458,25 +1526,27 @@ Custom events list:
 			if(contentPos < -this.dom.$content.length){
 				contentPos = contentPos + this.dom.$content.length;
 			}
-			
-			var content = this.dom.$content.eq(contentPos);
 
+			var content = this.dom.$content.eq(contentPos);
 			var freshItem = this.dom.$items.eq(j);
 			var freshData = freshItem.data('owl-item');
 
-			if(freshData.active === false || jumpTo !== 0){
+			if(freshData.active === false || this.pos.goToLazyContent !== 0 || update === true){
 
 				freshItem.empty();
-				freshItem.append(content);
+				freshItem.append(content.clone(true,true));
 				freshData.active = true;
 				freshData.current = true;
-				freshData.loaded = false;
+				if(!this.options.lazyLoad){
+					freshData.loaded = true;
+				} else {
+					freshData.loaded = false;
+				}
 			}
 		}
-		var currentAbs = this.pos.lsCurrent + this.options.startPosition;
-		this.pos.currentLight = currentAbs = currentAbs < 0 ? currentAbs+this.dom.$content.length : currentAbs;
 
-		this.pos.goToLightweight = 0;
+		this.pos.goToLazyContent = 0;
+		this.pos.current = this.pos.currentAbs = this.options.items;
 		this.setSpeed(0);
 		this.animStage(this.pos.items[this.options.items]);
 	};
@@ -1543,11 +1613,11 @@ Custom events list:
 		var isTouchIE = isTouchSupportIE();
 
 		if(isTouch && !isTouchIE){
-			this.dragType = ["touchstart","touchmove","touchend","touchcancel"];
+			this.dragType = ['touchstart','touchmove','touchend','touchcancel'];
 		} else if(isTouchIE){
-			this.dragType = ["MSPointerDown","MSPointerMove","MSPointerUp","MSPointerCancel"];
+			this.dragType = ['MSPointerDown','MSPointerMove','MSPointerUp','MSPointerCancel'];
 		} else {
-			this.dragType = ["mousedown","mousemove","mouseup"];
+			this.dragType = ['mousedown','mousemove','mouseup'];
 		}
 
 		if( (isTouch || isTouchIE) && this.options.touchDrag){
@@ -1556,10 +1626,15 @@ Custom events list:
 
 		} else {
 			// firefox startdrag fix - addeventlistener doesnt work here :/
-			this.dom.$stage.on("dragstart", function() {return false;});
+			this.dom.$stage.on('dragstart', function() {return false;});
 
-			//disable text select
-			this.dom.stage.onselectstart = function(){return false;};
+			if(this.options.mouseDrag){
+				//disable text select
+				this.dom.stage.onselectstart = function(){return false;}
+			} else {
+				// enable text select
+				this.dom.$el.addClass('owl-text-select-on');
+			}
 		}
 
 		// Video Play Button event delegation
@@ -1571,8 +1646,8 @@ Custom events list:
 
 		if(this.options.autoplayHoverPause){
 			var that = this;
-			this.dom.$stage.on("mouseover", this.e._pause )
-			this.dom.$stage.on("mouseleave", this.e._ap )
+			this.dom.$stage.on('mouseover', this.e._pause )
+			this.dom.$stage.on('mouseleave', this.e._ap )
 		}
 
 		// Catch transitionEnd event
@@ -1595,10 +1670,10 @@ Custom events list:
 
 	Owl.prototype.updateEvents = function(){
 
-		if(this.options.touchDrag && (this.dragType[0] === "touchstart" || this.dragType[0] === "MSPointerDown")){
+		if(this.options.touchDrag && (this.dragType[0] === 'touchstart' || this.dragType[0] === 'MSPointerDown')){
 			this.on(this.dom.stage, this.dragType[0], this.e._onDragStart,false);
 
-		} else if(this.options.mouseDrag && this.dragType[0] === "mousedown"){
+		} else if(this.options.mouseDrag && this.dragType[0] === 'mousedown'){
 			this.on(this.dom.stage, this.dragType[0], this.e._onDragStart,false);
 
 		} else {
@@ -1623,7 +1698,7 @@ Custom events list:
 			this.dom.$stage.addClass('owl-grab');
 		}
 
-		this.fireCallback("onStartTouch");
+		this.fireCallback('onTouchStart');
 		this.drag.startTime = new Date().getTime();
 		this.setSpeed(0);
 		this.state.isTouch = true;
@@ -1698,24 +1773,26 @@ Custom events list:
 
 		// Check move direction 
 		if (this.drag.distance < 0) {
-			this.state.direction = this.options.rtl ? "right" : "left";
+			this.state.direction = this.options.rtl ? 'right' : 'left';
 		} else if(this.drag.distance > 0){
-			this.state.direction = this.options.rtl ? "left" : "right";
+			this.state.direction = this.options.rtl ? 'left' : 'right';
 		}
-
 		// Loop
 		if(this.options.loop){
-			if(this.op(this.drag.currentX, '>', this.pos.minValue) && this.state.direction === "right" ){
+			if(this.op(this.drag.currentX, '>', this.pos.minValue) && this.state.direction === 'right' ){
 				this.drag.currentX -= this.pos.loop;
-			}else if(this.op(this.drag.currentX, '<', this.pos.maxValue) && this.state.direction === "left" ){
+			}else if(this.op(this.drag.currentX, '<', this.pos.maxValue) && this.state.direction === 'left' ){
 				this.drag.currentX += this.pos.loop;
 			}
 		} else {
-			// Strain
+			// pull
 			var minValue = this.options.rtl ? this.pos.maxValue : this.pos.minValue;
 			var maxValue = this.options.rtl ? this.pos.minValue : this.pos.maxValue;
-			this.drag.currentX = Math.max(Math.min(this.drag.currentX, minValue + this.drag.distance / 5), maxValue + this.drag.distance / 5);
+			var pull = this.options.pullDrag ? this.drag.distance / 5 : 0;
+			this.drag.currentX = Math.max(Math.min(this.drag.currentX, minValue + pull), maxValue + pull);
 		}
+
+
 
 		// Lock browser if swiping horizontal
 
@@ -1731,11 +1808,11 @@ Custom events list:
 		this.drag.updatedX = this.drag.currentX;
 
 		// Lock Owl if scrolling 
-
 		if ((this.drag.currentY > 16 || this.drag.currentY < -16) && this.state.isSwiping === false) {
 			 this.state.isScrolling = true;
 			 this.drag.updatedX = this.drag.start;
 		}
+
 		this.animStage(this.drag.updatedX);
 	};
 
@@ -1752,6 +1829,8 @@ Custom events list:
 		if(this.dragType[0] === 'mousedown'){
 			this.dom.$stage.removeClass('owl-grab');
 		}
+
+		this.fireCallback('onTouchEnd');
 
 		//prevent links and images dragging;
 		this.drag.targetEl.draggable = true;
@@ -1778,11 +1857,17 @@ Custom events list:
 		if(distanceAbs > 3 || compareTimes > 300){
 			this.removeClick(this.drag.targetEl);
 		}
+
 		var closest = this.closest(this.drag.updatedX);
 
 		this.setSpeed(this.options.dragEndSpeed, false, true);
-
 		this.animStage(this.pos.items[closest]);
+		
+		//if pullDrag is off then fire transitionEnd event manually when stick to border
+		if(!this.options.pullDrag && this.drag.updatedX === this.pos.items[closest]){
+			this.transitionEnd();
+		}
+
 		this.drag.distance = 0;
 
 		this.off(document, this.dragType[1], this.e._onDragMove);
@@ -1846,27 +1931,33 @@ Custom events list:
 		var newX = 0,
 			pull = 30;
 
-		// Check closest item
-		for(var i = 0; i< this.num.items; i++){
-			if(x > this.pos.items[i]-pull && x < this.pos.items[i]+pull){
-				newX = i;
-			}else if(this.op(x,'<',this.pos.items[i]) && this.op(x,'>',this.pos.items[i+1 || this.pos.items[i] - this.width.el]) ){
-				newX = this.state.direction === "left" ? i+1 : i;
+		if(!this.options.freeDrag){
+			// Check closest item
+			for(var i = 0; i< this.num.items; i++){
+				if(x > this.pos.items[i]-pull && x < this.pos.items[i]+pull){
+					newX = i;
+				}else if(this.op(x,'<',this.pos.items[i]) && this.op(x,'>',this.pos.items[i+1 || this.pos.items[i] - this.width.el]) ){
+					newX = this.state.direction === 'left' ? i+1 : i;
+				}
 			}
 		}
-
 		//non loop boundries
 		if(!this.options.loop){
 			if(this.op(x,'>',this.pos.minValue)){
-				newX = this.pos.min;
+				newX = x = this.pos.min;
 			} else if(this.op(x,'<',this.pos.maxValue)){
-				newX = this.pos.max;
+				newX = x = this.pos.max;
 			}
 		}
 
-		// set positions
-		this.pos.currentAbs = newX;
-		this.pos.current = this.dom.$items.eq(newX).data('owl-item').index;
+		if(!this.options.freeDrag){
+			// set positions
+			this.pos.currentAbs = newX;
+			this.pos.current = this.dom.$items.eq(newX).data('owl-item').index;
+		} else {
+			this.updateItemState();
+			return x;
+		}
 
 		return newX;
 	};
@@ -1881,17 +1972,13 @@ Custom events list:
 	Owl.prototype.animStage = function(pos){
 
 		// if speed is 0 the set inMotion to false
-		if(this.speed.current !== 0){
+		if(this.speed.current !== 0 && this.pos.currentAbs !== this.pos.min){
 			this.fireCallback('onAnimationStart');
 			this.state.inMotion = true;
 		}
 
 		var posX = this.pos.stage = pos,
 			style = this.dom.stage.style;
-
-		// if(this.options.rtl && !this.support3d){
-		// 	posX -= this.width.stage-this.width.el;
-		// }
 
 		if(this.support3d){
 			translate = 'translate3d(' + posX + 'px'+',0px, 0px)';
@@ -1920,6 +2007,7 @@ Custom events list:
 
 		// if no items then stop 
 		if(this.num.oItems === 0){return false;}
+		if(pos > this.num.items){pos = 0}
 		if(pos === undefined){return false;}
 
 		//pos - new current position
@@ -1937,9 +2025,10 @@ Custom events list:
 		} else {
 			nextPos = nextPos > this.num.oItems ? this.num.oItems-1 : nextPos;
 		}
-		
+
 		this.pos.current = this.dom.$oItems.eq(nextPos).data('owl-item').index;
 		this.pos.currentAbs = this.dom.$oItems.eq(nextPos).data('owl-item').indexAbs;
+
 	};
 
 	/**
@@ -1996,10 +2085,9 @@ Custom events list:
 	 */
 
 	Owl.prototype.jumpTo = function(pos,update){
-		if(this.state.lightweight){
-			this.pos.goToLightweight = pos;
+		if(this.state.lazyContent){
+			this.pos.goToLazyContent = pos;
 		}
-
 		this.updatePosition(pos);
 		this.setSpeed(0);
 		this.animStage(this.pos.items[this.pos.currentAbs]);
@@ -2017,6 +2105,9 @@ Custom events list:
 	 */
 
 	Owl.prototype.goTo = function(pos,speed){
+		if(this.state.lazyContent && this.state.inMotion){
+			return false;
+		}
 		this.updatePosition(pos);
 		this.setSpeed(speed,this.pos.currentAbs);
 		this.animStage(this.pos.items[this.pos.currentAbs]);
@@ -2029,7 +2120,7 @@ Custom events list:
 
 	Owl.prototype.next = function(optionalSpeed){
 		var s = optionalSpeed || this.options.naviSpeed;
-		if(this.options.loop){
+		if(this.options.loop && !this.state.lazyContent){
 			this.goToLoop(this.options.slideBy, s);
 		}else{
 			this.goTo(this.pos.current + this.options.slideBy, s);
@@ -2043,7 +2134,7 @@ Custom events list:
 
 	Owl.prototype.prev = function(optionalSpeed){
 		var s = optionalSpeed || this.options.naviSpeed;
-		if(this.options.loop){
+		if(this.options.loop && !this.state.lazyContent){
 			this.goToLoop(-this.options.slideBy, s);
 		}else{
 			this.goTo(this.pos.current-this.options.slideBy, s);
@@ -2061,27 +2152,31 @@ Custom events list:
 	Owl.prototype.goToLoop = function(distance,speed){
 
 		var revert = this.pos.currentAbs,
-			prevPositon = this.pos.currentAbs,
+			prevPosition = this.pos.currentAbs,
 			newPosition = this.pos.currentAbs + distance,
-			direction = prevPositon - newPosition < 0 ? true : false;
+			direction = prevPosition - newPosition < 0 ? true : false;
 
 		this.state.revert = true
 
 		if(newPosition < 1 && direction === false){
-			this.state.jumpToLoop = true;
-			revert = this.num.items - (this.options.items-prevPositon) - this.options.items;
-			this.jumpTo(revert,true);
-		} else if(newPosition >= this.num.items - this.options.items && direction === true ){
-			this.state.jumpToLoop = true;
-			revert = prevPositon - this.num.oItems;
-			this.jumpTo(revert,true);
-		}
 
+			this.state.bypass = true;
+			revert = this.num.items - (this.options.items-prevPosition) - this.options.items;
+			this.jumpTo(revert,true);
+
+		} else if(newPosition >= this.num.items - this.options.items && direction === true ){
+
+			this.state.bypass = true;
+			revert = prevPosition - this.num.oItems;
+			this.jumpTo(revert,true);
+
+		}
 		window.clearTimeout(this.e._goToLoop);
 		this.e._goToLoop = window.setTimeout(function(){
-			this.state.jumpToLoop = false;
+			this.state.bypass = false;
 			this.goTo(revert + distance, speed);
-			this.state.revert = false
+			this.state.revert = false;
+
 		}.bind(this), 30);
 	};
 
@@ -2090,7 +2185,9 @@ Custom events list:
 	 * @since 2.0.0
 	 */
 
-	Owl.prototype.initPosition = function(){
+	Owl.prototype.initPosition = function(init){
+
+		if(!this.dom.$oItems || !init){return false;}
 		var pos = this.options.startPosition;
 
 		if(this.options.startPosition === 'URLHash'){
@@ -2098,7 +2195,7 @@ Custom events list:
 		} else if(typeof this.options.startPosition !== Number && !this.options.center){
 			this.options.startPosition = 0;
 		}
-		if(this.state.lightweight){
+		if(this.state.lazyContent){
 			pos = this.options.items;
 		}
 		this.dom.oStage.scrollLeft = 0;
@@ -2394,7 +2491,7 @@ Custom events list:
 
 	Owl.prototype.rebuildDots = function(){
 		if(this.dom.$page === null){return false;}
-		var each, dot, span, counter = 0, last = 0, i, page=0, roundPages = 0, dotName;
+		var each, dot, span, counter = 0, last = 0, i, page=0, roundPages = 0;
 
 		each = this.options.dotsEach || this.options.items;
 
@@ -2493,6 +2590,12 @@ Custom events list:
 		}
 	}
 
+	Owl.prototype.insertContent = function(content){
+		this.dom.$stage.empty();
+		this.fetchContent(content);
+		this.refresh();
+	};
+
 	/**
 	 * addItem - Add an item
 	 * @since 2.0.0
@@ -2501,26 +2604,26 @@ Custom events list:
 	 */
 
 	Owl.prototype.addItem = function(content,pos){
+		var pos = pos || 0;
 
-		if(this.state.lightweight){
+		if(this.state.lazyContent){
 			this.dom.$content = this.dom.$content.add($(content));
-			this.refresh();
-			return false;
-		}
-
-		// wrap content
-		var item = this.fillItem(content);
-
-		// if carousel is empty then append item
-		if(this.dom.$oItems.length === 0){
-			this.dom.$stage.append(item);
+			this.updateItemState(true);
 		} else {
-			// append item
-			var it = this.dom.$oItems.eq(pos);
-			if(pos !== -1){it.before(item);} else {it.after(item);}
+			// wrap content
+			var item = this.fillItem(content);
+			// if carousel is empty then append item
+			if(this.dom.$oItems.length === 0){
+				this.dom.$stage.append(item);
+			} else {
+				// append item
+				var it = this.dom.$oItems.eq(pos);
+				if(pos !== -1){it.before(item);} else {it.after(item);}
+			}
+			// update and calculate carousel
+			this.refresh();
 		}
-		// update and calculate carousel
-		this.refresh();
+
 	};
 
 	/**
@@ -2530,8 +2633,13 @@ Custom events list:
 	 */
 
 	Owl.prototype.removeItem = function(pos){
-		this.dom.$oItems.eq(pos).remove();
-		this.refresh();
+		if(this.state.lazyContent){
+			this.dom.$content.splice(pos,1);
+			this.updateItemState(true);
+		} else {
+			this.dom.$oItems.eq(pos).remove();
+			this.refresh();
+		}
 	};
 
 	/**
@@ -2549,21 +2657,25 @@ Custom events list:
 		this.e.addItem = function(e,c,p){this.addItem(c,p);	}.bind(this);
 		this.e.removeItem = function(e,p){this.removeItem(p);}.bind(this);
 		this.e.refresh = function(e){this.refresh();		}.bind(this);
+		this.e.destroy = function(e){this.destroy();		}.bind(this);
 		this.e.autoHeight = function(e){this.autoHeight(true);}.bind(this);
 		this.e.stop = function(){this.stop();				}.bind(this);
 		this.e.play = function(e,t,s){this.play(t,s);		}.bind(this);
+		this.e.insertContent = function(e,d){this.insertContent(d);	}.bind(this);
 
-		this.dom.$el.on('owl.next',this.e.next);
-		this.dom.$el.on('owl.prev',this.e.prev);
-		this.dom.$el.on('owl.goTo',this.e.goTo);
-		this.dom.$el.on('owl.jumpTo',this.e.jumpTo);
-		this.dom.$el.on('owl.addItem',this.e.addItem);
-		this.dom.$el.on('owl.removeItem',this.e.removeItem);
-		this.dom.$el.on('owl.refresh',this.e.refresh);
-		this.dom.$el.on('owl.autoHeight',this.e.autoHeight);
-		this.dom.$el.on('owl.play',this.e.play);
-		this.dom.$el.on('owl.stop',this.e.stop);
-		this.dom.$el.on('owl.stopVideo',this.e.stop);
+		this.dom.$el.on('next.owl',this.e.next);
+		this.dom.$el.on('prev.owl',this.e.prev);
+		this.dom.$el.on('goTo.owl',this.e.goTo);
+		this.dom.$el.on('jumpTo.owl',this.e.jumpTo);
+		this.dom.$el.on('addItem.owl',this.e.addItem);
+		this.dom.$el.on('removeItem.owl',this.e.removeItem);
+		this.dom.$el.on('destroy.owl',this.e.destroy);
+		this.dom.$el.on('refresh.owl',this.e.refresh);
+		this.dom.$el.on('autoHeight.owl',this.e.autoHeight);
+		this.dom.$el.on('play.owl',this.e.play);
+		this.dom.$el.on('stop.owl',this.e.stop);
+		this.dom.$el.on('stopVideo.owl',this.e.stop);
+		this.dom.$el.on('insertContent.owl',this.e.insertContent);
 	
 	};
 
@@ -2610,19 +2722,16 @@ Custom events list:
 		if(this.dom.el.dispatchEvent){
 
 			// dispatch event
-
 			var evt = document.createEvent('CustomEvent');
 
 			//evt.initEvent(event, false, true );
-
 			evt.initCustomEvent(event, true, true, data);
 			return this.dom.el.dispatchEvent(evt);
 
 		} else if (!this.dom.el.dispatchEvent){
 
-			//	There is no clean solution for custom events name in >=IE8 
+			//	There is no clean solution for custom events name in <=IE8 
 			//	But if you know better way, please let me know :) 
-
 			return this.dom.$el.trigger(event);
 		}
 	};
@@ -2634,14 +2743,23 @@ Custom events list:
 	 */
 
 	Owl.prototype.watchVisibility = function(){
-		if (!this.dom.$el.is(":visible")) {
+		// test on zepto
+		//if (!this.dom.$el.is(':visible')) {
+
+		if(!isElVisible(this.dom.$el)) {
 			this.dom.$el.css({opacity: 0});
 			window.clearInterval(this.e._checkVisibile);
 			this.e._checkVisibile = window.setInterval(checkVisible.bind(this),500);
 		}
 
+		function isElVisible(el){
+			if(el.css('display') !== 'none' && el.css('visibility') !== 'hidden' && el.height()>0) {
+				return true;
+			} else {return false;}
+		}
+
 		function checkVisible(){
-			if (this.dom.$el.is(":visible")) {
+			if (isElVisible(this.dom.$el)) {
 				this.dom.$el.css({opacity: 1});
 				this.refresh();
 				window.clearInterval(this.e._checkVisibile);
@@ -2656,18 +2774,17 @@ Custom events list:
 
 	Owl.prototype.onChange = function(){
 
-		if(!this.state.isTouch && !this.state.jumpToLoop && !this.state.responsive ){
+		if(!this.state.isTouch && !this.state.bypass && !this.state.responsive ){
 			
 			if (this.options.navigation || this.options.dots) {
 				this.updateControls();
 			}
 			this.autoHeight();
 
-			this.fireCallback('onChange');
+			this.fireCallback('onChangeState');
 		}
 
-		if(!this.state.isTouch && !this.state.jumpToLoop){
-
+		if(!this.state.isTouch && !this.state.bypass){
 			// set Status to do
 			this.storeInfo();
 
@@ -2685,8 +2802,8 @@ Custom events list:
 	 */
 
 	Owl.prototype.storeInfo = function(){
-		var currentPosition = this.options.lightweightStructure ? this.pos.currentLight : this.pos.current;
-		var allItems = this.options.lightweightStructure ? this.dom.$content.length-1 : this.num.oItems;
+		var currentPosition = this.state.lazyContent ? this.pos.lcCurrentAbs || 0 : this.pos.current;
+		var allItems = this.state.lazyContent ? this.dom.$content.length-1 : this.num.oItems;
 		
 		this.info = {	
 			items: 			this.options.items,
@@ -2696,10 +2813,12 @@ Custom events list:
 			allPages:		this.num.allPages,
 			autoplay:		this.state.autoplay,
 			windowWidth:	this.width.window,
-			elWidth:		this.width.el
+			elWidth:		this.width.el,
+			breakpoint:		this.num.breakpoint
+
 		}
 
-		if (typeof this.options.info === "function") {
+		if (typeof this.options.info === 'function') {
 			this.options.info.apply(this,[this.info]);
 		}
 	}
@@ -2715,8 +2834,8 @@ Custom events list:
 		}
 		if(!this.dom.$oStage.hasClass(this.options.autoHeightClass)){
 			this.dom.$oStage.addClass(this.options.autoHeightClass);
-
 		}
+
 		var loaded = this.dom.$items.eq(this.pos.currentAbs);
 		var stage = this.dom.$oStage;
 		var iterations = 0;
@@ -2739,7 +2858,7 @@ Custom events list:
 	 */
 
 	Owl.prototype.lazyLoad = function(){
-		var attr = isRetina() ? "data-src-retina" : "data-src";
+		var attr = isRetina() ? 'data-src-retina' : 'data-src';
 		var src, img, type, i;
 
 		for(i = 0; i < this.num.items; i++){
@@ -2747,13 +2866,13 @@ Custom events list:
 
 			if( $item.data('owl-item').current === true && $item.data('owl-item').loaded === false){
 				img = $item.find('.owl-lazy, .owl-lazy-background');
-
+				
 				if(img.hasClass('owl-lazy-background')){
 					type='bg';
 				}
 
 				src = img.attr(attr);
-				src = src || img.attr("data-src");
+				src = src || img.attr('data-src');
 				if(src){
 					img.css('opacity','0');
 					this.preload(img,$item,type);
@@ -2773,8 +2892,8 @@ Custom events list:
 	 		var $el = $(el);
 	 		var img = new Image();
 	 		img.onload = function(){
-				//el.fadeIn(500);
 				$item.data('owl-item').loaded = true;
+
 				if(type!=='bg'){
 					$el.attr('src',img.src)
 				}else{
@@ -2782,10 +2901,9 @@ Custom events list:
 				}
 				
 				$el.css('opacity',1);
-				//$el.removeClass('owl-lazy');
 				that.fireCallback('onLazyLoaded');
 			};
-			img.src = $el.attr("data-src") || $el.attr("data-src-retina");
+			img.src = $el.attr('data-src') || $el.attr('data-src-retina');
 	 	});
 	 };
 
@@ -2817,7 +2935,7 @@ Custom events list:
 				this.off(document, this.dragType[3], this.e._onDragStart);
 			}
 			if(this.options.mouseDrag){
-				this.dom.$stage.off("dragstart", function() {return false;});
+				this.dom.$stage.off('dragstart', function() {return false;});
 				this.dom.stage.onselectstart = function(){};
 			}
 		}
@@ -2826,17 +2944,17 @@ Custom events list:
 			this.off(window, 'hashchange', this.e._goToHash);
 		}
 
-		this.dom.$el.off('owl.next',this.e.next);
-		this.dom.$el.off('owl.prev',this.e.prev);
-		this.dom.$el.off('owl.goTo',this.e.goTo);
-		this.dom.$el.off('owl.jumpTo',this.e.jumpTo);
-		this.dom.$el.off('owl.addItem',this.e.addItem);
-		this.dom.$el.off('owl.removeItem',this.e.removeItem);
-		this.dom.$el.off('owl.refresh',this.e.refresh);
-		this.dom.$el.off('owl.autoHeight',this.e.autoHeight);
-		this.dom.$el.off('owl.play',this.e.play);
-		this.dom.$el.off('owl.stop',this.e.stop);
-		this.dom.$el.off('owl.stopVideo',this.e.stop);
+		this.dom.$el.off('next.owl',this.e.next);
+		this.dom.$el.off('prev.owl',this.e.prev);
+		this.dom.$el.off('goTo.owl',this.e.goTo);
+		this.dom.$el.off('jumpTo.owl',this.e.jumpTo);
+		this.dom.$el.off('addItem.owl',this.e.addItem);
+		this.dom.$el.off('removeItem.owl',this.e.removeItem);
+		this.dom.$el.off('refresh.owl',this.e.refresh);
+		this.dom.$el.off('autoHeight.owl',this.e.autoHeight);
+		this.dom.$el.off('play.owl',this.e.play);
+		this.dom.$el.off('stop.owl',this.e.stop);
+		this.dom.$el.off('stopVideo.owl',this.e.stop);
 		this.dom.$stage.off('click',this.e._playVideo);
 
 		if(this.dom.$cc !== null){
@@ -2867,13 +2985,13 @@ Custom events list:
 	Owl.prototype.op = function(a,o,b){
 		var rtl = this.options.rtl;
         switch(o) {
-            case "<":
+            case '<':
                 return rtl ? a > b : a < b;
-            case ">":
+            case '>':
                 return rtl ? a < b : a > b;
-            case ">=":
+            case '>=':
                 return rtl ? a <= b : a >= b;
-            case "<=":
+            case '<=':
                 return rtl ? a >= b : a <= b;
             default:
             	break;
@@ -2961,9 +3079,9 @@ Custom events list:
 
 if (!Function.prototype.bind) {
   Function.prototype.bind = function (oThis) {
-	if (typeof this !== "function") {
+	if (typeof this !== 'function') {
 		// closest thing possible to the ECMAScript 5 internal IsCallable function
-		throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
+		throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
 	}
 
 	var aArgs = Array.prototype.slice.call(arguments, 1), 
