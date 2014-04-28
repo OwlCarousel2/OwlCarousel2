@@ -4,7 +4,7 @@
  * @release 2014
  * Licensed under MIT
  * 
- * @version 2.0.0-beta.1.1
+ * @version 2.0.0-beta.1.2
  * @versionNotes Not compatibile with Owl Carousel <2.0.0
  */
 
@@ -257,7 +257,7 @@ stopVideo.owl
 		element.owlCarousel = {
 			'name':		'Owl Carousel',
 			'author':	'Bartosz Wojciechowski',
-			'version':	'2.0.0-beta.1.1',
+			'version':	'2.0.0-beta.1.2',
 			'released':	'28.04.2014'
 		};
 
@@ -737,9 +737,9 @@ stopVideo.owl
 		if(!this.options.video){return false;}
 		var videoEl,item;
 
-		for(var i = 0; i<this.num.oItems; i++){
+		for(var i = 0; i<this.num.items; i++){
 
-			item = this.dom.$oItems.eq(i);
+			item = this.dom.$items.eq(i);
 			if(item.data('owl-item').hasVideo){
 				continue;
 			}
@@ -747,10 +747,11 @@ stopVideo.owl
 			videoEl = item.find('.owl-video');
 			if(videoEl.length){
 				this.state.hasVideos = true;
-				this.dom.$oItems.eq(i).data('owl-item').hasVideo = true;
+				this.dom.$items.eq(i).data('owl-item').hasVideo = true;
 				videoEl.css('display','none');
 				this.getVideoInfo(videoEl,item);
 			}
+
 		}
 	}
 
@@ -823,7 +824,7 @@ stopVideo.owl
 
 		if(this.options.lazyLoad){
 			srcType = 'data-src';
-			lazyClass = 'owl-lazy-background'
+			lazyClass = 'owl-lazy'
 		}
 
 		// Custom thumbnail
@@ -842,7 +843,6 @@ stopVideo.owl
 			} else{
 				tnLink = '<div class="owl-video-tn" style="opacity:1;background-image:url(' + tnPath + ')"></div>';
 			}
-
 			videoEl.after(tnLink);
 			videoEl.after(icon);
 		}
@@ -851,7 +851,7 @@ stopVideo.owl
 		if(info.type === 'youtube'){
 			var path = "http://img.youtube.com/vi/"+ info.id +"/hqdefault.jpg";
 			addThumbnail(path);
-		} else 
+		} else
 		if(info.type === 'vimeo'){
 			$.ajax({
 				type:'GET',
@@ -862,7 +862,7 @@ stopVideo.owl
 					var path = data[0].thumbnail_large;
 					addThumbnail(path);
 					if(that.options.loop){
-						that.refresh();
+						that.updateItemState();
 					}
 				}
 			});
@@ -1294,9 +1294,6 @@ stopVideo.owl
 			return false;
 		}
 
-		//Check for videos ( YouTube and Vimeo currently supported)
-		this.checkVideoLinks();
-
 		// Hide and Show methods helps here to set a proper widths.
 		// This prevents Scrollbar to be calculated in stage width
 		this.dom.$stage.addClass('owl-refresh');
@@ -1321,6 +1318,9 @@ stopVideo.owl
 		if(!this.state.lazyContent && !init){
 			this.jumpTo(this.pos.current,false); // fix that 
 		}
+
+		//Check for videos ( YouTube and Vimeo currently supported)
+		this.checkVideoLinks();
 
 		this.updateItemState();
 
@@ -2859,23 +2859,18 @@ stopVideo.owl
 
 	Owl.prototype.lazyLoad = function(){
 		var attr = isRetina() ? 'data-src-retina' : 'data-src';
-		var src, img, type, i;
+		var src, img,i;
 
 		for(i = 0; i < this.num.items; i++){
 			var $item = this.dom.$items.eq(i);
 
 			if( $item.data('owl-item').current === true && $item.data('owl-item').loaded === false){
-				img = $item.find('.owl-lazy, .owl-lazy-background');
-				
-				if(img.hasClass('owl-lazy-background')){
-					type='bg';
-				}
-
+				img = $item.find('.owl-lazy');
 				src = img.attr(attr);
 				src = src || img.attr('data-src');
 				if(src){
 					img.css('opacity','0');
-					this.preload(img,$item,type);
+					this.preload(img,$item);
 				}
 			}
 		}
@@ -2886,15 +2881,17 @@ stopVideo.owl
 	 * @since 2.0.0
 	 */
 
-	 Owl.prototype.preload = function(images,$item,type){
+	 Owl.prototype.preload = function(images,$item){
 	 	var that = this; // fix this later
+
 	 	images.each(function(i,el){
 	 		var $el = $(el);
 	 		var img = new Image();
-	 		img.onload = function(){
-				$item.data('owl-item').loaded = true;
 
-				if(type!=='bg'){
+	 		img.onload = function(){
+
+				$item.data('owl-item').loaded = true;
+				if($el.is('img')){
 					$el.attr('src',img.src)
 				}else{
 					$el.css('background-image','url(' + img.src + ')')
