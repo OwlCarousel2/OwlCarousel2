@@ -3,9 +3,10 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Owl Carousel 2.0.0-beta - Add/Remove Items</title>
+	<title>Owl Carousel 2.0.0-beta - Manipulations Items</title>
 	<link rel="stylesheet" href="../assets/css/foundation.min.css" />
 	<link rel="stylesheet" href="../owlcarousel/owl.carousel.css">
+	<link rel="stylesheet" href="../owlcarousel/owl.theme.css">
 	<link rel="stylesheet" href="../assets/js/highlight/styles/monokai_sublime.css">
 	<link rel="stylesheet" href="../assets/css/demo.css">
 	
@@ -14,7 +15,7 @@
 <div class="header">
 	<div class="row">
 	  <div class="large-12 columns">
-		<h1 class="left">Add/Remove Items.</h1>
+		<h1 class="left">Manipulations.</h1>
 		<ul class="button-group right">
 			<li><a href="../index.html" class="button secondary tiny button">Home</a></li>
 			<li><a href="https://github.com/OwlFonk/OwlCarousel2" class="button tiny show-for-medium-up">Download From GitHub</a></li>
@@ -32,6 +33,7 @@
 			</div>
 			<div class="button add">add</div>
 			<div class="button remove">remove</div>
+			<div class="button insert">insert new content</div>
 			<div class="button destroy">destroy</div>
 		</div>
 	</div>
@@ -41,14 +43,26 @@
 	<div class="row margin-top">
 		<div class="large-12 columns">
 			<h4>Descripton</h4>
-			<p>Owl Carousel manipulation methods:</p>
+			<p>Owl Carousel public manipulation methods:</p>
 			<div class="panel">
 				<ul>
 					<li>.addItem([DOM element,position])</li>
 					<li>.removeItem([position]) </li>
+					<li>.insertContent(content) </li>
 					<li>.destroy()</li>
 				</ul>
 			</div>
+
+			<p>Owl Carousel public manipulation events:</p>
+			<div class="panel">
+				<ul>
+					<li>$('.owl').trigger('addItem.owl',[DOM element,position])</li>
+					<li>$('.owl').trigger('removeItem.owl',[position]) </li>
+					<li>$('.owl').trigger('insertContent.owl',[content]) </li>
+					<li>$('.owl').trigger('destroy.owl')</li>
+				</ul>
+			</div>
+
 		</div>
 	</div>
 
@@ -75,7 +89,9 @@ owl.owlCarousel({
 		}
 	}
 });
+
 var counter = 0;
+
 $('.add').click(function(e){
 	counter++;
 	var content = '&lt;div class="article"&gt;&lt;h2&gt;'+counter+'&lt;/h2&gt;&lt;/div&gt;'
@@ -89,6 +105,20 @@ $('.remove').click(function(){
 
 $('.destroy').click(function(){
 	owl.data('owlCarousel').destroy();
+});
+
+$('.insert').click(function(){
+	$.ajax({
+		url: '../demos/JSON/demo2.json',
+		dataType: 'json',
+		success: function(data) {
+			var content = '';
+			for (i in data.owl) {
+				content += data.owl[i].item;
+			}
+			owl.data('owlCarousel').insertContent(content);
+		}
+	});
 });
 
 	</code></pre>
@@ -107,15 +137,20 @@ $('.destroy').click(function(){
 				<a href="merge.html" class="button">Merge</a>
 				<a href="autowidth.html" class="button">Auto Width</a>
 				<a href="videos.html" class="button">Videos</a>
+				<a href="callbacks.html" class="button">Callbacks</a>
 				<a href="autoplay.html" class="button">Autoplay</a>
 				<a href="urlhash.html" class="button">URL hash navigation</a>
 				<a href="info.html" class="button">Info callback</a>
 				<a href="rtl.html" class="button">Right to left</a>
-				<a href="lightweight.html" class="button">Thousands Items</a>
-				<a href="manipulations.html" class="button">Manipulation</a>
+				<a href="manipulations.html" class="button">Manipulations</a>
+				<a href="ajax.html" class="button">Ajax</a>
 				<a href="nestedItemSelector.html" class="button">Nested Item Selector</a>
 				<a href="autoHeight.html" class="button">AutoHeight</a>	
-				<a href="thumbnails.html" class="button">Dot Thumbnails</a>				</div>
+				<a href="thumbnails.html" class="button">Dot Thumbnails</a>
+				<a href="lazyContent.html" class="button">Lazy Content Structure</a>
+				<a href="ajaxLazyContent.html" class="button">Ajax + Lazy Content</a>
+				<a href="zepto.html" class="button">Zepto Support</a>
+			</div>
 		</div>
 	</div>
 </div>	
@@ -157,7 +192,7 @@ jQuery(document).ready(function($) {
 	var counter = 0;
 	$('.add').click(function(e){
 		counter++;
-		var content = '<div class="article"><h2>'+counter+'</h2></div>'
+		var content = '<div class="article"><h2>'+'added '+counter+'</h2></div>'
 		owl.data('owlCarousel').addItem(content,0);
 	});
 
@@ -170,6 +205,19 @@ jQuery(document).ready(function($) {
 		owl.data('owlCarousel').destroy();
 	});
 
+	$('.insert').click(function(){
+		$.ajax({
+			url: '../demos/JSON/demo2.json',
+			dataType: 'json',
+			success: function(data) {
+				var content = '';
+				for (i in data.owl) {
+					content += data.owl[i].item;
+				}
+				owl.data('owlCarousel').insertContent(content);
+			}
+		});
+	});
 });
 
 </script>
