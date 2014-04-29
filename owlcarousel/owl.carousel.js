@@ -4,7 +4,7 @@
  * @release 2014
  * Licensed under MIT
  * 
- * @version 2.0.0-beta.1.2
+ * @version 2.0.0-beta.1.3
  * @versionNotes Not compatibile with Owl Carousel <2.0.0
  */
 
@@ -96,7 +96,6 @@ stopVideo.owl
 		dotsSpeed:			false,
 		dragEndSpeed:		false,
 		
-		callbacks:			false,
 		responsive: 		{},
 		responsiveRefreshRate : 200,
 		responsiveBaseElement: window,
@@ -106,8 +105,12 @@ stopVideo.owl
 		videoHeight:		false,
 		videoWidth:			false,
 
+		animateOut:			false,
+		animateIn:			false,
+
 		fallbackEasing:		'swing',
 
+		callbacks:			false,
 		info: 				false,
 
 		nestedItemSelector:	false,
@@ -125,7 +128,7 @@ stopVideo.owl
 		controlsClass:		'owl-controls',
 		dotClass: 			'owl-dot',
 		dotsClass:			'owl-dots',
-		autoHeightClass:	'owl-height',
+		autoHeightClass:	'owl-height'
 
 	};
 
@@ -147,7 +150,7 @@ stopVideo.owl
 		$navNext:	null,
 		$page:		null,
 		$nav:		null,
-		$content:	null,
+		$content:	null
 	};
 
 	/**
@@ -257,8 +260,8 @@ stopVideo.owl
 		element.owlCarousel = {
 			'name':		'Owl Carousel',
 			'author':	'Bartosz Wojciechowski',
-			'version':	'2.0.0-beta.1.2',
-			'released':	'28.04.2014'
+			'version':	'2.0.0-beta.1.3',
+			'released':	'29.04.2014'
 		};
 
 		// Attach variables to object
@@ -289,17 +292,21 @@ stopVideo.owl
 	Owl.prototype.preloadAutoWidthImages = function(allImgs){
 		var loaded = 0;
 		for(var i = 0; i<allImgs.length;i++){
-	 		var img = new Image();
-	 		img.onload = function(){
-	 			loaded++;
-	 			if(loaded >= allImgs.length){
-	 				this.state.imagesLoaded = true;
-	 				this.init();
-	 			}
-			}.bind(this);
+			var img = new Image();
+			onLoadImg(allImgs.length);
 			// To do - check if image has src
 			img.src = allImgs[i].src;
-	 	}
+		}
+
+		function onLoadImg(allImgs){ 
+			img.onload = function(){
+				loaded++;
+				if(loaded >= allImgs){
+					this.state.imagesLoaded = true;
+					this.init();
+				}
+			}.bind(this);
+		}
 	};
 
 	/**
@@ -310,9 +317,6 @@ stopVideo.owl
 	Owl.prototype.init = function(){
 
 		this.fireCallback('onInitBefore');
-
-		// set opacity 0 to main element 
-		this.dom.el.style.opacity = '0';
 
 		//Add base class
 		if(!this.dom.$el.hasClass(this.options.baseClass)){
@@ -359,8 +363,7 @@ stopVideo.owl
 		this.fetchContent();
 
 		// Zepto require main element to be displayed befor data collection
-		this.dom.el.style.display = 'block';
-		this.dom.el.style.opacity = '1';
+		this.dom.$el.addClass('owl-loaded');
 
 		// attach generic events 
 		this.eventsCall();
@@ -390,14 +393,14 @@ stopVideo.owl
 		var keys = [],
 		i, j, k;
 		for (i in resOpt){
-		    keys.push(i);
+			keys.push(i);
 		}
 
 		keys = keys.sort(function (a, b) {return a - b;});
 
 		for (j = 0; j < keys.length; j++){
-		    k = keys[j];
-		    this.responsiveSorted[k] = resOpt[k];
+			k = keys[j];
+			this.responsiveSorted[k] = resOpt[k];
 		}
 
 	};
@@ -423,14 +426,14 @@ stopVideo.owl
 
 		// find responsive width
 		for (i in this.responsiveSorted){
-	        if(i<= width){
-	        	minWidth = i;
-    			// set responsive options
+			if(i<= width){
+				minWidth = i;
+				// set responsive options
 				for(j in this.responsiveSorted[minWidth]){
 					this.options[j] = this.responsiveSorted[minWidth][j];
 				}
 				
-	        }
+			}
 		}
 		this.num.breakpoint = minWidth;
 
@@ -481,6 +484,11 @@ stopVideo.owl
 			this.options.freeDrag = false;
 			this.options.lazyContent = true;
 		}
+
+		if((this.options.animateIn || this.options.animateOut) && this.options.items === 1 && this.support3d){
+			this.state.animate = true;
+		} else {this.state.animate = false;}
+
 	};
 
 	/**
@@ -677,9 +685,10 @@ stopVideo.owl
 
 
 	Owl.prototype.setData = function(item,cloneObj,traversed){
+		var dot,hash;
 		if(traversed){
-			var dot = traversed['dot'];
-			var hash = traversed['hash'];
+			dot = traversed.dot;
+			hash = traversed.hash;
 		}
 		var itemData = {
 			index:		false,
@@ -751,9 +760,8 @@ stopVideo.owl
 				videoEl.css('display','none');
 				this.getVideoInfo(videoEl,item);
 			}
-
 		}
-	}
+	};
 
 	/**
 	 * getVideoInfo
@@ -763,11 +771,11 @@ stopVideo.owl
 
 	Owl.prototype.getVideoInfo = function(videoEl,item){
 
-        var info, type, id
-        	vimeoId = videoEl.data('vimeo-id'),
-        	youTubeId = videoEl.data('youtube-id'),
-        	width = videoEl.data('width') || this.options.videoWidth;
-       		height = videoEl.data('height') || this.options.videoHeight;
+		var info, type, id,
+			vimeoId = videoEl.data('vimeo-id'),
+			youTubeId = videoEl.data('youtube-id'),
+			width = videoEl.data('width') || this.options.videoWidth,
+			height = videoEl.data('height') || this.options.videoHeight,
 			url = videoEl.attr('href');
 
 		if(vimeoId){
@@ -780,11 +788,11 @@ stopVideo.owl
 			id = url.match(/(http:|https:|)\/\/(player.|www.)?(vimeo\.com|youtu(be\.com|\.be|be\.googleapis\.com))\/(video\/|embed\/|watch\?v=|v\/)?([A-Za-z0-9._%-]*)(\&\S+)?/);
 			
 			if (id[3].indexOf('youtu') > -1) {
-	        	type = 'youtube';
-		    } else if (id[3].indexOf('vimeo') > -1) {
-		        type = 'vimeo';
-		    }
-		    id = id[6];
+				type = 'youtube';
+			} else if (id[3].indexOf('vimeo') > -1) {
+				type = 'vimeo';
+			}
+			id = id[6];
 		} else {
 			throw new Error('Missing video link.');
 		}
@@ -795,18 +803,18 @@ stopVideo.owl
 		item.data('owl-item').videoHeight = height;
 
 		info = {
-	    	type: type,
-	    	id: id
-	    }
-	    
-	    // Check dimensions
-	    var dimensions = width && height ? 'style="width:'+width+'px;height:'+height+'px;"' : '';
+			type: type,
+			id: id
+		};
+		
+		// Check dimensions
+		var dimensions = width && height ? 'style="width:'+width+'px;height:'+height+'px;"' : '';
 
-	    // wrap video content into owl-video-wrapper div
+		// wrap video content into owl-video-wrapper div
 		videoEl.wrap('<div class="owl-video-wrapper"'+dimensions+'></div>');
 
-	    this.createVideoTn(videoEl,info);
-	}
+		this.createVideoTn(videoEl,info);
+	};
 
 	/**
 	 * createVideoTn
@@ -824,7 +832,7 @@ stopVideo.owl
 
 		if(this.options.lazyLoad){
 			srcType = 'data-src';
-			lazyClass = 'owl-lazy'
+			lazyClass = 'owl-lazy';
 		}
 
 		// Custom thumbnail
@@ -847,7 +855,6 @@ stopVideo.owl
 			videoEl.after(icon);
 		}
 
-		var that = this;
 		if(info.type === 'youtube'){
 			var path = "http://img.youtube.com/vi/"+ info.id +"/hqdefault.jpg";
 			addThumbnail(path);
@@ -867,7 +874,7 @@ stopVideo.owl
 				}
 			});
 		}
-	}
+	};
 
 	/**
 	 * stopVideo
@@ -880,7 +887,7 @@ stopVideo.owl
 		item.find('.owl-video-frame').remove();
 		item.removeClass('owl-video-playing');
 		this.state.videoPlay = false;
-	}
+	};
 
 	/**
 	 * playVideo
@@ -893,26 +900,26 @@ stopVideo.owl
 		if(this.state.videoPlay){
 			this.stopVideo();
 		}
-		var target = $(ev.target || ev.srcElement);
-		var item = target.closest('.'+this.options.itemClass);
+		var videoLink,videoWrap,
+			target = $(ev.target || ev.srcElement),
+			item = target.closest('.'+this.options.itemClass);
 
-		var videoType = item.data('owl-item').videoType;
-		var id = item.data('owl-item').videoId;
-
-		var width = item.data('owl-item').videoWidth || Math.floor(item.data('owl-item').width - this.options.margin);
-		var height = item.data('owl-item').videoHeight || this.dom.$stage.height();
+		var videoType = item.data('owl-item').videoType,
+			id = item.data('owl-item').videoId,
+			width = item.data('owl-item').videoWidth || Math.floor(item.data('owl-item').width - this.options.margin),
+			height = item.data('owl-item').videoHeight || this.dom.$stage.height();
 
 		if(videoType === 'youtube'){
-			var videoLink = "<iframe width=\""+ width +"\" height=\""+ height +"\" src=\"http://www.youtube.com/embed/" + id + "?autoplay=1&v=" + id + "\" frameborder=\"0\" allowfullscreen></iframe>";
+			videoLink = "<iframe width=\""+ width +"\" height=\""+ height +"\" src=\"http://www.youtube.com/embed/" + id + "?autoplay=1&v=" + id + "\" frameborder=\"0\" allowfullscreen></iframe>";
 		} else if(videoType === 'vimeo'){
-			var videoLink = '<iframe src="http://player.vimeo.com/video/'+ id +'?autoplay=1" width="'+ width +'" height="'+ height +'" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+			videoLink = '<iframe src="http://player.vimeo.com/video/'+ id +'?autoplay=1" width="'+ width +'" height="'+ height +'" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
 		}
 		
 		item.addClass('owl-video-playing');
 		this.state.videoPlay = true;
 		this.state.videoPlayIndex = item.data('owl-item').indexAbs;
 
-		var videoWrap = $('<div style="height:'+ height +'px; width:'+ width +'px" class="owl-video-frame">' + videoLink + '</div>');
+		videoWrap = $('<div style="height:'+ height +'px; width:'+ width +'px" class="owl-video-frame">' + videoLink + '</div>');
 		target.after(videoWrap);
 	};
 
@@ -1041,7 +1048,7 @@ stopVideo.owl
 				this.num.merged.push(parseInt(mergeNumber));
 				this.width.mergeStage += this.width.item * this.num.merged[i];
 			} else {
-				this.num.merged.push(1)
+				this.num.merged.push(1);
 			}
 
 			// Array based on merged items used by dots and navigation
@@ -1104,7 +1111,7 @@ stopVideo.owl
 		}
 
 		// Set Min and Max
-		this.setMinMax()
+		this.setMinMax();
 
 		// Recalculate grid 
 		this.setSizes();
@@ -1151,14 +1158,14 @@ stopVideo.owl
 				}
 			}
 			this.pos.maxValue = this.options.rtl ? this.width.stage-this.width.el : -(this.width.stage-this.width.el);
-			this.pos.items[this.pos.max] = this.pos.maxValue
+			this.pos.items[this.pos.max] = this.pos.maxValue;
 		}
 
 		// Set loop boundries
 		if(this.options.center){
 			this.pos.loop = this.pos.items[0]-this.pos.items[this.num.oItems];
 		} else {
-			this.pos.loop = -this.pos.items[this.num.oItems]
+			this.pos.loop = -this.pos.items[this.num.oItems];
 		}
 
 		//if is less items
@@ -1166,7 +1173,7 @@ stopVideo.owl
 			this.pos.max = 0;
 			this.pos.maxValue = this.pos.items[0];
 		}
-	}
+	};
 
 	/**
 	 * setSizes
@@ -1222,7 +1229,7 @@ stopVideo.owl
 
 	Owl.prototype.responsive = function(){
 
-		if(!this.num.oItems){return false}
+		if(!this.num.oItems){return false;}
 		// If El width hasnt change then stop responsive 
 		var elChanged = this.isElWidthChanged();
 		if(!elChanged){return false;}
@@ -1330,7 +1337,7 @@ stopVideo.owl
 		this.updateControls();
 
 		// update drag events
-		this.updateEvents();
+		//this.updateEvents();
 
 		// update autoplay
 		this.autoplay();
@@ -1426,12 +1433,13 @@ stopVideo.owl
 	Owl.prototype.updateClonedItemsState = function(activeIndex){
 
 		//find cloned center
+		var center, $el,i;
 		if(this.options.center){
-			var center = this.dom.$items.eq(this.pos.currentAbs).data('owl-item').index;
+			center = this.dom.$items.eq(this.pos.currentAbs).data('owl-item').index;
 		}
 
-		for(var i = 0; i<this.num.items; i++){
-			var $el = this.dom.$items.eq(i);
+		for(i = 0; i<this.num.items; i++){
+			$el = this.dom.$items.eq(i);
 			if( $el.data('owl-item').index === activeIndex ){
 				$el.data('owl-item').current = true;
 				if($el.data('owl-item').index === center ){
@@ -1454,10 +1462,10 @@ stopVideo.owl
 
 		if(this.options.items < this.pos.currentAbs ){
 			this.pos.lcCurrent += this.pos.currentAbs - this.options.items;
-			this.state.lcDirection = 'right'
+			this.state.lcDirection = 'right';
 		} else if(this.options.items > this.pos.currentAbs ){
 			this.pos.lcCurrent -= this.options.items - this.pos.currentAbs;
-			this.state.lcDirection = 'left'
+			this.state.lcDirection = 'left';
 		}
 
 		this.pos.lcCurrent = jumpTo !== 0 ? jumpTo : this.pos.lcCurrent;
@@ -1493,16 +1501,17 @@ stopVideo.owl
 		if(!update){
 			this.updateLazyPosition();
 		}
+		var i,j,item,contentPos,content,freshItem,freshData;
 
 		if(this.state.lcDirection !== false){
-			for(var i = 0; i<this.pos.lcMovedBy; i++){
+			for(i = 0; i<this.pos.lcMovedBy; i++){
 
 				if(this.state.lcDirection === 'right'){
-					var item = this.dom.$stage.find('.owl-item').eq(0) //.appendTo(this.dom.$stage);
+					item = this.dom.$stage.find('.owl-item').eq(0); //.appendTo(this.dom.$stage);
 					item.appendTo(this.dom.$stage);
 				}
 				if(this.state.lcDirection === 'left'){
-					var item = this.dom.$stage.find('.owl-item').eq(-1);
+					item = this.dom.$stage.find('.owl-item').eq(-1);
 					item.prependTo(this.dom.$stage);
 				}
 				item.data('owl-item').active = false;
@@ -1512,13 +1521,12 @@ stopVideo.owl
 		// recollect 
 		this.dom.$items = this.dom.$stage.find('.owl-item');
 
-		for(var j = 0; j<this.num.items; j++){
-
+		for(j = 0; j<this.num.items; j++){
 			// to do
 			this.dom.$items.eq(j).removeClass(this.options.centerClass);
 
 			// get Content 
-			var contentPos = this.pos.lcCurrent + j - this.options.items;// + this.options.startPosition;
+			contentPos = this.pos.lcCurrent + j - this.options.items;// + this.options.startPosition;
 
 			if(contentPos >= this.dom.$content.length){
 				contentPos = contentPos - this.dom.$content.length;
@@ -1527,9 +1535,9 @@ stopVideo.owl
 				contentPos = contentPos + this.dom.$content.length;
 			}
 
-			var content = this.dom.$content.eq(contentPos);
-			var freshItem = this.dom.$items.eq(j);
-			var freshData = freshItem.data('owl-item');
+			content = this.dom.$content.eq(contentPos);
+			freshItem = this.dom.$items.eq(j);
+			freshData = freshItem.data('owl-item');
 
 			if(freshData.active === false || this.pos.goToLazyContent !== 0 || update === true){
 
@@ -1630,7 +1638,7 @@ stopVideo.owl
 
 			if(this.options.mouseDrag){
 				//disable text select
-				this.dom.stage.onselectstart = function(){return false;}
+				this.dom.stage.onselectstart = function(){return false;};
 			} else {
 				// enable text select
 				this.dom.$el.addClass('owl-text-select-on');
@@ -1646,8 +1654,8 @@ stopVideo.owl
 
 		if(this.options.autoplayHoverPause){
 			var that = this;
-			this.dom.$stage.on('mouseover', this.e._pause )
-			this.dom.$stage.on('mouseleave', this.e._ap )
+			this.dom.$stage.on('mouseover', this.e._pause );
+			this.dom.$stage.on('mouseleave', this.e._ap );
 		}
 
 		// Catch transitionEnd event
@@ -1679,7 +1687,7 @@ stopVideo.owl
 		} else {
 			this.off(this.dom.stage, this.dragType[0], this.e._onDragStart);
 		}
-	}
+	};
 
 	/**
 	 * onDragStart
@@ -2007,7 +2015,7 @@ stopVideo.owl
 
 		// if no items then stop 
 		if(this.num.oItems === 0){return false;}
-		if(pos > this.num.items){pos = 0}
+		if(pos > this.num.items){pos = 0;}
 		if(pos === undefined){return false;}
 
 		//pos - new current position
@@ -2057,7 +2065,7 @@ stopVideo.owl
 			
 			var diff = Math.abs(nextPos - this.pos.prev);
 			diff = diff === 0 ? 1 : diff;
-			if(diff>6){diff = 6}
+			if(diff>6){diff = 6;}
 			s = diff * this.options.smartSpeed;
 		}
 
@@ -2065,7 +2073,7 @@ stopVideo.owl
 			s = this.options.smartSpeed;
 		}
 
-		if(s === 0){s=0;};
+		if(s === 0){s=0;}
 
 		if(this.support3d){
 			var style = this.dom.stage.style;
@@ -2108,9 +2116,15 @@ stopVideo.owl
 		if(this.state.lazyContent && this.state.inMotion){
 			return false;
 		}
+
 		this.updatePosition(pos);
+
+		if(this.state.animate){speed = 0;}
 		this.setSpeed(speed,this.pos.currentAbs);
+
+		if(this.state.animate){this.animate();}
 		this.animStage(this.pos.items[this.pos.currentAbs]);
+	
 	};
 
 	/**
@@ -2156,7 +2170,7 @@ stopVideo.owl
 			newPosition = this.pos.currentAbs + distance,
 			direction = prevPosition - newPosition < 0 ? true : false;
 
-		this.state.revert = true
+		this.state.revert = true;
 
 		if(newPosition < 1 && direction === false){
 
@@ -2187,7 +2201,7 @@ stopVideo.owl
 
 	Owl.prototype.initPosition = function(init){
 
-		if(!this.dom.$oItems || !init){return false;}
+		if( !this.dom.$oItems || !init || this.state.lazyContent ){return false;}
 		var pos = this.options.startPosition;
 
 		if(this.options.startPosition === 'URLHash'){
@@ -2195,11 +2209,8 @@ stopVideo.owl
 		} else if(typeof this.options.startPosition !== Number && !this.options.center){
 			this.options.startPosition = 0;
 		}
-		if(this.state.lazyContent){
-			pos = this.options.items;
-		}
 		this.dom.oStage.scrollLeft = 0;
-		this.goTo(pos,0);
+		this.jumpTo(pos,true);
 	};
 
 	/**
@@ -2224,12 +2235,13 @@ stopVideo.owl
 	 */
 
 	Owl.prototype.hashPosition = function(){
-		var hash = window.location.hash.substring(1);
+		var hash = window.location.hash.substring(1),
+			hashPos;
 		if(hash === ""){return false;}
 
 		for(var i=0;i<this.num.oItems; i++){
 			if(hash === this.dom.$oItems.eq(i).data('owl-item').hash){
-				var hashPos = i;
+				hashPos = i;
 			}
 		}
 		return hashPos;
@@ -2401,7 +2413,7 @@ stopVideo.owl
 				this.dom.$page.hide();
 			}
 		}
-	}
+	};
 
 	/**
 	 * createNavigation
@@ -2466,7 +2478,7 @@ stopVideo.owl
 			e.preventDefault();
 			var page = $(this).data('page');
 			that.goTo(page,that.options.dotsSpeed);
-		};
+		}
 		// build dots
 		this.rebuildDots();
 	};
@@ -2565,7 +2577,7 @@ stopVideo.owl
 				dots.eq(i).removeClass('active');
 			}
 		}
-	}
+	};
 
 	/**
 	 * updateNavigation
@@ -2588,7 +2600,7 @@ stopVideo.owl
 				this.dom.$navPrev.removeClass('disabled');
 			}
 		}
-	}
+	};
 
 	Owl.prototype.insertContent = function(content){
 		this.dom.$stage.empty();
@@ -2604,7 +2616,7 @@ stopVideo.owl
 	 */
 
 	Owl.prototype.addItem = function(content,pos){
-		var pos = pos || 0;
+		pos = pos || 0;
 
 		if(this.state.lazyContent){
 			this.dom.$content = this.dom.$content.add($(content));
@@ -2686,6 +2698,7 @@ stopVideo.owl
 	 */
 
 	Owl.prototype.on = function (element, event, listener, capture) {
+
 		if (element.addEventListener) {
 			element.addEventListener(event, listener, capture);
 		}
@@ -2744,8 +2757,6 @@ stopVideo.owl
 
 	Owl.prototype.watchVisibility = function(){
 		// test on zepto
-		//if (!this.dom.$el.is(':visible')) {
-
 		if(!isElVisible(this.dom.$el)) {
 			this.dom.$el.css({opacity: 0});
 			window.clearInterval(this.e._checkVisibile);
@@ -2753,7 +2764,7 @@ stopVideo.owl
 		}
 
 		function isElVisible(el){
-			if(el.css('display') !== 'none' && el.css('visibility') !== 'hidden' && el.height()>0) {
+			if(el.css('display') !== 'none' && el.css('visibility') !== 'hidden') {
 				return true;
 			} else {return false;}
 		}
@@ -2793,7 +2804,7 @@ stopVideo.owl
 				this.stopVideo();
 			}
 		}
-	}
+	};
 
 	/**
 	 * storeInfo
@@ -2815,13 +2826,12 @@ stopVideo.owl
 			windowWidth:	this.width.window,
 			elWidth:		this.width.el,
 			breakpoint:		this.num.breakpoint
-
-		}
+		};
 
 		if (typeof this.options.info === 'function') {
 			this.options.info.apply(this,[this.info]);
 		}
-	}
+	};
 
 	/**
 	 * autoHeight
@@ -2849,7 +2859,7 @@ stopVideo.owl
 				clearInterval(isLoaded);
 			}
 		}, 100);
-	}
+	};
 
 	/**
 	 * lazyLoad
@@ -2882,26 +2892,74 @@ stopVideo.owl
 	 */
 
 	 Owl.prototype.preload = function(images,$item){
-	 	var that = this; // fix this later
+		var that = this; // fix this later
 
-	 	images.each(function(i,el){
-	 		var $el = $(el);
-	 		var img = new Image();
+		images.each(function(i,el){
+			var $el = $(el);
+			var img = new Image();
 
-	 		img.onload = function(){
+			img.onload = function(){
 
 				$item.data('owl-item').loaded = true;
 				if($el.is('img')){
-					$el.attr('src',img.src)
+					$el.attr('src',img.src);
 				}else{
-					$el.css('background-image','url(' + img.src + ')')
+					$el.css('background-image','url(' + img.src + ')');
 				}
 				
 				$el.css('opacity',1);
 				that.fireCallback('onLazyLoaded');
 			};
 			img.src = $el.attr('data-src') || $el.attr('data-src-retina');
-	 	});
+		});
+	 };
+
+	/**
+	 * animate
+	 * @since 2.0.0
+	 */
+
+	 Owl.prototype.animate = function(){
+
+		var prevItem = this.dom.$items.eq(this.pos.prev),
+			prevPos = Math.abs(prevItem.data('owl-item').width) * this.pos.prev,
+			currentItem = this.dom.$items.eq(this.pos.currentAbs),
+			currentPos = Math.abs(currentItem.data('owl-item').width) * this.pos.currentAbs;
+
+		if(this.pos.currentAbs === this.pos.prev){
+			return false;
+		}
+
+		var pos = currentPos - prevPos;
+		var tIn = this.options.animateIn;
+		var tOut = this.options.animateOut;
+		var that = this;
+
+		removeStyles = function(){
+			$(this).css({
+                "left" : ""
+            })
+            .removeClass('animated owl-animated-out owl-animated-in')
+            .removeClass(tIn)
+            .removeClass(tOut);
+
+            that.transitionEnd();
+        };
+
+		if(tOut){
+			prevItem
+			.css({
+				"left" : pos + "px"
+			})
+			.addClass('animated owl-animated-out '+tOut)
+			.one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', removeStyles);
+		}
+
+		if(tIn){
+			currentItem
+			.addClass('animated owl-animated-in '+tIn)
+			.one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', removeStyles);
+		}
 	 };
 
 	/**
@@ -2965,7 +3023,7 @@ stopVideo.owl
 		delete this.dom.el.owlCarousel;
 
 		this.dom.$stage.unwrap();
-		this.dom.$items.unwrap()
+		this.dom.$items.unwrap();
 		this.dom.$items.contents().unwrap();
 		this.dom = null;
 	};
@@ -2981,18 +3039,18 @@ stopVideo.owl
 
 	Owl.prototype.op = function(a,o,b){
 		var rtl = this.options.rtl;
-        switch(o) {
-            case '<':
-                return rtl ? a > b : a < b;
-            case '>':
-                return rtl ? a < b : a > b;
-            case '>=':
-                return rtl ? a <= b : a >= b;
-            case '<=':
-                return rtl ? a >= b : a <= b;
-            default:
-            	break;
-        }
+		switch(o) {
+			case '<':
+				return rtl ? a > b : a < b;
+			case '>':
+				return rtl ? a < b : a > b;
+			case '>=':
+				return rtl ? a <= b : a >= b;
+			case '<=':
+				return rtl ? a >= b : a <= b;
+			default:
+				break;
+		}
 	};
 
 	/**
@@ -3008,7 +3066,7 @@ stopVideo.owl
 			this.transformVendor = isTransform();
 
 			// take transitionend event name by detecting transition
-			var endVendors = ['transitionend','webkitTransitionEnd','transitionend','oTransitionEnd']
+			var endVendors = ['transitionend','webkitTransitionEnd','transitionend','oTransitionEnd'];
 			this.transitionEndVendor = endVendors[isTransition()];
 
 			// take vendor name from transform name
@@ -3017,7 +3075,7 @@ stopVideo.owl
 		}
 
 		this.state.orientation = window.orientation;
-	}
+	};
 
 	// Pivate methods 
 
@@ -3031,33 +3089,32 @@ stopVideo.owl
 				return [s,p];
 			}
 		}
-		return [false]
-	};
+		return [false];
+	}
 
 	function isTransition(){
 		return isStyleSupported(['transition','WebkitTransition','MozTransition','OTransition'])[1];
-	};
+	}
  
 	function isTransform() {
 		return isStyleSupported(['transform','WebkitTransform','MozTransform','OTransform','msTransform'])[0];
-	};
+	}
 
 	function isPerspective(){
 		return isStyleSupported(['perspective','webkitPerspective','MozPerspective','OPerspective','MsPerspective'])[0];
-	};
+	}
 
 	function isTouchSupport(){
 		return 'ontouchstart' in window || !!(navigator.msMaxTouchPoints);
-	};
+	}
 
 	function isTouchSupportIE(){
 		return window.navigator.msPointerEnabled;
-	};
+	}
 
 	function isRetina(){
 		return window.devicePixelRatio > 1;
-	};
-
+	}
 
 	$.fn.owlCarousel = function ( options ) {
 		return this.each(function () {
