@@ -126,6 +126,25 @@ table tr th
 	transition: background-color 300ms ease-out;
 }
 
+.owl-carousel .red{
+	background-color: #E0444F;
+}
+.owl-carousel .green{
+	background-color: #2CC990;
+}
+.owl-carousel .yellow{
+	background-color: #EEE657
+}
+.owl-carousel .curry{
+	background-color: #FCB941;
+}
+.owl-carousel .pink{
+	background-color: #FC6042
+}
+.owl-carousel .darkblue{
+	background-color: #25373D
+}
+
 
 
 

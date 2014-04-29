@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Owl Carousel 2.0.0-beta.1.2</title>
+	<title>Owl Carousel 2.0.0-beta.1.3</title>
 	<link rel="stylesheet" href="assets/css/foundation.min.css" />
 	<link rel="stylesheet" href="owlcarousel/owl.carousel.css">
 	<link rel="stylesheet" href="owlcarousel/owl.theme.css">
@@ -15,7 +15,7 @@
 <div class="header">
 	<div class="row">
 	  <div class="large-12 columns">
-		<h1>Owl Carousel <small>v2.0.0-beta.1.2</span></small></h1>
+		<h1>Owl Carousel <small>v2.0.0-beta.1.3</span></small></h1>
 		<p>Please note that this is a beta version only for testing purposes. Enjoy!</p>
 		<a href="https://github.com/OwlFonk/OwlCarousel2" class="button tiny secondary">Download From GitHub</a>
 	  </div>
@@ -84,6 +84,7 @@ $('.owl-carousel').owlCarousel({
 				<li>Brand new code</li>
 				<li>Infinity Loop</li>
 				<li>Center item</li>
+				<li>Handle 1000's items on mobile devices</li>
 				<li>Smart Speed</li>
 				<li>Stage Padding</li>
 				<li>Item Margin</li>
@@ -96,15 +97,14 @@ $('.owl-carousel').owlCarousel({
 				<li>Merged Items</li>
 				<li>RTL</li>
 				<li>More to come...</li>
-
 			</ul>
 
 			<h3>To do</h3>
 			<hr>
 			<ul>
-				<li>JSON features</li>
-				<li>Zepto Compatibility (problem with $.data object)</li>
 				<li>Clean the code</li>
+				<li>require.js support</li>
+				<li>Bower Support</li>
 				<li>Inprove CSS</li>
 				<li>Create new theme</li>
 				<li>Fade transition</li>
@@ -125,9 +125,9 @@ $('.owl-carousel').owlCarousel({
 				<a href="demos/merge.html" class="button">Merge</a>
 				<a href="demos/autowidth.html" class="button">Auto Width</a>
 				<a href="demos/videos.html" class="button">Videos</a>
-				<a href="demos/callbacks.html" class="button">Callbacks</a>
 				<a href="demos/autoplay.html" class="button">Autoplay</a>
 				<a href="demos/urlhash.html" class="button">URL hash navigation</a>
+				<a href="demos/callbacks.html" class="button">Callbacks</a>
 				<a href="demos/info.html" class="button">Info callback</a>
 				<a href="demos/rtl.html" class="button">Right to left</a>
 				<a href="demos/manipulations.html" class="button">Manipulations</a>
@@ -138,6 +138,7 @@ $('.owl-carousel').owlCarousel({
 				<a href="demos/lazyContent.html" class="button">Lazy Content Structure</a>
 				<a href="demos/ajaxLazyContent.html" class="button">Ajax + Lazy Content</a>
 				<a href="demos/zepto.html" class="button">Zepto Support</a>
+				<a href="demos/animate.html" class="button">Animate Transitions</a>
 
 			</div>
 		</div>
@@ -507,6 +508,22 @@ $(document).ready(function(){
 						<td>false</td>
 						<td>Int/Boolean</td>
 						<td>Set width for videos</td>
+						<td></td>
+					</tr>
+
+					<tr>
+						<td>animateOut</td>
+						<td>false</td>
+						<td>Bolean/String</td>
+						<td>CSS3 animation out</td>
+						<td></td>
+					</tr>
+
+					<tr>
+						<td>animateIn</td>
+						<td>false</td>
+						<td>Bolean/String</td>
+						<td>CSS3 animation in</td>
 						<td></td>
 					</tr>
 
