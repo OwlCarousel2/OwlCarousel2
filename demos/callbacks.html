@@ -64,10 +64,10 @@
 			<span class="label secondary onResponsiveAfter">on</span> onResponsiveAfter
 			</div>
 			<div>
-			<span class="label secondary onAnimationStart">on</span> onAnimationStart
+			<span class="label secondary onTransitionStart">on</span> onTransitionStart
 			</div>
 			<div>
-			<span class="label secondary onAnimationEnd">on</span> onAnimationEnd
+			<span class="label secondary onTransitionEnd">on</span> onTransitionEnd
 			</div>
 			<div>
 			<span class="label secondary onTouchStart">on</span> onTouchStart
@@ -152,15 +152,11 @@ owl.on('onResponsiveAfter',function(e){
 	evCall(e.type)
 });
 
-owl.on('onAnimationEnd',function(e){
+owl.on('onTransitionStart',function(e){
 	evCall(e.type)
 });
 
-owl.on('onAnimationStart',function(e){
-	evCall(e.type)
-});
-
-owl.on('onAnimationEnd',function(e){
+owl.on('onTransitionEnd',function(e){
 	evCall(e.type)
 });
 
@@ -297,15 +293,11 @@ jQuery(document).ready(function($) {
 		evCall(e.type);
 	});
 
-	owl.on('onAnimationEnd',function(e){
+	owl.on('onTransitionStart',function(e){
 		evCall(e.type);
 	});
 
-	owl.on('onAnimationStart',function(e){
-		evCall(e.type);
-	});
-
-	owl.on('onAnimationEnd',function(e){
+	owl.on('onTransitionEnd',function(e){
 		evCall(e.type);
 	});
 

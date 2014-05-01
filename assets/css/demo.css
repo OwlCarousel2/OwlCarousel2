@@ -144,8 +144,12 @@ table tr th
 .owl-carousel .darkblue{
 	background-color: #25373D
 }
-
-
+.owl-carousel .fiolet {
+	background: #9b59b6;
+}
+.owl-carousel .red2{
+	background: #e74c3c;
+}
 
 
 
