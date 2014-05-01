@@ -4,7 +4,7 @@
  * @release 2014
  * Licensed under MIT
  * 
- * @version 2.0.0-beta.1.4
+ * @version 2.0.0-beta.1.5
  * @versionNotes Not compatibile with Owl Carousel <2.0.0
  */
 
@@ -260,7 +260,7 @@ stopVideo.owl
 		element.owlCarousel = {
 			'name':		'Owl Carousel',
 			'author':	'Bartosz Wojciechowski',
-			'version':	'2.0.0-beta.1.4',
+			'version':	'2.0.0-beta.1.5',
 			'released':	'01.05.2014'
 		};
 
@@ -282,32 +282,6 @@ stopVideo.owl
 		this.dom.$el =		$(element);
 		this.init();
 	}
-
-	/**
-	 * preloadAutoWidthImages
-	 * @desc still to test
-	 * @since 2.0.0
-	 */
-
-	Owl.prototype.preloadAutoWidthImages = function(allImgs){
-		var loaded = 0;
-		for(var i = 0; i<allImgs.length;i++){
-			var img = new Image();
-			onLoadImg(allImgs.length);
-			// To do - check if image has src
-			img.src = allImgs[i].src;
-		}
-
-		function onLoadImg(allImgs){ 
-			img.onload = function(){
-				loaded++;
-				if(loaded >= allImgs){
-					this.state.imagesLoaded = true;
-					this.init();
-				}
-			}.bind(this);
-		}
-	};
 
 	/**
 	 * init
@@ -342,13 +316,11 @@ stopVideo.owl
 		// Update options.items on given size
 		this.setResponsiveOptions();
 
-		if(this.options.autoWidth){
-			var allImgs = this.dom.$el.find('img');
-			if(allImgs.length){
-				if(this.state.imagesLoaded !== true){
-					this.preloadAutoWidthImages(allImgs);
-					return false;
-				}
+		if(this.options.autoWidth && this.state.imagesLoaded !== true){
+			var imgs = this.dom.$el.find('img');
+			if(imgs.length){
+				this.preloadAutoWidthImages(imgs);
+				return false;
 			}
 		}
 
@@ -1261,10 +1233,6 @@ stopVideo.owl
 			}
 		}
 
-		if(this.state.videoPlay){
-			this.stopVideo();
-		}
-
 		this.fireCallback('onResponsiveBefore');
 		this.state.responsive = true;
 		this.refresh();
@@ -1280,6 +1248,10 @@ stopVideo.owl
 
 	Owl.prototype.refresh = function(init){
 		this.watchVisibility();
+
+		if(this.state.videoPlay){
+			this.stopVideo();
+		}
 
 		// Update Options for given width
 		this.setResponsiveOptions();
@@ -2859,6 +2831,34 @@ stopVideo.owl
 				clearInterval(isLoaded);
 			}
 		}, 100);
+	};
+
+	/**
+	 * preloadAutoWidthImages
+	 * @desc still to test
+	 * @since 2.0.0
+	 */
+
+	Owl.prototype.preloadAutoWidthImages = function(imgs){
+		var loaded = 0;
+		var that = this;
+		imgs.each(function(i,el){
+			var $el = $(el);
+			var img = new Image();
+
+			img.onload = function(){
+				loaded++;
+				$el.attr('src',img.src);
+				$el.css('opacity',1);
+				if(loaded >= imgs.length){
+					that.state.imagesLoaded = true;
+					that.init();
+				}
+			}
+
+			img.src = $el.attr('src') ||  $el.attr('data-src') || $el.attr('data-src-retina');;
+			console.log(img.src);
+		})
 	};
 
 	/**
