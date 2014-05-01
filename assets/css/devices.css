@@ -274,6 +274,8 @@
 	width: 180px;
 	background-color: #e8ebf0;
 	-webkit-transform: perspective( 50px ) rotateX( 10deg );
+	-moz-transform: perspective( 50px ) rotateX( 10deg );
+	transform: perspective( 50px ) rotateX( 10deg );
 }
 
 .foot-shadow-top{
@@ -285,6 +287,8 @@
 	width: 165px;
 	background-color: #d8dbe1;
 	-webkit-transform: perspective( 50px ) rotateX( 10deg );
+	-ms-transform: perspective( 50px ) rotateX( 10deg );
+	transform: perspective( 50px ) rotateX( 10deg );
 }
 .foot-bottom{
 	top:-15px;
