@@ -4,7 +4,7 @@
  * @release 2014
  * Licensed under MIT
  * 
- * @version 2.0.0-beta.1.3
+ * @version 2.0.0-beta.1.4
  * @versionNotes Not compatibile with Owl Carousel <2.0.0
  */
 
@@ -27,8 +27,8 @@ onInitBefore
 onInitAfter
 onResponsiveBefore
 onResponsiveAfter
-onAnimationStart
-onAnimationEnd
+onTransitionStart
+onTransitionEnd
 onTouchStart
 onTouchEnd
 onChangeState
@@ -260,8 +260,8 @@ stopVideo.owl
 		element.owlCarousel = {
 			'name':		'Owl Carousel',
 			'author':	'Bartosz Wojciechowski',
-			'version':	'2.0.0-beta.1.3',
-			'released':	'29.04.2014'
+			'version':	'2.0.0-beta.1.4',
+			'released':	'01.05.2014'
 		};
 
 		// Attach variables to object
@@ -1981,7 +1981,7 @@ stopVideo.owl
 
 		// if speed is 0 the set inMotion to false
 		if(this.speed.current !== 0 && this.pos.currentAbs !== this.pos.min){
-			this.fireCallback('onAnimationStart');
+			this.fireCallback('onTransitionStart');
 			this.state.inMotion = true;
 		}
 
@@ -2332,7 +2332,7 @@ stopVideo.owl
 		this.state.inMotion = false;
 		this.updateItemState();
 		this.autoplay();
-		this.fireCallback('onAnimationEnd');
+		this.fireCallback('onTransitionEnd');
 	};
 
 	/**
