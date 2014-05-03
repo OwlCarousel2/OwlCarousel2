@@ -1,6 +1,6 @@
 Owl Carousel 
 ============
-#### 2.0.0-beta.1.6
+#### 2.0.0-beta.1.8
 jQuery/Zepto Fully responsive, touch friendly carousel.
 
 
@@ -81,7 +81,7 @@ autoplayHoverPause:	false,
 smartSpeed:			250,
 fluidSpeed:			false,
 autoplaySpeed:		false,
-naviSpeed:			false,
+navSpeed:			false,
 dotsSpeed:			false,
 dragEndSpeed:		false,
 

@@ -4,7 +4,7 @@
  * @release 2014
  * Licensed under MIT
  * 
- * @version 2.0.0-beta.1.7
+ * @version 2.0.0-beta.1.8
  * @versionNotes Not compatibile with Owl Carousel <2.0.0
  */
 
@@ -93,7 +93,7 @@ stopVideo.owl
 		smartSpeed:			250,
 		fluidSpeed:			false,
 		autoplaySpeed:		false,
-		naviSpeed:			false,
+		navSpeed:			false,
 		dotsSpeed:			false,
 		dragEndSpeed:		false,
 		
@@ -220,7 +220,7 @@ stopVideo.owl
 
 	var speed = {
 		onDragEnd: 	300,
-		navi:		300,
+		nav:		300,
 		css2speed:	0
 
 	};
@@ -261,7 +261,7 @@ stopVideo.owl
 		element.owlCarousel = {
 			'name':		'Owl Carousel',
 			'author':	'Bartosz Wojciechowski',
-			'version':	'2.0.0-beta.1.7',
+			'version':	'2.0.0-beta.1.8',
 			'released':	'03.05.2014'
 		};
 
@@ -435,10 +435,14 @@ stopVideo.owl
 		} else if(this.options.slideBy > this.options.items){
 			this.options.slideBy = this.options.items;
 		}
+
+		// if items number is less than in body
 		if(this.options.loop && this.num.oItems < this.options.items){
 			this.options.loop = false;
-		} else if(this.options.loop){
-			this.options.loop = true;
+		}
+
+		if(this.num.oItems <= this.options.items){
+			this.options.navRewind = false;
 		}
 
 		if(this.options.autoWidth){
@@ -1069,7 +1073,7 @@ stopVideo.owl
 		if(this.options.autoWidth){
 			this.width.stage = this.options.center ? Math.abs(fullWidth) : Math.abs(dist);
 		} else {
-			this.width.stage = (Math.abs(fullWidth)+1); //1px extra for ie subpixel rounded issues
+			this.width.stage = Math.abs(fullWidth);
 		}
 
 		//update indexAbs on all items 
@@ -1138,7 +1142,7 @@ stopVideo.owl
 		}
 
 		//if is less items
-		if(this.num.oItems <= this.options.items && !this.options.center){
+		if(this.num.oItems < this.options.items && !this.options.center){
 			this.pos.max = 0;
 			this.pos.maxValue = this.pos.items[0];
 		}
@@ -1552,13 +1556,14 @@ stopVideo.owl
 		this.e._pause = 		function(){this.pause();				}.bind(this);
 		this.e._playVideo = 	function(e){this.playVideo(e);			}.bind(this);
 
-		this.e._naviNext = function(e){
-			//prevent double-click zoom on mobile
+		this.e._navNext = function(e){
+			if($(e.target).hasClass('disabled')){return false;}
 			e.preventDefault();
 			this.next();				
 		}.bind(this);
 
-		this.e._naviPrev = function(e){
+		this.e._navPrev = function(e){
+			if($(e.target).hasClass('disabled')){return false;}
 			e.preventDefault();
 			this.prev();
 		}.bind(this);
@@ -2109,7 +2114,7 @@ stopVideo.owl
 	 */
 
 	Owl.prototype.next = function(optionalSpeed){
-		var s = optionalSpeed || this.options.naviSpeed;
+		var s = optionalSpeed || this.options.navSpeed;
 		if(this.options.loop && !this.state.lazyContent){
 			this.goToLoop(this.options.slideBy, s);
 		}else{
@@ -2123,7 +2128,7 @@ stopVideo.owl
 	 */
 
 	Owl.prototype.prev = function(optionalSpeed){
-		var s = optionalSpeed || this.options.naviSpeed;
+		var s = optionalSpeed || this.options.navSpeed;
 		if(this.options.loop && !this.state.lazyContent){
 			this.goToLoop(-this.options.slideBy, s);
 		}else{
@@ -2200,7 +2205,7 @@ stopVideo.owl
 			pos = 0;
 		}
 		this.dom.oStage.scrollLeft = 0;
-		this.goTo(pos,this.options.naviSpeed);
+		this.goTo(pos,this.options.navSpeed);
 	};
 
 	/**
@@ -2359,7 +2364,7 @@ stopVideo.owl
 	 */
 
 	Owl.prototype.updateControls = function(){
-	
+
 		if(this.dom.$cc === null && (this.options.nav || this.options.dots)){
 			this.controls();
 		}
@@ -2419,12 +2424,12 @@ stopVideo.owl
 		this.dom.$navNext = $(navNext).html(this.options.navText[1]);
 
 		// add events to do
-		//this.on(navPrev, this.dragType[2], this.e._naviPrev, false);
-		//this.on(navNext, this.dragType[2], this.e._naviNext, false);
+		//this.on(navPrev, this.dragType[2], this.e._navPrev, false);
+		//this.on(navNext, this.dragType[2], this.e._navNext, false);
 
 		//FF fix?
-		this.dom.$nav.on(this.dragType[2], '.'+this.options.navClass[0], this.e._naviPrev);
-		this.dom.$nav.on(this.dragType[2], '.'+this.options.navClass[1], this.e._naviNext);
+		this.dom.$nav.on(this.dragType[2], '.'+this.options.navClass[0], this.e._navPrev);
+		this.dom.$nav.on(this.dragType[2], '.'+this.options.navClass[1], this.e._navNext);
 	};
 
 	/**
@@ -2568,12 +2573,12 @@ stopVideo.owl
 		this.dom.$navPrev.toggleClass('disabled',!isNav);
 
 		if(!this.options.loop && isNav && !this.options.navRewind){
+
 			if(this.pos.current <= 0){
-				this.dom.$navNext.removeClass('disabled');
 				this.dom.$navPrev.addClass('disabled');
-			} else if(this.pos.current >= this.pos.max){
+			} 
+			if(this.pos.current >= this.pos.max){
 				this.dom.$navNext.addClass('disabled');
-				this.dom.$navPrev.removeClass('disabled');
 			}
 		}
 	};
