@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Owl Carousel 2.0.0-beta - Zepto demo</title>
+	<title>Owl Carousel 2.0.0-beta - Mouse wheel demo</title>
 	<link rel="stylesheet" href="../assets/css/foundation.min.css" />
 	<link rel="stylesheet" href="../owlcarousel/owl.carousel.css">
 	<link rel="stylesheet" href="../owlcarousel/owl.theme.css">
@@ -15,7 +15,7 @@
 <div class="header">
 	<div class="row">
 	  <div class="large-12 columns">
-		<h1 class="left">Zepto.</h1>
+		<h1 class="left">Mouse wheel.</h1>
 		<ul class="button-group right">
 			<li><a href="../index.html" class="button secondary tiny button">Home</a></li>
 			<li><a href="https://github.com/OwlFonk/OwlCarousel2" class="button tiny show-for-medium-up">Download From GitHub</a></li>
@@ -33,18 +33,17 @@
 				<div class="article"><h2>2</h2></div>
 				<div class="article"><h2>3</h2></div>
 				<div class="article"><h2>4</h2></div>
-				<div class="article" data-merge="6"><h2>6</h2></div>
-				<div class="article" data-merge="2"><h2>7</h2></div>
-				<div class="article" data-merge="1"><h2>8</h2></div>
-				<div class="article" data-merge="3"><h2>9</h2></div>
+				<div class="article"><h2>5</h2></div>
+				<div class="article"><h2>6</h2></div>
+				<div class="article"><h2>7</h2></div>
+				<div class="article"><h2>8</h2></div>
+				<div class="article"><h2>9</h2></div>
 				<div class="article"><h2>10</h2></div>
 				<div class="article"><h2>11</h2></div>
-				<div class="article" data-merge="2"><h2>12</h2></div>
+				<div class="article"><h2>12</h2></div>
 				<div class="article"><h2>13</h2></div>
-				<div class="article"><h2>14</h2></div>
-				<div class="article"><h2>15</h2></div>
+			
 			</div>
-
 		</div>
 	</div>
 </div>
@@ -53,7 +52,10 @@
 	<div class="row margin-top">
 		<div class="large-12 columns">
 			<h4>Descripton</h4>
-			<p>Looks like Zepto works fine here :)</p>
+			<p>To add mouswheel scrolling just include a fantastic plugin jquery.mousewheel.js created by Brandon Aaron.
+			<a href="https://github.com/brandonaaron/jquery-mousewheel">Link to plugin GitHub page.</a>
+			</p>
+
 		</div>
 	</div>
 
@@ -63,22 +65,35 @@
 	<pre><code>
 //Javascript
 
-$('.owl-carousel').owlCarousel({
+var owl = $('.owl-carousel');
+
+owl.owlCarousel({
 	loop:true,
-	margin:10,
-	merge:true,
 	nav:true,
+	margin:10,
 	responsive:{
 		0:{
 			items:1
-		},
-		678:{
+		}
+		600:{
 			items:3
-		},
-		1000:{
+		},			
+		960:{
 			items:5
+		},
+		1200:{
+			items:6
 		}
 	}
+});
+
+owl.bind('mousewheel', function (e) {
+    if (e.deltaY>0) {
+		owl.trigger('next.owl');
+    } else {
+		owl.trigger('prev.owl');
+    }
+    e.preventDefault();
 });
 
 	</code></pre>
@@ -124,33 +139,44 @@ $('.owl-carousel').owlCarousel({
 	</div>
 </div>
 
-<!-- Zepto library + Data module-->
-<script src="../assets/js/zepto.min.js"></script>
-<script src="../assets/js/zepto.data.js"></script> 
-
-<script src="../owlcarousel/owl.carousel.js?v=beta.1.6"></script>
+<script src="../assets/js/jquery-1.11.0.min.js"></script>
+<script src="../assets/js/jquery.mousewheel.js"></script>
+<script src="../owlcarousel/owl.carousel.js?v=beta.1.6?v=beta.1.6"></script>
 <script src="../assets/js/highlight/highlight.pack.js"></script>
 <script src="../assets/js/app.js"></script>
 
 <script>
-$(document).ready(function($) {
+jQuery(document).ready(function($) {
 
-	$('.owl-carousel').owlCarousel({
+	var owl = $('.owl-carousel');
+
+	owl.owlCarousel({
 		loop:true,
-		margin:10,
-		merge:true,
 		nav:true,
+		margin:10,
 		responsive:{
 			0:{
 				items:1
 			},
-			678:{
+			600:{
 				items:3
-			},
-			1000:{
+			},			
+			960:{
 				items:5
+			},
+			1200:{
+				items:6
 			}
 		}
+	});
+
+	owl.on('mousewheel', function (e) {
+	    if (e.deltaY>0) {
+			owl.trigger('next.owl');
+	    } else {
+			owl.trigger('prev.owl');
+	    }
+	    e.preventDefault();
 	});
 
 });

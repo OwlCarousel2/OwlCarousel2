@@ -21,9 +21,7 @@
 	position: relative;
 	z-index:1;
 }
-.owl-loaded{
-	display: block;
-}
+
 
 .owl-carousel .owl-stage{
 	position: relative;
@@ -113,6 +111,16 @@
 	z-index: 1;
 }
 
+.owl-loaded{
+	display: block;
+}
+.owl-loading{
+	opacity: 0;
+	display: block;
+}
+.owl-hidden{
+	opacity:0;
+}
 .owl-carousel .owl-refresh .owl-item{
 	display: none;
 }

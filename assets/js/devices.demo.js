@@ -1,10 +1,27 @@
 $(document).ready(function($) {
 
+	function isPerspective(){
+		return isStyleSupported(['perspective','webkitPerspective','MozPerspective','OPerspective','MsPerspective']);
+	}
 
+	// CSS detection;
+	function isStyleSupported(array){
+		var p,s,fake = document.createElement('div'),list = array;
+		for(p in list){
+			s = list[p]; 
+			if(typeof fake.style[s] !== 'undefined'){
+				fake = null;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	var is3dsupport = isPerspective();
 	var width = $(window).width();
 	var devices = $('#devices');
 
-	if(width >= 960){
+	if(width >= 960 && is3dsupport){
 	
 		var icons = $('.devices-buttons').children();
 

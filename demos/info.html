@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="no-js">
+<html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -115,6 +115,8 @@
 			<h4>Descripton</h4>
 			<p>'info' option is the only function callback in Owl Carousel 2 and doesnt need to be activated by option callback:true.
 				Can be used to obtain basic information about items/pages/widths etc.
+				<br><br>
+				Info function has two parameters. First is object that containes information, second is Owl non jquery object reference.
 				<br><strong>Note that Item and page positions are zero based values.</strong>
 				If you need more specific variables there just let me know.
 			</p>
@@ -129,23 +131,25 @@
 //Javascript
 
 $('.owl-carousel').owlCarousel({
-items:2,
-loop:true,
-margin:10,
-info: getInfo,
-responsive:{
-	600:{
-		items:3
-	},			
-	960:{
-		items:5,
-		center:true
-	},
-	1200:{
-		items:6,
-		center:false
+	items:1,
+	loop:true,
+	nav:true,
+	margin:10,
+	info: getInfo,
+	responsive:{
+		600:{
+			items:3
+		},			
+		960:{
+			items:5,
+			center:true
+		},
+		1200:{
+			items:6,
+			center:false
+		}
 	}
-}
+});
 
 // Insert info into table
 function getInfo(i){
@@ -204,7 +208,7 @@ function getInfo(i){
 </div>
 
 <script src="../assets/js/jquery-1.11.0.min.js"></script>
-<script src="../owlcarousel/owl.carousel.js"></script>
+<script src="../owlcarousel/owl.carousel.js?v=beta.1.6?v=beta.1.6"></script>
 <script src="../assets/js/highlight/highlight.pack.js"></script>
 <script src="../assets/js/app.js"></script>
 
@@ -214,7 +218,7 @@ jQuery(document).ready(function($) {
 	$('.owl-carousel').owlCarousel({
 		items:1,
 		loop:true,
-		navigation:true,
+		nav:true,
 		margin:10,
 		info: getInfo,
 		responsive:{

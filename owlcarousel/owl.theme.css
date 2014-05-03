@@ -22,12 +22,14 @@
 	background: #869791;
 	cursor: pointer
 }
+.owl-theme .owl-controls .owl-nav .disabled{
+	opacity: 0.5;
+	cursor: default;
+}
 
 /* Clickable class fix problem with hover on touch devices */
 /* Use it for non-touch hover action */
 .owl-theme .owl-controls .owl-nav div:hover{
-	filter: Alpha(Opacity=100);/*IE7 fix*/
-	opacity: 1;
 	text-decoration: none;
 }
 

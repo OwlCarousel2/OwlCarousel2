@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
+	<meta name="msapplication-tap-highlight" content="no"/> 
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Owl Carousel 2.0.0-beta.1.5</title>
+	<title>Owl Carousel 2.0.0-beta.1.6</title>
 	<link rel="stylesheet" href="assets/css/foundation.min.css" />
 	<link rel="stylesheet" href="owlcarousel/owl.carousel.css">
 	<link rel="stylesheet" href="owlcarousel/owl.theme.css">
@@ -70,7 +71,7 @@
 <div class="header">
 	<div class="row">
 	  <div class="large-12 columns">
-		<h1>Owl Carousel <small>v2.0.0-beta.1.5</span></small></h1>
+		<h1>Owl Carousel <small>v2.0.0-beta.1.6</span></small></h1>
 		<p>Please note that this is a beta version only for testing purposes. Enjoy!</p>
 		<a href="https://github.com/OwlFonk/OwlCarousel2" class="button tiny secondary">Download From GitHub</a>
 	  </div>
@@ -367,10 +368,18 @@ $(document).ready(function(){
 					</tr>
 
 					<tr>
-						<td>navigation</td>
+						<td>nav</td>
 						<td>false</td>
 						<td>Boolean</td>
 						<td>Show next/prev buttons</td>
+						<td></td>
+					</tr>
+
+					<tr>
+						<td>navRewind</td>
+						<td>true</td>
+						<td>Boolean</td>
+						<td>Go to first/last</td>
 						<td></td>
 					</tr>
 
@@ -602,7 +611,9 @@ $(document).ready(function(){
 						<td>info</td>
 						<td>false</td>
 						<td>function</td>
-						<td>The only one Owl function callback to retrieve basic information (current item/pages/widths)</td>
+						<td>The only one Owl function callback to retrieve basic information (current item/pages/widths).
+							Info function second parameter is Owl DOM object reference.
+						</td>
 						<td></td>
 					</tr>
 
@@ -727,8 +738,7 @@ Public methods:
 -->
 
 <script src="assets/js/jquery-1.11.0.min.js"></script>
-
-<script src="owlcarousel/owl.carousel.js"></script>
+<script src="owlcarousel/owl.carousel.js?v=beta.1.6"></script>
 <script src="assets/js/highlight/highlight.pack.js"></script>
 <script src="assets/js/app.js"></script>
 <script src="assets/js/devices.demo.js"></script>

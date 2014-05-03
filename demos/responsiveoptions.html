@@ -60,7 +60,7 @@
 
 $('.owl-carousel').owlCarousel({
 	loop:true, // loop is true up to 1199px screen.
-	navigation:true, // is true across all sizes
+	nav:true, // is true across all sizes
 	margin:10, // margin 10px till 960 breakpoint
 	responsiveClass:true, // Optional helper class. Add 'owl-reponsive-' + 'breakpoint' class to main element.
 						
@@ -75,7 +75,7 @@ $('.owl-carousel').owlCarousel({
 
 		480:{
 			items:2, // from 480 to 677 
-			navigation:false // from 480 to max 
+			nav:false // from 480 to max 
 		},
 
 		678:{
@@ -142,7 +142,7 @@ $('.owl-carousel').owlCarousel({
 </div>
 
 <script src="../assets/js/jquery-1.11.0.min.js"></script>
-<script src="../owlcarousel/owl.carousel.js"></script>
+<script src="../owlcarousel/owl.carousel.js?v=beta.1.6"></script>
 <script src="../assets/js/highlight/highlight.pack.js"></script>
 <script src="../assets/js/app.js"></script>
 
@@ -151,7 +151,7 @@ jQuery(document).ready(function($) {
 
 	$('.owl-carousel').owlCarousel({
 		loop:true,
-		navigation:true,
+		nav:true,
 		margin:10,
 		responsiveClass:true,
 		responsive:{
