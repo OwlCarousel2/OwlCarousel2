@@ -1,6 +1,6 @@
 Owl Carousel 
 ============
-#### 2.0.0-beta.1.5
+#### 2.0.0-beta.1.6
 jQuery/Zepto Fully responsive, touch friendly carousel.
 
 
@@ -37,9 +37,7 @@ jQuery/Zepto Fully responsive, touch friendly carousel.
 * Bower Support
 * Inprove CSS
 * Create new theme
-* Fade transition
 * Video Names
-* Non JS support
 
 
 ###Options
@@ -65,7 +63,8 @@ autoHeight:			false,
 startPosition:		0,
 URLhashListener:	false,
 
-navigation: 		false,
+nav: 				false,
+navRewind:			true,
 navText: 			['prev','next'],
 slideBy:			1,
 dots: 				true,

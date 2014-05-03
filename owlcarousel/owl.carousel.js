@@ -75,7 +75,8 @@ stopVideo.owl
 		startPosition:		0,
 		URLhashListener:	false,
 
-		navigation: 		false,
+		nav: 				false,
+		navRewind:			true,
 		navText: 			['prev','next'],
 		slideBy:			1,
 		dots: 				true,
@@ -334,9 +335,6 @@ stopVideo.owl
 		// Append local content 
 		this.fetchContent();
 
-		// Zepto require main element to be displayed befor data collection
-		this.dom.$el.addClass('owl-loaded');
-
 		// attach generic events 
 		this.eventsCall();
 
@@ -346,11 +344,11 @@ stopVideo.owl
 		// attach generic events 
 		this.internalEvents();
 
+		this.dom.$el.addClass('owl-loading');
 		this.refresh(true);
-
+		this.dom.$el.removeClass('owl-loading').addClass('owl-loaded');
 		this.fireCallback('onInitAfter');
 	};
-
 
 	/**
 	 * sortOptions
@@ -437,8 +435,7 @@ stopVideo.owl
 		} else if(this.options.slideBy > this.options.items){
 			this.options.slideBy = this.options.items;
 		}
-
-		if(this.options.loop && this.num.oItems <= this.options.items){
+		if(this.options.loop && this.num.oItems < this.options.items){
 			this.options.loop = false;
 		} else if(this.options.loop){
 			this.options.loop = true;
@@ -902,7 +899,7 @@ stopVideo.owl
 	 */
 
 	Owl.prototype.loopClone = function(){
-		if(!this.options.loop || this.state.lazyContent || this.num.oItems <= this.options.items){return false;}
+		if(!this.options.loop || this.state.lazyContent || this.num.oItems < this.options.items){return false;}
 
 		var firstClone,	lastClone, i,
 			num	=		this.options.items, 
@@ -983,7 +980,7 @@ stopVideo.owl
 
 		// calculate element width and item width 
 		this.width.el =  	this.width.el + this.options.margin;
-		this.width.item = 	Math.floor(elMinusMargin / this.options.items) + this.options.margin;
+		this.width.item = 	((elMinusMargin / this.options.items) + this.options.margin).toFixed(3);
 
 		this.dom.$items = 	this.dom.$stage.find('.owl-item');
 		this.num.items = 	this.dom.$items.length;
@@ -1072,7 +1069,7 @@ stopVideo.owl
 		if(this.options.autoWidth){
 			this.width.stage = this.options.center ? Math.abs(fullWidth) : Math.abs(dist);
 		} else {
-			this.width.stage = Math.abs(fullWidth);
+			this.width.stage = (Math.abs(fullWidth)+1).toFixed(3); //1px extra for ie subpixel rounded issues
 		}
 
 		//update indexAbs on all items 
@@ -1247,7 +1244,6 @@ stopVideo.owl
 	 */
 
 	Owl.prototype.refresh = function(init){
-		this.watchVisibility();
 
 		if(this.state.videoPlay){
 			this.stopVideo();
@@ -1286,6 +1282,7 @@ stopVideo.owl
 		//aaaand show.
 		this.dom.$stage.removeClass('owl-refresh');
 
+		// to do
 		// lazyContent last position on refresh
 		if(this.state.lazyContent){
 			this.pos.currentAbs = this.options.items;
@@ -1317,6 +1314,8 @@ stopVideo.owl
 		this.autoHeight();
 
 		this.state.orientation = window.orientation;
+
+		this.watchVisibility();
 	};
 
 	/**
@@ -1594,7 +1593,7 @@ stopVideo.owl
 
 		if(isTouch && !isTouchIE){
 			this.dragType = ['touchstart','touchmove','touchend','touchcancel'];
-		} else if(isTouchIE){
+		} else if(isTouch && isTouchIE){
 			this.dragType = ['MSPointerDown','MSPointerMove','MSPointerUp','MSPointerCancel'];
 		} else {
 			this.dragType = ['mousedown','mousemove','mouseup'];
@@ -1618,7 +1617,7 @@ stopVideo.owl
 		}
 
 		// Video Play Button event delegation
-		this.dom.$stage.on('click', '.owl-video-play-icon',this.e._playVideo);
+		this.dom.$stage.on(this.dragType[2], '.owl-video-play-icon', this.e._playVideo);
 
 		if(this.options.URLhashListener){
 			this.on(window, 'hashchange', this.e._goToHash, false);
@@ -1652,7 +1651,6 @@ stopVideo.owl
 
 		if(this.options.touchDrag && (this.dragType[0] === 'touchstart' || this.dragType[0] === 'MSPointerDown')){
 			this.on(this.dom.stage, this.dragType[0], this.e._onDragStart,false);
-
 		} else if(this.options.mouseDrag && this.dragType[0] === 'mousedown'){
 			this.on(this.dom.stage, this.dragType[0], this.e._onDragStart,false);
 
@@ -1716,8 +1714,9 @@ stopVideo.owl
 		this.drag.targetEl = ev.target || ev.srcElement;
 		this.drag.updatedX = this.drag.start;
 
+		// to do/check
 		//prevent links and images dragging;
-		this.drag.targetEl.draggable = false;
+		//this.drag.targetEl.draggable = false;
 
 		this.on(document, this.dragType[1], this.e._onDragMove, false);
 		this.on(document, this.dragType[2], this.e._onDragEnd, false);
@@ -1813,7 +1812,7 @@ stopVideo.owl
 		this.fireCallback('onTouchEnd');
 
 		//prevent links and images dragging;
-		this.drag.targetEl.draggable = true;
+		//this.drag.targetEl.draggable = true;
 
 		//remove drag event listeners
 
@@ -1987,7 +1986,8 @@ stopVideo.owl
 
 		// if no items then stop 
 		if(this.num.oItems === 0){return false;}
-		if(pos > this.num.items){pos = 0;}
+		// to do
+		//if(pos > this.num.items){pos = 0;}
 		if(pos === undefined){return false;}
 
 		//pos - new current position
@@ -2001,9 +2001,13 @@ stopVideo.owl
 		}
 
 		if(!this.options.loop){
-			nextPos = nextPos > this.pos.max ? this.pos.max : (nextPos <= 0 ? 0 : nextPos);
+			if(this.options.navRewind){
+				nextPos = nextPos > this.pos.max ? this.pos.min : (nextPos < 0 ? this.pos.max : nextPos);
+			} else {
+				nextPos = nextPos > this.pos.max ? this.pos.max : (nextPos <= 0 ? 0 : nextPos);
+			}
 		} else {
-			nextPos = nextPos > this.num.oItems ? this.num.oItems-1 : nextPos;
+			nextPos = nextPos >= this.num.oItems ? this.num.oItems-1 : nextPos;
 		}
 
 		this.pos.current = this.dom.$oItems.eq(nextPos).data('owl-item').index;
@@ -2356,11 +2360,11 @@ stopVideo.owl
 
 	Owl.prototype.updateControls = function(){
 	
-		if(this.dom.$cc === null && (this.options.navigation || this.options.dots)){
+		if(this.dom.$cc === null && (this.options.nav || this.options.dots)){
 			this.controls();
 		}
 
-		if(this.dom.$nav === null && this.options.navigation){
+		if(this.dom.$nav === null && this.options.nav){
 			this.createNavigation(this.dom.$cc[0]);
 		}
 		
@@ -2369,7 +2373,7 @@ stopVideo.owl
 		}
 
 		if(this.dom.$nav !== null){
-			if(this.options.navigation){
+			if(this.options.nav){
 				this.dom.$nav.show();
 				this.updateNavigation();
 			} else {
@@ -2558,12 +2562,12 @@ stopVideo.owl
 
 	Owl.prototype.updateNavigation = function(){
 
-		var isNav = this.options.navigation;
+		var isNav = this.options.nav;
 
 		this.dom.$navNext.toggleClass('disabled',!isNav);
 		this.dom.$navPrev.toggleClass('disabled',!isNav);
 
-		if(!this.options.loop && isNav){
+		if(!this.options.loop && isNav && !this.options.navRewind){
 			if(this.pos.current <= 0){
 				this.dom.$navNext.removeClass('disabled');
 				this.dom.$navPrev.addClass('disabled');
@@ -2728,22 +2732,21 @@ stopVideo.owl
 	 */
 
 	Owl.prototype.watchVisibility = function(){
+
 		// test on zepto
-		if(!isElVisible(this.dom.$el)) {
-			this.dom.$el.css({opacity: 0});
+		if(!isElVisible(this.dom.el)) {
+			this.dom.$el.addClass('owl-hidden');
 			window.clearInterval(this.e._checkVisibile);
 			this.e._checkVisibile = window.setInterval(checkVisible.bind(this),500);
 		}
 
-		function isElVisible(el){
-			if(el.css('display') !== 'none' && el.css('visibility') !== 'hidden') {
-				return true;
-			} else {return false;}
+		function isElVisible(el) {
+		    return el.offsetWidth > 0 && el.offsetHeight > 0;
 		}
 
 		function checkVisible(){
-			if (isElVisible(this.dom.$el)) {
-				this.dom.$el.css({opacity: 1});
+			if (isElVisible(this.dom.el)) {
+				this.dom.$el.removeClass('owl-hidden');
 				this.refresh();
 				window.clearInterval(this.e._checkVisibile);
 			}
@@ -2759,7 +2762,7 @@ stopVideo.owl
 
 		if(!this.state.isTouch && !this.state.bypass && !this.state.responsive ){
 			
-			if (this.options.navigation || this.options.dots) {
+			if (this.options.nav || this.options.dots) {
 				this.updateControls();
 			}
 			this.autoHeight();
@@ -2801,7 +2804,7 @@ stopVideo.owl
 		};
 
 		if (typeof this.options.info === 'function') {
-			this.options.info.apply(this,[this.info]);
+			this.options.info.apply(this,[this.info,this.dom.el]);
 		}
 	};
 
@@ -2857,7 +2860,6 @@ stopVideo.owl
 			}
 
 			img.src = $el.attr('src') ||  $el.attr('data-src') || $el.attr('data-src-retina');;
-			console.log(img.src);
 		})
 	};
 

@@ -54,7 +54,7 @@
 				Scroll down to see more demos and how to setup animations with Animate.css library.
 
 				<br><br>
-				<strong>Animate functions works only with one item and only in browsers that support origin style.</strong>
+				<strong>Animate functions works only with one item and only in browsers that support perspective property.</strong>
 				
 			</p>
 		</div>
@@ -70,7 +70,7 @@ $('.fadeOut').owlCarousel({
 	animateOut: 'fadeOut',
 	items:1,
 	loop:true,
-	navigation:true,
+	nav:true,
 	margin:10,
 	smartSpeed:450
 });
@@ -107,7 +107,7 @@ $('.fadeOut').owlCarousel({
 		<div class="row ">
 			<div class="large-12 columns">
 	<pre><code>
-&lt;link rel="stylesheet" href="../owlcarousel/animate.css"&gt;
+&lt;link rel="stylesheet" href="animate.css"&gt;
 	</code></pre>
 			</div>
 		</div>
@@ -285,7 +285,7 @@ Before animation starts three classes are added to each item:
 </div>
 
 <script src="../assets/js/jquery-1.11.0.min.js"></script>
-<script src="../owlcarousel/owl.carousel.js"></script>
+<script src="../owlcarousel/owl.carousel.js?v=beta.1.6"></script>
 <script src="../assets/js/highlight/highlight.pack.js"></script>
 <script src="../assets/js/app.js"></script>
 
@@ -295,7 +295,7 @@ jQuery(document).ready(function($) {
 		animateOut: 'fadeOut',
 		items:1,
 		loop:true,
-		navigation:true,
+		nav:true,
 		margin:10,
 		smartSpeed:450,
 		autoplay:true,
@@ -307,7 +307,7 @@ jQuery(document).ready(function($) {
 		animateIn: 'flipInX',
 		items:1,
 		loop:true,
-		navigation:true,
+		nav:true,
 		margin:30,
 		stagePadding:30,
 		smartSpeed:450
@@ -318,7 +318,7 @@ jQuery(document).ready(function($) {
 		animateIn: 'bounceIn',
 		items:1,
 		loop:true,
-		navigation:true,
+		nav:true,
 		margin:10
 	});
 
@@ -327,7 +327,7 @@ jQuery(document).ready(function($) {
 		animateIn: 'bounceInDown',
 		items:1,
 		loop:true,
-		navigation:true,
+		nav:true,
 		margin:10,
 		stagePadding:0,
 		smartSpeed:450
