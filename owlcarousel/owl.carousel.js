@@ -4,7 +4,7 @@
  * @release 2014
  * Licensed under MIT
  * 
- * @version 2.0.0-beta.1.5
+ * @version 2.0.0-beta.1.7
  * @versionNotes Not compatibile with Owl Carousel <2.0.0
  */
 
@@ -261,8 +261,8 @@ stopVideo.owl
 		element.owlCarousel = {
 			'name':		'Owl Carousel',
 			'author':	'Bartosz Wojciechowski',
-			'version':	'2.0.0-beta.1.5',
-			'released':	'01.05.2014'
+			'version':	'2.0.0-beta.1.7',
+			'released':	'03.05.2014'
 		};
 
 		// Attach variables to object
@@ -1069,7 +1069,7 @@ stopVideo.owl
 		if(this.options.autoWidth){
 			this.width.stage = this.options.center ? Math.abs(fullWidth) : Math.abs(dist);
 		} else {
-			this.width.stage = (Math.abs(fullWidth)+1).toFixed(3); //1px extra for ie subpixel rounded issues
+			this.width.stage = (Math.abs(fullWidth)+1); //1px extra for ie subpixel rounded issues
 		}
 
 		//update indexAbs on all items 
