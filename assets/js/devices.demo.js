@@ -54,13 +54,13 @@ $(document).ready(function($) {
 				0:{
 					items:1,
 					dots: false,
-					navigation:true,
+					nav:true
 				},
 
 				370:{
 					items:2,
 					dots: true,
-					navigation:false
+					nav:false
 				},
 
 				960:{
