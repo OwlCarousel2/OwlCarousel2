@@ -6,9 +6,7 @@ jQuery/Zepto Fully responsive, touch friendly carousel.
 
 **Please note that this is a beta version only for testing purposes.**
 
-
-**Demo page is currently unavailable. Please download master zip from GitHub.**
-
+####[Demo page] (http://www.owlgraphic.com/owlcarousel2/)
 
 ###New features
 ---
