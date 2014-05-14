@@ -1,6 +1,6 @@
 Owl Carousel 
 ============
-#### 2.0.0-beta.1.8
+#### 2.0.0-beta.1.9
 jQuery/Zepto Fully responsive, touch friendly carousel.
 
 
@@ -97,12 +97,15 @@ animateIn:			false,
 
 fallbackEasing:		'swing',
 
-callbacks:			false,
+callbacks:			true,
 info: 				false,
 
 nestedItemSelector:	false,
 itemElement:		'div',
 stageElement:		'div',
+
+navContainer: 		false,
+dotsContainer: 		false,
 
 //Classes and Names
 themeClass: 		'owl-theme',

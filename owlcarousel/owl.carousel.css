@@ -139,10 +139,10 @@
 }
 /* If mouseDrag:false then you are able to select text */
 .owl-carousel.owl-text-select-on .owl-item{
-    -webkit-user-select: all;
-    -moz-user-select: all;
-    -ms-user-select: all;
-    user-select: all;
+    -webkit-user-select: auto;
+    -moz-user-select: auto;
+    -ms-user-select: auto;
+    user-select: auto;
 }
 
 .owl-carousel .owl-grab {

@@ -4,7 +4,7 @@
  * @release 2014
  * Licensed under MIT
  * 
- * @version 2.0.0-beta.1.8
+ * @version 2.0.0-beta.1.9
  * @versionNotes Not compatibile with Owl Carousel <2.0.0
  */
 
@@ -111,12 +111,15 @@ stopVideo.owl
 
 		fallbackEasing:		'swing',
 
-		callbacks:			false,
+		callbacks:			true,
 		info: 				false,
 
 		nestedItemSelector:	false,
 		itemElement:		'div',
 		stageElement:		'div',
+
+		navContainer: 		false,
+		dotsContainer: 		false,
 
 		//Classes and Names
 		themeClass: 		'owl-theme',
@@ -261,8 +264,8 @@ stopVideo.owl
 		element.owlCarousel = {
 			'name':		'Owl Carousel',
 			'author':	'Bartosz Wojciechowski',
-			'version':	'2.0.0-beta.1.8',
-			'released':	'03.05.2014'
+			'version':	'2.0.0-beta.1.9',
+			'released':	'14.05.2014'
 		};
 
 		// Attach variables to object
@@ -319,7 +322,10 @@ stopVideo.owl
 
 		if(this.options.autoWidth && this.state.imagesLoaded !== true){
 			var imgs = this.dom.$el.find('img');
-			if(imgs.length){
+			var nestedSelector = this.options.nestedItemSelector ? '.'+this.options.nestedItemSelector : undefined;
+			var width = this.dom.$el.children(nestedSelector).width();
+
+			if(imgs.length && width <= 0){
 				this.preloadAutoWidthImages(imgs);
 				return false;
 			}
@@ -441,7 +447,7 @@ stopVideo.owl
 			this.options.loop = false;
 		}
 
-		if(this.num.oItems <= this.options.items){
+		if(this.num.oItems <= this.options.items && !this.options.center){
 			this.options.navRewind = false;
 		}
 
@@ -1330,9 +1336,7 @@ stopVideo.owl
 
 	Owl.prototype.updateItemState = function(update){
 
-		if(!this.state.lazyContent){
-			this.updateActiveItems();
-		} else {
+		if(this.state.lazyContent){
 			this.updateLazyContent(update);
 		}
 
@@ -1341,7 +1345,6 @@ stopVideo.owl
 			.addClass(this.options.centerClass)
 			.data('owl-item').center = true;
 		}
-
 		if(this.options.lazyLoad){
 			this.lazyLoad();
 		}
@@ -1473,16 +1476,20 @@ stopVideo.owl
 			this.pos.current = this.pos.currentAbs = this.options.items;
 		}
 
+
 		if(!update){
 			this.updateLazyPosition();
 		}
 		var i,j,item,contentPos,content,freshItem,freshData;
 
+		this.pos.current = this.pos.currentAbs = this.options.items;
+		this.setSpeed(0);
+
 		if(this.state.lcDirection !== false){
 			for(i = 0; i<this.pos.lcMovedBy; i++){
 
 				if(this.state.lcDirection === 'right'){
-					item = this.dom.$stage.find('.owl-item').eq(0); //.appendTo(this.dom.$stage);
+					item = this.dom.$stage.find('.owl-item').eq(0); 
 					item.appendTo(this.dom.$stage);
 				}
 				if(this.state.lcDirection === 'left'){
@@ -1497,8 +1504,9 @@ stopVideo.owl
 		this.dom.$items = this.dom.$stage.find('.owl-item');
 
 		for(j = 0; j<this.num.items; j++){
+
 			// to do
-			this.dom.$items.eq(j).removeClass(this.options.centerClass);
+			//this.dom.$items.eq(j).removeClass(this.options.centerClass);
 
 			// get Content 
 			contentPos = this.pos.lcCurrent + j - this.options.items;// + this.options.startPosition;
@@ -1527,11 +1535,9 @@ stopVideo.owl
 				}
 			}
 		}
-
-		this.pos.goToLazyContent = 0;
-		this.pos.current = this.pos.currentAbs = this.options.items;
-		this.setSpeed(0);
 		this.animStage(this.pos.items[this.options.items]);
+		this.pos.goToLazyContent = 0;
+		
 	};
 
 	/**
@@ -1867,7 +1873,11 @@ stopVideo.owl
 
 	Owl.prototype.removeClick = function(target){
 		this.drag.targetEl = target;
-		this.on(target,'click', this.e._preventClick, false);
+		$(target).on('click.preventClick', this.e._preventClick);
+		// to make sure click is removed:
+		window.setTimeout(function(){
+			$(target).off('click.preventClick');
+		},300);
 	};
 
 	/**
@@ -1885,7 +1895,7 @@ stopVideo.owl
 		if(ev.stopPropagation){
 			ev.stopPropagation();
 		}
-		this.off(this.drag.targetEl,'click',this.e._preventClick,false);
+		$(ev.target).off('click.preventClick')
 	};
 
 	/**
@@ -2153,7 +2163,7 @@ stopVideo.owl
 
 		this.state.revert = true;
 
-		if(newPosition < 1 && direction === false){
+		if(newPosition < this.options.items && direction === false){
 
 			this.state.bypass = true;
 			revert = this.num.items - (this.options.items-prevPosition) - this.options.items;
@@ -2366,15 +2376,17 @@ stopVideo.owl
 	Owl.prototype.updateControls = function(){
 
 		if(this.dom.$cc === null && (this.options.nav || this.options.dots)){
-			this.controls();
+			if(!this.options.navContainer || !this.options.dotsContainer){
+				this.controls();
+			}
 		}
 
 		if(this.dom.$nav === null && this.options.nav){
-			this.createNavigation(this.dom.$cc[0]);
+			this.createNavigation();
 		}
 		
 		if(this.dom.$page === null && this.options.dots){
-			this.createDots(this.dom.$cc[0]);
+			this.createDots();
 		}
 
 		if(this.dom.$nav !== null){
@@ -2399,10 +2411,11 @@ stopVideo.owl
 	/**
 	 * createNavigation
 	 * @since 2.0.0
-	 * @param [cc] - dom element - Controls Container
 	 */
 
-	Owl.prototype.createNavigation = function(cc){
+	Owl.prototype.createNavigation = function(){
+
+		var cc = this.options.navContainer ? $(this.options.navContainer).get(0) : this.dom.$cc.get(0);
 
 		// Create nav container
 		var nav = document.createElement('div');
@@ -2438,7 +2451,9 @@ stopVideo.owl
 	 * @param [cc] - dom element - Controls Container
 	 */
 
-	Owl.prototype.createDots = function(cc){
+	Owl.prototype.createDots = function(){
+
+		var cc = this.options.dotsContainer ? $(this.options.dotsContainer).get(0) : this.dom.$cc.get(0);
 
 		// Create dots container
 		var page = document.createElement('div');
@@ -2463,19 +2478,6 @@ stopVideo.owl
 		// build dots
 		this.rebuildDots();
 	};
-
-	/**
-	 * goToPage
-	 * @desc Event used by dots
-	 * @since 2.0.0
-	 */
-
-	// Owl.prototype.goToPage = function(e){
-	// 	console.log(e.taget);
-	// 	var page = $(e.currentTarget).data('page')
-	// 	this.goTo(page,this.options.dotsSpeed);
-	// 	return false;
-	// };
 
 	/**
 	 * rebuildDots
@@ -2713,6 +2715,10 @@ stopVideo.owl
 	Owl.prototype.fireCallback = function(event, data){
 		if(!this.options.callbacks){return;}
 
+		if (typeof this.options[event] === 'function') {
+			this.options[event].apply(this,[this.dom.el,this.info,event]);
+		}
+
 		if(this.dom.el.dispatchEvent){
 
 			// dispatch event
@@ -2776,6 +2782,11 @@ stopVideo.owl
 		}
 
 		if(!this.state.isTouch && !this.state.bypass){
+			
+			if(!this.state.lazyContent){
+				this.updateActiveItems();
+			}
+
 			// set Status to do
 			this.storeInfo();
 
@@ -2904,6 +2915,8 @@ stopVideo.owl
 		images.each(function(i,el){
 			var $el = $(el);
 			var img = new Image();
+			var srcType = isRetina() ? $el.attr('data-src-retina') : $el.attr('data-src');
+			var srcType = srcType || $el.attr('data-src');
 
 			img.onload = function(){
 
@@ -2917,7 +2930,7 @@ stopVideo.owl
 				$el.css('opacity',1);
 				that.fireCallback('onLazyLoaded');
 			};
-			img.src = $el.attr('data-src') || $el.attr('data-src-retina');
+			img.src = srcType;
 		});
 	 };
 
