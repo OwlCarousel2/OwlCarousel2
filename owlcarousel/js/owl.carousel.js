@@ -93,10 +93,6 @@ stopVideo.owl
 		responsiveBaseElement: window,
 		responsiveClass:	false,
 
-		video:				false,
-		videoHeight:		false,
-		videoWidth:			false,
-
 		animateOut:			false,
 		animateIn:			false,
 
@@ -1028,18 +1024,15 @@ stopVideo.owl
 		var elChanged = this.isElWidthChanged();
 		if(!elChanged){return false;}
 
-		if(this.plugins.video){
-			var checkFullScreen = this.plugins.video.checkFullScreen();
-			if(!checkFullScreen){
-				return false;
-			}
-		}
+		var event = $.Event('resize.owl.carousel');
+		this.dom.$el.trigger(event)
+		if (event.isDefaultPrevented()) return false;
 
-		this.fireCallback('onResponsiveBefore');
 		this.state.responsive = true;
 		this.refresh();
 		this.state.responsive = false;
-		this.fireCallback('onResponsiveAfter');
+
+		this.dom.$el.trigger('resized.owl.carousel')
 	};
 
 	/**
@@ -1050,9 +1043,9 @@ stopVideo.owl
 
 	Owl.prototype.refresh = function(init){
 
-		if(this.plugins.video && this.state.videoPlay){
-			this.plugins.video.stopVideo();
-		}
+		var event = $.Event('refresh.owl.carousel');
+		this.dom.$el.trigger(event);
+		if (event.isDefaultPrevented()) return false;
 
 		// Update Options for given width
 		this.setResponsiveOptions();
@@ -1100,11 +1093,6 @@ stopVideo.owl
 			this.jumpTo(this.pos.current,false); // fix that 
 		}
 
-		//Check for videos ( YouTube and Vimeo currently supported)
-		if(this.plugins.video){
-			this.plugins.video.checkVideoLinks();
-		}
-
 		this.updateItemState();
 
 		// Update controls
@@ -1125,6 +1113,8 @@ stopVideo.owl
 		this.state.orientation = window.orientation;
 
 		this.watchVisibility();
+		
+		this.dom.$el.trigger('refreshed.owl.carousel')
 	};
 
 	/**
@@ -1135,6 +1125,8 @@ stopVideo.owl
 
 	Owl.prototype.updateItemState = function(update){
 
+		this.dom.$el.trigger('update.owl.carousel');
+		
 		if(this.state.lazyContent){
 			this.updateLazyContent(update);
 		}
@@ -1147,6 +1139,8 @@ stopVideo.owl
 		if(this.options.lazyLoad){
 			this.plugins.lazyLoad.check();
 		}
+		
+		this.dom.$el.trigger('updated.owl.carousel');
 	};
 
 	/**
@@ -2570,7 +2564,11 @@ stopVideo.owl
 	 */
 
 	Owl.prototype.onChange = function(){
-
+		
+		var event = $.Event('change.owl.carousel');
+		this.dom.$el.trigger(event)
+		if (event.isDefaultPrevented()) return false;
+		
 		if(!this.state.isTouch && !this.state.bypass && !this.state.responsive ){
 			
 			if(this.options.nav || this.options.dots) {
@@ -2580,8 +2578,6 @@ stopVideo.owl
 			if(this.plugins.autoHeight){
 				this.plugins.autoHeight.setHeight();
 			}
-
-			this.fireCallback('onChangeState');
 		}
 
 		if(!this.state.isTouch && !this.state.bypass){
@@ -2592,14 +2588,9 @@ stopVideo.owl
 
 			// set Status to do
 			this.storeInfo();
-
-			// stopVideo 
-			if(this.plugins.video){
-				if(this.state.videoPlay){
-					this.plugins.video.stopVideo();
-				}
-			}
 		}
+		
+		this.dom.$el.trigger('changed.owl.carousel');
 	};
 
 	/**

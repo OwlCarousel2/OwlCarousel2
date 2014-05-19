@@ -5,11 +5,34 @@
 
 ;(function ($, window, document, undefined) {
 
-    Video = function(scope){
-    	this.owl = scope;
-    	var playEv = function(e){this.playVideo(e);}.bind(this);
-		this.owl.dom.$stage.on(this.owl.dragType[2], '.owl-video-play-icon', playEv);
-    }
+	Video = function(scope){
+		this.owl = scope;
+		this.owl.options = $.extend(Video.Defaults, this.owl.options);
+		
+		if (!this.owl.options.video) return;
+
+		this.owl.dom.$stage.on(this.owl.dragType[2], '.owl-video-play-icon', $.proxy(function(e) {
+			this.playVideo(e);
+		}, this));
+
+		this.owl.dom.$el.on({
+			'resize.owl.carousel': $.proxy(function(e) {
+				if (!this.isInFullScreen()) e.preventDefault();
+			}, this),
+			'refresh.owl.carousel changed.owl.carousel': $.proxy(function(e) {
+				if (this.owl.state.videoPlay) this.stopVideo();
+			}),
+			'refresh.owl.carousel': $.proxy(function(e) {
+				this.owl.dom.$el.one('update.owl.carousel', $.proxy(this.checkvideoLinks, this));
+			})
+		});
+	}
+	
+	Video.Defaults = {
+		video:			false,
+		videoHeight:	false,
+		videoWidth:		false
+	}
 
 	/**
 	 * checkVideoLinks
@@ -198,7 +221,7 @@
 		target.after(videoWrap);
 	};
 
-	Video.prototype.checkFullScreen = function(){
+	Video.prototype.isInFullScreen = function(){
 
 		// if Vimeo Fullscreen mode
 		var fullscreenElement = document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement;
@@ -232,6 +255,6 @@
 		this.owl.dom.$stage.off(this.owl.dragType[2]);
 	}
 
-    $.fn.owlCarousel.Constructor.Plugins['video'] = Video;
+	$.fn.owlCarousel.Constructor.Plugins['video'] = Video;
 
 }(jQuery, this, this.document));
