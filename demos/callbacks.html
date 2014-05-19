@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Owl Carousel 2.0.0-beta - Callback - demo</title>
+	<link rel="stylesheet" href="../assets/css/foundation.min.css" />
+	<link rel="stylesheet" href="../owlcarousel/owl.carousel.css">
+	<link rel="stylesheet" href="../owlcarousel/owl.theme.css">
+	<link rel="stylesheet" href="../assets/js/highlight/styles/monokai_sublime.css">
+	<link rel="stylesheet" href="../assets/css/demo.css">
+	
+</head>
+<body>
+<div class="header">
+	<div class="row">
+	  <div class="large-12 columns">
+		<h1 class="left">Callbacks.</h1>
+		<ul class="button-group right">
+			<li><a href="../index.html" class="button secondary tiny button">Home</a></li>
+			<li><a href="https://github.com/OwlFonk/OwlCarousel2" class="button tiny show-for-medium-up">Download From GitHub</a></li>
+		</ul>
+	  </div>
+	</div>
+</div>
+<div class="margin-top">
+	
+	<div class="row">
+		<div class="large-12 columns">
+			<div class="owl-carousel">
+				<div class="article"><h2>1</h2></div>
+				<div class="article"><h2>2</h2></div>
+				<div class="article"><h2>3</h2></div>
+				<div class="article"><h2>4</h2></div>
+				<div class="article"><h2>5</h2></div>
+				<div class="article"><h2>6</h2></div>
+				<div class="article"><h2>7</h2></div>
+				<div class="article"><h2>8</h2></div>
+				<div class="article-video" data-merge="2"><a class="owl-video" href="https://www.youtube.com/watch?v=JpxsRwnRwCQ"></a></div>
+				<div class="article"><h2>9</h2></div>
+				<div class="article"><h2>10</h2></div>
+				<div class="article"><h2>11</h2></div>
+				<div class="article"><h2>12</h2></div>
+				<div class="article"><h2>13</h2></div>
+				<div class="article"><img class="owl-lazy" data-src="http://placehold.it/180x180/008cba/FFFFFF/&text=lazyImage" alt=""></div>
+				<div class="article"><img class="owl-lazy" data-src="http://placehold.it/180x180/008cba/FFFFFF/&text=lazyImage" alt=""></div>
+				<div class="article"><img class="owl-lazy" data-src="http://placehold.it/180x180/008cba/FFFFFF/&text=lazyImage" alt=""></div>
+				<div class="article"><img class="owl-lazy" data-src="http://placehold.it/180x180/008cba/FFFFFF/&text=lazyImage" alt=""></div>
+			</div>
+		</div>
+
+		<div class="large-12 columns callbacks">
+			<div>
+			<span class="label secondary onInitBefore">on</span> onInitBefore
+			</div>
+			<div>
+			<span class="label secondary onInitAfter">on</span> onInitAfter
+			</div>
+			<div>
+			<span class="label secondary onResponsiveBefore">on</span> onResponsiveBefore
+			</div>
+			<div>
+			<span class="label secondary onResponsiveAfter">on</span> onResponsiveAfter
+			</div>
+			<div>
+			<span class="label secondary onTransitionStart">on</span> onTransitionStart
+			</div>
+			<div>
+			<span class="label secondary onTransitionEnd">on</span> onTransitionEnd
+			</div>
+			<div>
+			<span class="label secondary onTouchStart">on</span> onTouchStart
+			</div>
+			<div>
+			<span class="label secondary onTouchEnd">on</span> onTouchEnd
+			</div>
+			<div>
+			<span class="label secondary onChangeState">on</span> onChangeState
+			</div>
+			<div>
+			<span class="label secondary onLazyLoaded">on</span> onLazyLoaded
+			</div>
+			<div>
+			<span class="label secondary onVideoPlay">on</span> onVideoPlay
+			</div>
+			<div>
+			<span class="label secondary onVideoStop">on</span> onVideoStop
+			</div>
+
+		</div>
+	</div>
+</div>
+
+<div class="content">
+	<div class="row margin-top">
+		<div class="large-12 columns">
+			<h4>Descripton</h4>
+			<p>Notice that <strong>'onInitBefore'</strong> and <strong>'onInitAfter'</strong> callbacks are positioned above Owl initialization. This is required only for those two.
+			<br>
+			<strong>'onChangeState'</strong> event is attached to main Owl animation method so every carousel move fire this callback.
+			<strong>Since beta.1.9 all available event callbacks can be used as callback function in option.</strong>
+			</p>
+		</div>
+	</div>
+
+	<div class="code">
+		<div class="row margin-top">
+			<div class="large-12 columns">
+	<pre><code>
+//Javascript
+
+var owl = $('.owl-carousel');
+
+owl.on('onInitBefore',function(e){
+	evCall(e.type)
+});
+
+owl.on('onInitAfter',function(e){
+	evCall(e.type)
+});
+
+owl.owlCarousel({
+	loop:true,
+	nav:true,
+	callbacks:true,
+	lazyLoad:true,
+	merge:true,
+	margin:10,
+	video:true,
+	responsive:{
+		0:{
+			items:1
+		},
+		600:{
+			items:3
+		},			
+		960:{
+			items:5,
+		},
+		1200:{
+			items:6,
+		}
+	}
+});
+
+owl.on('onResponsiveBefore',function(e){
+	evCall(e.type)
+});
+
+owl.on('onResponsiveAfter',function(e){
+	evCall(e.type)
+});
+
+owl.on('onTransitionStart',function(e){
+	evCall(e.type)
+});
+
+owl.on('onTransitionEnd',function(e){
+	evCall(e.type)
+});
+
+owl.on('onTouchStart',function(e){
+	evCall(e.type)
+});
+
+owl.on('onTouchEnd',function(e){
+	evCall(e.type)
+});
+
+owl.on('onChangeState',function(e){
+	evCall(e.type)
+});
+
+owl.on('onLazyLoaded',function(e){
+	evCall(e.type)
+});
+
+owl.on('onChangeState',function(e){
+	evCall(e.type)
+});
+
+owl.on('onVideoPlay',function(e){
+	evCall(e.type)
+});
+
+owl.on('onVideoStop',function(e){
+	evCall(e.type)
+});
+
+
+function evCall(evClass){
+	$('.'+evClass)
+	.removeClass('secondary')
+	.addClass('success');
+
+	window.setTimeout(function(){
+		$('.'+evClass)
+		.removeClass('success')
+		.addClass('secondary');
+	},500);
+}
+
+	</code></pre>
+			</div>
+		</div>
+	</div>
+	
+	<div class="demos-buttons margin-top">
+		<div class="row">
+			<div class="large-12 columns">
+				<h3>Demos:</h3>
+				<hr>
+				<a href="responsiveoptions.html" class="button">Responsive options</a>
+				<a href="center.html" class="button">Center</a>
+				<a href="lazyload.html" class="button">Lazy Load</a>
+				<a href="merge.html" class="button">Merge</a>
+				<a href="autowidth.html" class="button">Auto Width</a>
+				<a href="videos.html" class="button">Videos</a>
+				<a href="autoplay.html" class="button">Autoplay</a>
+				<a href="urlhash.html" class="button">URL hash navigation</a>
+				<a href="callbacks.html" class="button">Callbacks</a>
+				<a href="info.html" class="button">Info callback</a>
+				<a href="rtl.html" class="button">Right to left</a>
+				<a href="manipulations.html" class="button">Manipulations</a>
+				<a href="ajax.html" class="button">Ajax</a>
+				<a href="nestedItemSelector.html" class="button">Nested Item Selector</a>
+				<a href="autoHeight.html" class="button">AutoHeight</a>	
+				<a href="thumbnails.html" class="button">Dot Thumbnails</a>
+				<a href="lazyContent.html" class="button">Lazy Content Structure</a>
+				<a href="ajaxLazyContent.html" class="button">Ajax + Lazy Content</a>
+				<a href="zepto.html" class="button">Zepto Support</a>
+				<a href="animate.html" class="button">Animate Transitions</a>
+				<a href="mousewheel.html" class="button">Mousewheel</a>
+				<a href="navAndDotsContainers.html" class="button">Nav and Dots Containers</a>		
+			</div>
+		</div>
+	</div>
+</div>	
+<div class="footer">
+	<div class="row margin-top">
+		<div class="large-12 columns">
+			<hr>
+			<p>Bartosz Wojciechowski 2014. <a href="mailto:owl@owlgraphic.com">owl@owlgraphic.com</a></p>
+		</div>
+	</div>
+</div>
+
+<script src="../assets/js/jquery-1.11.0.min.js"></script>
+<script src="../owlcarousel/owl.carousel.js?v=beta.1.9"></script>
+<script src="../assets/js/highlight/highlight.pack.js"></script>
+<script src="../assets/js/app.js"></script>
+
+<script>
+jQuery(document).ready(function($) {
+
+	var owl = $('.owl-carousel');
+
+	owl.on('onInitBefore',function(e){
+		evCall(e.type);
+	});
+	owl.on('onInitAfter',function(e){
+		evCall(e.type);
+	});
+
+	owl.owlCarousel({
+		loop:true,
+		nav:true,
+		callbacks:true,
+		lazyLoad:true,
+		merge:true,
+		margin:10,
+		video:true,
+		responsive:{
+			0:{
+				items:1
+			},
+			600:{
+				items:3
+			},			
+			960:{
+				items:5,
+			},
+			1200:{
+				items:6,
+			}
+		}
+	});
+
+	owl.on('onResponsiveBefore',function(e){
+		evCall(e.type);
+	});
+
+	owl.on('onResponsiveAfter',function(e){
+		evCall(e.type);
+	});
+
+	owl.on('onTransitionStart',function(e){
+		evCall(e.type);
+	});
+
+	owl.on('onTransitionEnd',function(e){
+		evCall(e.type);
+	});
+
+	owl.on('onTouchStart',function(e){
+		evCall(e.type);
+	});
+
+	owl.on('onTouchEnd',function(e){
+		evCall(e.type);
+	});
+
+	owl.on('onChangeState',function(e){
+		evCall(e.type);
+	});
+
+	owl.on('onLazyLoaded',function(e){
+		evCall(e.type);
+	});
+
+	owl.on('onChangeState',function(e){
+		evCall(e.type);
+	});
+
+	owl.on('onVideoPlay',function(e){
+		evCall(e.type);
+	});
+
+	owl.on('onVideoStop',function(e){
+		evCall(e.type);
+	});
+
+
+	function evCall(evClass){
+		$('.'+evClass)
+		.removeClass('secondary')
+		.addClass('success');
+
+		window.setTimeout(function(){
+			$('.'+evClass)
+			.removeClass('success')
+			.addClass('secondary');
+		},500);
+	}
+});
+
+</script>
+
+
+</body>
+</html>

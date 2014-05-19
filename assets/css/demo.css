@@ -1,0 +1,157 @@
+h1{
+	//color: #00A8C6;
+}
+
+pre {
+	display: block;
+	font-family: monospace;
+	overflow: hidden;
+}
+code.hljs {
+	padding: 1em 2em 2em 2em;
+	font-size: 1.1em;
+	line-height: 1.2
+}
+.content{
+	margin-top: 6em
+}
+.margin-top{
+	margin-top: 4em;
+}
+.footer{
+	padding-top: 30px;
+}
+.code{
+	background: #23241f;
+}
+
+/* Table */
+
+table {
+	margin-bottom: 1.25rem;
+	border: 0px;
+}
+
+table tr td,
+table tr th
+{
+	border-bottom: solid 1px #ddd;
+	background: #FFFFFF;
+	padding: 1em;
+}
+
+/* demos */
+.article{
+	background: #008cba;
+	height: 180px;
+	padding: 10px;
+}
+
+.article-video{
+	height: 180px;
+}
+
+.article h2{
+	color: #FFF;
+}
+
+.article p{
+	color: #FFF;
+}
+
+.video-demo .article-video{
+	height: 300px;
+}
+.owl-carousel .owl-video-tn {
+	opacity: 0;
+	height: 100%;
+	background-position: center center;
+	background-repeat: no-repeat;
+
+	-webkit-background-size: initial;
+	-moz-background-size: initial;
+	-o-background-size: initial;
+	background-size: initial;
+}
+.hash .owl-center .owl-item{
+	opacity: 0.45;
+
+	transition-property: opacity;
+  	transition-duration: 300ms,300ms;
+  	transition-timing-function: ease;
+
+	-webkit-transform: scale(0.9);
+	-moz-transform: scale(0.9);
+	-ms-transform: scale(0.9);
+	-o-transform: scale(0.9);
+	transform: scale(0.9);
+}
+
+.hash .owl-center .owl-item.center{
+	opacity: 1;
+	-webkit-transform: scale(1);
+	-moz-transform: scale(1);
+	-ms-transform: scale(1);
+	-o-transform: scale(1);
+	transform: scale(1);
+}
+
+.owl-dots:after {
+	content: ".";
+	display: block;
+	clear: both;
+	visibility: hidden;
+	line-height: 0;
+	height: 0;
+}
+.thumbnails-dot .owl-dot{
+	display: block;
+	float:left;
+	overflow: hidden;
+	margin-right: 10px;
+	opacity: 0.7
+}
+
+.thumbnails-dot .owl-dot.active{
+	opacity: 1
+}
+
+.callbacks div{
+	margin-bottom: 3px;
+}
+.callbacks .label.secondary{
+	color: #e7e7e7;
+}
+.callbacks .label{
+	transition: background-color 300ms ease-out;
+}
+
+.owl-carousel .red{
+	background-color: #E0444F;
+}
+.owl-carousel .green{
+	background-color: #2CC990;
+}
+.owl-carousel .yellow{
+	background-color: #EEE657
+}
+.owl-carousel .curry{
+	background-color: #FCB941;
+}
+.owl-carousel .pink{
+	background-color: #FC6042
+}
+.owl-carousel .darkblue{
+	background-color: #25373D
+}
+.owl-carousel .fiolet {
+	background: #9b59b6;
+}
+.owl-carousel .red2{
+	background: #e74c3c;
+}
+
+
+
+
+
