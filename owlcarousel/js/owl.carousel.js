@@ -1,8 +1,3 @@
-/**
- * Owl Carousel v2.0.0-beta.1.9
- * Copyright 2013-2014 Bartosz Wojciechowski
- * Licensed under MIT (https://github.com/OwlFonk/OwlCarousel/blob/master/LICENSE)
- */
 
 /*
 
@@ -97,10 +92,6 @@ stopVideo.owl
 		responsiveRefreshRate: 200,
 		responsiveBaseElement: window,
 		responsiveClass:	false,
-
-		video:				false,
-		videoHeight:		false,
-		videoWidth:			false,
 
 		animateOut:			false,
 		animateIn:			false,
@@ -1033,18 +1024,15 @@ stopVideo.owl
 		var elChanged = this.isElWidthChanged();
 		if(!elChanged){return false;}
 
-		if(this.plugins.video){
-			var checkFullScreen = this.plugins.video.checkFullScreen();
-			if(!checkFullScreen){
-				return false;
-			}
-		}
+		var event = $.Event('resize.owl.carousel');
+		this.dom.$el.trigger(event)
+		if (event.isDefaultPrevented()) return false;
 
-		this.fireCallback('onResponsiveBefore');
 		this.state.responsive = true;
 		this.refresh();
 		this.state.responsive = false;
-		this.fireCallback('onResponsiveAfter');
+
+		this.dom.$el.trigger('resized.owl.carousel')
 	};
 
 	/**
@@ -1055,9 +1043,9 @@ stopVideo.owl
 
 	Owl.prototype.refresh = function(init){
 
-		if(this.plugins.video && this.state.videoPlay){
-			this.plugins.video.stopVideo();
-		}
+		var event = $.Event('refresh.owl.carousel');
+		this.dom.$el.trigger(event);
+		if (event.isDefaultPrevented()) return false;
 
 		// Update Options for given width
 		this.setResponsiveOptions();
@@ -1105,11 +1093,6 @@ stopVideo.owl
 			this.jumpTo(this.pos.current,false); // fix that 
 		}
 
-		//Check for videos ( YouTube and Vimeo currently supported)
-		if(this.plugins.video){
-			this.plugins.video.checkVideoLinks();
-		}
-
 		this.updateItemState();
 
 		// Update controls
@@ -1130,6 +1113,8 @@ stopVideo.owl
 		this.state.orientation = window.orientation;
 
 		this.watchVisibility();
+		
+		this.dom.$el.trigger('refreshed.owl.carousel')
 	};
 
 	/**
@@ -1140,6 +1125,8 @@ stopVideo.owl
 
 	Owl.prototype.updateItemState = function(update){
 
+		this.dom.$el.trigger('update.owl.carousel');
+		
 		if(this.state.lazyContent){
 			this.updateLazyContent(update);
 		}
@@ -1152,6 +1139,8 @@ stopVideo.owl
 		if(this.options.lazyLoad){
 			this.plugins.lazyLoad.check();
 		}
+		
+		this.dom.$el.trigger('updated.owl.carousel');
 	};
 
 	/**
@@ -2575,7 +2564,11 @@ stopVideo.owl
 	 */
 
 	Owl.prototype.onChange = function(){
-
+		
+		var event = $.Event('change.owl.carousel');
+		this.dom.$el.trigger(event)
+		if (event.isDefaultPrevented()) return false;
+		
 		if(!this.state.isTouch && !this.state.bypass && !this.state.responsive ){
 			
 			if(this.options.nav || this.options.dots) {
@@ -2585,8 +2578,6 @@ stopVideo.owl
 			if(this.plugins.autoHeight){
 				this.plugins.autoHeight.setHeight();
 			}
-
-			this.fireCallback('onChangeState');
 		}
 
 		if(!this.state.isTouch && !this.state.bypass){
@@ -2597,14 +2588,9 @@ stopVideo.owl
 
 			// set Status to do
 			this.storeInfo();
-
-			// stopVideo 
-			if(this.plugins.video){
-				if(this.state.videoPlay){
-					this.plugins.video.stopVideo();
-				}
-			}
 		}
+		
+		this.dom.$el.trigger('changed.owl.carousel');
 	};
 
 	/**
@@ -2852,401 +2838,3 @@ if (!Function.prototype.bind) {
 	return fBound;
   };
 }
-/**
- * lazyLoad Plugin
- * @since 2.0.0
- */
-
-;(function ($, window, document, undefined) {
-
-    LazyLoad = function(scope){
-    	this.owl = scope;
-    }
-
-	LazyLoad.prototype.check = function(){
-
-		var attr = window.devicePixelRatio > 1 ? 'data-src-retina' : 'data-src';
-		var src, img,i;
-
-		for(i = 0; i < this.owl.num.items; i++){
-			var $item = this.owl.dom.$items.eq(i);
-
-			if( $item.data('owl-item').current === true && $item.data('owl-item').loaded === false){
-				img = $item.find('.owl-lazy');
-				src = img.attr(attr);
-				src = src || img.attr('data-src');
-				if(src){
-					img.css('opacity','0');
-					this.preload(img,$item);
-				}
-			}
-		}
-	};
-
-	LazyLoad.prototype.preload = function(images,$item){
-		var that = this.owl; // fix this later
-
-		images.each(function(i,el){
-			var $el = $(el);
-			var img = new Image();
-			var srcType = window.devicePixelRatio > 1 ? $el.attr('data-src-retina') : $el.attr('data-src');
-			var srcType = srcType || $el.attr('data-src');
-
-			img.onload = function(){
-
-				$item.data('owl-item').loaded = true;
-				if($el.is('img')){
-					$el.attr('src',img.src);
-				}else{
-					$el.css('background-image','url(' + img.src + ')');
-				}
-				
-				$el.css('opacity',1);
-				that.fireCallback('onLazyLoaded');
-			};
-			img.src = srcType;
-		});
-	};
-
-	LazyLoad.prototype.destroy = function(){};
-
-	$.fn.owlCarousel.Constructor.Plugins['lazyLoad'] = LazyLoad;
-
-}(jQuery, this, this.document));
-
-/**
- * AutoHeight Plugin
- * @since 2.0.0
- */
-
-;(function ($, window, document, undefined) {
-
-    AutoHeight = function(scope){
-    	this.owl = scope;
-    }
-
-	AutoHeight.prototype.setHeight = function(callback){
-
-		 if(this.owl.options.autoHeight !== true && callback !== true){
-			return false;
-		}
-		if(!this.owl.dom.$oStage.hasClass(this.owl.options.autoHeightClass)){
-			this.owl.dom.$oStage.addClass(this.owl.options.autoHeightClass);
-		}
-
-		var loaded = this.owl.dom.$items.eq(this.owl.pos.currentAbs);
-		var stage = this.owl.dom.$oStage;
-		var iterations = 0;
-
-		var isLoaded = window.setInterval(function() {
-			iterations += 1;
-			if(loaded.data('owl-item').loaded){
-				stage.height(loaded.height() + 'px');
-				clearInterval(isLoaded);
-			} else if(iterations === 500){
-				clearInterval(isLoaded);
-			}
-		}, 100);
-	};
-
-	AutoHeight.prototype.destroy = function(){};
-
-    $.fn.owlCarousel.Constructor.Plugins['autoHeight'] = AutoHeight;
-    
-}(jQuery, this, this.document));
-
-/**
- * Animate Plugin
- * @since 2.0.0
- */
-
-;(function ($, window, document, undefined) {
-
-    Animate = function(scope){
-    	this.owl = scope;
-    }
-
-    Animate.prototype.swap = function(){
-		var prevItem = this.owl.dom.$items.eq(this.owl.pos.prev),
-			prevPos = Math.abs(prevItem.data('owl-item').width) * this.owl.pos.prev,
-			currentItem = this.owl.dom.$items.eq(this.owl.pos.currentAbs),
-			currentPos = Math.abs(currentItem.data('owl-item').width) * this.owl.pos.currentAbs;
-
-		if(this.owl.pos.currentAbs === this.owl.pos.prev){
-			return false;
-		}
-
-		var pos = currentPos - prevPos;
-		var tIn = this.owl.options.animateIn;
-		var tOut = this.owl.options.animateOut;
-		var that = this.owl;
-
-		removeStyles = function(){
-			$(this).css({
-                "left" : ""
-            })
-            .removeClass('animated owl-animated-out owl-animated-in')
-            .removeClass(tIn)
-            .removeClass(tOut);
-
-            that.transitionEnd();
-        };
-
-		if(tOut){
-			prevItem
-			.css({
-				"left" : pos + "px"
-			})
-			.addClass('animated owl-animated-out '+tOut)
-			.one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', removeStyles);
-		}
-
-		if(tIn){
-			currentItem
-			.addClass('animated owl-animated-in '+tIn)
-			.one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', removeStyles);
-		}
-	};
-	Animate.prototype.destroy = function(){};
-	$.fn.owlCarousel.Constructor.Plugins['animate'] = Animate;
-	
-}(jQuery, this, this.document));
-
-
-/**
- * Video Plugin
- * @since 2.0.0
- */
-
-;(function ($, window, document, undefined) {
-
-    Video = function(scope){
-    	this.owl = scope;
-    	var playEv = function(e){this.playVideo(e);}.bind(this);
-		this.owl.dom.$stage.on(this.owl.dragType[2], '.owl-video-play-icon', playEv);
-    }
-
-	/**
-	 * checkVideoLinks
-	 * @desc Check if for any videos links
-	 * @since 2.0.0
-	 */
-
-	Video.prototype.checkVideoLinks = function(){
-		if(!this.owl.options.video){return false;}
-		var videoEl,item;
-
-		for(var i = 0; i<this.owl.num.items; i++){
-
-			item = this.owl.dom.$items.eq(i);
-			if(item.data('owl-item').hasVideo){
-				continue;
-			}
-
-			videoEl = item.find('.owl-video');
-			if(videoEl.length){
-				this.owl.state.hasVideos = true;
-				this.owl.dom.$items.eq(i).data('owl-item').hasVideo = true;
-				videoEl.css('display','none');
-				this.getVideoInfo(videoEl,item);
-			}
-		}
-	};
-
-	/**
-	 * getVideoInfo
-	 * @desc Get Video ID and Type (YouTube/Vimeo only)
-	 * @since 2.0.0
-	 */
-
-	Video.prototype.getVideoInfo = function(videoEl,item){
-
-		var info, type, id,
-			vimeoId = videoEl.data('vimeo-id'),
-			youTubeId = videoEl.data('youtube-id'),
-			width = videoEl.data('width') || this.owl.options.videoWidth,
-			height = videoEl.data('height') || this.owl.options.videoHeight,
-			url = videoEl.attr('href');
-
-		if(vimeoId){
-			type = 'vimeo';
-			id = vimeoId;
-		} else if(youTubeId){
-			type = 'youtube';
-			id = youTubeId;
-		} else if(url){
-			id = url.match(/(http:|https:|)\/\/(player.|www.)?(vimeo\.com|youtu(be\.com|\.be|be\.googleapis\.com))\/(video\/|embed\/|watch\?v=|v\/)?([A-Za-z0-9._%-]*)(\&\S+)?/);
-			
-			if (id[3].indexOf('youtu') > -1) {
-				type = 'youtube';
-			} else if (id[3].indexOf('vimeo') > -1) {
-				type = 'vimeo';
-			}
-			id = id[6];
-		} else {
-			throw new Error('Missing video link.');
-		}
-
-		item.data('owl-item').videoType = type;
-		item.data('owl-item').videoId = id;
-		item.data('owl-item').videoWidth = width;
-		item.data('owl-item').videoHeight = height;
-
-		info = {
-			type: type,
-			id: id
-		};
-		
-		// Check dimensions
-		var dimensions = width && height ? 'style="width:'+width+'px;height:'+height+'px;"' : '';
-
-		// wrap video content into owl-video-wrapper div
-		videoEl.wrap('<div class="owl-video-wrapper"'+dimensions+'></div>');
-
-		this.createVideoTn(videoEl,info);
-	};
-
-	/**
-	 * createVideoTn
-	 * @desc Create Video Thumbnail
-	 * @since 2.0.0
-	 */
-
-	Video.prototype.createVideoTn = function(videoEl,info){
-
-		var tnLink,icon,height;
-		var customTn = videoEl.find('img');
-		var srcType = 'src';
-		var lazyClass = '';
-		var that = this.owl;
-
-		if(this.owl.options.lazyLoad){
-			srcType = 'data-src';
-			lazyClass = 'owl-lazy';
-		}
-
-		// Custom thumbnail
-
-		if(customTn.length){
-			addThumbnail(customTn.attr(srcType));
-			customTn.remove();
-			return false;
-		}
-		
-		function addThumbnail(tnPath){
-			icon = '<div class="owl-video-play-icon"></div>';
-
-			if(that.options.lazyLoad){
-				tnLink = '<div class="owl-video-tn '+ lazyClass +'" '+ srcType +'="'+ tnPath +'"></div>';
-			} else{
-				tnLink = '<div class="owl-video-tn" style="opacity:1;background-image:url(' + tnPath + ')"></div>';
-			}
-			videoEl.after(tnLink);
-			videoEl.after(icon);
-		}
-
-		if(info.type === 'youtube'){
-			var path = "http://img.youtube.com/vi/"+ info.id +"/hqdefault.jpg";
-			addThumbnail(path);
-		} else
-		if(info.type === 'vimeo'){
-			$.ajax({
-				type:'GET',
-				url: 'http://vimeo.com/api/v2/video/' + info.id + '.json',
-				jsonp: 'callback',
-				dataType: 'jsonp',
-				success: function(data){
-					var path = data[0].thumbnail_large;
-					addThumbnail(path);
-					if(that.options.loop){
-						that.updateItemState();
-					}
-				}
-			});
-		}
-	};
-
-	/**
-	 * stopVideo
-	 * @since 2.0.0
-	 */
-
-	Video.prototype.stopVideo = function(){
-		this.owl.fireCallback('onVideoStop');
-		var item = this.owl.dom.$items.eq(this.owl.state.videoPlayIndex);
-		item.find('.owl-video-frame').remove();
-		item.removeClass('owl-video-playing');
-		this.owl.state.videoPlay = false;
-	};
-
-	/**
-	 * playVideo
-	 * @since 2.0.0
-	 */
-
-	Video.prototype.playVideo = function(ev){
-		this.owl.fireCallback('onVideoPlay');
-
-		if(this.owl.state.videoPlay){
-			this.stopVideo();
-		}
-		var videoLink,videoWrap,
-			target = $(ev.target || ev.srcElement),
-			item = target.closest('.'+this.owl.options.itemClass);
-
-		var videoType = item.data('owl-item').videoType,
-			id = item.data('owl-item').videoId,
-			width = item.data('owl-item').videoWidth || Math.floor(item.data('owl-item').width - this.owl.options.margin),
-			height = item.data('owl-item').videoHeight || this.owl.dom.$stage.height();
-
-		if(videoType === 'youtube'){
-			videoLink = "<iframe width=\""+ width +"\" height=\""+ height +"\" src=\"http://www.youtube.com/embed/" + id + "?autoplay=1&v=" + id + "\" frameborder=\"0\" allowfullscreen></iframe>";
-		} else if(videoType === 'vimeo'){
-			videoLink = '<iframe src="http://player.vimeo.com/video/'+ id +'?autoplay=1" width="'+ width +'" height="'+ height +'" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
-		}
-		
-		item.addClass('owl-video-playing');
-		this.owl.state.videoPlay = true;
-		this.owl.state.videoPlayIndex = item.data('owl-item').indexAbs;
-
-		videoWrap = $('<div style="height:'+ height +'px; width:'+ width +'px" class="owl-video-frame">' + videoLink + '</div>');
-		target.after(videoWrap);
-	};
-
-	Video.prototype.checkFullScreen = function(){
-
-		// if Vimeo Fullscreen mode
-		var fullscreenElement = document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement;
-		if(fullscreenElement){
-			if($(fullscreenElement.parentNode).hasClass('owl-video-frame')){
-				this.owl.setSpeed(0);
-				this.owl.state.isFullScreen = true;
-			}
-		}
-
-		if(fullscreenElement && this.owl.state.isFullScreen && this.owl.state.videoPlay){
-			return false;
-		}
-
-		// Comming back from fullscreen
-		if(this.owl.state.isFullScreen){
-			this.owl.state.isFullScreen = false;
-			return false;
-		}
-
-		// check full screen mode and window orientation
-		if (this.owl.state.videoPlay) {
-			if(this.owl.state.orientation !== window.orientation){
-				this.owl.state.orientation = window.orientation;
-				return false;
-			}
-		}
-	}
-
-	Video.prototype.destroy = function(){
-		this.owl.dom.$stage.off(this.owl.dragType[2]);
-	}
-
-    $.fn.owlCarousel.Constructor.Plugins['video'] = Video;
-
-}(jQuery, this, this.document));
