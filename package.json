@@ -1,0 +1,33 @@
+{
+  "name": "owl-carousel",
+  "title": "Owl Carousel",
+  "version": "2.0.0-beta-1.9",
+  "license": "MIT License",
+  "author": "Bartosz Wojciechowski",
+  "scripts": [
+    "owlcarousel/js/owl.carousel.js",
+    "owlcarousel/js/owl.animate.js",
+    "owlcarousel/js/owl.autoHeight.js",
+    "owlcarousel/js/owl.lazyLoad.js",
+    "owlcarousel/js/owl.video.js"
+  ],
+  "dependencies": {
+    "btoa": "~1.1.1",
+    "canonical-json": "~0.0.4",
+    "glob": "^3.2.9",
+    "grunt": "~0.4.4",
+    "grunt-banner": "~0.2.2",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-concat": "~0.4.0",
+    "grunt-contrib-jshint": "~0.10.0",
+    "grunt-contrib-uglify": "~0.4.0",
+    "grunt-contrib-watch": "~0.6.1",
+    "grunt-jscs-checker": "~0.4.1",
+    "load-grunt-tasks": "~0.4.0",
+    "markdown": "~0.5.0",
+    "time-grunt": "~0.3.1"
+  },
+  "engines": {
+    "node": "~0.10.1"
+  }
+}
