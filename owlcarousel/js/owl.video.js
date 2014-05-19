@@ -21,10 +21,10 @@
 			}, this),
 			'refresh.owl.carousel changed.owl.carousel': $.proxy(function(e) {
 				if (this.owl.state.videoPlay) this.stopVideo();
-			}),
+			}, this),
 			'refresh.owl.carousel': $.proxy(function(e) {
-				this.owl.dom.$el.one('update.owl.carousel', $.proxy(this.checkvideoLinks, this));
-			})
+				this.owl.dom.$el.one('update.owl.carousel', $.proxy(this.checkVideoLinks, this));
+			}, this)
 		});
 	}
 	
