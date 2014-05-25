@@ -1,0 +1,16 @@
+.sass-cache
+.bowerrc
+bower_components
+docs
+node_modules
+*.sublime*
+*.zip
+download
+
+.DS_Store
+*/.DS_Store
+.DS_Store?
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

@@ -1,0 +1,53 @@
+[
+  {
+    "name":     "next.owl",
+    "parameter":"[speed]",
+    "desc":     "Go to next item."
+  },
+  {
+    "name":     "prev.owl",
+    "parameter":"[speed]",
+     "desc":     "Go to previous item."
+  },
+  {
+    "name":     "goTo.owl",
+    "parameter":"[position,speed]",
+     "desc":     "Go to postion."
+  },
+  {
+    "name":     "destroy.owl",
+    "parameter":"",
+     "desc":     "Destroy carousel."
+  },
+  {
+    "name":     "refresh.owl",
+    "parameter":"[event,speed]",
+     "desc":     "Refresh carousel."
+  },
+  {
+    "name":     "autoplay.play.owl",
+    "parameter":"[timeout,speed]",
+     "desc":     "Run autoplay."
+  },
+  {
+    "name":     "autoplay.stop.owl",
+    "parameter":"",
+     "desc":     "Stop autoplay."
+  },
+  {
+    "name":     "insertContent.owl",
+    "parameter":"[data]",
+     "desc":     "Remove current content and add a new one passed in the parameter."
+  },
+  {
+    "name":     "addItem.owl",
+    "parameter":"[data,position]",
+     "desc":     "Adds a new item on a given position."
+  },
+  {
+    "name":     "removeItem.owl",
+    "parameter":"[position]",
+     "desc":     "Removes an item from a given position."
+  }
+
+]

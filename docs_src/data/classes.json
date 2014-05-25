@@ -1,0 +1,68 @@
+[
+  {
+    "name":     "themeClass",
+    "type":     "Class/String",
+    "Default":  "owl-theme",
+    "desc":     "Theme Class."
+  },
+  {
+    "name":     "baseClass",
+    "type":     "Class/String",
+    "Default":  "owl-carousel",
+    "desc":     "Base element Class."
+  },
+  {
+    "name":     "itemClass",
+    "type":     "Class/String",
+    "Default":  "owl-item",
+    "desc":     "Item Class."
+  },
+  {
+    "name":     "centerClass",
+    "type":     "Class/String",
+    "Default":  "center",
+    "desc":     "Center Class."
+  },
+  {
+    "name":     "activeClass",
+    "type":     "Class/String",
+    "Default":  "active",
+    "desc":     "Active Class."
+  },
+  {
+    "name":     "navContainerClass",
+    "type":     "Class/String",
+    "Default":  "owl-nav",
+    "desc":     "Nav container Class."
+  },
+  {
+    "name":     "navClass",
+    "type":     "Array/Class/String",
+    "Default":  "['owl-prev','owl-next']",
+    "desc":     "Nav buttons Classes."
+  },
+  {
+    "name":     "controlsClass",
+    "type":     "Class/String",
+    "Default":  "owl-controls",
+    "desc":     "Controls Class - wrapper for navs and dots."
+  },
+  {
+    "name":     "dotClass",
+    "type":     "Class/String",
+    "Default":  "owl-dot",
+    "desc":     "Dot Class."
+  },
+  {
+    "name":     "dotsClass",
+    "type":     "Class/String",
+    "Default":  "owl-dots",
+    "desc":     "Dots Class - Container for dots.."
+  },
+  {
+    "name":     "autoHeightClass",
+    "type":     "Class/String",
+    "Default":  "owl-height",
+    "desc":     "Auto height Class."
+  }
+]

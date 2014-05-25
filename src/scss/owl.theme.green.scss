@@ -1,0 +1,31 @@
+/* 
+ * 	Green theme - Owl Carousel CSS File
+ */
+
+$color-base:			#4DC7A0;
+$color-white:			#FFF;
+$color-gray:			#D6D6D6;
+
+//nav
+
+$nav-color: 			$color-white;
+$nav-color-hover:		$color-white;
+$nav-font-size: 		14px;
+$nav-rounded: 			3px;
+$nav-margin: 			5px;
+$nav-padding: 			4px 7px;
+$nav-background: 		$color-gray;
+$nav-background-hover:	$color-base;
+$nav-disabled-opacity: 	0.5;
+
+//dots
+
+$dot-width:				10px;
+$dot-height:			10px;
+$dot-rounded:			30px;
+$dot-margin: 			5px 7px;
+$dot-background:		$color-gray;
+$dot-background-active:	$color-base;
+
+@import 'mixins';
+@import 'theme';
