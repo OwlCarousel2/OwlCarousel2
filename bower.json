@@ -1,0 +1,13 @@
+{
+  "name": "owl.carousel",
+  "version": "2.0.0-beta.1.8",
+  "main": [
+    "./dist/"
+  ],
+  "dependencies": {
+    "jquery": ">= 1.7.1"
+  },
+  "devDependencies": {
+    "foundation": "5.2.2"
+  }
+}

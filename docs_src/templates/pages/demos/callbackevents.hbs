@@ -1,0 +1,166 @@
+---
+title: Callback Events Demo
+subTitle: Callback Events
+nav: demos
+description: Callback Events usage demo
+sort: 10
+published: false
+
+tags: 
+- demo
+- core
+---
+
+<div class="owl-carousel">
+	<div class="item"><h4>1</h4></div>
+	<div class="item"><h4>2</h4></div>
+	<div class="item"><h4>3</h4></div>
+	<div class="item"><h4>4</h4></div>
+	<div class="item"><h4>5</h4></div>
+	<div class="item"><h4>6</h4></div>
+	<div class="item"><h4>7</h4></div>
+	<div class="item"><h4>8</h4></div>
+	<div class="item"><h4>9</h4></div>
+	<div class="item"><h4>10</h4></div>
+	<div class="item"><h4>11</h4></div>
+	<div class="item"><h4>12</h4></div>
+</div>
+<hr>
+<div class="large-12 columns callbacks"><div>
+	<span class="label secondary onInitBefore">on</span> onInitBefore.owl.carousel </div>
+	<div><span class="label secondary initialize">on</span> initialize.owl.carousel </div>
+	<div><span class="label secondary initialized">on</span> initialized.owl.carousel </div>
+	<div><span class="label secondary resize">on</span> resize.owl.carousel </div>
+	<div><span class="label secondary resized">on</span> resized.owl.carousel </div>
+	<div><span class="label secondary refresh">on</span> refresh.owl.carousel </div>
+	<div><span class="label secondary refreshed">on</span> refreshed.owl.carousel </div>
+	<div><span class="label secondary update">on</span> update.owl.carousel </div>
+	<div><span class="label secondary updated">on</span> updated.owl.carousel </div>
+	<div><span class="label secondary touch">on</span> touch.owl.carousel </div>
+	<div><span class="label secondary touched">on</span> touched.owl.carousel </div>
+	<div><span class="label secondary translate">on</span> translate.owl.carousel </div>
+	<div><span class="label secondary translated">on</span> translated.owl.carousel </div>
+	<div><span class="label secondary goto">on</span> goto.owl.carousel </div>
+	<div><span class="label secondary changed">on</span> changed.owl.carousel </div>
+
+</div>
+
+
+{{#markdown }}
+### Overview
+
+Notice that `initialize.owl` and 'initialized.owl.carousel' callbacks are positioned above Owl initialization. This is required only for those two.
+
+changed.owl event is attached to the main Owl animation method so that every carousel move triggers this callback.
+
+### Setup
+```
+	$('.owl-carousel').owlCarousel({
+		items:4,
+		loop:false,
+		center:true,
+		margin:10,
+		URLhashListener:true,
+		autoplayHoverPause:true,
+		startPosition: 'URLHash'
+	});
+```
+{{/markdown }} 
+
+<script>
+jQuery(document).ready(function($) {
+
+	var owl = $('.owl-carousel');
+
+	owl.on('initialize.owl.carousel',function(e){
+		evCall(e.type);
+	});
+	owl.on('initialized.owl.carousel',function(e){
+		evCall(e.type);
+	});
+
+	owl.owlCarousel({
+		loop:true,
+		nav:true,
+		lazyLoad:true,
+		margin:10,
+		video:true,
+		responsive:{
+			0:{
+				items:1
+			},
+			600:{
+				items:3
+			},			
+			960:{
+				items:5,
+			},
+			1200:{
+				items:6
+			}
+		}
+	});
+
+	owl.on('resize.owl.carousel',function(e){
+		evCall(e.type);
+	});
+
+	owl.on('resized.owl.carousel',function(e){
+		console.log('yoyoy');
+		evCall(e.type);
+	});
+
+	owl.on('onTransitionStart',function(e){
+		evCall(e.type);
+	});
+
+	owl.on('onTransitionEnd',function(e){
+		evCall(e.type);
+	});
+
+	owl.on('onTouchStart',function(e){
+		evCall(e.type);
+	});
+
+	owl.on('onTouchEnd',function(e){
+		evCall(e.type);
+	});
+
+	owl.on('onChangeState',function(e){
+		evCall(e.type);
+	});
+
+	owl.on('onLazyLoaded',function(e){
+		evCall(e.type);
+	});
+
+	owl.on('onChangeState',function(e){
+		evCall(e.type);
+	});
+
+	owl.on('onVideoPlay',function(e){
+		evCall(e.type);
+	});
+
+	owl.on('onVideoStop',function(e){
+		evCall(e.type);
+	});
+
+
+	function evCall(evClass){
+		var className = evClass.split(".");
+		var className = className[0];
+
+		$('.'+className)
+		.removeClass('secondary')
+		.addClass('success');
+
+		window.setTimeout(function(){
+			$('.'+className)
+			.removeClass('success')
+			.addClass('secondary');
+		},500);
+	}
+});
+
+</script>

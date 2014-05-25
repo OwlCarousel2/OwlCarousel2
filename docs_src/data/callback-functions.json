@@ -1,0 +1,72 @@
+[
+  {
+    "name":     "initialize.owl.carousel",
+    "type":     "non-cancelable",
+    "desc":     "Before plugin initialize."
+  },
+  {
+    "name":     "initialized.owl.carousel",
+    "type":     "non-cancelable",
+    "desc":     "After plugin initialize."
+  },
+  {
+    "name":     "resize.owl.carousel",
+    "type":     "cancelable",
+    "desc":     "When resizing occurs."
+  },
+  {
+    "name":     "resized.owl.carousel",
+    "type":     "non-cancelable",
+    "desc":     "After window/object resize."
+  },
+  {
+    "name":     "refresh.owl.carousel",
+    "type":     "non-cancelable",
+    "desc":     "Before refresh."
+  },
+  {
+    "name":     "refreshed.owl.carousel",
+    "type":     "non-cancelable",
+    "desc":     "After refresh."
+  },
+  {
+    "name":     "update.owl.carousel",
+    "type":     "non-cancelable",
+    "desc":     "on classes update. //will remove it"
+  },
+  {
+    "name":     "updated.owl.carousel",
+    "type":     "non-cancelable",
+    "desc":     "on classes update. //will remove it"
+  },
+  {
+    "name":     "touch.owl.carousel",
+    "type":     "non-cancelable",
+    "desc":     "On touch/drag start."
+  },
+  {
+    "name":     "touched.owl.carousel",
+    "type":     "non-cancelable",
+    "desc":     "On touch/drag end."
+  },
+  {
+    "name":     "translate.owl.carousel",
+    "type":     "non-cancelable",
+    "desc":     "When translate(animation) start."
+  },
+  {
+    "name":     "translated.owl.carousel",
+    "type":     "non-cancelable",
+    "desc":     "When translate(animation) enf."
+  },
+  {
+    "name":     "goto.owl.carousel",
+    "type":     "non-cancelable",
+    "desc":     "On goTo."
+  },
+  {
+    "name":     "changed.owl.carousel",
+    "type":     "non-cancelable",
+    "desc":     "on every action."
+  }
+]

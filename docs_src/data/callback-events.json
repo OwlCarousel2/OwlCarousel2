@@ -1,0 +1,92 @@
+[
+  {
+    "name":     "onInitialize.owl",
+    "type":     "non-cancelable",
+    "desc":     "Before plugin initializes."
+  },
+  {
+    "name":     "onInitialized.owl",
+    "type":     "non-cancelable",
+    "desc":     "After plugin initializes."
+  },
+  {
+    "name":     "onResize.owl",
+    "type":     "cancelable",
+    "desc":     "When resizing occurs."
+  },
+  {
+    "name":     "onResized.owl",
+    "type":     "non-cancelable",
+    "desc":     "After window/object resize."
+  },
+  {
+    "name":     "onRefresh.owl",
+    "type":     "non-cancelable",
+    "desc":     "Before refresh."
+  },
+  {
+    "name":     "onRefreshed.owl",
+    "type":     "non-cancelable",
+    "desc":     "After refresh."
+  },
+  {
+    "name":     "onUpdate.owl",
+    "type":     "non-cancelable",
+    "desc":     "on classes update. //will remove it"
+  },
+  {
+    "name":     "onUpdated.owl",
+    "type":     "non-cancelable",
+    "desc":     "on classes update. //will remove it"
+  },
+  {
+    "name":     "onTouch.owl",
+    "type":     "non-cancelable",
+    "desc":     "On touch/drag start."
+  },
+  {
+    "name":     "onTouched.owl",
+    "type":     "non-cancelable",
+    "desc":     "On touch/drag end."
+  },
+  {
+    "name":     "onTranslate.owl",
+    "type":     "non-cancelable",
+    "desc":     "When translate(animation) starts."
+  },
+  {
+    "name":     "onTranslated.owl",
+    "type":     "non-cancelable",
+    "desc":     "When translate(animation) ends."
+  },
+  {
+    "name":     "onAnimate.owl",
+    "type":     "non-cancelable",
+    "desc":     "On goTo."
+  },
+  {
+    "name":     "onChanged.owl",
+    "type":     "non-cancelable",
+    "desc":     "on every action."
+  },
+  {
+    "name":     "onLazyload.owl",
+    "type":     "non-cancelable",
+    "desc":     "When lazy load triggers."
+  },
+  {
+    "name":     "onLazyloaded.owl",
+    "type":     "non-cancelable",
+    "desc":     "When lazyload image is loaded."
+  },
+  {
+    "name":     "onVideoStop.owl",
+    "type":     "non-cancelable",
+    "desc":     "When video is unloaded."
+  },
+  {
+    "name":     "onVideoPlay.owl",
+    "type":     "non-cancelable",
+    "desc":     "When video is loaded."
+  }
+]
