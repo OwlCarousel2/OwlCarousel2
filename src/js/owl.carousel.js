@@ -222,8 +222,7 @@ To do:
 		element.owlCarousel = {
 			'name':		'Owl Carousel',
 			'author':	'Bartosz Wojciechowski',
-			'version':	'2.0.0-beta.1.9',
-			'released':	'14.05.2014'
+			'version':	'2.0.0-beta.2.1'
 		};
 
 		// Attach variables to object
