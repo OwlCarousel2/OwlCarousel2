@@ -1,10 +1,10 @@
 ---
-title: Callback Events Demo
-subTitle: Callback Events
+title: Events Demo
+subTitle: Events
 nav: demos
-description: Callback Events usage demo
+description: Events usage demo
 sort: 10
-published: false
+published: true
 
 tags: 
 - demo
@@ -27,7 +27,6 @@ tags:
 </div>
 <hr>
 <div class="large-12 columns callbacks"><div>
-	<span class="label secondary onInitBefore">on</span> onInitBefore.owl.carousel </div>
 	<div><span class="label secondary initialize">on</span> initialize.owl.carousel </div>
 	<div><span class="label secondary initialized">on</span> initialized.owl.carousel </div>
 	<div><span class="label secondary resize">on</span> resize.owl.carousel </div>
@@ -36,22 +35,21 @@ tags:
 	<div><span class="label secondary refreshed">on</span> refreshed.owl.carousel </div>
 	<div><span class="label secondary update">on</span> update.owl.carousel </div>
 	<div><span class="label secondary updated">on</span> updated.owl.carousel </div>
-	<div><span class="label secondary touch">on</span> touch.owl.carousel </div>
-	<div><span class="label secondary touched">on</span> touched.owl.carousel </div>
+	<div><span class="label secondary drag">on</span> drag.owl.carousel </div>
+	<div><span class="label secondary dragged">on</span> dragged.owl.carousel </div>
 	<div><span class="label secondary translate">on</span> translate.owl.carousel </div>
 	<div><span class="label secondary translated">on</span> translated.owl.carousel </div>
-	<div><span class="label secondary goto">on</span> goto.owl.carousel </div>
+	<div><span class="label secondary to">on</span> to.owl.carousel </div>
 	<div><span class="label secondary changed">on</span> changed.owl.carousel </div>
-
 </div>
 
 
 {{#markdown }}
 ### Overview
 
-Notice that `initialize.owl` and 'initialized.owl.carousel' callbacks are positioned above Owl initialization. This is required only for those two.
+Notice that `initialize.owl.carousel` and `initialized.owl.carousel` events must be attached before Owl Carousel initialization. This is required only for those two.
 
-changed.owl event is attached to the main Owl animation method so that every carousel move triggers this callback.
+`changed.owl.carousel` event is attached to the main Owl Carousel animation method so that every carousel move triggers this callback.
 
 ### Setup
 ```
@@ -71,12 +69,24 @@ changed.owl event is attached to the main Owl animation method so that every car
 jQuery(document).ready(function($) {
 
 	var owl = $('.owl-carousel');
+	
+	owl.on('initialize.owl.carousel initialized.owl.carousel ' +
+		'initialize.owl.carousel initialize.owl.carousel ' +
+		'resize.owl.carousel resized.owl.carousel ' + 
+		'refresh.owl.carousel refreshed.owl.carousel ' + 
+		'update.owl.carousel updated.owl.carousel ' + 
+		'drag.owl.carousel dragged.owl.carousel ' + 
+		'translate.owl.carousel translated.owl.carousel ' + 
+		'to.owl.carousel changed.owl.carousel', function(e){
+		$('.' + e.type)
+			.removeClass('secondary')
+			.addClass('success');
 
-	owl.on('initialize.owl.carousel',function(e){
-		evCall(e.type);
-	});
-	owl.on('initialized.owl.carousel',function(e){
-		evCall(e.type);
+		window.setTimeout(function(){
+			$('.' + e.type)
+				.removeClass('success')
+				.addClass('secondary');
+		},500);
 	});
 
 	owl.owlCarousel({
@@ -100,67 +110,6 @@ jQuery(document).ready(function($) {
 			}
 		}
 	});
-
-	owl.on('resize.owl.carousel',function(e){
-		evCall(e.type);
-	});
-
-	owl.on('resized.owl.carousel',function(e){
-		console.log('yoyoy');
-		evCall(e.type);
-	});
-
-	owl.on('onTransitionStart',function(e){
-		evCall(e.type);
-	});
-
-	owl.on('onTransitionEnd',function(e){
-		evCall(e.type);
-	});
-
-	owl.on('onTouchStart',function(e){
-		evCall(e.type);
-	});
-
-	owl.on('onTouchEnd',function(e){
-		evCall(e.type);
-	});
-
-	owl.on('onChangeState',function(e){
-		evCall(e.type);
-	});
-
-	owl.on('onLazyLoaded',function(e){
-		evCall(e.type);
-	});
-
-	owl.on('onChangeState',function(e){
-		evCall(e.type);
-	});
-
-	owl.on('onVideoPlay',function(e){
-		evCall(e.type);
-	});
-
-	owl.on('onVideoStop',function(e){
-		evCall(e.type);
-	});
-
-
-	function evCall(evClass){
-		var className = evClass.split(".");
-		var className = className[0];
-
-		$('.'+className)
-		.removeClass('secondary')
-		.addClass('success');
-
-		window.setTimeout(function(){
-			$('.'+className)
-			.removeClass('success')
-			.addClass('secondary');
-		},500);
-	}
 });
 
 </script>

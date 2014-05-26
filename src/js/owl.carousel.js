@@ -2365,12 +2365,14 @@ To do:
 		var handler = $.camelCase($.grep(['on', name, namespace], function(v) {return v}).join('-').toLowerCase());
 		var event = $.Event([name, 'owl', namespace || 'carousel'].join('.').toLowerCase(), data);
 		
+		event.data = $.extend(this.info, data);
+		
 		if (!this.suppressedEvents[event.type]) {
 			this.dom.$el.trigger(event);
 		}
 
 		if (typeof this.options[handler] === 'function') {
-			this.options[handler].apply(this, [this.dom.el, this.info, name]);
+			this.options[handler].apply(this, event);
 		}
 		
 		return event;
