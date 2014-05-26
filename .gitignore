@@ -1,11 +1,11 @@
 .sass-cache
 .bowerrc
-bower_components
-docs
-node_modules
+/bower_components
+/docs
+/node_modules
 *.sublime*
 *.zip
-download
+/download
 
 .DS_Store
 */.DS_Store

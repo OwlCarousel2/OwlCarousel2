@@ -1,0 +1,72 @@
+---
+title: Custom Events
+subTitle: API
+nav: docs
+description: Owl Carousel Documentation
+
+sort: 5
+tags:
+- API
+---
+
+{{#markdown }}
+## Custom Events
+
+> The following events allow you to manipulate Owl Carousel
+
+
+```
+"next.owl"
+"prev.owl"
+"goTo.owl"
+"destroy.owl"
+"refresh.owl"
+"autoplay.play.owl"
+"autoplay.stop.owl"
+"insertContent.owl"
+"addItem.owl"
+"removeItem.owl"
+```
+
+### Example:
+
+```
+var owl = $('.owl-carousel');
+
+owl.owlCarousel();
+
+// go to next item
+$('.customNextBtn').click(function(){
+	owl.trigger('next.owl');
+})
+
+// go to prev item
+$('.customPrevBtn').click(function(){
+	// with optional speed parameter
+	// optinal paramter has to be in square bracket '[]'
+	owl.trigger('prev.owl',[300]);
+})
+
+```
+
+See custom navigation demo.
+
+-----
+
+### Paramters:
+
+> Each event has its own paramteres
+
+{{#each custom-events}}
+#### {{name}}
+
+parameter: `{{parameter}}`
+
+{{desc}}
+
+------
+{{/each }}
+
+
+{{/markdown }}
+

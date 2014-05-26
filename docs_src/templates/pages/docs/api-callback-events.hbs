@@ -1,0 +1,43 @@
+---
+title: Callback Events
+subTitle: API
+nav: docs
+description: Owl Carousel Documentation
+
+sort: 3
+tags:
+- API
+---
+
+{{#markdown }}
+## Callback events
+
+> Callback events are simple $.events triggerd by Owl in strategic code locations. This gives you ability to listen for any changes and perform your own actions.
+
+On the [next page](callback-functions.html) you'll find a list of sibiling Callback Functions with exacly the same behavior but slightly different names.
+
+
+```
+var owl = $('.owl-carousel');
+owl.owlCarousel();
+// Listen to owl events:
+
+owl.on('changed.owl.carousel',function(){
+	...
+})
+
+```
+### Events
+
+{{#each callback-events}}
+#### {{name}}
+
+Type: `{{type}}`<br />
+
+{{desc}}
+
+------
+{{/each}}
+
+{{/markdown }}
+

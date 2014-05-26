@@ -1,0 +1,64 @@
+---
+title: SASS Styles
+subTitle: Development
+nav: docs
+description: Owl Carousel Documentation
+
+sort: 3
+tags:
+- Development
+---
+
+{{#markdown }}
+## Using SASS 
+> Owl supports SASS pre-processor to build CSS for all main modules and themes. If you don’t know SASS have a look at their [website](http://sass-lang.com/) and you’ll love it.
+
+For using sass it’s required to have:
+
+* [Ruby](http://rubyinstaller.org/) (only on Windows)
+* [Node.js](http://nodejs.org/)
+* [Grunt](http://gruntjs.com/)
+
+Check this [tutorial](http://ryanchristiani.com/getting-started-with-grunt-and-sass/) to learn how to use Sass in Grunt environment.
+
+### SCSS Files included
+
+Source files can be found on [Github Project]( {{ pkg.homepage }})
+
+```
+src/
+└── scss/
+    ├── _mixins.scss
+    ├── _theme.scss
+    ├── owl.carousel.scss
+    ├── owl.animate.scss
+    ├── owl.autoheight.scss
+    ├── owl.lazyload.scss
+    ├── owl.video.scss
+    ├── owl.theme.default.scss
+    └── owl.theme.green.scss
+```
+
+### _mixins.scss
+
+_mixins contain basic snippets generators for CSS3 cross-browser styles.
+
+### _theme.scss
+
+Scss structure for theme. Use owl.carousel.defautl.scss to change variables and generate new styles.
+
+### owl.carousel.scss
+
+Core file to handle basic styles and override some unnecessary browsers behaviors. You shouldn’t change this file unless you have to.
+
+### owl.[pluginname].scss
+
+Styles for modules.
+
+### owl.theme.*.scss
+
+Theme files for dots and navigations buttons. Use `owl.theme.default.scss` to upgrade to your own styles or create a new theme.
+
+
+{{/markdown }}
+
