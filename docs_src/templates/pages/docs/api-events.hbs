@@ -1,72 +1,88 @@
 ---
-title: Custom Events
+title: Events
 subTitle: API
 nav: docs
 description: Owl Carousel Documentation
 
-sort: 5
+sort: 3
 tags:
 - API
 ---
 
 {{#markdown }}
-## Custom Events
+## Events
 
-> The following events allow you to manipulate Owl Carousel
-
-
-```
-"next.owl"
-"prev.owl"
-"goTo.owl"
-"destroy.owl"
-"refresh.owl"
-"autoplay.play.owl"
-"autoplay.stop.owl"
-"insertContent.owl"
-"addItem.owl"
-"removeItem.owl"
-```
-
-### Example:
+> Events are provided by Owl Carousel in strategic code locations. This gives you the ability to listen for any changes and perform your own actions.
 
 ```
 var owl = $('.owl-carousel');
-
 owl.owlCarousel();
 
-// go to next item
-$('.customNextBtn').click(function(){
-	owl.trigger('next.owl');
-})
-
-// go to prev item
-$('.customPrevBtn').click(function(){
-	// with optional speed parameter
-	// optinal paramter has to be in square bracket '[]'
-	owl.trigger('prev.owl',[300]);
+// Listen to owl events:
+owl.on('changed.owl.carousel', function(event) {
+	...
 })
 
 ```
 
-See custom navigation demo.
+You could also trigger events by yourself to control Owl Carousel:
 
------
+```
+var owl = $('.owl-carousel');
+owl.owlCarousel();
 
-### Paramters:
+// Go to the next item
+$('.customNextBtn').click(function() {
+	owl.trigger('next.owl.carousel');
+})
 
-> Each event has its own paramteres
+// Go to the previous item
+$('.customPrevBtn').click(function() {
+	// With optional speed parameter
+	// Parameters has to be in square bracket '[]'
+	owl.trigger('prev.owl.carousel', [300]);
+})
 
-{{#each custom-events}}
+```
+
+### Callbacks
+
+Instead of attaching an event handler you can also just add a callback to the options of Owl Carousel.
+
+```
+$('.owl-carousel').owlCarousel({
+	onDragged: callback
+});
+
+function callback(event) {
+	...
+}
+```
+
+### Data
+
+Each event passes very useful information within the [event object](http://api.jquery.com/category/events/event-object/). Based on the example above:
+
+```Javascript
+function callback(event) {
+	var element   = event.target;    // DOM element, in this example .owl-carousel
+	var data      = event.data;      // Data object contains status information
+	var name      = event.type;      // Name of the event, in this example dragged
+	var namespace = event.namespace; // Namespace of the event, in this example owl.carousel
+}
+```
+
+### Events
+
+{{#each events}}
 #### {{name}}
 
-parameter: `{{parameter}}`
+Type: `{{type}}`<br />{{#isnt callback undefined}}Callback: `{{callback}}`<br/>{{/isnt}}{{#isnt param undefined}}Parameter: `{{param}}`<br/>{{/isnt}}
 
 {{desc}}
 
 ------
-{{/each }}
-
+{{/each}}
 
 {{/markdown }}
 

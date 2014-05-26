@@ -14,15 +14,15 @@
 		}, this));
 
 		this.owl.dom.$el.on({
-			'onResize.owl': $.proxy(function(e) {
+			'resize.owl.carousel': $.proxy(function(e) {
 				if (this.owl.options.video && !this.isInFullScreen()) e.preventDefault();
 			}, this),
-			'onRefresh.owl onChanged.owl': $.proxy(function(e) {
+			'refresh.owl.carousel changed.owl.carousel': $.proxy(function(e) {
 				if (this.owl.state.videoPlay) this.stopVideo();
 			}, this),
-			'onRefresh.owl': $.proxy(function(e) {
+			'refresh.owl.carousel': $.proxy(function(e) {
 				if(!this.owl.options.video) return false;
-				this.owl.dom.$el.one('onUpdated.owl', $.proxy(this.checkVideoLinks, this));
+				this.owl.dom.$el.one('updated.owl.carousel', $.proxy(this.checkVideoLinks, this));
 			}, this)
 		});
 	};
@@ -178,7 +178,7 @@
 	 */
 
 	Video.prototype.stopVideo = function(){
-		this.owl.trigger('videoStop');
+		this.owl.trigger('stop', null, 'video');
 		var item = this.owl.dom.$items.eq(this.owl.state.videoPlayIndex);
 		item.find('.owl-video-frame').remove();
 		item.removeClass('owl-video-playing');
@@ -191,7 +191,7 @@
 	 */
 
 	Video.prototype.playVideo = function(ev){
-		this.owl.trigger('videoPlay');
+		this.owl.trigger('play', null, 'video');
 
 		if(this.owl.state.videoPlay){
 			this.stopVideo();

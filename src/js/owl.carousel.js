@@ -251,6 +251,8 @@ To do:
 		for (var plugin in Owl.Plugins) {
 			this.plugins[plugin] = new Owl.Plugins[plugin](this);
 		}
+		
+		this.suppressedEvents = {};
 
 		this.init();
 	}
@@ -315,7 +317,7 @@ To do:
 		this.eventsCall();
 
 		// attach custom control events
-		this.addCustomEvents();
+		this.addTriggerableEvents();
 
 		// attach generic events 
 		this.internalEvents();
@@ -931,7 +933,7 @@ To do:
 		var elChanged = this.isElWidthChanged();
 		if(!elChanged){return false;}
 
-		if(!this.trigger('resize')){return false;}
+		if(this.trigger('resize').isDefaultPrevented()){return false;}
 
 		this.state.responsive = true;
 		this.refresh();
@@ -1230,7 +1232,7 @@ To do:
 			this.dom.$stage.addClass('owl-grab');
 		}
 
-		this.trigger('touch');
+		this.trigger('drag');
 		this.drag.startTime = new Date().getTime();
 		this.setSpeed(0);
 		this.state.isTouch = true;
@@ -1365,7 +1367,7 @@ To do:
 			this.dom.$stage.removeClass('owl-grab');
 		}
 
-		this.trigger('touched');
+		this.trigger('dragged');
 
 		//prevent links and images dragging;
 		this.drag.targetEl.removeAttribute("draggable");
@@ -2105,23 +2107,33 @@ To do:
 	};
 
 	/**
-	 * addCustomEvents
-	 * @desc Add custom events by jQuery .on method
+	 * addTriggerableEvents
+	 * @desc Add triggerable events by jQuery's `on` method
 	 * @since 2.0.0
 	 */
 
-	Owl.prototype.addCustomEvents = function(){
+	Owl.prototype.addTriggerableEvents = function(){
+		var handler = $.proxy(function(callback, event) {
+			return $.proxy(function() {
+				this.suppressedEvents[event] = true;
+				callback.apply(this, [].slice.call(arguments, 1));
+				delete this.suppressedEvents[event];
+			}, this);
+		}, this);
+		
+		$.each({
+			'next': this.next,
+			'prev': this.prev,
+			'to': this.goTo,
+			'destroy': this.destroy,
+			'refresh': this.refresh,
+			'replace': this.insertContent,
+			'add': this.addItem,
+			'remove': this.removeItem
+		}, $.proxy(function(event, callback) {
+			this.dom.$el.on(event + '.owl.carousel', handler(callback, event + '.owl.carousel'));
+		}, this));
 
-		this.dom.$el.on({
-			'next.owl': 		function(e,s){ this.next(s);}.bind(this),
-			'prev.owl': 		function(e,s){ this.prev(s);}.bind(this),
-			'goTo.owl': 		function(e,p,s){ this.goTo(p,s);}.bind(this),
-			'destroy.owl': 		function(e){ this.destroy();}.bind(this),
-			'refresh.owl': 		function(e){ this.refresh();}.bind(this),
-			'insertContent.owl':function(e,d){ this.insertContent(d);}.bind(this),
-			'addItem.owl':		function(e,d,p){ this.next(d,p);}.bind(this),
-			'removeItem.owl':	function(e,p){ this.next(p); }.bind(this)
-		});
 	};
 
 	/**
@@ -2346,19 +2358,25 @@ To do:
 	 * @since 2.0.0
 	 * @param event - string - event name
 	 * @param data - object - additional options - to do
+	 * @param namespace
 	 */
 
-	Owl.prototype.trigger = function(name) {
-		var handler = 'on' + name.charAt(0).toUpperCase() + name.slice(1);
-        var event = $.Event(handler + '.owl');
-       
-        this.dom.$el.trigger(event);
+	Owl.prototype.trigger = function(name, data, namespace) {
+		var handler = $.camelCase($.grep(['on', name, namespace], function(v) {return v}).join('-').toLowerCase());
+		var event = $.Event([name, 'owl', namespace || 'carousel'].join('.').toLowerCase(), data);
+		
+		event.data = $.extend(this.info, data);
+		
+		if (!this.suppressedEvents[event.type]) {
+			this.dom.$el.trigger(event);
+		}
 
-        if (typeof this.options[handler] === 'function') {
-            this.options[handler].apply(this, [this.dom.el, this.info, name]);
-        }
-        return !event.isDefaultPrevented();
-    };
+		if (typeof this.options[handler] === 'function') {
+			this.options[handler].apply(this, event);
+		}
+		
+		return event;
+	};
 
 	/**
 	 * Opertators 

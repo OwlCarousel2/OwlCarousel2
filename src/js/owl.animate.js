@@ -10,7 +10,7 @@
     	this.owl.options = $.extend({}, Animate.Defaults, this.owl.options);
 
     	this.owl.dom.$el.on({
-			'onAnimate.owl': $.proxy(function(e) {
+			'animate.owl.carousel': $.proxy(function(e) {
 				if (this.owl.options.animateIn || this.owl.options.animateOut) this.swap();
 			}, this)
 		});
