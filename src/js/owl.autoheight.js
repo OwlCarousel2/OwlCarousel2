@@ -10,7 +10,7 @@
     	this.owl.options = $.extend({}, AutoHeight.Defaults, this.owl.options);
 
     	this.owl.dom.$el.on({
-			'onRefreshed.owl onChanged.owl': $.proxy(function(e) {
+			'refreshed.owl.carousel changed.owl.carousel': $.proxy(function(e) {
 				if (this.owl.options.autoHeight) this.setHeight();
 			}, this)
 		});

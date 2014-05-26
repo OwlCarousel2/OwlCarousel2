@@ -1,53 +1,53 @@
 [
   {
-    "name":     "next.owl",
+    "name":     "next.owl.carousel",
     "parameter":"[speed]",
-    "desc":     "Go to next item."
+    "desc":     "Goes to next item."
   },
   {
-    "name":     "prev.owl",
+    "name":     "prev.owl.carousel",
     "parameter":"[speed]",
-     "desc":     "Go to previous item."
+     "desc":    "Goes to previous item."
   },
   {
-    "name":     "goTo.owl",
+    "name":     "to.owl.carousel",
     "parameter":"[position,speed]",
-     "desc":     "Go to postion."
+     "desc":    "Goes to postion."
   },
   {
-    "name":     "destroy.owl",
+    "name":     "destroy.owl.carousel",
     "parameter":"",
-     "desc":     "Destroy carousel."
+     "desc":    "Destroys carousel."
   },
   {
-    "name":     "refresh.owl",
+    "name":     "refresh.owl.carousel",
     "parameter":"[event,speed]",
-     "desc":     "Refresh carousel."
+     "desc":    "Refreshes carousel."
   },
   {
-    "name":     "autoplay.play.owl",
+    "name":     "play.owl.autoplay",
     "parameter":"[timeout,speed]",
-     "desc":     "Run autoplay."
+     "desc":    "Runs autoplay."
   },
   {
-    "name":     "autoplay.stop.owl",
+    "name":     "stop.owl.autoplay",
     "parameter":"",
-     "desc":     "Stop autoplay."
+     "desc":    "Stops autoplay."
   },
   {
-    "name":     "insertContent.owl",
+    "name":     "replace.owl.carousel",
     "parameter":"[data]",
-     "desc":     "Remove current content and add a new one passed in the parameter."
+     "desc":    "Removes current content and add a new one passed in the parameter."
   },
   {
-    "name":     "addItem.owl",
+    "name":     "add.owl.carousel",
     "parameter":"[data,position]",
-     "desc":     "Adds a new item on a given position."
+     "desc":    "Adds a new item on a given position."
   },
   {
-    "name":     "removeItem.owl",
+    "name":     "remove.owl.carousel",
     "parameter":"[position]",
-     "desc":     "Removes an item from a given position."
+     "desc":    "Removes an item from a given position."
   }
 
 ]

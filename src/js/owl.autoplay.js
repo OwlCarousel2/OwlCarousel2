@@ -10,13 +10,13 @@
     	this.owl.options = $.extend({}, Autoplay.Defaults, this.owl.options);
 
     	this.owl.dom.$el.on({
-			'onTranslated.owl onRefreshed.owl': $.proxy(function(e) {
+			'translated.owl.carousel refreshed.owl.carousel': $.proxy(function(e) {
 				this.autoplay();
 			}, this),
-			'autoplay.play.owl': $.proxy(function(e,t,s){
+			'play.owl.autoplay': $.proxy(function(e,t,s){
 				this.play(t,s);
 			},this),
-			'autoplay.stop.owl': $.proxy(function(e){
+			'stop.owl.autoplay': $.proxy(function(e){
 				this.stop();
 			},this)
 		});

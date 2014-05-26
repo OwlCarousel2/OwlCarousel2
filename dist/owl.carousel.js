@@ -931,7 +931,7 @@ To do:
 		var elChanged = this.isElWidthChanged();
 		if(!elChanged){return false;}
 
-		if(!this.trigger('resize')){return false;}
+		if(this.trigger('resize').isDefaultPrevented()){return false;}
 
 		this.state.responsive = true;
 		this.refresh();
@@ -1230,7 +1230,7 @@ To do:
 			this.dom.$stage.addClass('owl-grab');
 		}
 
-		this.trigger('touch');
+		this.trigger('drag');
 		this.drag.startTime = new Date().getTime();
 		this.setSpeed(0);
 		this.state.isTouch = true;
@@ -1365,7 +1365,7 @@ To do:
 			this.dom.$stage.removeClass('owl-grab');
 		}
 
-		this.trigger('touched');
+		this.trigger('dragged');
 
 		//prevent links and images dragging;
 		this.drag.targetEl.removeAttribute("draggable");
@@ -2111,16 +2111,22 @@ To do:
 	 */
 
 	Owl.prototype.addCustomEvents = function(){
-
+		var handler = $.proxy(function(callback) {
+			return $.proxy(function() {
+				if (!arguments[0].isInternal)
+					callback.apply(this, [].slice.call(arguments, 1));
+			}, this);
+		}, this);
+		
 		this.dom.$el.on({
-			'next.owl': 		function(e,s){ this.next(s);}.bind(this),
-			'prev.owl': 		function(e,s){ this.prev(s);}.bind(this),
-			'goTo.owl': 		function(e,p,s){ this.goTo(p,s);}.bind(this),
-			'destroy.owl': 		function(e){ this.destroy();}.bind(this),
-			'refresh.owl': 		function(e){ this.refresh();}.bind(this),
-			'insertContent.owl':function(e,d){ this.insertContent(d);}.bind(this),
-			'addItem.owl':		function(e,d,p){ this.next(d,p);}.bind(this),
-			'removeItem.owl':	function(e,p){ this.next(p); }.bind(this)
+			'next.owl.carousel': handler(this.next),
+			'prev.owl.carousel': handler(this.prev),
+			'to.owl.carousel': handler(this.goTo),
+			'destroy.owl.carousel': handler(this.destroy),
+			'refresh.owl.carousel': handler(this.refresh),
+			'replace.owl.carousel': handler(this.insertContent),
+			'add.owl.carousel': handler(this.addItem),
+			'remove.owl.carousel': handler(this.removeItem)
 		});
 	};
 
@@ -2348,17 +2354,19 @@ To do:
 	 * @param data - object - additional options - to do
 	 */
 
-	Owl.prototype.trigger = function(name) {
-		var handler = 'on' + name.charAt(0).toUpperCase() + name.slice(1);
-        var event = $.Event(handler + '.owl');
-       
-        this.dom.$el.trigger(event);
+	Owl.prototype.trigger = function(name, data, namespace) {
+		var handler = 'on' + name.charAt(0).toUpperCase() + name.slice(1) 
+			+ (namespace ? namespace.charAt(0).toUpperCase() + namespace.slice(1) : '');
+		var event = $.Event(name.toLowerCase() + '.owl.' + (namespace || 'carousel'), 
+			$.extend({isInternal: true}, data));
+		
+		this.dom.$el.trigger(event);
 
-        if (typeof this.options[handler] === 'function') {
-            this.options[handler].apply(this, [this.dom.el, this.info, name]);
-        }
-        return !event.isDefaultPrevented();
-    };
+		if (typeof this.options[handler] === 'function') {
+			this.options[handler].apply(this, [this.dom.el, this.info, name]);
+		}
+		return event;
+	};
 
 	/**
 	 * Opertators 
@@ -2470,7 +2478,7 @@ if (!Function.prototype.bind) {
     	this.owl.options = $.extend({}, LazyLoad.Defaults, this.owl.options);
 
 		this.owl.dom.$el.on({
-			'onUpdated.owl': $.proxy(function(e) {
+			'updated.owl.carousel': $.proxy(function(e) {
 				if (this.owl.options.lazyLoad) this.check();
 			}, this)
 		});
@@ -2501,17 +2509,14 @@ if (!Function.prototype.bind) {
 	};
 
 	LazyLoad.prototype.preload = function(images,$item){
-		var that = this.owl; // fix this later
-
-		images.each(function(i,el){
-			that.trigger('lazyload');
+		images.each($.proxy(function(i,el){
+			this.owl.trigger('load', null, 'lazy');
 			var $el = $(el);
 			var img = new Image();
 			var srcType = window.devicePixelRatio > 1 ? $el.attr('data-src-retina') : $el.attr('data-src');
 				srcType = srcType || $el.attr('data-src');
 
-			img.onload = function(){
-
+			img.onload = $.proxy(function(){
 				$item.data('owl-item').loaded = true;
 				if($el.is('img')){
 					$el.attr('src',img.src);
@@ -2520,10 +2525,10 @@ if (!Function.prototype.bind) {
 				}
 				
 				$el.css('opacity',1);
-				that.trigger('lazyloaded');
-			};
+				this.owl.trigger('loaded', null, 'lazy');
+			}, this);
 			img.src = srcType;
-		});
+		}, this));
 	};
 
 	LazyLoad.prototype.destroy = function(){
@@ -2545,7 +2550,7 @@ if (!Function.prototype.bind) {
     	this.owl.options = $.extend({}, AutoHeight.Defaults, this.owl.options);
 
     	this.owl.dom.$el.on({
-			'onRefreshed.owl onChanged.owl': $.proxy(function(e) {
+			'refreshed.owl.carousel changed.owl.carousel': $.proxy(function(e) {
 				if (this.owl.options.autoHeight) this.setHeight();
 			}, this)
 		});
@@ -2605,15 +2610,15 @@ if (!Function.prototype.bind) {
 		}, this));
 
 		this.owl.dom.$el.on({
-			'onResize.owl': $.proxy(function(e) {
+			'resize.owl.carousel': $.proxy(function(e) {
 				if (this.owl.options.video && !this.isInFullScreen()) e.preventDefault();
 			}, this),
-			'onRefresh.owl onChanged.owl': $.proxy(function(e) {
+			'refresh.owl.carousel changed.owl.carousel': $.proxy(function(e) {
 				if (this.owl.state.videoPlay) this.stopVideo();
 			}, this),
-			'onRefresh.owl': $.proxy(function(e) {
+			'refresh.owl.carousel': $.proxy(function(e) {
 				if(!this.owl.options.video) return false;
-				this.owl.dom.$el.one('onUpdated.owl', $.proxy(this.checkVideoLinks, this));
+				this.owl.dom.$el.one('updated.owl.carousel', $.proxy(this.checkVideoLinks, this));
 			}, this)
 		});
 	};
@@ -2769,7 +2774,7 @@ if (!Function.prototype.bind) {
 	 */
 
 	Video.prototype.stopVideo = function(){
-		this.owl.trigger('videoStop');
+		this.owl.trigger('stop', null, 'video');
 		var item = this.owl.dom.$items.eq(this.owl.state.videoPlayIndex);
 		item.find('.owl-video-frame').remove();
 		item.removeClass('owl-video-playing');
@@ -2782,7 +2787,7 @@ if (!Function.prototype.bind) {
 	 */
 
 	Video.prototype.playVideo = function(ev){
-		this.owl.trigger('videoPlay');
+		this.owl.trigger('play', null, 'video');
 
 		if(this.owl.state.videoPlay){
 			this.stopVideo();
@@ -2862,7 +2867,7 @@ if (!Function.prototype.bind) {
     	this.owl.options = $.extend({}, Animate.Defaults, this.owl.options);
 
     	this.owl.dom.$el.on({
-			'onAnimate.owl': $.proxy(function(e) {
+			'animate.owl.carousel': $.proxy(function(e) {
 				if (this.owl.options.animateIn || this.owl.options.animateOut) this.swap();
 			}, this)
 		});
@@ -2941,13 +2946,13 @@ if (!Function.prototype.bind) {
     	this.owl.options = $.extend({}, Autoplay.Defaults, this.owl.options);
 
     	this.owl.dom.$el.on({
-			'onTranslated.owl onRefreshed.owl': $.proxy(function(e) {
+			'translated.owl.carousel refreshed.owl.carousel': $.proxy(function(e) {
 				this.autoplay();
 			}, this),
-			'autoplay.play.owl': $.proxy(function(e,t,s){
+			'play.owl.autoplay': $.proxy(function(e,t,s){
 				this.play(t,s);
 			},this),
-			'autoplay.stop.owl': $.proxy(function(e){
+			'stop.owl.autoplay': $.proxy(function(e){
 				this.stop();
 			},this)
 		});

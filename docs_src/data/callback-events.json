@@ -1,92 +1,92 @@
 [
   {
-    "name":     "onInitialize.owl",
+    "name":     "initialize.owl.carousel",
     "type":     "non-cancelable",
-    "desc":     "Before plugin initializes."
+    "desc":     "When the plugin initializes."
   },
   {
-    "name":     "onInitialized.owl",
+    "name":     "initialized.owl.carousel",
     "type":     "non-cancelable",
-    "desc":     "After plugin initializes."
+    "desc":     "When the plugin has initialized."
   },
   {
-    "name":     "onResize.owl",
+    "name":     "resize.owl.carousel",
     "type":     "cancelable",
-    "desc":     "When resizing occurs."
+    "desc":     "When the plugin gets resized."
   },
   {
-    "name":     "onResized.owl",
+    "name":     "resized.owl.carousel",
     "type":     "non-cancelable",
-    "desc":     "After window/object resize."
+    "desc":     "When the plugin has resized."
   },
   {
-    "name":     "onRefresh.owl",
+    "name":     "refresh.owl.carousel",
     "type":     "non-cancelable",
-    "desc":     "Before refresh."
+    "desc":     "When the plugin refreshes."
   },
   {
-    "name":     "onRefreshed.owl",
+    "name":     "refreshed.owl.carousel",
     "type":     "non-cancelable",
-    "desc":     "After refresh."
+    "desc":     "When the plugin has refreshed."
   },
   {
-    "name":     "onUpdate.owl",
-    "type":     "non-cancelable",
-    "desc":     "on classes update. //will remove it"
-  },
-  {
-    "name":     "onUpdated.owl",
+    "name":     "update.owl.carousel",
     "type":     "non-cancelable",
     "desc":     "on classes update. //will remove it"
   },
   {
-    "name":     "onTouch.owl",
+    "name":     "updated.owl.carousel",
     "type":     "non-cancelable",
-    "desc":     "On touch/drag start."
+    "desc":     "on classes update. //will remove it"
   },
   {
-    "name":     "onTouched.owl",
+    "name":     "drag.owl.carousel",
     "type":     "non-cancelable",
-    "desc":     "On touch/drag end."
+    "desc":     "When the dragging of an item has started."
   },
   {
-    "name":     "onTranslate.owl",
+    "name":     "dragged.owl.carousel",
     "type":     "non-cancelable",
-    "desc":     "When translate(animation) starts."
+    "desc":     "When the dragging of an item has finished."
   },
   {
-    "name":     "onTranslated.owl",
+    "name":     "translate.owl.carousel",
     "type":     "non-cancelable",
-    "desc":     "When translate(animation) ends."
+    "desc":     "When the translation of the stage starts."
   },
   {
-    "name":     "onAnimate.owl",
+    "name":     "translated.owl.carousel",
     "type":     "non-cancelable",
-    "desc":     "On goTo."
+    "desc":     "When the translation of the stage has finished."
   },
   {
-    "name":     "onChanged.owl",
+    "name":     "animate.owl.carousel",
     "type":     "non-cancelable",
-    "desc":     "on every action."
+    "desc":     "When the position changes."
   },
   {
-    "name":     "onLazyload.owl",
+    "name":     "changed.owl.carousel",
     "type":     "non-cancelable",
-    "desc":     "When lazy load triggers."
+    "desc":     "When something has changed."
   },
   {
-    "name":     "onLazyloaded.owl",
+    "name":     "load.owl.lazy",
     "type":     "non-cancelable",
-    "desc":     "When lazyload image is loaded."
+    "desc":     "When lazy image loads."
   },
   {
-    "name":     "onVideoStop.owl",
+    "name":     "loaded.owl.lazy",
     "type":     "non-cancelable",
-    "desc":     "When video is unloaded."
+    "desc":     "When lazy image has loaded."
   },
   {
-    "name":     "onVideoPlay.owl",
+    "name":     "stop.owl.video",
     "type":     "non-cancelable",
-    "desc":     "When video is loaded."
+    "desc":     "When video has unloaded."
+  },
+  {
+    "name":     "play.owl.video",
+    "type":     "non-cancelable",
+    "desc":     "When video has loaded."
   }
 ]
