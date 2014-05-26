@@ -251,6 +251,8 @@ To do:
 		for (var plugin in Owl.Plugins) {
 			this.plugins[plugin] = new Owl.Plugins[plugin](this);
 		}
+		
+		this.suppressedEvents = {};
 
 		this.init();
 	}
@@ -315,7 +317,7 @@ To do:
 		this.eventsCall();
 
 		// attach custom control events
-		this.addCustomEvents();
+		this.addTriggerableEvents();
 
 		// attach generic events 
 		this.internalEvents();
@@ -2105,29 +2107,33 @@ To do:
 	};
 
 	/**
-	 * addCustomEvents
-	 * @desc Add custom events by jQuery .on method
+	 * addTriggerableEvents
+	 * @desc Add triggerable events by jQuery's `on` method
 	 * @since 2.0.0
 	 */
 
-	Owl.prototype.addCustomEvents = function(){
-		var handler = $.proxy(function(callback) {
+	Owl.prototype.addTriggerableEvents = function(){
+		var handler = $.proxy(function(callback, event) {
 			return $.proxy(function() {
-				if (!arguments[0].isInternal)
-					callback.apply(this, [].slice.call(arguments, 1));
+				this.suppressedEvents[event] = true;
+				callback.apply(this, [].slice.call(arguments, 1));
+				delete this.suppressedEvents[event];
 			}, this);
 		}, this);
 		
-		this.dom.$el.on({
-			'next.owl.carousel': handler(this.next),
-			'prev.owl.carousel': handler(this.prev),
-			'to.owl.carousel': handler(this.goTo),
-			'destroy.owl.carousel': handler(this.destroy),
-			'refresh.owl.carousel': handler(this.refresh),
-			'replace.owl.carousel': handler(this.insertContent),
-			'add.owl.carousel': handler(this.addItem),
-			'remove.owl.carousel': handler(this.removeItem)
-		});
+		$.each({
+			'next': this.next,
+			'prev': this.prev,
+			'to': this.goTo,
+			'destroy': this.destroy,
+			'refresh': this.refresh,
+			'replace': this.insertContent,
+			'add': this.addItem,
+			'remove': this.removeItem
+		}, $.proxy(function(event, callback) {
+			this.dom.$el.on(event + '.owl.carousel', handler(callback, event + '.owl.carousel'));
+		}, this));
+
 	};
 
 	/**
@@ -2352,19 +2358,22 @@ To do:
 	 * @since 2.0.0
 	 * @param event - string - event name
 	 * @param data - object - additional options - to do
+	 * @param namespace
 	 */
 
 	Owl.prototype.trigger = function(name, data, namespace) {
-		var handler = 'on' + name.charAt(0).toUpperCase() + name.slice(1) 
-			+ (namespace ? namespace.charAt(0).toUpperCase() + namespace.slice(1) : '');
-		var event = $.Event(name.toLowerCase() + '.owl.' + (namespace || 'carousel'), 
-			$.extend({isInternal: true}, data));
+		var handler = $.camelCase($.grep(['on', name, namespace], function(v) {return v}).join('-').toLowerCase());
+		var event = $.Event([name, 'owl', namespace || 'carousel'].join('.').toLowerCase(), data);
 		
-		this.dom.$el.trigger(event);
-
+		if (!this.suppressedEvents[event.type]) {
+			console.log(event.type);
+			this.dom.$el.trigger(event);
+		}
+		console.log(handler);
 		if (typeof this.options[handler] === 'function') {
 			this.options[handler].apply(this, [this.dom.el, this.info, name]);
 		}
+		
 		return event;
 	};
 
