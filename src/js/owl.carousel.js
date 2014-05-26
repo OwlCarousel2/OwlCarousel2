@@ -2366,10 +2366,9 @@ To do:
 		var event = $.Event([name, 'owl', namespace || 'carousel'].join('.').toLowerCase(), data);
 		
 		if (!this.suppressedEvents[event.type]) {
-			console.log(event.type);
 			this.dom.$el.trigger(event);
 		}
-		console.log(handler);
+
 		if (typeof this.options[handler] === 'function') {
 			this.options[handler].apply(this, [this.dom.el, this.info, name]);
 		}
