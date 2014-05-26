@@ -77,9 +77,7 @@ function callback(event) {
 {{#each events}}
 #### {{name}}
 
-Type: `{{type}}`<br />
-{{#isnt callback undefined}}Callback: `{{callback}}`<br/>{{/isnt}}
-{{#isnt param undefined}}Parameter: `{{param}}`<br/>{{/isnt}}
+Type: `{{type}}`<br />{{#isnt callback undefined}}Callback: `{{callback}}`<br/>{{/isnt}}{{#isnt param undefined}}Parameter: `{{param}}`<br/>{{/isnt}}
 
 {{desc}}
 
