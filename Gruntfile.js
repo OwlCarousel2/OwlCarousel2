@@ -135,6 +135,24 @@ module.exports = function (grunt) {
 				}
 			}
 		},
+		
+		jshint: {
+			options: {
+				jshintrc: 'src/js/.jshintrc'
+			},
+			dist: {
+				src: ['<%= app.src.scripts %>', 'Gruntfile.js']
+			}
+		},
+
+		jscs: {
+			options: {
+				config: 'src/js/.jscsrc'
+			},
+			dist: {
+				src: ['<%= app.src.scripts %>', 'Gruntfile.js']
+			}
+		},
 
 		uglify: {
 			dist: {
@@ -232,16 +250,12 @@ module.exports = function (grunt) {
 			},
 			js :{
 				files: ['src/**/*.js'],
-				tasks: ['uglify:dist','concat:dist','copy:distToDocs']
+				tasks: ['jscs:dist', 'uglify:dist','concat:dist','copy:distToDocs']
 			},
 			helpers :{
 				files: ['<%= app.src %>/helpers/*.js'],
 				tasks: ['assemble']
 			}
-		},
-
-		jshint: {
-			all: ['src/js/*.js','*.js']
 		},
 
 		// compress zip
@@ -263,7 +277,7 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('assemble');
 
 	// Tasks
-	grunt.registerTask('dist', ['clean:dist', 'sass:dist', 'concat:dist', 'cssmin:dist', 'copy:themes', 'copy:distImages', 'uglify:dist','copy:readme']);
+	grunt.registerTask('dist', ['clean:dist', 'sass:dist', 'concat:dist', 'cssmin:dist', 'copy:themes', 'copy:distImages', 'jscs:dist', 'jshint:dist', 'uglify:dist', 'copy:readme']);
 
 	grunt.registerTask('docs', ['clean:docs','assemble','sass:docs','copy:docsAssets','copy:distToDocs']);
 
