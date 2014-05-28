@@ -2434,12 +2434,16 @@
 	 * @param namespace
 	 */
 	Owl.prototype.trigger = function(name, data, namespace) {
-		var handler = $.camelCase($.grep([ 'on', name, namespace ], function(v) {
-			return v
-		}).join('-').toLowerCase());
-		var event = $.Event([ name, 'owl', namespace || 'carousel' ].join('.').toLowerCase(), data);
-
-		event.data = $.extend(this.info, data);
+		var status = {
+			page: {size: this.options.items, count: this.num.allPages, index: this.pos.currentPage}, 
+			item: {count: this.num.oItems, index: this.pos.current}
+		}, handler = $.camelCase(
+			$.grep([ 'on', name, namespace ], 
+			function(v) {return v}).join('-').toLowerCase()
+		), event = $.Event(
+			[ name, 'owl', namespace || 'carousel' ].join('.').toLowerCase(), 
+			$.extend(status, data)
+		);
 
 		if (!this.suppressedEvents[event.type]) {
 			this.dom.$el.trigger(event);
