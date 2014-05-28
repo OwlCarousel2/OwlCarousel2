@@ -65,10 +65,14 @@ Each event passes very useful information within the [event object](http://api.j
 
 ```Javascript
 function callback(event) {
-	var element   = event.target;    // DOM element, in this example .owl-carousel
-	var data      = event.data;      // Data object contains status information
-	var name      = event.type;      // Name of the event, in this example dragged
-	var namespace = event.namespace; // Namespace of the event, in this example owl.carousel
+	var element   = event.target;         // DOM element, in this example .owl-carousel
+	var name      = event.type;           // Name of the event, in this example dragged
+	var namespace = event.namespace;      // Namespace of the event, in this example owl.carousel
+	var pages     = event.page.count;     // Number of pages
+	var page      = event.page.index;     // Position of the current page
+	var size      = event.page.size;      // Number of items per page
+	var items     = event.item.count;     // Number of items
+	var item      = event.item.index;     // Position of the current item
 }
 ```
 
