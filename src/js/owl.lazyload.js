@@ -1,6 +1,5 @@
 /**
  * lazyLoad Plugin
- * 
  * @since 2.0.0
  */
 ;(function($, window, document, undefined) {
@@ -10,9 +9,10 @@
 		this.owl.options = $.extend({}, LazyLoad.Defaults, this.owl.options);
 
 		this.owl.dom.$el.on({
-			'updated.owl.carousel': $.proxy(function(e) {
-				if (this.owl.options.lazyLoad)
+			'updated.owl.carousel': $.proxy(function() {
+				if (this.owl.options.lazyLoad){
 					this.check();
+				}
 			}, this)
 		});
 	};
@@ -23,11 +23,11 @@
 
 	LazyLoad.prototype.check = function() {
 
-		var attr = window.devicePixelRatio > 1 ? 'data-src-retina' : 'data-src';
-		var src, img, i;
+		var attr = window.devicePixelRatio > 1 ? 'data-src-retina' : 'data-src',
+			src, img, i, $item;
 
 		for (i = 0; i < this.owl.num.items; i++) {
-			var $item = this.owl.dom.$items.eq(i);
+			$item = this.owl.dom.$items.eq(i);
 
 			if ($item.data('owl-item').current === true && $item.data('owl-item').loaded === false) {
 				img = $item.find('.owl-lazy');
@@ -42,11 +42,15 @@
 	};
 
 	LazyLoad.prototype.preload = function(images, $item) {
+		var $el, img, srcType;
+
 		images.each($.proxy(function(i, el) {
+
 			this.owl.trigger('load', null, 'lazy');
-			var $el = $(el);
-			var img = new Image();
-			var srcType = window.devicePixelRatio > 1 ? $el.attr('data-src-retina') : $el.attr('data-src');
+
+			$el = $(el);
+			img = new Image();
+			srcType = window.devicePixelRatio > 1 ? $el.attr('data-src-retina') : $el.attr('data-src');
 			srcType = srcType || $el.attr('data-src');
 
 			img.onload = $.proxy(function() {

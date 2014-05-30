@@ -1,14 +1,17 @@
 /**
  * Owl Carousel
- * 
+ *
  * @todo Lazy Load Icon
  * @todo prevent animationend bubling
  * @todo itemsScaleUp
  * @todo Test Zepto
+ * @todo stagePadding calculate wrong active classes
  */
 ;(function($, window, document, undefined) {
 
-	var defaults = {
+	var defaults, item, dom, width, num, pos, drag, speed, state, e;
+
+	defaults = {
 		items: 3,
 		loop: false,
 		center: false,
@@ -75,7 +78,7 @@
 
 	// Each item has following data:
 
-	var item = {
+	item = {
 		index: false,
 		indexAbs: false,
 		posLeft: false,
@@ -94,7 +97,7 @@
 	// Reference to DOM elements
 	// Those with $ sign are jQuery objects
 
-	var dom = {
+	dom = {
 		el: null, // main element
 		$el: null, // jQuery main element
 		stage: null, // stage
@@ -104,7 +107,7 @@
 		$items: null, // all items, clones and originals included
 		$oItems: null, // original items
 		$cItems: null, // cloned items only
-		$cc: null,
+		$cc: null, // controls container
 		$navPrev: null,
 		$navNext: null,
 		$page: null,
@@ -114,12 +117,14 @@
 
 	/**
 	 * Variables
-	 * 
+	 *
 	 * @since 2.0.0
 	 */
+
 	// Only for development process
 	// Widths
-	var width = {
+
+	width = {
 		el: 0,
 		stage: 0,
 		item: 0,
@@ -129,7 +134,7 @@
 
 	// Numbers
 
-	var num = {
+	num = {
 		items: 0,
 		oItems: 0,
 		cItems: 0,
@@ -141,7 +146,7 @@
 
 	// Positions
 
-	var pos = {
+	pos = {
 		start: 0,
 		max: 0,
 		maxValue: 0,
@@ -156,7 +161,7 @@
 
 	// Drag/Touches
 
-	var drag = {
+	drag = {
 		start: 0,
 		startX: 0,
 		startY: 0,
@@ -174,7 +179,7 @@
 
 	// Speeds
 
-	var speed = {
+	speed = {
 		onDragEnd: 300,
 		nav: 300,
 		css2speed: 0
@@ -183,7 +188,7 @@
 
 	// States
 
-	var state = {
+	state = {
 		isTouch: false,
 		isScrolling: false,
 		isSwiping: false,
@@ -193,7 +198,7 @@
 
 	// Event functions references
 
-	var e = {
+	e = {
 		_onDragStart: null,
 		_onDragMove: null,
 		_onDragEnd: null,
@@ -248,7 +253,7 @@
 
 	/**
 	 * init
-	 * 
+	 *
 	 * @since 2.0.0
 	 */
 	Owl.prototype.init = function() {
@@ -280,9 +285,10 @@
 		this.setResponsiveOptions();
 
 		if (this.options.autoWidth && this.state.imagesLoaded !== true) {
-			var imgs = this.dom.$el.find('img');
-			var nestedSelector = this.options.nestedItemSelector ? '.' + this.options.nestedItemSelector : undefined;
-			var width = this.dom.$el.children(nestedSelector).width();
+			var imgs, nestedSelector, width;
+			imgs = this.dom.$el.find('img');
+			nestedSelector = this.options.nestedItemSelector ? '.' + this.options.nestedItemSelector : undefined;
+			width = this.dom.$el.children(nestedSelector).width();
 
 			if (imgs.length && width <= 0) {
 				this.preloadAutoWidthImages(imgs);
@@ -303,9 +309,6 @@
 		// attach generic events
 		this.eventsCall();
 
-		// attach custom control events
-		this.addTriggerableEvents();
-
 		// attach generic events
 		this.internalEvents();
 
@@ -314,19 +317,23 @@
 		this.dom.$el.removeClass('owl-loading').addClass('owl-loaded');
 
 		this.trigger('initialized');
+
+		// attach custom control events
+		this.addTriggerableEvents();
 	};
 
 	/**
 	 * sortOptions
-	 * 
 	 * @desc Sort responsive sizes
 	 * @since 2.0.0
 	 */
 	Owl.prototype.sortOptions = function() {
 
-		var resOpt = this.options.responsive;
+		var resOpt, keys = [], i, j, k;
+
+		resOpt = this.options.responsive;
 		this.responsiveSorted = {};
-		var keys = [], i, j, k;
+
 		for (i in resOpt) {
 			keys.push(i);
 		}
@@ -344,7 +351,6 @@
 
 	/**
 	 * setResponsiveOptions
-	 * 
 	 * @since 2.0.0
 	 */
 	Owl.prototype.setResponsiveOptions = function() {
@@ -352,9 +358,10 @@
 			return false;
 		}
 
-		var width = this.windowWidth();
-		var resOpt = this.options.responsive;
-		var i, j, k, minWidth;
+		var width, resOpt, i, j, k, minWidth;
+
+		width = this.windowWidth();
+		resOpt = this.options.responsive;
 
 		// overwrite non resposnive options
 		for (k in this._options) {
@@ -386,7 +393,6 @@
 
 	/**
 	 * optionsLogic
-	 * 
 	 * @desc Update option logic if necessery
 	 * @since 2.0.0
 	 */
@@ -420,13 +426,12 @@
 
 	/**
 	 * createStage
-	 * 
 	 * @desc Create stage and Outer-stage elements
 	 * @since 2.0.0
 	 */
 	Owl.prototype.createStage = function() {
-		var oStage = document.createElement('div');
-		var stage = document.createElement(this.options.stageElement);
+		var oStage = document.createElement('div'),
+			stage = document.createElement(this.options.stageElement);
 
 		oStage.className = 'owl-stage-outer';
 		stage.className = 'owl-stage';
@@ -445,7 +450,6 @@
 
 	/**
 	 * createItem
-	 * 
 	 * @desc Create item container
 	 * @since 2.0.0
 	 */
@@ -457,7 +461,6 @@
 
 	/**
 	 * fetchContent
-	 * 
 	 * @since 2.0.0
 	 */
 	Owl.prototype.fetchContent = function(extContent) {
@@ -479,7 +482,6 @@
 
 	/**
 	 * initStructure
-	 * 
 	 * @param [refresh] -
 	 *            if refresh and not lazyContent then dont create normal
 	 *            structure
@@ -492,14 +494,15 @@
 
 	/**
 	 * createNormalStructure
-	 * 
 	 * @desc Create normal structure for small/mid weight content
 	 * @since 2.0.0
 	 */
 	Owl.prototype.createNormalStructure = function() {
-		for (var i = 0; i < this.num.oItems; i++) {
+		var i, item;
+
+		for (i = 0; i < this.num.oItems; i++) {
 			// fill 'owl-item' with content
-			var item = this.fillItem(this.dom.$content, i);
+			item = this.fillItem(this.dom.$content, i);
 			// append into stage
 			this.dom.$stage.append(item);
 		}
@@ -508,13 +511,14 @@
 
 	/**
 	 * createCustomStructure
-	 * 
 	 * @since 2.0.0
 	 */
 	Owl.prototype.createCustomStructure = function(howManyItems) {
-		for (var i = 0; i < howManyItems; i++) {
-			var emptyItem = this.createItem();
-			var item = $(emptyItem);
+		var i, emptyItem, item;
+
+		for (i = 0; i < howManyItems; i++) {
+			emptyItem = this.createItem();
+			item = $(emptyItem);
 
 			this.setData(item, false);
 			this.dom.$stage.append(item);
@@ -523,7 +527,6 @@
 
 	/**
 	 * fillItem
-	 * 
 	 * @desc Fill empty item container with provided content
 	 * @since 2.0.0
 	 * @param [content] -
@@ -532,17 +535,18 @@
 	 *            index in jquery object return $ new object
 	 */
 	Owl.prototype.fillItem = function(content, i) {
-		var emptyItem = this.createItem();
-		var c = content[i] || content;
+		var emptyItem, c, traversed;
+
+		emptyItem = this.createItem();
+		c = content[i] || content;
 		// set item data
-		var traversed = this.traversContent(c);
+		traversed = this.traversContent(c);
 		this.setData(emptyItem, false, traversed);
 		return $(emptyItem).append(c);
 	};
 
 	/**
 	 * traversContent
-	 * 
 	 * @since 2.0.0
 	 * @param [c] -
 	 *            content return object
@@ -564,20 +568,18 @@
 
 	/**
 	 * setData
-	 * 
 	 * @desc Set item jQuery Data
 	 * @since 2.0.0
-	 * @param [item] -
-	 *            dom - passed owl-item
-	 * @param [cloneObj] -
-	 *            $dom - passed clone item
+	 * @param [item] - dom - passed owl-item
+	 * @param [cloneObj] - $dom - passed clone item
 	 */
 	Owl.prototype.setData = function(item, cloneObj, traversed) {
 
-		var data = this.itemData;
+		var data = this.itemData,
+			travers;
 
 		if (traversed) {
-			var travers = {
+			travers = {
 				dot: traversed.dot,
 				hash: traversed.hash
 			};
@@ -594,10 +596,12 @@
 
 	/**
 	 * updateLocalContent
-	 * 
 	 * @since 2.0.0
 	 */
 	Owl.prototype.updateLocalContent = function() {
+
+		var k, item;
+
 		this.dom.$oItems = this.dom.$stage.find('.' + this.options.itemClass).filter(function() {
 			return $(this).data('owl-item').clone === false;
 		});
@@ -605,15 +609,14 @@
 		this.num.oItems = this.dom.$oItems.length;
 		// update index on original items
 
-		for (var k = 0; k < this.num.oItems; k++) {
-			var item = this.dom.$oItems.eq(k);
+		for (k = 0; k < this.num.oItems; k++) {
+			item = this.dom.$oItems.eq(k);
 			item.data('owl-item').index = k;
 		}
 	};
 
 	/**
 	 * loopClone
-	 * 
 	 * @desc Make a clones for infinity loop
 	 * @since 2.0.0
 	 */
@@ -622,7 +625,7 @@
 			return false;
 		}
 
-		var firstClone, lastClone, i, num = this.options.items, lastNum = this.num.oItems - 1;
+		var firstClone, first, last, lastClone, i, num = this.options.items, lastNum = this.num.oItems - 1;
 
 		// if neighbour margin then add one more duplicat
 		if (this.options.stagePadding && this.options.items === 1) {
@@ -632,8 +635,8 @@
 
 		for (i = 0; i < num; i++) {
 			// Clone item
-			var first = this.dom.$oItems.eq(i).clone(true, true);
-			var last = this.dom.$oItems.eq(lastNum - i).clone(true, true);
+			first = this.dom.$oItems.eq(i).clone(true, true);
+			last = this.dom.$oItems.eq(lastNum - i).clone(true, true);
 			firstClone = $(first[0]).addClass('cloned');
 			lastClone = $(last[0]).addClass('cloned');
 
@@ -659,7 +662,6 @@
 
 	/**
 	 * reClone
-	 * 
 	 * @desc Update Cloned elements
 	 * @since 2.0.0
 	 */
@@ -682,13 +684,12 @@
 
 	/**
 	 * calculate
-	 * 
 	 * @desc Update item index data
 	 * @since 2.0.0
 	 */
 	Owl.prototype.calculate = function() {
 
-		var i, j, k, dist, posLeft = 0, fullWidth = 0;
+		var i, j, elMinusMargin, dist, allItems, iWidth,  mergeNumber,  posLeft = 0, fullWidth = 0;
 
 		// element width minus neighbour
 		this.width.el = this.dom.$el.width() - (this.options.stagePadding * 2);
@@ -697,8 +698,7 @@
 		this.width.view = this.dom.$el.width();
 
 		// calculate width minus addition margins
-		var elMinusMargin = this.width.el
-			- (this.options.margin * (this.options.items === 1 ? 0 : this.options.items - 1));
+		elMinusMargin = this.width.el - (this.options.margin * (this.options.items === 1 ? 0 : this.options.items - 1));
 
 		// calculate element width and item width
 		this.width.el = this.width.el + this.options.margin;
@@ -732,7 +732,7 @@
 			// check merged items
 
 			if (this.options.merge) {
-				var mergeNumber = this.dom.$items.eq(i).find('[data-merge]').attr('data-merge') || 1;
+				mergeNumber = this.dom.$items.eq(i).find('[data-merge]').attr('data-merge') || 1;
 				if (this.options.mergeFit && mergeNumber > this.options.items) {
 					mergeNumber = this.options.items;
 				}
@@ -751,7 +751,7 @@
 				this.num.nav.push(this.num.merged[i]);
 			}
 
-			var iWidth = this.width.item * this.num.merged[i];
+			iWidth = this.width.item * this.num.merged[i];
 
 			// autoWidth item size
 			if (this.options.autoWidth) {
@@ -796,7 +796,7 @@
 		}
 
 		// update indexAbs on all items
-		var allItems = this.num.oItems + this.num.cItems;
+		allItems = this.num.oItems + this.num.cItems;
 
 		for (j = 0; j < allItems; j++) {
 			this.dom.$items.eq(j).data('owl-item').indexAbs = j;
@@ -811,13 +811,14 @@
 
 	/**
 	 * setMinMax
-	 * 
 	 * @since 2.0.0
 	 */
 	Owl.prototype.setMinMax = function() {
 
+		var minimum, revert;
+
 		// set Min
-		var minimum = this.dom.$oItems.eq(0).data('owl-item').indexAbs;
+		minimum = this.dom.$oItems.eq(0).data('owl-item').indexAbs;
 		this.pos.min = 0;
 		this.pos.minValue = this.pos.items[minimum];
 
@@ -844,7 +845,7 @@
 		// Max for autoWidth content
 		if ((!this.options.loop && !this.options.center && this.options.autoWidth)
 			|| (this.options.merge && !this.options.center)) {
-			var revert = this.options.rtl ? 1 : -1;
+			revert = this.options.rtl ? 1 : -1;
 			for (i = 0; i < this.pos.items.length; i++) {
 				if ((this.pos.items[i] * revert) < this.width.stage - this.width.el) {
 					this.pos.max = i + 1;
@@ -871,7 +872,6 @@
 
 	/**
 	 * setSizes
-	 * 
 	 * @desc Set sizes on elements (from collectData function)
 	 * @since 2.0.0
 	 */
@@ -917,7 +917,6 @@
 
 	/**
 	 * responsive
-	 * 
 	 * @desc Responsive function update all data by calling refresh()
 	 * @since 2.0.0
 	 */
@@ -945,7 +944,6 @@
 
 	/**
 	 * refresh
-	 * 
 	 * @desc Refresh method is basically collection of functions that are
 	 *       responsible for Owl responsive functionality
 	 * @since 2.0.0
@@ -986,12 +984,10 @@
 
 		this.initPosition(init);
 
-		// jump to last position
+		//jump to last position
 		if (!init) {
 			this.jumpTo(this.pos.current, false); // fix that
 		}
-
-		this.updateItemState();
 
 		// Update controls
 		this.rebuildDots();
@@ -1006,30 +1002,15 @@
 	};
 
 	/**
-	 * updateItemState
-	 * 
+	 * updateActiveItems
 	 * @desc Update information about current state of items (visibile, hidden,
 	 *       active, etc.)
 	 * @since 2.0.0
 	 */
-	Owl.prototype.updateItemState = function(update) {
-
+	Owl.prototype.updateActiveItems = function() {
 		this.trigger('update');
 
-		if (this.options.center) {
-			this.dom.$items.eq(this.pos.currentAbs).addClass(this.options.centerClass).data('owl-item').center = true;
-		}
-
-		this.trigger('updated');
-	};
-
-	/**
-	 * updateActiveItems
-	 * 
-	 * @since 2.0.0
-	 */
-	Owl.prototype.updateActiveItems = function() {
-		var i, j, item, ipos, iwidth, wpos, stage, outsideView, foundCurrent;
+		var i, j, item, ipos, iwidth, outsideView, foundCurrent;
 		// clear states
 		for (i = 0; i < this.num.items; i++) {
 			this.dom.$items.eq(i).data('owl-item').active = false;
@@ -1038,7 +1019,8 @@
 		}
 
 		this.num.active = 0;
-		stageX = this.pos.stage;
+		padding = this.options.stagePadding * 2;
+		stageX = this.pos.stage + padding;
 		view = this.options.rtl ? this.width.view : -this.width.view;
 
 		for (j = 0; j < this.num.items; j++) {
@@ -1046,7 +1028,7 @@
 			item = this.dom.$items.eq(j);
 			ipos = item.data('owl-item').posLeft;
 			iwidth = item.data('owl-item').width;
-			outsideView = this.options.rtl ? ipos + iwidth : ipos - iwidth;
+			outsideView = this.options.rtl ? ipos - iwidth - padding : ipos - iwidth + padding;
 
 			if ((this.op(ipos, '<=', stageX) && (this.op(ipos, '>', stageX + view)))
 				|| (this.op(outsideView, '<', stageX) && this.op(outsideView, '>', stageX + view))) {
@@ -1071,11 +1053,15 @@
 				}
 			}
 		}
+
+		if (this.options.center) {
+			this.dom.$items.eq(this.pos.currentAbs).addClass(this.options.centerClass).data('owl-item').center = true;
+		}
+		this.trigger('updated');
 	};
 
 	/**
 	 * updateClonedItemsState
-	 * 
 	 * @desc Set current state on sibilings items for lazyLoad and center
 	 * @since 2.0.0
 	 */
@@ -1100,7 +1086,6 @@
 
 	/**
 	 * eventsCall
-	 * 
 	 * @desc Save internal event references and add event based functions like
 	 *       transitionEnd,responsive etc.
 	 * @since 2.0.0
@@ -1155,7 +1140,6 @@
 
 	/**
 	 * responsiveTimer
-	 * 
 	 * @desc Check Window resize event with 200ms delay /
 	 *       this.options.responsiveRefreshRate
 	 * @since 2.0.0
@@ -1172,14 +1156,13 @@
 
 	/**
 	 * internalEvents
-	 * 
 	 * @desc Checks for touch/mouse drag options and add necessery event
 	 *       handlers.
 	 * @since 2.0.0
 	 */
 	Owl.prototype.internalEvents = function() {
-		var isTouch = isTouchSupport();
-		var isTouchIE = isTouchSupportIE();
+		var isTouch = isTouchSupport(),
+			isTouchIE = isTouchSupportIE();
 
 		if (isTouch && !isTouchIE) {
 			this.dragType = [ 'touchstart', 'touchmove', 'touchend', 'touchcancel' ];
@@ -1229,7 +1212,6 @@
 
 	/**
 	 * dragEvents
-	 * 
 	 * @since 2.0.0
 	 */
 	Owl.prototype.dragEvents = function() {
@@ -1245,12 +1227,14 @@
 
 	/**
 	 * onDragStart
-	 * 
 	 * @desc touchstart/mousedown event
 	 * @since 2.0.0
 	 */
 	Owl.prototype.onDragStart = function(event) {
-		var ev = event.originalEvent || event || window.event;
+		var ev, isTouchEvent, pageX, pageY, animatedPos;
+
+		ev = event.originalEvent || event || window.event;
+
 		// prevent right click
 		if (ev.which === 3) {
 			return false;
@@ -1269,9 +1253,9 @@
 		this.drag.distance = 0;
 
 		// if is 'touchstart'
-		var isTouchEvent = ev.type === 'touchstart';
-		var pageX = isTouchEvent ? event.targetTouches[0].pageX : (ev.pageX || ev.clientX);
-		var pageY = isTouchEvent ? event.targetTouches[0].pageY : (ev.pageY || ev.clientY);
+		isTouchEvent = ev.type === 'touchstart';
+		pageX = isTouchEvent ? event.targetTouches[0].pageX : (ev.pageX || ev.clientX);
+		pageY = isTouchEvent ? event.targetTouches[0].pageY : (ev.pageY || ev.clientY);
 
 		// get stage position left
 		this.drag.offsetX = this.dom.$stage.position().left - this.options.stagePadding;
@@ -1284,7 +1268,7 @@
 
 		// catch position // ie to fix
 		if (this.state.inMotion && this.support3d) {
-			var animatedPos = this.getTransformProperty();
+			animatedPos = this.getTransformProperty();
 			this.drag.offsetX = animatedPos;
 			this.animStage(animatedPos);
 		} else if (this.state.inMotion && !this.support3d) {
@@ -1311,11 +1295,12 @@
 
 	/**
 	 * onDragMove
-	 * 
 	 * @desc touchmove/mousemove event
 	 * @since 2.0.0
 	 */
 	Owl.prototype.onDragMove = function(event) {
+		var ev, neighbourItemWidth, isTouchEvent, pageX, pageY, minValue, maxValue, pull;
+
 		if (!this.state.isTouch) {
 			return;
 		}
@@ -1324,13 +1309,13 @@
 			return;
 		}
 
-		var neighbourItemWidth = 0;
-		var ev = event.originalEvent || event || window.event;
+		neighbourItemWidth = 0;
+		ev = event.originalEvent || event || window.event;
 
 		// if is 'touchstart'
-		var isTouchEvent = ev.type == 'touchmove';
-		var pageX = isTouchEvent ? ev.targetTouches[0].pageX : (ev.pageX || ev.clientX);
-		var pageY = isTouchEvent ? ev.targetTouches[0].pageY : (ev.pageY || ev.clientY);
+		isTouchEvent = ev.type == 'touchmove';
+		pageX = isTouchEvent ? ev.targetTouches[0].pageX : (ev.pageX || ev.clientX);
+		pageY = isTouchEvent ? ev.targetTouches[0].pageY : (ev.pageY || ev.clientY);
 
 		// Drag Direction
 		this.drag.currentX = pageX - this.drag.startX;
@@ -1352,9 +1337,9 @@
 			}
 		} else {
 			// pull
-			var minValue = this.options.rtl ? this.pos.maxValue : this.pos.minValue;
-			var maxValue = this.options.rtl ? this.pos.minValue : this.pos.maxValue;
-			var pull = this.options.pullDrag ? this.drag.distance / 5 : 0;
+			minValue = this.options.rtl ? this.pos.maxValue : this.pos.minValue;
+			maxValue = this.options.rtl ? this.pos.minValue : this.pos.maxValue;
+			pull = this.options.pullDrag ? this.drag.distance / 5 : 0;
 			this.drag.currentX = Math.max(Math.min(this.drag.currentX, minValue + pull), maxValue + pull);
 		}
 
@@ -1382,11 +1367,12 @@
 
 	/**
 	 * onDragEnd
-	 * 
 	 * @desc touchend/mouseup event
 	 * @since 2.0.0
 	 */
-	Owl.prototype.onDragEnd = function(event) {
+	Owl.prototype.onDragEnd = function() {
+		var compareTimes, distanceAbs, closest;
+
 		if (!this.state.isTouch) {
 			return;
 		}
@@ -1414,15 +1400,15 @@
 		// prevent clicks while scrolling
 
 		this.drag.endTime = new Date().getTime();
-		var compareTimes = this.drag.endTime - this.drag.startTime;
-		var distanceAbs = Math.abs(this.drag.distance);
+		compareTimes = this.drag.endTime - this.drag.startTime;
+		distanceAbs = Math.abs(this.drag.distance);
 
 		// to test
 		if (distanceAbs > 3 || compareTimes > 300) {
 			this.removeClick(this.drag.targetEl);
 		}
 
-		var closest = this.closest(this.drag.updatedX);
+		closest = this.closest(this.drag.updatedX);
 
 		this.setSpeed(this.options.dragEndSpeed, false, true);
 		this.animStage(this.pos.items[closest]);
@@ -1441,7 +1427,6 @@
 
 	/**
 	 * removeClick
-	 * 
 	 * @desc Attach preventClick function to disable link while swipping
 	 * @since 2.0.0
 	 * @param [target] -
@@ -1458,7 +1443,6 @@
 
 	/**
 	 * preventClick
-	 * 
 	 * @desc Add preventDefault for any link and then remove removeClick event
 	 *       hanlder
 	 * @since 2.0.0
@@ -1477,33 +1461,33 @@
 
 	/**
 	 * getTransformProperty
-	 * 
 	 * @desc catch stage position while animate (only css3)
 	 * @since 2.0.0
 	 */
 	Owl.prototype.getTransformProperty = function() {
-		var transform = window.getComputedStyle(this.dom.stage, null).getPropertyValue(this.vendorName + 'transform');
+		var transform, matrix3d;
+
+		transform = window.getComputedStyle(this.dom.stage, null).getPropertyValue(this.vendorName + 'transform');
 		// var transform = this.dom.$stage.css(this.vendorName + 'transform')
 		transform = transform.replace(/matrix(3d)?\(|\)/g, '').split(',');
-		var matrix3d = transform.length === 16;
+		matrix3d = transform.length === 16;
 
 		return matrix3d !== true ? transform[4] : transform[12];
 	};
 
 	/**
 	 * closest
-	 * 
 	 * @desc Get closest item after touchend/mouseup
 	 * @since 2.0.0
 	 * @param [x] -
 	 *            curent position in pixels return position in pixels
 	 */
 	Owl.prototype.closest = function(x) {
-		var newX = 0, pull = 30;
+		var newX = 0, pull = 30, i;
 
 		if (!this.options.freeDrag) {
 			// Check closest item
-			for (var i = 0; i < this.num.items; i++) {
+			for (i = 0; i < this.num.items; i++) {
 				if (x > this.pos.items[i] - pull && x < this.pos.items[i] + pull) {
 					newX = i;
 				} else if (this.op(x, '<', this.pos.items[i])
@@ -1526,7 +1510,6 @@
 			this.pos.currentAbs = newX;
 			this.pos.current = this.dom.$items.eq(newX).data('owl-item').index;
 		} else {
-			this.updateItemState();
 			return x;
 		}
 
@@ -1535,17 +1518,15 @@
 
 	/**
 	 * animStage
-	 * 
 	 * @desc animate stage position (both css3/css2) and perform onChange
 	 *       functions/events
 	 * @since 2.0.0
 	 * @param [x] -
 	 *            curent position in pixels
 	 */
-	Owl.prototype.animStage = function(pos) {
+	Owl.prototype.animStage = function(pos, bypassEvent) {
 
-		// if speed is 0 then set inMotion to false
-		if (this.speed.current !== 0 && this.pos.currentAbs !== this.pos.min) {
+		if (pos !== this.pos.stage && bypassEvent !== true){
 			this.trigger('translate');
 			this.state.inMotion = true;
 		}
@@ -1572,7 +1553,6 @@
 
 	/**
 	 * updatePosition
-	 * 
 	 * @desc Update current positions
 	 * @since 2.0.0
 	 * @param [pos] -
@@ -1621,7 +1601,6 @@
 
 	/**
 	 * setSpeed
-	 * 
 	 * @since 2.0.0
 	 * @param [speed] -
 	 *            number
@@ -1633,7 +1612,7 @@
 	 *            speed
 	 */
 	Owl.prototype.setSpeed = function(speed, pos, drag) {
-		var s = speed, nextPos = pos;
+		var s = speed, nextPos = pos, diff, style;
 
 		if ((s === false && s !== 0 && drag !== true) || s === undefined) {
 
@@ -1646,7 +1625,7 @@
 			// s = 1000;
 			// }
 
-			var diff = Math.abs(nextPos - this.pos.prev);
+			diff = Math.abs(nextPos - this.pos.prev);
 			diff = diff === 0 ? 1 : diff;
 			if (diff > 6) {
 				diff = 6;
@@ -1663,7 +1642,7 @@
 		}
 
 		if (this.support3d) {
-			var style = this.dom.stage.style;
+			style = this.dom.stage.style;
 			style.webkitTransitionDuration = style.MsTransitionDuration = style.msTransitionDuration = style.MozTransitionDuration = style.OTransitionDuration = style.transitionDuration = (s / 1000)
 				+ 's';
 		} else {
@@ -1675,7 +1654,6 @@
 
 	/**
 	 * jumpTo
-	 * 
 	 * @since 2.0.0
 	 * @param [pos] -
 	 *            number - next position - use this param to calculate
@@ -1683,18 +1661,14 @@
 	 * @param [update] -
 	 *            boolean - if drag is true then smart speed is disabled
 	 */
-	Owl.prototype.jumpTo = function(pos, update) {
+	Owl.prototype.jumpTo = function(pos, bypassEvent) {
 		this.updatePosition(pos);
 		this.setSpeed(0);
-		this.animStage(this.pos.items[this.pos.currentAbs]);
-		if (update !== true) {
-			this.updateItemState();
-		}
+		this.animStage(this.pos.items[this.pos.currentAbs], bypassEvent);
 	};
 
 	/**
 	 * goTo
-	 * 
 	 * @since 2.0.0
 	 * @param [pos] -
 	 *            number
@@ -1705,17 +1679,15 @@
 	 */
 	Owl.prototype.goTo = function(pos, speed) {
 		this.updatePosition(pos);
-
 		this.setSpeed(speed, this.pos.currentAbs);
 
-		this.trigger('animate');
+		this.trigger('animateto');
 
 		this.animStage(this.pos.items[this.pos.currentAbs]);
 	};
 
 	/**
 	 * next
-	 * 
 	 * @since 2.0.0
 	 */
 	Owl.prototype.next = function(optionalSpeed) {
@@ -1729,7 +1701,6 @@
 
 	/**
 	 * prev
-	 * 
 	 * @since 2.0.0
 	 */
 	Owl.prototype.prev = function(optionalSpeed) {
@@ -1743,7 +1714,6 @@
 
 	/**
 	 * goToLoop
-	 * 
 	 * @desc Go to given position if loop is enabled - used only internal
 	 * @since 2.0.0
 	 * @param [distance] -
@@ -1782,7 +1752,6 @@
 
 	/**
 	 * initPosition
-	 * 
 	 * @since 2.0.0
 	 */
 	Owl.prototype.initPosition = function(init) {
@@ -1803,7 +1772,6 @@
 
 	/**
 	 * goToHash
-	 * 
 	 * @since 2.0.0
 	 */
 	Owl.prototype.goToHash = function() {
@@ -1817,17 +1785,16 @@
 
 	/**
 	 * hashPosition
-	 * 
 	 * @desc Find hash in URL then look into items to find contained ID
 	 * @since 2.0.0 return hashPos - number of item
 	 */
 	Owl.prototype.hashPosition = function() {
-		var hash = window.location.hash.substring(1), hashPos;
+		var hash = window.location.hash.substring(1), hashPos, i;
 		if (hash === "") {
 			return false;
 		}
 
-		for (var i = 0; i < this.num.oItems; i++) {
+		for (i = 0; i < this.num.oItems; i++) {
 			if (hash === this.dom.$oItems.eq(i).data('owl-item').hash) {
 				hashPos = i;
 			}
@@ -1837,7 +1804,6 @@
 
 	/**
 	 * transitionEnd
-	 * 
 	 * @desc event used by css3 animation end and $.animate callback like
 	 *       transitionEnd,responsive etc.
 	 * @since 2.0.0
@@ -1856,13 +1822,11 @@
 		}
 
 		this.state.inMotion = false;
-		this.updateItemState();
 		this.trigger('translated');
 	};
 
 	/**
 	 * isElWidthChanged
-	 * 
 	 * @desc Check if element width has changed
 	 * @since 2.0.0
 	 */
@@ -1875,7 +1839,6 @@
 
 	/**
 	 * windowWidth
-	 * 
 	 * @desc Get Window/responsiveBaseElement width
 	 * @since 2.0.0
 	 */
@@ -1892,7 +1855,6 @@
 
 	/**
 	 * Controls
-	 * 
 	 * @desc Calls controls container, navigation and dots creator
 	 * @since 2.0.0
 	 */
@@ -1905,7 +1867,6 @@
 
 	/**
 	 * updateControls
-	 * 
 	 * @since 2.0.0
 	 */
 	Owl.prototype.updateControls = function() {
@@ -1945,21 +1906,21 @@
 
 	/**
 	 * createNavigation
-	 * 
 	 * @since 2.0.0
 	 */
 	Owl.prototype.createNavigation = function() {
+		var cc, nav, navPrev, navNext;
 
-		var cc = this.options.navContainer ? $(this.options.navContainer).get(0) : this.dom.$cc.get(0);
+		cc = this.options.navContainer ? $(this.options.navContainer).get(0) : this.dom.$cc.get(0);
 
 		// Create nav container
-		var nav = document.createElement('div');
+		nav = document.createElement('div');
 		nav.className = this.options.navContainerClass;
 		cc.appendChild(nav);
 
 		// Create left and right buttons
-		var navPrev = document.createElement(this.options.navElement), navNext = document
-			.createElement(this.options.navElement);
+		navPrev = document.createElement(this.options.navElement);
+		navNext = document.createElement(this.options.navElement);
 
 		navPrev.className = this.options.navClass[0];
 		navNext.className = this.options.navClass[1];
@@ -1982,17 +1943,18 @@
 
 	/**
 	 * createNavigation
-	 * 
 	 * @since 2.0.0
 	 * @param [cc] -
 	 *            dom element - Controls Container
 	 */
 	Owl.prototype.createDots = function() {
 
-		var cc = this.options.dotsContainer ? $(this.options.dotsContainer).get(0) : this.dom.$cc.get(0);
+		var cc, page, that;
+
+		cc = this.options.dotsContainer ? $(this.options.dotsContainer).get(0) : this.dom.$cc.get(0);
 
 		// Create dots container
-		var page = document.createElement('div');
+		page = document.createElement('div');
 		page.className = this.options.dotsClass;
 		cc.appendChild(page);
 
@@ -2003,12 +1965,12 @@
 		// this.on(page, this.dragType[2], this.e._goToPage, false);
 
 		// FF fix? To test!
-		var that = this;
+		that = this;
 		this.dom.$page.on(this.dragType[2], '.' + this.options.dotClass, goToPage);
 
 		function goToPage(e) {
 			e.preventDefault();
-			var page = $(this).data('page');
+			page = $(this).data('page');
 			that.goTo(page, that.options.dotsSpeed);
 		}
 		// build dots
@@ -2017,14 +1979,13 @@
 
 	/**
 	 * rebuildDots
-	 * 
 	 * @since 2.0.0
 	 */
 	Owl.prototype.rebuildDots = function() {
 		if (this.dom.$page === null) {
 			return false;
 		}
-		var each, dot, span, counter = 0, last = 0, i, page = 0, roundPages = 0;
+		var each, dot, $dot, span, counter = 0, last = 0, i, j, page = 0, roundPages = 0;
 
 		each = this.options.dotsEach || this.options.items;
 
@@ -2044,7 +2005,7 @@
 				dot.className = this.options.dotClass;
 				span = document.createElement('span');
 				dot.appendChild(span);
-				var $dot = $(dot);
+				$dot = $(dot);
 
 				if (this.options.dotData) {
 					$dot.html(this.dom.$oItems.eq(i).data('owl-item').dot);
@@ -2067,7 +2028,7 @@
 		}
 		// find rest of dots
 		if (!this.options.loop && !this.options.center) {
-			for (var j = this.num.nav.length - 1; j >= 0; j--) {
+			for (j = this.num.nav.length - 1; j >= 0; j--) {
 				last += this.num.nav[j];
 				this.dom.$oItems.eq(j).data('owl-item').page = roundPages - 1;
 				if (last >= each) {
@@ -2081,15 +2042,16 @@
 
 	/**
 	 * updateDots
-	 * 
 	 * @since 2.0.0
 	 */
 	Owl.prototype.updateDots = function() {
-		var dots = this.dom.$page.children();
-		var itemIndex = this.dom.$oItems.eq(this.pos.current).data('owl-item').page;
+		var dots, itemIndex, dotPage, i;
 
-		for (var i = 0; i < dots.length; i++) {
-			var dotPage = dots.eq(i).data('goToPage');
+		dots = this.dom.$page.children();
+		itemIndex = this.dom.$oItems.eq(this.pos.current).data('owl-item').page;
+
+		for (i = 0; i < dots.length; i++) {
+			dotPage = dots.eq(i).data('goToPage');
 
 			if (dotPage === itemIndex) {
 				this.pos.currentPage = i;
@@ -2102,7 +2064,6 @@
 
 	/**
 	 * updateNavigation
-	 * 
 	 * @since 2.0.0
 	 */
 	Owl.prototype.updateNavigation = function() {
@@ -2131,7 +2092,6 @@
 
 	/**
 	 * addItem - Add an item
-	 * 
 	 * @since 2.0.0
 	 * @param [content] -
 	 *            dom element / string '<div>content</div>'
@@ -2139,16 +2099,18 @@
 	 *            number - position
 	 */
 	Owl.prototype.addItem = function(content, pos) {
+		var item, it;
+
 		pos = pos || 0;
 
 		// wrap content
-		var item = this.fillItem(content);
+		item = this.fillItem(content);
 		// if carousel is empty then append item
 		if (this.dom.$oItems.length === 0) {
 			this.dom.$stage.append(item);
 		} else {
 			// append item
-			var it = this.dom.$oItems.eq(pos);
+			it = this.dom.$oItems.eq(pos);
 			if (pos !== -1) {
 				it.before(item);
 			} else {
@@ -2162,7 +2124,6 @@
 
 	/**
 	 * removeItem - Remove an Item
-	 * 
 	 * @since 2.0.0
 	 * @param [pos] -
 	 *            number - position
@@ -2174,7 +2135,6 @@
 
 	/**
 	 * addTriggerableEvents
-	 * 
 	 * @desc Add triggerable events by jQuery's `on` method
 	 * @since 2.0.0
 	 */
@@ -2204,7 +2164,6 @@
 
 	/**
 	 * watchVisibility
-	 * 
 	 * @desc check if el is visible - handy if Owl is inside hidden content
 	 *       (tabs etc.)
 	 * @since 2.0.0
@@ -2233,7 +2192,6 @@
 
 	/**
 	 * onChange
-	 * 
 	 * @since 2.0.0
 	 */
 	Owl.prototype.onChange = function() {
@@ -2248,7 +2206,6 @@
 		if (!this.state.isTouch && !this.state.bypass) {
 
 			this.updateActiveItems();
-
 			// set Status to do
 			this.storeInfo();
 			this.trigger('changed');
@@ -2258,7 +2215,6 @@
 
 	/**
 	 * storeInfo store basic information about current states
-	 * 
 	 * @since 2.0.0
 	 */
 	Owl.prototype.storeInfo = function() {
@@ -2280,16 +2236,17 @@
 
 	/**
 	 * preloadAutoWidthImages
-	 * 
 	 * @desc still to test
 	 * @since 2.0.0
 	 */
 	Owl.prototype.preloadAutoWidthImages = function(imgs) {
-		var loaded = 0;
-		var that = this;
+		var loaded, that, $el, img;
+
+		loaded = 0;
+		that = this;
 		imgs.each(function(i, el) {
-			var $el = $(el);
-			var img = new Image();
+			$el = $(el);
+			img = new Image();
 
 			img.onload = function() {
 				loaded++;
@@ -2307,7 +2264,6 @@
 
 	/**
 	 * destroy
-	 * 
 	 * @desc Remove Owl structure and events :(
 	 * @since 2.0.0
 	 */
@@ -2368,7 +2324,6 @@
 
 	/**
 	 * Opertators
-	 * 
 	 * @desc Used to calculate RTL
 	 * @param [a] -
 	 *            Number - left side
@@ -2396,7 +2351,6 @@
 
 	/**
 	 * on
-	 * 
 	 * @desc On method for adding internal events
 	 * @since 2.0.0
 	 */
@@ -2411,7 +2365,6 @@
 
 	/**
 	 * off
-	 * 
 	 * @desc Off method for removing internal events
 	 * @since 2.0.0
 	 */
@@ -2425,7 +2378,6 @@
 
 	/**
 	 * trigger
-	 * 
 	 * @since 2.0.0
 	 * @param event -
 	 *            string - event name
@@ -2435,13 +2387,13 @@
 	 */
 	Owl.prototype.trigger = function(name, data, namespace) {
 		var status = {
-			page: {size: this.options.items, count: this.num.allPages, index: this.pos.currentPage}, 
-			item: {count: this.num.oItems, index: this.pos.current}
+			page: { size: this.options.items, count: this.num.allPages, index: this.pos.currentPage },
+			item: { count: this.num.oItems, index: this.pos.current }
 		}, handler = $.camelCase(
-			$.grep([ 'on', name, namespace ], 
+			$.grep([ 'on', name, namespace ],
 			function(v) {return v}).join('-').toLowerCase()
 		), event = $.Event(
-			[ name, 'owl', namespace || 'carousel' ].join('.').toLowerCase(), 
+			[ name, 'owl', namespace || 'carousel' ].join('.').toLowerCase(),
 			$.extend(status, data)
 		);
 
@@ -2458,7 +2410,6 @@
 
 	/**
 	 * Opertators
-	 * 
 	 * @desc Used to calculate RTL
 	 * @since 2.0.0
 	 */
@@ -2513,10 +2464,6 @@
 
 	function isTouchSupportIE() {
 		return window.navigator.msPointerEnabled;
-	}
-
-	function isRetina() {
-		return window.devicePixelRatio > 1;
 	}
 
 	$.fn.owlCarousel = function(options) {

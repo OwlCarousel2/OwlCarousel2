@@ -1,6 +1,5 @@
 /**
  * Animate Plugin
- * 
  * @since 2.0.0
  */
 ;(function($, window, document, undefined) {
@@ -10,9 +9,10 @@
 		this.owl.options = $.extend({}, Animate.Defaults, this.owl.options);
 
 		this.owl.dom.$el.on({
-			'animate.owl.carousel': $.proxy(function(e) {
-				if (this.owl.options.animateIn || this.owl.options.animateOut)
+			'animateto.owl.carousel': $.proxy(function() {
+				if (this.owl.options.animateIn || this.owl.options.animateOut){
 					this.swap();
+				}
 			}, this)
 		});
 	};
@@ -23,28 +23,27 @@
 	};
 
 	Animate.prototype.swap = function() {
-		// speed = 0;
-		this.owl.setSpeed(0);
 
-		if (this.owl.options.items === 1 && this.owl.support3d) {
-			this.owl.state.animate = true;
-		} else {
-			this.owl.state.animate = false;
+		if ( !(this.owl.options.items === 1 && this.owl.support3d) ) {
+			return false;
 		}
 
-		var prevItem = this.owl.dom.$items.eq(this.owl.pos.prev), 
-			prevPos = Math.abs(prevItem.data('owl-item').width) * this.owl.pos.prev, 
-			currentItem = this.owl.dom.$items.eq(this.owl.pos.currentAbs), 
+		this.owl.setSpeed(0);
+
+		var pos, tIn, tOut, that,
+			prevItem = this.owl.dom.$items.eq(this.owl.pos.prev),
+			prevPos = Math.abs(prevItem.data('owl-item').width) * this.owl.pos.prev,
+			currentItem = this.owl.dom.$items.eq(this.owl.pos.currentAbs),
 			currentPos = Math.abs(currentItem.data('owl-item').width) * this.owl.pos.currentAbs;
 
 		if (this.owl.pos.currentAbs === this.owl.pos.prev) {
 			return false;
 		}
 
-		var pos = currentPos - prevPos;
-		var tIn = this.owl.options.animateIn;
-		var tOut = this.owl.options.animateOut;
-		var that = this.owl;
+		pos = currentPos - prevPos;
+		tIn = this.owl.options.animateIn;
+		tOut = this.owl.options.animateOut;
+		that = this.owl;
 
 		removeStyles = function() {
 			$(this).css({

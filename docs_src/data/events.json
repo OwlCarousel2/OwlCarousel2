@@ -40,13 +40,13 @@
     "name":     "update.owl.carousel",
     "type":     "attachable",
     "callback": "onUpdate",
-    "desc":     "on classes update. //will remove it"
+    "desc":     "on classes update."
   },
   {
     "name":     "updated.owl.carousel",
     "type":     "attachable",
     "callback": "onUpdated",
-    "desc":     "on classes update. //will remove it"
+    "desc":     "on classes update."
   },
   {
     "name":     "drag.owl.carousel",
@@ -73,9 +73,9 @@
     "desc":     "When the translation of the stage has finished."
   },
   {
-    "name":     "animate.owl.carousel",
+    "name":     "animateto.owl.carousel",
     "type":     "attachable",
-    "callback": "onAnimate",
+    "callback": "onAnimateto",
     "desc":     "When the position changes."
   },
   {

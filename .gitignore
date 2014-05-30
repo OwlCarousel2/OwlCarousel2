@@ -6,6 +6,7 @@
 *.sublime*
 *.zip
 /download
+/jscs.report.txt
 
 .DS_Store
 */.DS_Store

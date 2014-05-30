@@ -1,6 +1,5 @@
 /**
  * Video Plugin
- * 
  * @since 2.0.0
  */
 ;(function($, window, document, undefined) {
@@ -15,16 +14,19 @@
 
 		this.owl.dom.$el.on({
 			'resize.owl.carousel': $.proxy(function(e) {
-				if (this.owl.options.video && !this.isInFullScreen())
+				if (this.owl.options.video && !this.isInFullScreen()){
 					e.preventDefault();
+				}
 			}, this),
-			'refresh.owl.carousel changed.owl.carousel': $.proxy(function(e) {
-				if (this.owl.state.videoPlay)
+			'refresh.owl.carousel changed.owl.carousel': $.proxy(function() {
+				if (this.owl.state.videoPlay){
 					this.stopVideo();
+				}
 			}, this),
-			'refresh.owl.carousel': $.proxy(function(e) {
-				if (!this.owl.options.video)
+			'refresh.owl.carousel': $.proxy(function() {
+				if (!this.owl.options.video){
 					return false;
+				}
 				this.owl.dom.$el.one('updated.owl.carousel', $.proxy(this.checkVideoLinks, this));
 			}, this)
 		});
@@ -38,14 +40,13 @@
 
 	/**
 	 * checkVideoLinks
-	 * 
 	 * @desc Check if for any videos links
 	 * @since 2.0.0
 	 */
 	Video.prototype.checkVideoLinks = function() {
-		var videoEl, item;
+		var videoEl, item, i;
 
-		for (var i = 0; i < this.owl.num.items; i++) {
+		for (i = 0; i < this.owl.num.items; i++) {
 
 			item = this.owl.dom.$items.eq(i);
 			if (item.data('owl-item').hasVideo) {
@@ -64,16 +65,17 @@
 
 	/**
 	 * getVideoInfo
-	 * 
 	 * @desc Get Video ID and Type (YouTube/Vimeo only)
 	 * @since 2.0.0
 	 */
 	Video.prototype.getVideoInfo = function(videoEl, item) {
 
-		var info, type, id, vimeoId = videoEl.data('vimeo-id'), youTubeId = videoEl.data('youtube-id'), width = videoEl
-			.data('width')
-			|| this.owl.options.videoWidth, height = videoEl.data('height') || this.owl.options.videoHeight, url = videoEl
-			.attr('href');
+		var info, type, id, dimensions,
+			vimeoId = videoEl.data('vimeo-id'),
+			youTubeId = videoEl.data('youtube-id'),
+			width = videoEl.data('width') || this.owl.options.videoWidth,
+			height = videoEl.data('height') || this.owl.options.videoHeight,
+			url = videoEl.attr('href');
 
 		if (vimeoId) {
 			type = 'vimeo';
@@ -82,8 +84,7 @@
 			type = 'youtube';
 			id = youTubeId;
 		} else if (url) {
-			id = url
-				.match(/(http:|https:|)\/\/(player.|www.)?(vimeo\.com|youtu(be\.com|\.be|be\.googleapis\.com))\/(video\/|embed\/|watch\?v=|v\/)?([A-Za-z0-9._%-]*)(\&\S+)?/);
+			id = url.match(/(http:|https:|)\/\/(player.|www.)?(vimeo\.com|youtu(be\.com|\.be|be\.googleapis\.com))\/(video\/|embed\/|watch\?v=|v\/)?([A-Za-z0-9._%-]*)(\&\S+)?/);
 
 			if (id[3].indexOf('youtu') > -1) {
 				type = 'youtube';
@@ -106,7 +107,7 @@
 		};
 
 		// Check dimensions
-		var dimensions = width && height ? 'style="width:' + width + 'px;height:' + height + 'px;"' : '';
+		dimensions = width && height ? 'style="width:' + width + 'px;height:' + height + 'px;"' : '';
 
 		// wrap video content into owl-video-wrapper div
 		videoEl.wrap('<div class="owl-video-wrapper"' + dimensions + '></div>');
@@ -116,17 +117,16 @@
 
 	/**
 	 * createVideoTn
-	 * 
 	 * @desc Create Video Thumbnail
 	 * @since 2.0.0
 	 */
 	Video.prototype.createVideoTn = function(videoEl, info) {
 
-		var tnLink, icon, height;
-		var customTn = videoEl.find('img');
-		var srcType = 'src';
-		var lazyClass = '';
-		var that = this.owl;
+		var tnLink, icon, path,
+			customTn = videoEl.find('img'),
+			srcType = 'src',
+			lazyClass = '',
+			that = this.owl;
 
 		if (this.owl.options.lazyLoad) {
 			srcType = 'data-src';
@@ -154,7 +154,7 @@
 		}
 
 		if (info.type === 'youtube') {
-			var path = "http://img.youtube.com/vi/" + info.id + "/hqdefault.jpg";
+			path = "http://img.youtube.com/vi/" + info.id + "/hqdefault.jpg";
 			addThumbnail(path);
 		} else if (info.type === 'vimeo') {
 			$.ajax({
@@ -163,10 +163,10 @@
 				jsonp: 'callback',
 				dataType: 'jsonp',
 				success: function(data) {
-					var path = data[0].thumbnail_large;
+					path = data[0].thumbnail_large;
 					addThumbnail(path);
 					if (that.options.loop) {
-						that.updateItemState();
+						that.updateActiveItems();
 					}
 				}
 			});
@@ -175,7 +175,6 @@
 
 	/**
 	 * stopVideo
-	 * 
 	 * @since 2.0.0
 	 */
 	Video.prototype.stopVideo = function() {
@@ -188,7 +187,6 @@
 
 	/**
 	 * playVideo
-	 * 
 	 * @since 2.0.0
 	 */
 	Video.prototype.playVideo = function(ev) {
@@ -197,10 +195,11 @@
 		if (this.owl.state.videoPlay) {
 			this.stopVideo();
 		}
-		var videoLink, videoWrap, target = $(ev.target || ev.srcElement), item = target.closest('.'
-			+ this.owl.options.itemClass);
+		var videoLink, videoWrap, videoType,
+			target = $(ev.target || ev.srcElement),
+			item = target.closest('.' + this.owl.options.itemClass);
 
-		var videoType = item.data('owl-item').videoType, id = item.data('owl-item').videoId, width = item
+		videoType = item.data('owl-item').videoType, id = item.data('owl-item').videoId, width = item
 			.data('owl-item').videoWidth
 			|| Math.floor(item.data('owl-item').width - this.owl.options.margin), height = item.data('owl-item').videoHeight
 			|| this.owl.dom.$stage.height();
