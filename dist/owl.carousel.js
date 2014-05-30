@@ -1423,9 +1423,15 @@
 		}
 
 		var closest = this.closest(this.drag.updatedX);
+		var closestPos = this.pos.items[closest];
+
+		// trigger "moved" event when item is changed
+		if (closestPos !== this.drag.start) {
+			this.trigger('moved');
+		}
 
 		this.setSpeed(this.options.dragEndSpeed, false, true);
-		this.animStage(this.pos.items[closest]);
+		this.animStage(closestPos);
 
 		// if pullDrag is off then fire transitionEnd event manually when stick
 		// to border
