@@ -1426,7 +1426,7 @@
 		var closestPos = this.pos.items[closest];
 
 		// trigger "moved" event when item is changed
-		if (closestPos !== this.drag.start) {
+		if (Math.ceil(closestPos) !== Math.ceil(this.drag.start)) {
 			this.trigger('moved');
 		}
 
