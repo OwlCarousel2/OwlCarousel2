@@ -1,6 +1,5 @@
 /**
  * Autoplay Plugin
- * 
  * @since 2.0.0
  */
 ;(function($, window, document, undefined) {
@@ -10,22 +9,22 @@
 		this.owl.options = $.extend({}, Autoplay.Defaults, this.owl.options);
 
 		this.owl.dom.$el.on({
-			'translated.owl.carousel refreshed.owl.carousel': $.proxy(function(e) {
+			'translated.owl.carousel refreshed.owl.carousel': $.proxy(function() {
 				this.autoplay();
 			}, this),
 			'play.owl.autoplay': $.proxy(function(e, t, s) {
 				this.play(t, s);
 			}, this),
-			'stop.owl.autoplay': $.proxy(function(e) {
+			'stop.owl.autoplay': $.proxy(function() {
 				this.stop();
 			}, this)
 		});
 
 		if (this.owl.options.autoplayHoverPause) {
-			this.owl.dom.$el.on('mouseover.ap.owl', '.owl-stage', $.proxy(function(e) {
+			this.owl.dom.$el.on('mouseover.ap.owl', '.owl-stage', $.proxy(function() {
 				this.pause();
 			}, this));
-			this.owl.dom.$el.on('mouseleave.ap.owl', '.owl-stage', $.proxy(function(e) {
+			this.owl.dom.$el.on('mouseleave.ap.owl', '.owl-stage', $.proxy(function() {
 				this.autoplay();
 			}, this));
 		}
@@ -40,7 +39,6 @@
 
 	/**
 	 * Autoplay
-	 * 
 	 * @since 2.0.0
 	 */
 
@@ -60,11 +58,8 @@
 
 	/**
 	 * play
-	 * 
-	 * @param [timeout] -
-	 *            Integrer
-	 * @param [speed] -
-	 *            Integrer
+	 * @param [timeout] - Integrer
+	 * @param [speed] - Integrer
 	 * @since 2.0.0
 	 */
 	Autoplay.prototype.play = function(timeout, speed) {
@@ -98,7 +93,6 @@
 
 	/**
 	 * stop
-	 * 
 	 * @since 2.0.0
 	 */
 	Autoplay.prototype.stop = function() {
@@ -109,7 +103,6 @@
 
 	/**
 	 * pause
-	 * 
 	 * @since 2.0.0
 	 */
 	Autoplay.prototype.pause = function() {

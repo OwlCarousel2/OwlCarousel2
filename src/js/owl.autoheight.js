@@ -1,6 +1,5 @@
 /**
  * AutoHeight Plugin
- * 
  * @since 2.0.0
  */
 ;(function($, window, document, undefined) {
@@ -10,9 +9,10 @@
 		this.owl.options = $.extend({}, AutoHeight.Defaults, this.owl.options);
 
 		this.owl.dom.$el.on({
-			'refreshed.owl.carousel changed.owl.carousel': $.proxy(function(e) {
-				if (this.owl.options.autoHeight)
+			'refreshed.owl.carousel changed.owl.carousel': $.proxy(function() {
+				if (this.owl.options.autoHeight){
 					this.setHeight();
+				}
 			}, this)
 		});
 	};
@@ -31,11 +31,12 @@
 			this.owl.dom.$oStage.addClass(this.owl.options.autoHeightClass);
 		}
 
-		var loaded = this.owl.dom.$items.eq(this.owl.pos.currentAbs);
-		var stage = this.owl.dom.$oStage;
-		var iterations = 0;
+		var loaded = this.owl.dom.$items.eq(this.owl.pos.currentAbs),
+			stage = this.owl.dom.$oStage;
+			iterations = 0,
+			isLoaded;
 
-		var isLoaded = window.setInterval(function() {
+		isLoaded = window.setInterval(function() {
 			iterations += 1;
 			if (loaded.data('owl-item').loaded) {
 				stage.height(loaded.height() + 'px');

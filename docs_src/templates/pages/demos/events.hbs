@@ -3,7 +3,7 @@ title: Events Demo
 subTitle: Events
 nav: demos
 description: Events usage demo
-sort: 10
+sort: 7
 published: true
 
 tags: 
@@ -26,7 +26,7 @@ tags:
 	<div class="item"><h4>12</h4></div>
 </div>
 <hr>
-<div class="large-12 columns callbacks"><div>
+<div class="large-12 columns callbacks">
 	<div><span class="label secondary initialize">on</span> initialize.owl.carousel </div>
 	<div><span class="label secondary initialized">on</span> initialized.owl.carousel </div>
 	<div><span class="label secondary resize">on</span> resize.owl.carousel </div>
@@ -51,18 +51,6 @@ Notice that `initialize.owl.carousel` and `initialized.owl.carousel` events must
 
 `changed.owl.carousel` event is attached to the main Owl Carousel animation method so that every carousel move triggers this callback.
 
-### Setup
-```
-	$('.owl-carousel').owlCarousel({
-		items:4,
-		loop:false,
-		center:true,
-		margin:10,
-		URLhashListener:true,
-		autoplayHoverPause:true,
-		startPosition: 'URLHash'
-	});
-```
 {{/markdown }} 
 
 <script>
