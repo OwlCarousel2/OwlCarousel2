@@ -61,6 +61,12 @@
     "desc":     "When the dragging of an item has finished."
   },
   {
+    "name":     "moved.owl.carousel",
+    "type":     "attachable",
+    "callback": "onMoved",
+    "desc":     "When the dragging of an item has finished and the new current item is different."
+  },
+  {
     "name":     "translate.owl.carousel",
     "type":     "attachable",
     "callback": "onTranslate",
