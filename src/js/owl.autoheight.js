@@ -32,7 +32,7 @@
 		}
 
 		var loaded = this.owl.dom.$items.eq(this.owl.pos.currentAbs),
-			stage = this.owl.dom.$oStage;
+			stage = this.owl.dom.$oStage,
 			iterations = 0,
 			isLoaded;
 
