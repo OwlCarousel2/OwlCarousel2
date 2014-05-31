@@ -14,20 +14,25 @@
 
 		this.owl.dom.$el.on({
 			'resize.owl.carousel': $.proxy(function(e) {
-				if (this.owl.options.video && !this.isInFullScreen()){
+				if (this.owl.options.video && !this.isInFullScreen()) {
 					e.preventDefault();
 				}
 			}, this),
-			'refresh.owl.carousel changed.owl.carousel': $.proxy(function() {
-				if (this.owl.state.videoPlay){
+			'refresh.owl.carousel changed.owl.carousel': $.proxy(function(e) {
+				if (this.owl.state.videoPlay) {
 					this.stopVideo();
 				}
 			}, this),
-			'refresh.owl.carousel': $.proxy(function() {
-				if (!this.owl.options.video){
+			'refresh.owl.carousel refreshed.owl.carousel': $.proxy(function(e) {
+				if (!this.owl.options.video) {
 					return false;
 				}
-				this.owl.dom.$el.one('updated.owl.carousel', $.proxy(this.checkVideoLinks, this));
+				this.refreshing = e.type == 'refresh';
+			}, this),
+			'changed.owl.carousel': $.proxy(function(e) {
+				if (this.refreshing && e.property.name == 'items' && e.property.value && !e.property.value.is(':empty')) {
+					this.checkVideoLinks();
+				}
 			}, this)
 		});
 	};

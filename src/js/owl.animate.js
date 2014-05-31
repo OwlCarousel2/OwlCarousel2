@@ -8,9 +8,16 @@
 		this.owl = scope;
 		this.owl.options = $.extend({}, Animate.Defaults, this.owl.options);
 
+		if (!this.owl.options.animateIn && !this.owl.options.animateOut) {
+			return;
+		}
+
 		this.owl.dom.$el.on({
-			'animateto.owl.carousel': $.proxy(function() {
-				if (this.owl.options.animateIn || this.owl.options.animateOut){
+			'drag.owl.carousel dragged.owl.carousel translated.owl.carousel': $.proxy(function(e) {
+				this.swapping = e.type == 'translated';
+			}, this),
+			'translate.owl.carousel': $.proxy(function(e) {
+				if (this.swapping) {
 					this.swap();
 				}
 			}, this)
@@ -24,7 +31,7 @@
 
 	Animate.prototype.swap = function() {
 
-		if ( !(this.owl.options.items === 1 && this.owl.support3d) ) {
+		if (this.owl.options.items !== 1 || !this.owl.support3d) {
 			return false;
 		}
 
@@ -47,7 +54,7 @@
 
 		removeStyles = function() {
 			$(this).css({
-				"left": ""
+				'left': ''
 			}).removeClass('animated owl-animated-out owl-animated-in').removeClass(tIn).removeClass(tOut);
 
 			that.transitionEnd();
@@ -55,7 +62,7 @@
 
 		if (tOut) {
 			prevItem.css({
-				"left": pos + "px"
+				'left': pos + 'px'
 			}).addClass('animated owl-animated-out ' + tOut).one(
 				'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', removeStyles);
 		}
@@ -65,9 +72,11 @@
 				'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', removeStyles);
 		}
 	};
+
 	Animate.prototype.destroy = function() {
 		this.owl.dom.$el.off('.owl');
 	};
+
 	$.fn.owlCarousel.Constructor.Plugins.animate = Animate;
 
 })(window.Zepto || window.jQuery, window, document);

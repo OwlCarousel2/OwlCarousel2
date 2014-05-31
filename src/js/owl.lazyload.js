@@ -8,13 +8,19 @@
 		this.owl = scope;
 		this.owl.options = $.extend({}, LazyLoad.Defaults, this.owl.options);
 
-		this.owl.dom.$el.on({
-			'updated.owl.carousel': $.proxy(function() {
-				if (this.owl.options.lazyLoad){
+		if (!this.owl.options.lazyLoad) {
+			return;
+		}
+
+		this.handlers = {
+			'changed.owl.carousel': $.proxy(function(e) {
+				if (e.property.name == 'items' && e.property.value && !e.property.value.is(':empty')) {
 					this.check();
 				}
 			}, this)
-		});
+		};
+
+		this.owl.dom.$el.on(this.handlers);
 	};
 
 	LazyLoad.Defaults = {
@@ -69,7 +75,9 @@
 	};
 
 	LazyLoad.prototype.destroy = function() {
-		this.owl.dom.$el.off('.owl');
+		for (var handler in this.handlers) {
+			this.owl.dom.$el.off(handler, this.handlers[handler]);
+		}
 	};
 
 	$.fn.owlCarousel.Constructor.Plugins.lazyLoad = LazyLoad;
