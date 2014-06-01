@@ -2840,7 +2840,7 @@
 	/**
 	 * Creates the animate plugin.
 	 * @class The Navigation Plugin
-	 * @param {Owl} carousel - The Owl Carousel
+	 * @param {Owl} carousel - The Owl Carousel.
 	 */
 	var Navigation = function(carousel) {
 		// define members
@@ -2902,6 +2902,7 @@
 
 	/**
 	 * Default options.
+	 * @public
 	 * @todo Rename `slideBy` to `navBy`
 	 */
 	Navigation.Defaults = {
@@ -2926,6 +2927,7 @@
 
 	/**
 	 * Initializes the plugin.
+	 * @protected
 	 */
 	Navigation.prototype.initialize = function() {
 		var $container,
@@ -2999,6 +3001,7 @@
 
 	/**
 	 * Destroys the plugin.
+	 * @protected
 	 */
 	Navigation.prototype.destroy = function() {
 		var handler, control, property;
@@ -3016,6 +3019,7 @@
 
 	/**
 	 * Refreshes the internal data of the plugin.
+	 * @protected
 	 */
 	Navigation.prototype.refresh = function() {
 		var i, j, k,
@@ -3054,6 +3058,7 @@
 
 	/**
 	 * Updates the DOM structures of the plugin.
+	 * @protected
 	 */
 	Navigation.prototype.update = function() {
 		var difference, i, html = '',
@@ -3089,6 +3094,7 @@
 
 	/**
 	 * Extends event data.
+	 * @protected
 	 * @param {Event} event - The event object which gets thrown.
 	 */
 	Navigation.prototype.onTrigger = function(event) {
