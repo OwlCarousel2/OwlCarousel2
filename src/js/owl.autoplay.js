@@ -56,9 +56,9 @@
 		if (this.owl.options.autoplay && !this.owl.state.videoPlay) {
 			window.clearInterval(this.apInterval);
 
-			this.apInterval = window.setInterval(function() {
+			this.apInterval = window.setInterval($.proxy(function() {
 				this.play();
-			}.bind(this), this.owl.options.autoplayTimeout);
+			}, this), this.owl.options.autoplayTimeout);
 		} else {
 			window.clearInterval(this.apInterval);
 			this.autoplayState = false;

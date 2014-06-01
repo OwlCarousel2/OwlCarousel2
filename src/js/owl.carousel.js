@@ -869,9 +869,9 @@
 
 		// if(this.width.stagePrev > this.width.stage){
 		if (this.options.rtl) {
-			window.setTimeout(function() {
+			window.setTimeout($.proxy(function() {
 				this.dom.stage.style.width = this.width.stage + 'px';
-			}.bind(this), 0);
+			}, this), 0);
 		} else {
 			this.dom.stage.style.width = this.width.stage + 'px';
 		}
@@ -1059,27 +1059,27 @@
 	 */
 	Owl.prototype.eventsCall = function() {
 		// Save events references
-		this.e._onDragStart = function(e) {
+		this.e._onDragStart = $.proxy(function(e) {
 			this.onDragStart(e);
-		}.bind(this);
-		this.e._onDragMove = function(e) {
+		}, this);
+		this.e._onDragMove = $.proxy(function(e) {
 			this.onDragMove(e);
-		}.bind(this);
-		this.e._onDragEnd = function(e) {
+		}, this);
+		this.e._onDragEnd = $.proxy(function(e) {
 			this.onDragEnd(e);
-		}.bind(this);
-		this.e._transitionEnd = function(e) {
+		}, this);
+		this.e._transitionEnd = $.proxy(function(e) {
 			this.transitionEnd(e);
-		}.bind(this);
-		this.e._resizer = function() {
+		}, this);
+		this.e._resizer = $.proxy(function() {
 			this.responsiveTimer();
-		}.bind(this);
-		this.e._responsiveCall = function() {
+		}, this);
+		this.e._responsiveCall = $.proxy(function() {
 			this.responsive();
-		}.bind(this);
-		this.e._preventClick = function(e) {
+		}, this);
+		this.e._preventClick = $.proxy(function(e) {
 			this.preventClick(e);
-		}.bind(this);
+		}, this);
 	};
 
 	/**
@@ -1469,11 +1469,11 @@
 		} else {
 			this.dom.$stage.animate({
 				left: posX
-			}, this.speed.css2speed, this.options.fallbackEasing, function() {
+			}, this.speed.css2speed, this.options.fallbackEasing, $.proxy(function() {
 				if (this.state.inMotion) {
 					this.transitionEnd();
 				}
-			}.bind(this));
+			}, this));
 		}
 
 		this.onChange();
@@ -1792,7 +1792,7 @@
 		if (!isElVisible(this.dom.el)) {
 			this.dom.$el.addClass('owl-hidden');
 			window.clearInterval(this.e._checkVisibile);
-			this.e._checkVisibile = window.setInterval(checkVisible.bind(this), 500);
+			this.e._checkVisibile = window.setInterval($.proxy(checkVisible, this), 500);
 		}
 
 		function isElVisible(el) {
@@ -2118,27 +2118,3 @@
 	$.fn.owlCarousel.Constructor = Owl;
 
 })(window.Zepto || window.jQuery, window, document);
-
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind
-// The bind() method creates a new function that, when called, has its this
-// keyword set to the provided value, with a given sequence of arguments
-// preceding any provided when the new function is called.
-
-if (!Function.prototype.bind) {
-	Function.prototype.bind = function(oThis) {
-		if (typeof this !== 'function') {
-			// closest thing possible to the ECMAScript 5 internal IsCallable
-			// function
-			throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
-		}
-
-		var aArgs = Array.prototype.slice.call(arguments, 1), fToBind = this, fNOP = function() {
-		}, fBound = function() {
-			return fToBind.apply(this instanceof fNOP && oThis ? this : oThis, aArgs.concat(Array.prototype.slice
-				.call(arguments)));
-		};
-		fNOP.prototype = this.prototype;
-		fBound.prototype = new fNOP();
-		return fBound;
-	};
-}
