@@ -2934,7 +2934,7 @@
 		// refresh internal data
 		this.refresh();
 
-		// creates the indicator template
+		// create the indicator template
 		if (!options.dotsData) {
 			this.template = $('<div>')
 				.addClass(options.dotClass)
@@ -3001,7 +3001,7 @@
 	 * Destroys the plugin.
 	 */
 	Navigation.prototype.destroy = function() {
-		var handler, control;
+		var handler, control, property;
 
 		for (handler in this.handlers) {
 			this.$element.off(handler, this.handlers[handler]);
@@ -3009,8 +3009,9 @@
 		for (control in this.controls) {
 			this.controls[control].remove();
 		}
-
-		this.page = this.pages = this.initialized = this.core = this.$element = this.core.options = null;
+		for (property in Object.getOwnPropertyNames(this)) {
+			typeof this[property] != 'function' && (this[property] = null);
+		}
 	}
 
 	/**
