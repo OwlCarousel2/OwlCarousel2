@@ -1,12 +1,16 @@
 /**
  * Hash Plugin
+ * @version 2.0.0
+ * @author Artus Kolanowski
+ * @license The MIT License (MIT)
  */
 ;(function($, window, document, undefined) {
 	'use strict';
 
 	/**
-	 * Constructor of the plugin.
-	 * @param {Carousel} carousel
+	 * Creates the hash plugin.
+	 * @class The Hash Plugin
+	 * @param {Owl} carousel - The Owl Carousel
 	 */
 	var Hash = function(carousel) {
 		// define members
@@ -61,6 +65,7 @@
 
 	/**
 	 * Default options.
+	 * @public
 	 */
 	Hash.Defaults = {
 		URLhashListener: false
@@ -68,6 +73,7 @@
 
 	/**
 	 * Destroys the plugin.
+	 * @public
 	 */
 	Hash.prototype.destroy = function() {
 		var handler;

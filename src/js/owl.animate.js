@@ -1,9 +1,16 @@
 /**
  * Animate Plugin
- * @since 2.0.0
+ * @version 2.0.0
+ * @author Bartosz Wojciechowski
+ * @license The MIT License (MIT)
  */
 ;(function($, window, document, undefined) {
 
+	/**
+	 * Creates the animate plugin.
+	 * @class The Navigation Plugin
+	 * @param {Owl} scope - The Owl Carousel
+	 */
 	Animate = function(scope) {
 		this.owl = scope;
 		this.owl.options = $.extend({}, Animate.Defaults, this.owl.options);
@@ -24,11 +31,20 @@
 		});
 	};
 
+	/**
+	 * Default options.
+	 * @public
+	 */
 	Animate.Defaults = {
 		animateOut: false,
 		animateIn: false
 	};
 
+	/**
+	 * Toggles the animation classes whenever an translations starts.
+	 * @protected
+	 * @returns {Boolean|undefined}
+	 */
 	Animate.prototype.swap = function() {
 
 		if (this.owl.options.items !== 1 || !this.owl.support3d) {
@@ -73,6 +89,10 @@
 		}
 	};
 
+	/**
+	 * Destroys the plugin.
+	 * @public
+	 */
 	Animate.prototype.destroy = function() {
 		this.owl.dom.$el.off('.owl');
 	};

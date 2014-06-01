@@ -1,6 +1,8 @@
 /**
- * Owl Carousel
- *
+ * Owl carousel
+ * @version 2.0.0
+ * @author Bartosz Wojciechowski
+ * @license The MIT License (MIT)
  * @todo Lazy Load Icon
  * @todo prevent animationend bubling
  * @todo itemsScaleUp
@@ -11,6 +13,11 @@
 
 	var defaults, item, dom, width, num, pos, drag, speed, state, e;
 
+	/**
+	 * Default options for the carousel.
+	 * @private
+	 * @todo Better as public member of `Owl`
+	 */
 	defaults = {
 		items: 3,
 		loop: false,
@@ -55,8 +62,10 @@
 		activeClass: 'active'
 	};
 
-	// Each item has following data:
-
+	/**
+	 * Template for the data of each item respectively its DOM element.
+	 * @private
+	 */
 	item = {
 		index: false,
 		indexAbs: false,
@@ -73,9 +82,10 @@
 		playVideo: false
 	};
 
-	// Reference to DOM elements
-	// Those with $ sign are jQuery objects
-
+	/**
+	 * Template for the references to DOM elements, those with `$` sign are `jQuery` objects.
+	 * @private
+	 */
 	dom = {
 		el: null, // main element
 		$el: null, // jQuery main element
@@ -90,14 +100,9 @@
 	};
 
 	/**
-	 * Variables
-	 *
-	 * @since 2.0.0
+	 * Template for the widths of some elements.
+	 * @private
 	 */
-
-	// Only for development process
-	// Widths
-
 	width = {
 		el: 0,
 		stage: 0,
@@ -106,8 +111,10 @@
 		cloneLast: 0
 	};
 
-	// Numbers
-
+	/**
+	 * Template for counting to some properties.
+	 * @private
+	 */
 	num = {
 		items: 0,
 		oItems: 0,
@@ -116,8 +123,10 @@
 		merged: []
 	};
 
-	// Positions
-
+	/**
+	 * Template for some informations about the position.
+	 * @private
+	 */
 	pos = {
 		start: 0,
 		max: 0,
@@ -130,8 +139,10 @@
 		lsCurrent: 0
 	};
 
-	// Drag/Touches
-
+	/**
+	 * Template for status information about drag and touch events.
+	 * @private
+	 */
 	drag = {
 		start: 0,
 		startX: 0,
@@ -148,15 +159,19 @@
 		targetEl: null
 	};
 
-	// Speeds
-
+	/**
+	 * Template for some speed informations.
+	 * @private
+	 */
 	speed = {
 		onDragEnd: 300,
 		css2speed: 0
 	};
 
-	// States
-
+	/**
+	 * Template for some status informations.
+	 * @private
+	 */
 	state = {
 		isTouch: false,
 		isScrolling: false,
@@ -165,8 +180,10 @@
 		inMotion: false
 	};
 
-	// Event functions references
-
+	/**
+	 * Event functions references.
+	 * @private
+	 */
 	e = {
 		_onDragStart: null,
 		_onDragMove: null,
@@ -178,52 +195,119 @@
 		_checkVisibile: null
 	};
 
+	/**
+	 * Creates a carousel.
+	 * @class The Owl Carousel.
+	 * @public
+	 * @param {HTMLElement|jQuery} element - The element to create the carousel for.
+	 * @param {Object} [options] - The options
+	 */
 	function Owl(element, options) {
 
 		// add basic Owl information to dom element
-
 		element.owlCarousel = {
 			'name': 'Owl Carousel',
 			'author': 'Bartosz Wojciechowski',
 			'version': '2.0.0-beta.2.1'
 		};
 
-		// Attach variables to object
-		// Only for development process
-
+		/**
+		 * Current settings for the carousel.
+		 * @protected
+		 */
 		this.options = $.extend({}, defaults, options);
+
+		/**
+		 * @protected
+		 * @todo Must be dosumented.
+		 */
 		this._options = $.extend({}, defaults, this.options);
+
+		/**
+		 * Template for the data of each item.
+		 * @protected
+		 */
 		this.itemData = $.extend({}, item);
 
+		/**
+		 * Contains references to DOM elements, those with `$` sign are `jQuery` objects.
+		 * @protected
+		 */
 		this.dom = $.extend({}, dom);
+
+		/**
+		 * Caches the widths of some elements.
+		 * @protected
+		 */
 		this.width = $.extend({}, width);
+
+		/**
+		 * Caches some count informations.
+		 * @protected
+		 */
 		this.num = $.extend({}, num);
+
+		/**
+		 * Caches some position informations.
+		 * @protected
+		 */
 		this.pos = $.extend({}, pos);
+
+		/**
+		 * Caches informations about drag and touch events.
+		 */
 		this.drag = $.extend({}, drag);
+
+		/**
+		 * Caches some speed settings.
+		 * @protected
+		 */
 		this.speed = $.extend({}, speed);
+
+		/**
+		 * Caches some status informations.
+		 * @protected
+		 */
 		this.state = $.extend({}, state);
+
+		/**
+		 * @protected
+		 * @todo Must be documented
+		 */
 		this.e = $.extend({}, e);
+
+		/**
+		 * References to the running plugins of this carousel.
+		 * @protected
+		 */
+		this.plugins = {};
+
+		/**
+		 * Currently suppressed events to prevent them from beeing retriggered.
+		 * @protected
+		 * @see `addTriggerableEvents()`
+		 */
+		this.suppressedEvents = {};
 
 		this.dom.el = element;
 		this.dom.$el = $(element);
-
-		this.plugins = {};
 
 		for (var plugin in Owl.Plugins) {
 			this.plugins[plugin] = new Owl.Plugins[plugin](this);
 		}
 
-		this.suppressedEvents = {};
-
 		this.init();
 	}
 
+	/**
+	 * Contains all registered plugins.
+	 * @public
+	 */
 	Owl.Plugins = {};
 
 	/**
-	 * init
-	 *
-	 * @since 2.0.0
+	 * Initializes the carousel.
+	 * @protected
 	 */
 	Owl.prototype.init = function() {
 
@@ -292,9 +376,8 @@
 	};
 
 	/**
-	 * sortOptions
-	 * @desc Sort responsive sizes
-	 * @since 2.0.0
+	 * Sorts responsive sizes.
+	 * @protected
 	 */
 	Owl.prototype.sortOptions = function() {
 
@@ -319,15 +402,15 @@
 	};
 
 	/**
-	 * setResponsiveOptions
-	 * @since 2.0.0
+	 * Sets responsive options.
+	 * @protected
 	 */
 	Owl.prototype.setResponsiveOptions = function() {
 		if (this.options.responsive === false) {
 			return false;
 		}
 
-		var width, resOpt, i, j, k, minWidth;
+		var width, i, j, k, minWidth;
 
 		width = this.windowWidth();
 		resOpt = this.options.responsive;
@@ -361,9 +444,8 @@
 	};
 
 	/**
-	 * optionsLogic
-	 * @desc Update option logic if necessery
-	 * @since 2.0.0
+	 * Updates option logic if necessery.
+	 * @protected
 	 */
 	Owl.prototype.optionsLogic = function() {
 		// Toggle Center class
@@ -381,9 +463,8 @@
 	};
 
 	/**
-	 * createStage
-	 * @desc Create stage and Outer-stage elements
-	 * @since 2.0.0
+	 * Creates stage and outer-stage elements.
+	 * @protected
 	 */
 	Owl.prototype.createStage = function() {
 		var oStage = document.createElement('div'),
@@ -405,9 +486,9 @@
 	};
 
 	/**
-	 * createItem
-	 * @desc Create item container
-	 * @since 2.0.0
+	 * Creates an item container.
+	 * @protected
+	 * @returns {jQuery} - The item container.
 	 */
 	Owl.prototype.createItemContainer = function() {
 		var item = document.createElement(this.options.itemElement);
@@ -416,8 +497,8 @@
 	};
 
 	/**
-	 * fetchContent
-	 * @since 2.0.0
+	 * Fetches the content.
+	 * @protected
 	 */
 	Owl.prototype.fetchContent = function(extContent) {
 		if (extContent) {
@@ -437,21 +518,22 @@
 	};
 
 	/**
-	 * initStructure
-	 * @param [refresh] -
-	 *            if refresh and not lazyContent then dont create normal
-	 *            structure
-	 * @since 2.0.0
+	 * Initializes the content struture.
+	 * @protected
 	 */
 	Owl.prototype.initStructure = function() {
-		// create normal structure
 		this.createNormalStructure();
 	};
 
 	/**
-	 * createNormalStructure
-	 * @desc Create normal structure for small/mid weight content
-	 * @since 2.0.0
+	 * Creates small/mid weight content structure.
+	 * @protected
+	 * @todo This results in a poor performance,
+	 * but this is due to the approach of completely
+	 * rebuild the existing DOM tree from scratch,
+	 * rather to use them. The effort to implement
+	 * this with a good performance, while maintaining
+	 * the original approach is disproportionate.
 	 */
 	Owl.prototype.createNormalStructure = function() {
 		var i, $item;
@@ -464,8 +546,8 @@
 	};
 
 	/**
-	 * createCustomStructure
-	 * @since 2.0.0
+	 * Creates custom content structure.
+	 * @protected
 	 */
 	Owl.prototype.createCustomStructure = function(howManyItems) {
 		var i, $item;
@@ -477,13 +559,10 @@
 	};
 
 	/**
-	 * initializeItemContainer
-	 * @desc Fill empty item container with provided content
-	 * @since 2.0.0
-	 * @param [content] -
-	 *            string/$dom - passed owl-item
-	 * @param [i] -
-	 *            index in jquery object return $ new object
+	 * Initializes item container with provided content.
+	 * @protected
+	 * @param {jQuery} item - The item that has to be filled.
+	 * @param {HTMLElement|jQuery|string} content - The content that fills the item.
 	 */
 	Owl.prototype.initializeItemContainer = function(item, content) {
 		this.trigger('change', { property: { name: 'item', value: item } });
@@ -496,7 +575,6 @@
 
 	/**
 	 * Creates item container data.
-	 * @since 2.0.0
 	 * @protected
 	 * @param {jQuery} item - The item for which the data are to be set.
 	 * @param {jQuery} [source] - The item whose data are to be copied.
@@ -513,7 +591,6 @@
 
 	/**
 	 * Clones an item container.
-	 * @since 2.0.0
 	 * @protected
 	 * @param {jQuery} item - The item to clone.
 	 * @returns {jQuery} - The cloned item.
@@ -527,8 +604,8 @@
 	};
 
 	/**
-	 * updateLocalContent
-	 * @since 2.0.0
+	 * Updates original items index data.
+	 * @protected
 	 */
 	Owl.prototype.updateLocalContent = function() {
 
@@ -548,9 +625,8 @@
 	};
 
 	/**
-	 * loopClone
-	 * @desc Make a clones for infinity loop
-	 * @since 2.0.0
+	 * Creates clones for infinity loop.
+	 * @protected
 	 */
 	Owl.prototype.loopClone = function() {
 		if (!this.options.loop || this.num.oItems < this.options.items) {
@@ -581,9 +657,8 @@
 	};
 
 	/**
-	 * reClone
-	 * @desc Update Cloned elements
-	 * @since 2.0.0
+	 * Update cloned elements.
+	 * @protected
 	 */
 	Owl.prototype.reClone = function() {
 		// remove cloned items
@@ -603,9 +678,8 @@
 	};
 
 	/**
-	 * calculate
-	 * @desc Update item index data
-	 * @since 2.0.0
+	 * Updates all items index data.
+	 * @protected
 	 */
 	Owl.prototype.calculate = function() {
 
@@ -720,12 +794,12 @@
 	};
 
 	/**
-	 * setMinMax
-	 * @since 2.0.0
+	 * Updates original items boundaries.
+	 * @protected
 	 */
 	Owl.prototype.setMinMax = function() {
 
-		var minimum, revert;
+		var i, minimum, revert;
 
 		// set Min
 		minimum = this.dom.$oItems.eq(0).data('owl-item').indexAbs;
@@ -781,9 +855,9 @@
 	};
 
 	/**
-	 * setSizes
-	 * @desc Set sizes on elements (from collectData function)
-	 * @since 2.0.0
+	 * Set sizes on elements from `collectData`.
+	 * @protected
+	 * @todo CRAZY FIX!!! Doublecheck this!
 	 */
 	Owl.prototype.setSizes = function() {
 
@@ -793,7 +867,6 @@
 			this.dom.oStage.style.paddingRight = this.options.stagePadding + 'px';
 		}
 
-		// CRAZY FIX!!! Doublecheck this!
 		// if(this.width.stagePrev > this.width.stage){
 		if (this.options.rtl) {
 			window.setTimeout(function() {
@@ -826,9 +899,8 @@
 	};
 
 	/**
-	 * responsive
-	 * @desc Responsive function update all data by calling refresh()
-	 * @since 2.0.0
+	 * Updates all data by calling `refresh`.
+	 * @protected
 	 */
 	Owl.prototype.responsive = function() {
 
@@ -853,10 +925,8 @@
 	};
 
 	/**
-	 * refresh
-	 * @desc Refresh method is basically collection of functions that are
-	 *       responsible for Owl responsive functionality
-	 * @since 2.0.0
+	 * Refreshes the carousel primarily for adaptive purposes.
+	 * @public
 	 */
 	Owl.prototype.refresh = function(init) {
 
@@ -891,10 +961,7 @@
 
 		if (init) {
 			this.initPosition();
-		}
-
-		//jump to last position
-		if (!init) {
+		} else {
 			this.jumpTo(this.pos.current, false); // fix that
 		}
 
@@ -906,10 +973,8 @@
 	};
 
 	/**
-	 * updateActiveItems
-	 * @desc Update information about current state of items (visibile, hidden,
-	 *       active, etc.)
-	 * @since 2.0.0
+	 * Updates information about current state of items (visibile, hidden, active, etc.).
+	 * @protected
 	 */
 	Owl.prototype.updateActiveItems = function() {
 		this.trigger('change', { property: { name: 'items', value: this.dom.$items } });
@@ -966,9 +1031,8 @@
 	};
 
 	/**
-	 * updateClonedItemsState
-	 * @desc Set current state on sibilings items for lazyLoad and center
-	 * @since 2.0.0
+	 * Sets current state on sibilings items for center.
+	 * @protected
 	 */
 	Owl.prototype.updateClonedItemsState = function(activeIndex) {
 
@@ -990,10 +1054,8 @@
 	};
 
 	/**
-	 * eventsCall
-	 * @desc Save internal event references and add event based functions like
-	 *       transitionEnd,responsive etc.
-	 * @since 2.0.0
+	 * Save internal event references and add event based functions.
+	 * @protected
 	 */
 	Owl.prototype.eventsCall = function() {
 		// Save events references
@@ -1021,10 +1083,8 @@
 	};
 
 	/**
-	 * responsiveTimer
-	 * @desc Check Window resize event with 200ms delay /
-	 *       this.options.responsiveRefreshRate
-	 * @since 2.0.0
+	 * Checks window `resize` event.
+	 * @protected
 	 */
 	Owl.prototype.responsiveTimer = function() {
 		if (this.windowWidth() === this.width.prevWindow) {
@@ -1037,10 +1097,8 @@
 	};
 
 	/**
-	 * internalEvents
-	 * @desc Checks for touch/mouse drag options and add necessery event
-	 *       handlers.
-	 * @since 2.0.0
+	 * Checks for touch/mouse drag options and add necessery event handlers.
+	 * @protected
 	 */
 	Owl.prototype.internalEvents = function() {
 		var isTouch = isTouchSupport(),
@@ -1089,8 +1147,8 @@
 	};
 
 	/**
-	 * dragEvents
-	 * @since 2.0.0
+	 * Triggers event handlers for drag events.
+	 * @protected
 	 */
 	Owl.prototype.dragEvents = function() {
 
@@ -1104,9 +1162,9 @@
 	};
 
 	/**
-	 * onDragStart
-	 * @desc touchstart/mousedown event
-	 * @since 2.0.0
+	 * Handles touchstart/mousedown event.
+	 * @protected
+	 * @param {Event} event - The event arguments.
 	 */
 	Owl.prototype.onDragStart = function(event) {
 		var ev, isTouchEvent, pageX, pageY, animatedPos;
@@ -1172,12 +1230,12 @@
 	};
 
 	/**
-	 * onDragMove
-	 * @desc touchmove/mousemove event
-	 * @since 2.0.0
+	 * Handles the touchmove/mousemove events.
+	 * @protected
+	 * @param {Event} event - The event arguments.
 	 */
 	Owl.prototype.onDragMove = function(event) {
-		var ev, neighbourItemWidth, isTouchEvent, pageX, pageY, minValue, maxValue, pull;
+		var ev, isTouchEvent, pageX, pageY, minValue, maxValue, pull;
 
 		if (!this.state.isTouch) {
 			return;
@@ -1187,7 +1245,6 @@
 			return;
 		}
 
-		neighbourItemWidth = 0;
 		ev = event.originalEvent || event || window.event;
 
 		// if is 'touchstart'
@@ -1244,9 +1301,8 @@
 	};
 
 	/**
-	 * onDragEnd
-	 * @desc touchend/mouseup event
-	 * @since 2.0.0
+	 * Handles the touchend/mouseup events.
+	 * @protected
 	 */
 	Owl.prototype.onDragEnd = function() {
 		var compareTimes, distanceAbs, closest;
@@ -1304,11 +1360,9 @@
 	};
 
 	/**
-	 * removeClick
-	 * @desc Attach preventClick function to disable link while swipping
-	 * @since 2.0.0
-	 * @param [target] -
-	 *            clicked dom element
+	 * Attaches `preventClick` to disable link while swipping.
+	 * @protected
+	 * @param {HTMLElement} [target] - The target of the `click` event.
 	 */
 	Owl.prototype.removeClick = function(target) {
 		this.drag.targetEl = target;
@@ -1320,10 +1374,9 @@
 	};
 
 	/**
-	 * preventClick
-	 * @desc Add preventDefault for any link and then remove removeClick event
-	 *       hanlder
-	 * @since 2.0.0
+	 * Suppresses click event.
+	 * @protected
+	 * @param {Event} ev - The event arguments.
 	 */
 	Owl.prototype.preventClick = function(ev) {
 		if (ev.preventDefault) {
@@ -1338,9 +1391,9 @@
 	};
 
 	/**
-	 * getTransformProperty
-	 * @desc catch stage position while animate (only css3)
-	 * @since 2.0.0
+	 * Catches stage position while animate (only CSS3).
+	 * @protected
+	 * @returns
 	 */
 	Owl.prototype.getTransformProperty = function() {
 		var transform, matrix3d;
@@ -1354,11 +1407,10 @@
 	};
 
 	/**
-	 * closest
-	 * @desc Get closest item after touchend/mouseup
-	 * @since 2.0.0
-	 * @param [x] -
-	 *            curent position in pixels return position in pixels
+	 * Gets closest item index for a coordinate.
+	 * @protected
+	 * @param {Number} x - The coordinate on the x axis in pixel.
+	 * @return {Number} - The item's index.
 	 */
 	Owl.prototype.closest = function(x) {
 		var newX = 0, pull = 30, i;
@@ -1395,12 +1447,10 @@
 	};
 
 	/**
-	 * animStage
-	 * @desc animate stage position (both css3/css2) and perform onChange
-	 *       functions/events
-	 * @since 2.0.0
-	 * @param [x] -
-	 *            curent position in pixels
+	 * Animates stage position (both css3/css2).
+	 * @protected
+	 * @param {Number} pos - The curent position in pixels.
+	 * @param {Boolean} bypassEvent - Wether the animation end event should be triggered or not.
 	 */
 	Owl.prototype.animStage = function(pos, bypassEvent) {
 
@@ -1430,11 +1480,9 @@
 	};
 
 	/**
-	 * updatePosition
-	 * @desc Update current positions
-	 * @since 2.0.0
-	 * @param [pos] -
-	 *            number - new position
+	 * Updates the current position.
+	 * @protected
+	 * @param {Number} position - The new position.
 	 */
 	Owl.prototype.updatePosition = function(position) {
 		if (this.num.oItems === 0 || position === undefined) {
@@ -1465,16 +1513,11 @@
 	};
 
 	/**
-	 * setSpeed
-	 * @since 2.0.0
-	 * @param [speed] -
-	 *            number
-	 * @param [pos] -
-	 *            number - next position - use this param to calculate
-	 *            smartSpeed
-	 * @param [drag] -
-	 *            boolean - if drag is true then smart speed is disabled return
-	 *            speed
+	 * Sets the animation speed.
+	 * @protected
+	 * @param {Number} speed - The animation speed in milliseconds.
+	 * @param {Number} [pos] - The next position, used to calculate `smartSpeed`
+	 * @param {Boolean} [drag] - Wether the `smartSpeed` should be disabled or not.
 	 */
 	Owl.prototype.setSpeed = function(speed, pos, drag) {
 		var s = speed, nextPos = pos, diff, style;
@@ -1518,13 +1561,10 @@
 	};
 
 	/**
-	 * jumpTo
-	 * @since 2.0.0
-	 * @param [pos] -
-	 *            number - next position - use this param to calculate
-	 *            smartSpeed
-	 * @param [update] -
-	 *            boolean - if drag is true then smart speed is disabled
+	 * Jumps to a specified position without animating.
+	 * @protected
+	 * @param {Number} pos - The position to jump to.
+	 * @param {Boolean} bypassEvent - Wether the animation end event shoudl be triggered or not.
 	 */
 	Owl.prototype.jumpTo = function(pos, bypassEvent) {
 		this.updatePosition(pos);
@@ -1533,14 +1573,10 @@
 	};
 
 	/**
-	 * to
-	 * @since 2.0.0
-	 * @param [pos] -
-	 *            number
-	 * @param [speed] -
-	 *            speed in ms
-	 * @param [speed] -
-	 *            speed in ms
+	 * Slides to the specified item.
+	 * @public
+	 * @param {Number} position - The position of the item.
+	 * @param {Number} [speed] - The time in milliseconds for the transition.
 	 */
 	Owl.prototype.to = function(position, speed) {
 		if (this.options.loop) {
@@ -1577,9 +1613,9 @@
 	};
 
 	/**
-	 * next
-	 * @since 2.0.0
-	 * @param {number} [speed=false] - The time in milliseconds for the transition.
+	 * Slides to the next item.
+	 * @public
+	 * @param {Number} [speed=false] - The time in milliseconds for the transition.
 	 */
 	Owl.prototype.next = function(speed) {
 		speed = speed || false;
@@ -1587,8 +1623,9 @@
 	};
 
 	/**
-	 * prev
-	 * @since 2.0.0
+	 * Slides to the previous item.
+	 * @public
+	 * @param {Number} [speed=false] - The time in milliseconds for the transition.
 	 */
 	Owl.prototype.prev = function(speed) {
 		speed = speed || false;
@@ -1596,8 +1633,8 @@
 	};
 
 	/**
-	 * initPosition
-	 * @since 2.0.0
+	 * Initializes the current position.
+	 * @protected
 	 */
 	Owl.prototype.initPosition = function() {
 		if (!this.dom.$oItems) {
@@ -1620,10 +1657,9 @@
 	};
 
 	/**
-	 * transitionEnd
-	 * @desc event used by css3 animation end and $.animate callback like
-	 *       transitionEnd,responsive etc.
-	 * @since 2.0.0
+	 * Handles the end of an animation.
+	 * @protected
+	 * @param {Event} event - The event arguments.
 	 */
 	Owl.prototype.transitionEnd = function(event) {
 
@@ -1643,9 +1679,9 @@
 	};
 
 	/**
-	 * isElWidthChanged
-	 * @desc Check if element width has changed
-	 * @since 2.0.0
+	 * Checks if element width has changed
+	 * @protected
+	 * @returns {Booelan}
 	 */
 	Owl.prototype.isElWidthChanged = function() {
 		var newElWidth = this.dom.$el.width() - this.options.stagePadding, // to
@@ -1655,9 +1691,9 @@
 	};
 
 	/**
-	 * windowWidth
-	 * @desc Get Window/responsiveBaseElement width
-	 * @since 2.0.0
+	 * Gets `window`/`responsiveBaseElement` width.
+	 * @protected
+	 * @return {Number} - The width in pixel.
 	 */
 	Owl.prototype.windowWidth = function() {
 		if (this.options.responsiveBaseElement !== window) {
@@ -1670,6 +1706,11 @@
 		return this.width.window;
 	};
 
+	/**
+	 * Replaces the current content.
+	 * @public
+	 * @param {HTMLElement|jQuery|String} content - The new content.
+	 */
 	Owl.prototype.insertContent = function(content) {
 		this.dom.$stage.empty();
 		this.fetchContent(content);
@@ -1677,12 +1718,10 @@
 	};
 
 	/**
-	 * addItem - Add an item
-	 * @since 2.0.0
-	 * @param [content] -
-	 *            dom element / string '<div>content</div>'
-	 * @param [pos] -
-	 *            number - position
+	 * Adds an item.
+	 * @public
+	 * @param {HTMLElement|jQuery|String} content - The item content to add.
+	 * @param {Number} [position=0] - The position at which to insert the item.
 	 */
 	Owl.prototype.addItem = function(content, position) {
 		var $item = this.createItemContainer();
@@ -1706,10 +1745,9 @@
 	};
 
 	/**
-	 * removeItem - Remove an Item
-	 * @since 2.0.0
-	 * @param [pos] -
-	 *            number - position
+	 * Removes an item.
+	 * @public
+	 * @param {Number} pos - The position of the item.
 	 */
 	Owl.prototype.removeItem = function(pos) {
 		this.dom.$oItems.eq(pos).remove();
@@ -1717,9 +1755,8 @@
 	};
 
 	/**
-	 * addTriggerableEvents
-	 * @desc Add triggerable events by jQuery's `on` method
-	 * @since 2.0.0
+	 * Adds triggerable events.
+	 * @protected
 	 */
 	Owl.prototype.addTriggerableEvents = function() {
 		var handler = $.proxy(function(callback, event) {
@@ -1746,10 +1783,8 @@
 	};
 
 	/**
-	 * watchVisibility
-	 * @desc check if el is visible - handy if Owl is inside hidden content
-	 *       (tabs etc.)
-	 * @since 2.0.0
+	 * Watches the visibility of the carousel element.
+	 * @protected
 	 */
 	Owl.prototype.watchVisibility = function() {
 
@@ -1774,8 +1809,8 @@
 	};
 
 	/**
-	 * onChange
-	 * @since 2.0.0
+	 * Handles changes of the carousel.
+	 * @proteted
 	 */
 	Owl.prototype.onChange = function() {
 		if (this.state.isTouch || this.state.bypass) {
@@ -1787,8 +1822,8 @@
 	};
 
 	/**
-	 * storeInfo store basic information about current states
-	 * @since 2.0.0
+	 * Store basic information about current states.
+	 * @protected
 	 */
 	Owl.prototype.storeInfo = function() {
 		this.info = {
@@ -1808,9 +1843,9 @@
 	};
 
 	/**
-	 * preloadAutoWidthImages
-	 * @desc still to test
-	 * @since 2.0.0
+	 * Preloads images with auto width.
+	 * @protected
+	 * @todo Still to test
 	 */
 	Owl.prototype.preloadAutoWidthImages = function(imgs) {
 		var loaded, that, $el, img;
@@ -1836,9 +1871,8 @@
 	};
 
 	/**
-	 * destroy
-	 * @desc Remove Owl structure and events :(
-	 * @since 2.0.0
+	 * Destroys the carousel.
+	 * @public
 	 */
 	Owl.prototype.destroy = function() {
 
@@ -1889,15 +1923,11 @@
 	};
 
 	/**
-	 * Opertators
-	 * @desc Used to calculate RTL
-	 * @param [a] -
-	 *            Number - left side
-	 * @param [o] -
-	 *            String - operator
-	 * @param [b] -
-	 *            Number - right side
-	 * @since 2.0.0
+	 * Operators to calculate right-to-left and left-to-right.
+	 * @protected
+	 * @param {Number} [a] - The left side operand.
+	 * @param {String} [o] - The operator.
+	 * @param {Number} [b] - The right side operand.
 	 */
 	Owl.prototype.op = function(a, o, b) {
 		var rtl = this.options.rtl;
@@ -1916,12 +1946,14 @@
 	};
 
 	/**
-	 * on
-	 * @desc On method for adding internal events
-	 * @since 2.0.0
+	 * Attaches to an internal event.
+	 * @protected
+	 * @param {HTMLElement} element - The event source.
+	 * @param {String} event - The event name.
+	 * @param {Function} listener - The event handler to attach.
+	 * @param {Boolean} capture - Wether the event should be handled at the capturing phase or not.
 	 */
 	Owl.prototype.on = function(element, event, listener, capture) {
-
 		if (element.addEventListener) {
 			element.addEventListener(event, listener, capture);
 		} else if (element.attachEvent) {
@@ -1930,9 +1962,12 @@
 	};
 
 	/**
-	 * off
-	 * @desc Off method for removing internal events
-	 * @since 2.0.0
+	 * Detaches from an internal event.
+	 * @protected
+	 * @param {HTMLElement} element - The event source.
+	 * @param {String} event - The event name.
+	 * @param {Function} listener - The attached event handler to detach.
+	 * @param {Boolean} capture - Wether the attached event handler was registered as a capturing listener or not.
 	 */
 	Owl.prototype.off = function(element, event, listener, capture) {
 		if (element.removeEventListener) {
@@ -1943,13 +1978,12 @@
 	};
 
 	/**
-	 * trigger
-	 * @since 2.0.0
-	 * @param event -
-	 *            string - event name
-	 * @param data -
-	 *            object - additional options - to do
-	 * @param namespace
+	 * Triggers an public event.
+	 * @protected
+	 * @param {String} name - The event name.
+	 * @param {*} [data=null] - The event data.
+	 * @param {String} [namespace=.owl.carousel] - The event namespace.
+	 * @returns {Event} - The event arguments.
 	 */
 	Owl.prototype.trigger = function(name, data, namespace) {
 		var status = {
@@ -1980,9 +2014,8 @@
 	};
 
 	/**
-	 * Opertators
-	 * @desc Used to calculate RTL
-	 * @since 2.0.0
+	 * Checks the availability of some browser features.
+	 * @protected
 	 */
 	Owl.prototype.browserSupport = function() {
 		this.support3d = isPerspective();
@@ -2002,9 +2035,12 @@
 		this.state.orientation = window.orientation;
 	};
 
-	// Pivate methods
-
-	// CSS detection;
+	/**
+	 * Checks for CSS support.
+	 * @private
+	 * @param {Array} array - The CSS properties to check for.
+	 * @returns {Array} - Contains the supported CSS property name and its index or `false`.
+	 */
 	function isStyleSupported(array) {
 		var p, s, fake = document.createElement('div'), list = array;
 		for (p in list) {
@@ -2017,35 +2053,68 @@
 		return [ false ];
 	}
 
+	/**
+	 * Checks for CSS transition support.
+	 * @private
+	 * @todo Realy bad design
+	 * @returns {Number}
+	 */
 	function isTransition() {
 		return isStyleSupported([ 'transition', 'WebkitTransition', 'MozTransition', 'OTransition' ])[1];
 	}
 
+	/**
+	 * Checks for CSS transform support.
+	 * @private
+	 * @returns {String} The supported property name or false.
+	 */
 	function isTransform() {
 		return isStyleSupported([ 'transform', 'WebkitTransform', 'MozTransform', 'OTransform', 'msTransform' ])[0];
 	}
 
+	/**
+	 * Checks for CSS perspective support.
+	 * @private
+	 * @returns {String} The supported property name or false.
+	 */
 	function isPerspective() {
 		return isStyleSupported([ 'perspective', 'webkitPerspective', 'MozPerspective', 'OPerspective', 'MsPerspective' ])[0];
 	}
 
+	/**
+	 * Checks wether touch is supported or not.
+	 * @private
+	 * @returns {Boolean}
+	 */
 	function isTouchSupport() {
 		return 'ontouchstart' in window || !!(navigator.msMaxTouchPoints);
 	}
 
+	/**
+	 * Checks wether touch is supported or not for IE.
+	 * @private
+	 * @returns {Boolean}
+	 */
 	function isTouchSupportIE() {
 		return window.navigator.msPointerEnabled;
 	}
 
+	/**
+	 * The jQuery Plugin for the Owl Carousel
+	 * @public
+	 */
 	$.fn.owlCarousel = function(options) {
 		return this.each(function() {
 			if (!$(this).data('owlCarousel')) {
 				$(this).data('owlCarousel', new Owl(this, options));
 			}
 		});
-
 	};
 
+	/**
+	 * The constructor for the jQuery Plugin
+	 * @public
+	 */
 	$.fn.owlCarousel.Constructor = Owl;
 
 })(window.Zepto || window.jQuery, window, document);
@@ -2075,11 +2144,18 @@ if (!Function.prototype.bind) {
 }
 
 /**
- * lazyLoad Plugin
- * @since 2.0.0
+ * LazyLoad Plugin
+ * @version 2.0.0
+ * @author Bartosz Wojciechowski
+ * @license The MIT License (MIT)
  */
 ;(function($, window, document, undefined) {
 
+	/**
+	 * Creates the lazy load plugin.
+	 * @class The Lazy Load Plugin
+	 * @param {Owl} scope - The Owl Carousel
+	 */
 	LazyLoad = function(scope) {
 		this.owl = scope;
 		this.owl.options = $.extend({}, LazyLoad.Defaults, this.owl.options);
@@ -2099,12 +2175,19 @@ if (!Function.prototype.bind) {
 		this.owl.dom.$el.on(this.handlers);
 	};
 
+	/**
+	 * Default options.
+	 * @public
+	 */
 	LazyLoad.Defaults = {
 		lazyLoad: false
 	};
 
+	/**
+	 * Checks all items and if necessary, calls `preload`.
+	 * @protected
+	 */
 	LazyLoad.prototype.check = function() {
-
 		var attr = window.devicePixelRatio > 1 ? 'data-src-retina' : 'data-src',
 			src, img, i, $item;
 
@@ -2123,6 +2206,12 @@ if (!Function.prototype.bind) {
 		}
 	};
 
+	/**
+	 * Preloads the images of an item.
+	 * @protected
+	 * @param {jQuery} images - The images to load.
+	 * @param {jQuery} $item - The item for which the images are loaded.
+	 */
 	LazyLoad.prototype.preload = function(images, $item) {
 		var $el, img, srcType;
 
@@ -2150,6 +2239,10 @@ if (!Function.prototype.bind) {
 		}, this));
 	};
 
+	/**
+	 * Destroys the plugin.
+	 * @public
+	 */
 	LazyLoad.prototype.destroy = function() {
 		for (var handler in this.handlers) {
 			this.owl.dom.$el.off(handler, this.handlers[handler]);
@@ -2162,41 +2255,53 @@ if (!Function.prototype.bind) {
 
 /**
  * AutoHeight Plugin
- * @since 2.0.0
+ * @version 2.0.0
+ * @author Bartosz Wojciechowski
+ * @license The MIT License (MIT)
  */
 ;(function($, window, document, undefined) {
 
+	/**
+	 * Creates the auto height plugin.
+	 * @class The Auto Height Plugin
+	 * @param {Owl} scope - The Owl Carousel
+	 */
 	AutoHeight = function(scope) {
 		this.owl = scope;
 		this.owl.options = $.extend({}, AutoHeight.Defaults, this.owl.options);
 
 		this.owl.dom.$el.on({
 			'refreshed.owl.carousel changed.owl.carousel': $.proxy(function() {
-				if (this.owl.options.autoHeight){
+				if (this.owl.options.autoHeight) {
 					this.setHeight();
 				}
 			}, this)
 		});
 	};
 
+	/**
+	 * Default options.
+	 * @public
+	 */
 	AutoHeight.Defaults = {
 		autoHeight: false,
 		autoHeightClass: 'owl-height'
 	};
 
-	AutoHeight.prototype.setHeight = function(callback) {
-
-		if (this.owl.options.autoHeight !== true && callback !== true) {
-			return false;
-		}
-		if (!this.owl.dom.$oStage.hasClass(this.owl.options.autoHeightClass)) {
-			this.owl.dom.$oStage.addClass(this.owl.options.autoHeightClass);
-		}
-
+	/**
+	 *
+	 * @param {Boolean} callback - Whether
+	 * @returns {Boolean}
+	 */
+	AutoHeight.prototype.setHeight = function() {
 		var loaded = this.owl.dom.$items.eq(this.owl.pos.currentAbs),
 			stage = this.owl.dom.$oStage,
 			iterations = 0,
 			isLoaded;
+
+		if (!this.owl.dom.$oStage.hasClass(this.owl.options.autoHeightClass)) {
+			this.owl.dom.$oStage.addClass(this.owl.options.autoHeightClass);
+		}
 
 		isLoaded = window.setInterval(function() {
 			iterations += 1;
@@ -2220,10 +2325,17 @@ if (!Function.prototype.bind) {
 
 /**
  * Video Plugin
- * @since 2.0.0
+ * @version 2.0.0
+ * @author Bartosz Wojciechowski
+ * @license The MIT License (MIT)
  */
 ;(function($, window, document, undefined) {
 
+	/**
+	 * Creates the video plugin.
+	 * @class The Video Plugin
+	 * @param {Owl} scope - The Owl Carousel
+	 */
 	Video = function(scope) {
 		this.owl = scope;
 		this.owl.options = $.extend({}, Video.Defaults, this.owl.options);
@@ -2257,6 +2369,10 @@ if (!Function.prototype.bind) {
 		});
 	};
 
+	/**
+	 * Default options.
+	 * @public
+	 */
 	Video.Defaults = {
 		video: false,
 		videoHeight: false,
@@ -2264,9 +2380,8 @@ if (!Function.prototype.bind) {
 	};
 
 	/**
-	 * checkVideoLinks
-	 * @desc Check if for any videos links
-	 * @since 2.0.0
+	 * Checks if for any videos links exists.
+	 * @protected
 	 */
 	Video.prototype.checkVideoLinks = function() {
 		var videoEl, item, i;
@@ -2289,9 +2404,10 @@ if (!Function.prototype.bind) {
 	};
 
 	/**
-	 * getVideoInfo
-	 * @desc Get Video ID and Type (YouTube/Vimeo only)
-	 * @since 2.0.0
+	 * Gets the video ID and the type (YouTube/Vimeo only).
+	 * @protected
+	 * @param {jQuery} videoEl - The element containing the video data.
+	 * @param {jQuery} item - The item containing the video.
 	 */
 	Video.prototype.getVideoInfo = function(videoEl, item) {
 
@@ -2341,9 +2457,11 @@ if (!Function.prototype.bind) {
 	};
 
 	/**
-	 * createVideoTn
-	 * @desc Create Video Thumbnail
-	 * @since 2.0.0
+	 * Creates video thumbnail.
+	 * @protected
+	 * @param {jQuery} videoEl - The element containing the video data.
+	 * @param {Object} info - The video info object.
+	 * @see `getVideoInfo`
 	 */
 	Video.prototype.createVideoTn = function(videoEl, info) {
 
@@ -2399,8 +2517,8 @@ if (!Function.prototype.bind) {
 	};
 
 	/**
-	 * stopVideo
-	 * @since 2.0.0
+	 * Stops the current video.
+	 * @public
 	 */
 	Video.prototype.stopVideo = function() {
 		this.owl.trigger('stop', null, 'video');
@@ -2411,8 +2529,9 @@ if (!Function.prototype.bind) {
 	};
 
 	/**
-	 * playVideo
-	 * @since 2.0.0
+	 * Starts the current video.
+	 * @public
+	 * @param {Event} ev - The event arguments.
 	 */
 	Video.prototype.playVideo = function(ev) {
 		this.owl.trigger('play', null, 'video');
@@ -2447,6 +2566,11 @@ if (!Function.prototype.bind) {
 		target.after(videoWrap);
 	};
 
+	/**
+	 * Checks whether an video is currently in full screen mode or not.
+	 * @protected
+	 * @returns {Boolean}
+	 */
 	Video.prototype.isInFullScreen = function() {
 
 		// if Vimeo Fullscreen mode
@@ -2479,6 +2603,9 @@ if (!Function.prototype.bind) {
 		return true;
 	};
 
+	/**
+	 * Destroys the plugin.
+	 */
 	Video.prototype.destroy = function() {
 		this.owl.dom.$el.off('.owl');
 		this.owl.dom.$el.off('.owl.video');
@@ -2490,10 +2617,17 @@ if (!Function.prototype.bind) {
 
 /**
  * Animate Plugin
- * @since 2.0.0
+ * @version 2.0.0
+ * @author Bartosz Wojciechowski
+ * @license The MIT License (MIT)
  */
 ;(function($, window, document, undefined) {
 
+	/**
+	 * Creates the animate plugin.
+	 * @class The Navigation Plugin
+	 * @param {Owl} scope - The Owl Carousel
+	 */
 	Animate = function(scope) {
 		this.owl = scope;
 		this.owl.options = $.extend({}, Animate.Defaults, this.owl.options);
@@ -2514,11 +2648,20 @@ if (!Function.prototype.bind) {
 		});
 	};
 
+	/**
+	 * Default options.
+	 * @public
+	 */
 	Animate.Defaults = {
 		animateOut: false,
 		animateIn: false
 	};
 
+	/**
+	 * Toggles the animation classes whenever an translations starts.
+	 * @protected
+	 * @returns {Boolean|undefined}
+	 */
 	Animate.prototype.swap = function() {
 
 		if (this.owl.options.items !== 1 || !this.owl.support3d) {
@@ -2563,6 +2706,10 @@ if (!Function.prototype.bind) {
 		}
 	};
 
+	/**
+	 * Destroys the plugin.
+	 * @public
+	 */
 	Animate.prototype.destroy = function() {
 		this.owl.dom.$el.off('.owl');
 	};
@@ -2573,10 +2720,17 @@ if (!Function.prototype.bind) {
 
 /**
  * Autoplay Plugin
- * @since 2.0.0
+ * @version 2.0.0
+ * @author Bartosz Wojciechowski
+ * @license The MIT License (MIT)
  */
 ;(function($, window, document, undefined) {
 
+	/**
+	 * Creates the autoplay plugin.
+	 * @class The Autoplay Plugin
+	 * @param {Owl} scope - The Owl Carousel
+	 */
 	Autoplay = function(scope) {
 		this.owl = scope;
 		this.owl.options = $.extend({}, Autoplay.Defaults, this.owl.options);
@@ -2603,6 +2757,10 @@ if (!Function.prototype.bind) {
 		}
 	};
 
+	/**
+	 * Default options.
+	 * @public
+	 */
 	Autoplay.Defaults = {
 		autoplay: false,
 		autoplayTimeout: 5000,
@@ -2611,10 +2769,9 @@ if (!Function.prototype.bind) {
 	};
 
 	/**
-	 * Autoplay
-	 * @since 2.0.0
+	 * @protected
+	 * @todo Must be documented.
 	 */
-
 	Autoplay.prototype.autoplay = function() {
 		if (this.owl.options.autoplay && !this.owl.state.videoPlay) {
 			window.clearInterval(this.apInterval);
@@ -2622,7 +2779,6 @@ if (!Function.prototype.bind) {
 			this.apInterval = window.setInterval(function() {
 				this.play();
 			}.bind(this), this.owl.options.autoplayTimeout);
-
 		} else {
 			window.clearInterval(this.apInterval);
 			this.autoplayState = false;
@@ -2630,10 +2786,12 @@ if (!Function.prototype.bind) {
 	};
 
 	/**
-	 * play
-	 * @param [timeout] - Integrer
-	 * @param [speed] - Integrer
-	 * @since 2.0.0
+	 * Starts the autoplay.
+	 * @public
+	 * @param {Number} [timeout] - ...
+	 * @param {Number} [speed] - ...
+	 * @returns {Boolean|undefined} - ...
+	 * @todo Must be documented.
 	 */
 	Autoplay.prototype.play = function(timeout, speed) {
 		// if tab is inactive - doesnt work in <IE10
@@ -2657,7 +2815,7 @@ if (!Function.prototype.bind) {
 
 		if (!this.owl.options.loop && this.owl.pos.current >= this.owl.pos.max) {
 			window.clearInterval(this.e._autoplay);
-			this.owl.goTo(0);
+			this.owl.to(0);
 		} else {
 			this.owl.next(this.owl.options.autoplaySpeed);
 		}
@@ -2665,8 +2823,8 @@ if (!Function.prototype.bind) {
 	};
 
 	/**
-	 * stop
-	 * @since 2.0.0
+	 * Stops the autoplay.
+	 * @public
 	 */
 	Autoplay.prototype.stop = function() {
 		this.owl._options.autoplay = this.owl.options.autoplay = false;
@@ -2675,13 +2833,16 @@ if (!Function.prototype.bind) {
 	};
 
 	/**
-	 * pause
-	 * @since 2.0.0
+	 * Pauses the autoplay.
+	 * @public
 	 */
 	Autoplay.prototype.pause = function() {
 		window.clearInterval(this.apInterval);
 	};
 
+	/**
+	 * Destroys the plugin.
+	 */
 	Autoplay.prototype.destroy = function() {
 		window.clearInterval(this.apInterval);
 		this.owl.dom.$el.off('.owl');
@@ -2693,12 +2854,16 @@ if (!Function.prototype.bind) {
 
 /**
  * Navigation Plugin
+ * @version 2.0.0
+ * @author Artus Kolanowski
+ * @license The MIT License (MIT)
  */
 ;(function($, window, document, undefined) {
 	'use strict';
 
 	/**
-	 * Constructor of the plugin.
+	 * Creates the animate plugin.
+	 * @class The Navigation Plugin
 	 * @param {Owl} carousel - The Owl Carousel
 	 */
 	var Navigation = function(carousel) {
@@ -2966,13 +3131,17 @@ if (!Function.prototype.bind) {
 
 /**
  * Hash Plugin
+ * @version 2.0.0
+ * @author Artus Kolanowski
+ * @license The MIT License (MIT)
  */
 ;(function($, window, document, undefined) {
 	'use strict';
 
 	/**
-	 * Constructor of the plugin.
-	 * @param {Carousel} carousel
+	 * Creates the hash plugin.
+	 * @class The Hash Plugin
+	 * @param {Owl} carousel - The Owl Carousel
 	 */
 	var Hash = function(carousel) {
 		// define members
@@ -3027,6 +3196,7 @@ if (!Function.prototype.bind) {
 
 	/**
 	 * Default options.
+	 * @public
 	 */
 	Hash.Defaults = {
 		URLhashListener: false
@@ -3034,6 +3204,7 @@ if (!Function.prototype.bind) {
 
 	/**
 	 * Destroys the plugin.
+	 * @public
 	 */
 	Hash.prototype.destroy = function() {
 		var handler;

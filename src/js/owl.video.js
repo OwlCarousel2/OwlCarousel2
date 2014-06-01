@@ -1,9 +1,16 @@
 /**
  * Video Plugin
- * @since 2.0.0
+ * @version 2.0.0
+ * @author Bartosz Wojciechowski
+ * @license The MIT License (MIT)
  */
 ;(function($, window, document, undefined) {
 
+	/**
+	 * Creates the video plugin.
+	 * @class The Video Plugin
+	 * @param {Owl} scope - The Owl Carousel
+	 */
 	Video = function(scope) {
 		this.owl = scope;
 		this.owl.options = $.extend({}, Video.Defaults, this.owl.options);
@@ -37,6 +44,10 @@
 		});
 	};
 
+	/**
+	 * Default options.
+	 * @public
+	 */
 	Video.Defaults = {
 		video: false,
 		videoHeight: false,
@@ -44,9 +55,8 @@
 	};
 
 	/**
-	 * checkVideoLinks
-	 * @desc Check if for any videos links
-	 * @since 2.0.0
+	 * Checks if for any videos links exists.
+	 * @protected
 	 */
 	Video.prototype.checkVideoLinks = function() {
 		var videoEl, item, i;
@@ -69,9 +79,10 @@
 	};
 
 	/**
-	 * getVideoInfo
-	 * @desc Get Video ID and Type (YouTube/Vimeo only)
-	 * @since 2.0.0
+	 * Gets the video ID and the type (YouTube/Vimeo only).
+	 * @protected
+	 * @param {jQuery} videoEl - The element containing the video data.
+	 * @param {jQuery} item - The item containing the video.
 	 */
 	Video.prototype.getVideoInfo = function(videoEl, item) {
 
@@ -121,9 +132,11 @@
 	};
 
 	/**
-	 * createVideoTn
-	 * @desc Create Video Thumbnail
-	 * @since 2.0.0
+	 * Creates video thumbnail.
+	 * @protected
+	 * @param {jQuery} videoEl - The element containing the video data.
+	 * @param {Object} info - The video info object.
+	 * @see `getVideoInfo`
 	 */
 	Video.prototype.createVideoTn = function(videoEl, info) {
 
@@ -179,8 +192,8 @@
 	};
 
 	/**
-	 * stopVideo
-	 * @since 2.0.0
+	 * Stops the current video.
+	 * @public
 	 */
 	Video.prototype.stopVideo = function() {
 		this.owl.trigger('stop', null, 'video');
@@ -191,8 +204,9 @@
 	};
 
 	/**
-	 * playVideo
-	 * @since 2.0.0
+	 * Starts the current video.
+	 * @public
+	 * @param {Event} ev - The event arguments.
 	 */
 	Video.prototype.playVideo = function(ev) {
 		this.owl.trigger('play', null, 'video');
@@ -227,6 +241,11 @@
 		target.after(videoWrap);
 	};
 
+	/**
+	 * Checks whether an video is currently in full screen mode or not.
+	 * @protected
+	 * @returns {Boolean}
+	 */
 	Video.prototype.isInFullScreen = function() {
 
 		// if Vimeo Fullscreen mode
@@ -259,6 +278,9 @@
 		return true;
 	};
 
+	/**
+	 * Destroys the plugin.
+	 */
 	Video.prototype.destroy = function() {
 		this.owl.dom.$el.off('.owl');
 		this.owl.dom.$el.off('.owl.video');

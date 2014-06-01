@@ -1,11 +1,15 @@
 /**
  * Navigation Plugin
+ * @version 2.0.0
+ * @author Artus Kolanowski
+ * @license The MIT License (MIT)
  */
 ;(function($, window, document, undefined) {
 	'use strict';
 
 	/**
-	 * Constructor of the plugin.
+	 * Creates the animate plugin.
+	 * @class The Navigation Plugin
 	 * @param {Owl} carousel - The Owl Carousel
 	 */
 	var Navigation = function(carousel) {

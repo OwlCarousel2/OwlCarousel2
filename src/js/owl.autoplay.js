@@ -1,9 +1,16 @@
 /**
  * Autoplay Plugin
- * @since 2.0.0
+ * @version 2.0.0
+ * @author Bartosz Wojciechowski
+ * @license The MIT License (MIT)
  */
 ;(function($, window, document, undefined) {
 
+	/**
+	 * Creates the autoplay plugin.
+	 * @class The Autoplay Plugin
+	 * @param {Owl} scope - The Owl Carousel
+	 */
 	Autoplay = function(scope) {
 		this.owl = scope;
 		this.owl.options = $.extend({}, Autoplay.Defaults, this.owl.options);
@@ -30,6 +37,10 @@
 		}
 	};
 
+	/**
+	 * Default options.
+	 * @public
+	 */
 	Autoplay.Defaults = {
 		autoplay: false,
 		autoplayTimeout: 5000,
@@ -38,10 +49,9 @@
 	};
 
 	/**
-	 * Autoplay
-	 * @since 2.0.0
+	 * @protected
+	 * @todo Must be documented.
 	 */
-
 	Autoplay.prototype.autoplay = function() {
 		if (this.owl.options.autoplay && !this.owl.state.videoPlay) {
 			window.clearInterval(this.apInterval);
@@ -49,7 +59,6 @@
 			this.apInterval = window.setInterval(function() {
 				this.play();
 			}.bind(this), this.owl.options.autoplayTimeout);
-
 		} else {
 			window.clearInterval(this.apInterval);
 			this.autoplayState = false;
@@ -57,10 +66,12 @@
 	};
 
 	/**
-	 * play
-	 * @param [timeout] - Integrer
-	 * @param [speed] - Integrer
-	 * @since 2.0.0
+	 * Starts the autoplay.
+	 * @public
+	 * @param {Number} [timeout] - ...
+	 * @param {Number} [speed] - ...
+	 * @returns {Boolean|undefined} - ...
+	 * @todo Must be documented.
 	 */
 	Autoplay.prototype.play = function(timeout, speed) {
 		// if tab is inactive - doesnt work in <IE10
@@ -84,7 +95,7 @@
 
 		if (!this.owl.options.loop && this.owl.pos.current >= this.owl.pos.max) {
 			window.clearInterval(this.e._autoplay);
-			this.owl.goTo(0);
+			this.owl.to(0);
 		} else {
 			this.owl.next(this.owl.options.autoplaySpeed);
 		}
@@ -92,8 +103,8 @@
 	};
 
 	/**
-	 * stop
-	 * @since 2.0.0
+	 * Stops the autoplay.
+	 * @public
 	 */
 	Autoplay.prototype.stop = function() {
 		this.owl._options.autoplay = this.owl.options.autoplay = false;
@@ -102,13 +113,16 @@
 	};
 
 	/**
-	 * pause
-	 * @since 2.0.0
+	 * Pauses the autoplay.
+	 * @public
 	 */
 	Autoplay.prototype.pause = function() {
 		window.clearInterval(this.apInterval);
 	};
 
+	/**
+	 * Destroys the plugin.
+	 */
 	Autoplay.prototype.destroy = function() {
 		window.clearInterval(this.apInterval);
 		this.owl.dom.$el.off('.owl');
