@@ -1,30 +1,56 @@
 /**
  * Animate Plugin
- * @since 2.0.0
+ * @version 2.0.0
+ * @author Bartosz Wojciechowski
+ * @license The MIT License (MIT)
  */
 ;(function($, window, document, undefined) {
 
+	/**
+	 * Creates the animate plugin.
+	 * @class The Navigation Plugin
+	 * @param {Owl} scope - The Owl Carousel
+	 */
 	Animate = function(scope) {
 		this.owl = scope;
 		this.owl.options = $.extend({}, Animate.Defaults, this.owl.options);
+		this.swapping = true;
 
-		this.owl.dom.$el.on({
-			'animateto.owl.carousel': $.proxy(function() {
-				if (this.owl.options.animateIn || this.owl.options.animateOut){
+		if (!this.owl.options.animateIn && !this.owl.options.animateOut) {
+			return;
+		}
+
+		this.handlers = {
+			'drag.owl.carousel dragged.owl.carousel translated.owl.carousel': $.proxy(function(e) {
+				this.swapping = e.type == 'translated';
+			}, this),
+			'translate.owl.carousel': $.proxy(function(e) {
+				if (this.swapping) {
 					this.swap();
 				}
 			}, this)
-		});
+		};
+
+		this.owl.dom.$el.on(this.handlers);
 	};
 
+	/**
+	 * Default options.
+	 * @public
+	 */
 	Animate.Defaults = {
 		animateOut: false,
 		animateIn: false
 	};
 
+	/**
+	 * Toggles the animation classes whenever an translations starts.
+	 * @protected
+	 * @returns {Boolean|undefined}
+	 */
 	Animate.prototype.swap = function() {
 
-		if ( !(this.owl.options.items === 1 && this.owl.support3d) ) {
+		if (this.owl.options.items !== 1 || !this.owl.support3d) {
 			return false;
 		}
 
@@ -47,7 +73,7 @@
 
 		removeStyles = function() {
 			$(this).css({
-				"left": ""
+				'left': ''
 			}).removeClass('animated owl-animated-out owl-animated-in').removeClass(tIn).removeClass(tOut);
 
 			that.transitionEnd();
@@ -55,7 +81,7 @@
 
 		if (tOut) {
 			prevItem.css({
-				"left": pos + "px"
+				'left': pos + 'px'
 			}).addClass('animated owl-animated-out ' + tOut).one(
 				'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', removeStyles);
 		}
@@ -65,9 +91,22 @@
 				'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', removeStyles);
 		}
 	};
+
+	/**
+	 * Destroys the plugin.
+	 * @public
+	 */
 	Animate.prototype.destroy = function() {
-		this.owl.dom.$el.off('.owl');
+		var handler, property;
+
+		for (handler in this.handlers) {
+			this.owl.dom.$el.off(handler, this.handlers[handler]);
+		}
+		for (property in Object.getOwnPropertyNames(this)) {
+			typeof this[property] != 'function' && (this[property] = null);
+		}
 	};
+
 	$.fn.owlCarousel.Constructor.Plugins.animate = Animate;
 
 })(window.Zepto || window.jQuery, window, document);
