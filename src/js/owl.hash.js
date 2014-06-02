@@ -76,15 +76,16 @@
 	 * @public
 	 */
 	Hash.prototype.destroy = function() {
-		var handler;
-
-		for (handler in this.handlers) {
-			this.$element.off(handler, this.handlers[handler]);
-		}
+		var handler, property;
 
 		$(window).off('hashchange.owl.navigation');
 
-		this.hashes = this.carousel = this.$element = this.options = null;
+		for (handler in this.handlers) {
+			this.owl.dom.$el.off(handler, this.handlers[handler]);
+		}
+		for (property in Object.getOwnPropertyNames(this)) {
+			typeof this[property] != 'function' && (this[property] = null);
+		}
 	}
 
 	$.fn.owlCarousel.Constructor.Plugins.Hash = Hash;

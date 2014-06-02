@@ -15,11 +15,7 @@
 		this.owl = scope;
 		this.owl.options = $.extend({}, Video.Defaults, this.owl.options);
 
-		this.owl.dom.$el.on('click.owl.video', '.owl-video-play-icon', $.proxy(function(e) {
-			this.playVideo(e);
-		}, this));
-
-		this.owl.dom.$el.on({
+		this.handlers = {
 			'resize.owl.carousel': $.proxy(function(e) {
 				if (this.owl.options.video && !this.isInFullScreen()) {
 					e.preventDefault();
@@ -41,7 +37,13 @@
 					this.checkVideoLinks();
 				}
 			}, this)
-		});
+		};
+
+		this.owl.dom.$el.on(this.handlers);
+
+		this.owl.dom.$el.on('click.owl.video', '.owl-video-play-icon', $.proxy(function(e) {
+			this.playVideo(e);
+		}, this));
 	};
 
 	/**
@@ -282,8 +284,16 @@
 	 * Destroys the plugin.
 	 */
 	Video.prototype.destroy = function() {
-		this.owl.dom.$el.off('.owl');
-		this.owl.dom.$el.off('.owl.video');
+		var handler, property;
+
+		this.owl.dom.$el.off('click.owl.video');
+
+		for (handler in this.handlers) {
+			this.owl.dom.$el.off(handler, this.handlers[handler]);
+		}
+		for (property in Object.getOwnPropertyNames(this)) {
+			typeof this[property] != 'function' && (this[property] = null);
+		}
 	};
 
 	$.fn.owlCarousel.Constructor.Plugins.video = Video;

@@ -15,7 +15,7 @@
 		this.owl = scope;
 		this.owl.options = $.extend({}, Autoplay.Defaults, this.owl.options);
 
-		this.owl.dom.$el.on({
+		this.handlers = {
 			'translated.owl.carousel refreshed.owl.carousel': $.proxy(function() {
 				this.autoplay();
 			}, this),
@@ -24,17 +24,20 @@
 			}, this),
 			'stop.owl.autoplay': $.proxy(function() {
 				this.stop();
+			}, this),
+			'mouseover.owl.autoplay': $.proxy(function() {
+				if (this.owl.options.autoplayHoverPause) {
+					this.pause();
+				}
+			}, this),
+			'mouseleave.owl.autoplay': $.proxy(function() {
+				if (this.owl.options.autoplayHoverPause) {
+					this.autoplay();
+				}
 			}, this)
-		});
+		};
 
-		if (this.owl.options.autoplayHoverPause) {
-			this.owl.dom.$el.on('mouseover.ap.owl', '.owl-stage', $.proxy(function() {
-				this.pause();
-			}, this));
-			this.owl.dom.$el.on('mouseleave.ap.owl', '.owl-stage', $.proxy(function() {
-				this.autoplay();
-			}, this));
-		}
+		this.owl.dom.$el.on(this.handlers);
 	};
 
 	/**
@@ -124,8 +127,16 @@
 	 * Destroys the plugin.
 	 */
 	Autoplay.prototype.destroy = function() {
+		var handler, property;
+
 		window.clearInterval(this.apInterval);
-		this.owl.dom.$el.off('.owl');
+
+		for (handler in this.handlers) {
+			this.owl.dom.$el.off(handler, this.handlers[handler]);
+		}
+		for (property in Object.getOwnPropertyNames(this)) {
+			typeof this[property] != 'function' && (this[property] = null);
+		}
 	};
 
 	$.fn.owlCarousel.Constructor.Plugins.autoplay = Autoplay;

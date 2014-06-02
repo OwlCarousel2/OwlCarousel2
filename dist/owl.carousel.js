@@ -2220,8 +2220,13 @@
 	 * @public
 	 */
 	LazyLoad.prototype.destroy = function() {
-		for (var handler in this.handlers) {
+		var handler, property;
+
+		for (handler in this.handlers) {
 			this.owl.dom.$el.off(handler, this.handlers[handler]);
+		}
+		for (property in Object.getOwnPropertyNames(this)) {
+			typeof this[property] != 'function' && (this[property] = null);
 		}
 	};
 
@@ -2246,13 +2251,15 @@
 		this.owl = scope;
 		this.owl.options = $.extend({}, AutoHeight.Defaults, this.owl.options);
 
-		this.owl.dom.$el.on({
+		this.handlers = {
 			'refreshed.owl.carousel changed.owl.carousel': $.proxy(function() {
 				if (this.owl.options.autoHeight) {
 					this.setHeight();
 				}
 			}, this)
-		});
+		};
+
+		this.owl.dom.$el.on(this.handlers);
 	};
 
 	/**
@@ -2292,7 +2299,14 @@
 	};
 
 	AutoHeight.prototype.destroy = function() {
-		this.owl.dom.$el.off('.owl');
+		var handler, property;
+
+		for (handler in this.handlers) {
+			this.owl.dom.$el.off(handler, this.handlers[handler]);
+		}
+		for (property in Object.getOwnPropertyNames(this)) {
+			typeof this[property] != 'function' && (this[property] = null);
+		}
 	};
 
 	$.fn.owlCarousel.Constructor.Plugins.autoHeight = AutoHeight;
@@ -2316,11 +2330,7 @@
 		this.owl = scope;
 		this.owl.options = $.extend({}, Video.Defaults, this.owl.options);
 
-		this.owl.dom.$el.on('click.owl.video', '.owl-video-play-icon', $.proxy(function(e) {
-			this.playVideo(e);
-		}, this));
-
-		this.owl.dom.$el.on({
+		this.handlers = {
 			'resize.owl.carousel': $.proxy(function(e) {
 				if (this.owl.options.video && !this.isInFullScreen()) {
 					e.preventDefault();
@@ -2342,7 +2352,13 @@
 					this.checkVideoLinks();
 				}
 			}, this)
-		});
+		};
+
+		this.owl.dom.$el.on(this.handlers);
+
+		this.owl.dom.$el.on('click.owl.video', '.owl-video-play-icon', $.proxy(function(e) {
+			this.playVideo(e);
+		}, this));
 	};
 
 	/**
@@ -2583,8 +2599,16 @@
 	 * Destroys the plugin.
 	 */
 	Video.prototype.destroy = function() {
-		this.owl.dom.$el.off('.owl');
-		this.owl.dom.$el.off('.owl.video');
+		var handler, property;
+
+		this.owl.dom.$el.off('click.owl.video');
+
+		for (handler in this.handlers) {
+			this.owl.dom.$el.off(handler, this.handlers[handler]);
+		}
+		for (property in Object.getOwnPropertyNames(this)) {
+			typeof this[property] != 'function' && (this[property] = null);
+		}
 	};
 
 	$.fn.owlCarousel.Constructor.Plugins.video = Video;
@@ -2607,12 +2631,13 @@
 	Animate = function(scope) {
 		this.owl = scope;
 		this.owl.options = $.extend({}, Animate.Defaults, this.owl.options);
+		this.swapping = true;
 
 		if (!this.owl.options.animateIn && !this.owl.options.animateOut) {
 			return;
 		}
 
-		this.owl.dom.$el.on({
+		this.handlers = {
 			'drag.owl.carousel dragged.owl.carousel translated.owl.carousel': $.proxy(function(e) {
 				this.swapping = e.type == 'translated';
 			}, this),
@@ -2621,7 +2646,9 @@
 					this.swap();
 				}
 			}, this)
-		});
+		};
+
+		this.owl.dom.$el.on(this.handlers);
 	};
 
 	/**
@@ -2687,7 +2714,14 @@
 	 * @public
 	 */
 	Animate.prototype.destroy = function() {
-		this.owl.dom.$el.off('.owl');
+		var handler, property;
+
+		for (handler in this.handlers) {
+			this.owl.dom.$el.off(handler, this.handlers[handler]);
+		}
+		for (property in Object.getOwnPropertyNames(this)) {
+			typeof this[property] != 'function' && (this[property] = null);
+		}
 	};
 
 	$.fn.owlCarousel.Constructor.Plugins.animate = Animate;
@@ -2711,7 +2745,7 @@
 		this.owl = scope;
 		this.owl.options = $.extend({}, Autoplay.Defaults, this.owl.options);
 
-		this.owl.dom.$el.on({
+		this.handlers = {
 			'translated.owl.carousel refreshed.owl.carousel': $.proxy(function() {
 				this.autoplay();
 			}, this),
@@ -2720,17 +2754,20 @@
 			}, this),
 			'stop.owl.autoplay': $.proxy(function() {
 				this.stop();
+			}, this),
+			'mouseover.owl.autoplay': $.proxy(function() {
+				if (this.owl.options.autoplayHoverPause) {
+					this.pause();
+				}
+			}, this),
+			'mouseleave.owl.autoplay': $.proxy(function() {
+				if (this.owl.options.autoplayHoverPause) {
+					this.autoplay();
+				}
 			}, this)
-		});
+		};
 
-		if (this.owl.options.autoplayHoverPause) {
-			this.owl.dom.$el.on('mouseover.ap.owl', '.owl-stage', $.proxy(function() {
-				this.pause();
-			}, this));
-			this.owl.dom.$el.on('mouseleave.ap.owl', '.owl-stage', $.proxy(function() {
-				this.autoplay();
-			}, this));
-		}
+		this.owl.dom.$el.on(this.handlers);
 	};
 
 	/**
@@ -2820,8 +2857,16 @@
 	 * Destroys the plugin.
 	 */
 	Autoplay.prototype.destroy = function() {
+		var handler, property;
+
 		window.clearInterval(this.apInterval);
-		this.owl.dom.$el.off('.owl');
+
+		for (handler in this.handlers) {
+			this.owl.dom.$el.off(handler, this.handlers[handler]);
+		}
+		for (property in Object.getOwnPropertyNames(this)) {
+			typeof this[property] != 'function' && (this[property] = null);
+		}
 	};
 
 	$.fn.owlCarousel.Constructor.Plugins.autoplay = Autoplay;
@@ -3190,15 +3235,16 @@
 	 * @public
 	 */
 	Hash.prototype.destroy = function() {
-		var handler;
-
-		for (handler in this.handlers) {
-			this.$element.off(handler, this.handlers[handler]);
-		}
+		var handler, property;
 
 		$(window).off('hashchange.owl.navigation');
 
-		this.hashes = this.carousel = this.$element = this.options = null;
+		for (handler in this.handlers) {
+			this.owl.dom.$el.off(handler, this.handlers[handler]);
+		}
+		for (property in Object.getOwnPropertyNames(this)) {
+			typeof this[property] != 'function' && (this[property] = null);
+		}
 	}
 
 	$.fn.owlCarousel.Constructor.Plugins.Hash = Hash;

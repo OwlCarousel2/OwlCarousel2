@@ -15,13 +15,15 @@
 		this.owl = scope;
 		this.owl.options = $.extend({}, AutoHeight.Defaults, this.owl.options);
 
-		this.owl.dom.$el.on({
+		this.handlers = {
 			'refreshed.owl.carousel changed.owl.carousel': $.proxy(function() {
 				if (this.owl.options.autoHeight) {
 					this.setHeight();
 				}
 			}, this)
-		});
+		};
+
+		this.owl.dom.$el.on(this.handlers);
 	};
 
 	/**
@@ -61,7 +63,14 @@
 	};
 
 	AutoHeight.prototype.destroy = function() {
-		this.owl.dom.$el.off('.owl');
+		var handler, property;
+
+		for (handler in this.handlers) {
+			this.owl.dom.$el.off(handler, this.handlers[handler]);
+		}
+		for (property in Object.getOwnPropertyNames(this)) {
+			typeof this[property] != 'function' && (this[property] = null);
+		}
 	};
 
 	$.fn.owlCarousel.Constructor.Plugins.autoHeight = AutoHeight;

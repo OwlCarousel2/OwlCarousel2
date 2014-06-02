@@ -14,12 +14,13 @@
 	Animate = function(scope) {
 		this.owl = scope;
 		this.owl.options = $.extend({}, Animate.Defaults, this.owl.options);
+		this.swapping = true;
 
 		if (!this.owl.options.animateIn && !this.owl.options.animateOut) {
 			return;
 		}
 
-		this.owl.dom.$el.on({
+		this.handlers = {
 			'drag.owl.carousel dragged.owl.carousel translated.owl.carousel': $.proxy(function(e) {
 				this.swapping = e.type == 'translated';
 			}, this),
@@ -28,7 +29,9 @@
 					this.swap();
 				}
 			}, this)
-		});
+		};
+
+		this.owl.dom.$el.on(this.handlers);
 	};
 
 	/**
@@ -94,7 +97,14 @@
 	 * @public
 	 */
 	Animate.prototype.destroy = function() {
-		this.owl.dom.$el.off('.owl');
+		var handler, property;
+
+		for (handler in this.handlers) {
+			this.owl.dom.$el.off(handler, this.handlers[handler]);
+		}
+		for (property in Object.getOwnPropertyNames(this)) {
+			typeof this[property] != 'function' && (this[property] = null);
+		}
 	};
 
 	$.fn.owlCarousel.Constructor.Plugins.animate = Animate;

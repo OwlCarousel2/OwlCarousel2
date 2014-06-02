@@ -99,8 +99,13 @@
 	 * @public
 	 */
 	LazyLoad.prototype.destroy = function() {
-		for (var handler in this.handlers) {
+		var handler, property;
+
+		for (handler in this.handlers) {
 			this.owl.dom.$el.off(handler, this.handlers[handler]);
+		}
+		for (property in Object.getOwnPropertyNames(this)) {
+			typeof this[property] != 'function' && (this[property] = null);
 		}
 	};
 
