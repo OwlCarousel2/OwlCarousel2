@@ -63,7 +63,17 @@
 				if (this.initialized) {
 					this.refresh();
 				}
-			}, this)
+			}, this),
+      'next.owl.navigation': $.proxy(function() {
+        if (this.initialized) {
+          this.next();
+        }
+      }, this),
+      'prev.owl.navigation': $.proxy(function() {
+        if (this.initialized) {
+          this.prev();
+        }
+      }, this)
 		};
 
 		// register the event handlers
@@ -277,6 +287,36 @@
 				? 1 : options.dotsEach || options.items
 		};
 	}
+
+  /**
+   * Call the next item
+   * @public
+   */
+   Navigation.prototype.next = function() {
+      var options = this.core.options;
+
+      if (!options.loop && (this.core.pos.current + options.slideBy) > this.core.pos.max) {
+        this.core.to(0);
+      } else {
+        this.core.to(this.core.pos.current + options.slideBy);
+      }
+
+   }
+
+  /**
+   * Call the prev item
+   * @public
+   */
+   Navigation.prototype.prev = function() {
+      var options = this.core.options;
+
+      if (!options.loop && (this.core.pos.current - options.slideBy) < 0) {
+        this.core.to(this.core.pos.max);
+      } else {
+        this.core.to(this.core.pos.current - options.slideBy);
+      }
+
+   }
 
 	$.fn.owlCarousel.Constructor.Plugins.Navigation = Navigation;
 
