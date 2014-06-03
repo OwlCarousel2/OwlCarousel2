@@ -2883,41 +2883,64 @@
 	'use strict';
 
 	/**
-	 * Creates the animate plugin.
+	 * Creates the navigation plugin.
 	 * @class The Navigation Plugin
 	 * @param {Owl} carousel - The Owl Carousel.
 	 */
 	var Navigation = function(carousel) {
-		// define members
+		/**
+		 * Reference to the core.
+		 * @type {Owl}
+		 */
 		this.core = carousel;
-		this.core.options = $.extend({}, Navigation.Defaults, this.core.options);
-		this.refreshing = false;
+
+		/**
+		 * Indicates whether the plugin is initialized or not.
+		 * @type {Boolean}
+		 */
 		this.initialized = false;
-		this.page = null;
+
+		/**
+		 * The current paging indexes.
+		 * @type {Array}
+		 */
 		this.pages = [];
+
+		/**
+		 * All DOM elements of the user interface.
+		 * @type {Object}
+		 */
 		this.controls = {};
+
+		/**
+		 * Markup for an indicator.
+		 * @type {String}
+		 */
 		this.template = null;
+
+		/**
+		 * The carousel element.
+		 * @type {jQuery}
+		 */
 		this.$element = this.core.dom.$el;
 
-		// check plugin is enabled
-		if (!this.core.options.nav && !this.core.options.dots) {
-			return false;
-		}
-
-		// define the event handlers
+		/**
+		 * All event handlers.
+		 * @type {Object}
+		 */
 		this.handlers = {
-			'initialized.owl.carousel': $.proxy(function() {
-				if (!this.initialized) {
-					this.initialize();
-				}
-			}, this),
 			'changed.owl.carousel': $.proxy(function(e) {
-				if (e.property.name == 'items' && this.initialized) {
+				if (e.property.name == 'items') {
+					if (!this.initialized) {
+						this.initialize();
+						this.initialized = true;
+					}
 					this.update();
+					this.draw();
 				}
 				if (this.filling) {
-					e.property.value.data('owl-item').dot
-						= $(':first-child', e.property.value).find('[data-dot]').andSelf().data('dot');
+					e.property.value.data('owl-item').dot = $(':first-child', e.property.value)
+						.find('[data-dot]').andSelf().data('dot');
 				}
 			}, this),
 			'change.owl.carousel': $.proxy(function(e) {
@@ -2928,20 +2951,21 @@
 						? position.current >= position.max ? position.min : position.max
 						: e.property.value < 0 ? position.max : e.property.value;
 				}
-				this.filling
-					= this.core.options.dotsData && e.property.name == 'item' && e.property.value && e.property.value.is(':empty');
-			}, this),
-			'refresh.owl.carousel refreshed.owl.carousel': $.proxy(function(e) {
-				this.refreshing = e.type == 'refresh';
+				this.filling = this.core.options.dotsData && e.property.name == 'item'
+					&& e.property.value && e.property.value.is(':empty');
 			}, this),
 			'refreshed.owl.carousel': $.proxy(function() {
 				if (this.initialized) {
-					this.refresh();
+					this.update();
+					this.draw();
 				}
 			}, this)
 		};
 
-		// register the event handlers
+		// set default options
+		this.core.options = $.extend({}, Navigation.Defaults, this.core.options);
+
+		// register event handlers
 		this.$element.on(this.handlers);
 	}
 
@@ -2971,15 +2995,12 @@
 	}
 
 	/**
-	 * Initializes the plugin.
+	 * Initializes the layout of the plugin.
 	 * @protected
 	 */
 	Navigation.prototype.initialize = function() {
 		var $container,
 			options = this.core.options;
-
-		// refresh internal data
-		this.refresh();
 
 		// create the indicator template
 		if (!options.dotsData) {
@@ -2997,51 +3018,44 @@
 		}
 
 		// create DOM structure for absolute navigation
-		if (options.dots) {
-			this.$indicators = options.dotsContainer ? $(options.dotsContainer)
-				: $('<div>').addClass(options.dotsClass).appendTo(this.controls.$container);
+		this.controls.$indicators = options.dotsContainer ? $(options.dotsContainer)
+			: $('<div>').hide().addClass(options.dotsClass).appendTo(this.controls.$container);
 
-			this.$indicators.on(this.core.dragType[2], 'div', $.proxy(function(e) {
-				var index = $(e.target).parent().is(this.$indicators)
-					? $(e.target).index() : $(e.target).parent().index();
+		this.controls.$indicators.on(this.core.dragType[2], 'div', $.proxy(function(e) {
+			var index = $(e.target).parent().is(this.controls.$indicators)
+				? $(e.target).index() : $(e.target).parent().index();
 
-				e.preventDefault();
+			e.preventDefault();
 
-				this.core.to(
-					this.pages[index].start,
-					options.dotsSpeed
-				);
-			}, this));
-		}
+			this.core.to(
+				this.pages[index].start,
+				options.dotsSpeed
+			);
+		}, this));
 
 		// create DOM structure for relative navigation
-		if (options.nav) {
-			$container = options.navContainer ? $(options.navContainer)
-				: $('<div>').addClass(options.navContainerClass).prependTo(this.controls.$container);
+		$container = options.navContainer ? $(options.navContainer)
+			: $('<div>').addClass(options.navContainerClass).prependTo(this.controls.$container);
 
-			this.controls.$next = $('<' + options.navElement + '>');
-			this.controls.$previous = this.controls.$next.clone();
+		this.controls.$next = $('<' + options.navElement + '>');
+		this.controls.$previous = this.controls.$next.clone();
 
-			this.controls.$previous
-				.addClass(options.navClass[0])
-				.text(options.navText[0])
-				.prependTo($container)
-				.on(this.core.dragType[2], $.proxy(function(e) {
-					this.core.to(this.core.pos.current - options.slideBy);
-				}, this));
-			this.controls.$next
-				.addClass(options.navClass[1])
-				.text(options.navText[1])
-				.appendTo($container)
-				.on(this.core.dragType[2], $.proxy(function(e) {
-					this.core.to(this.core.pos.current + options.slideBy);
-				}, this));
-		}
-
-		// update the created DOM structures
-		this.update();
-
-		this.initialized = true;
+		this.controls.$previous
+			.addClass(options.navClass[0])
+			.text(options.navText[0])
+			.hide()
+			.prependTo($container)
+			.on(this.core.dragType[2], $.proxy(function(e) {
+				this.core.to(this.core.pos.current - options.slideBy);
+			}, this));
+		this.controls.$next
+			.addClass(options.navClass[1])
+			.text(options.navText[1])
+			.hide()
+			.appendTo($container)
+			.on(this.core.dragType[2], $.proxy(function(e) {
+				this.core.to(this.core.pos.current + options.slideBy);
+			}, this));
 	}
 
 	/**
@@ -3063,10 +3077,10 @@
 	}
 
 	/**
-	 * Refreshes the internal data of the plugin.
+	 * Updates the internal state.
 	 * @protected
 	 */
-	Navigation.prototype.refresh = function() {
+	Navigation.prototype.update = function() {
 		var i, j, k,
 			options = this.core.options,
 			lower = this.core.num.cItems / 2,
@@ -3102,10 +3116,10 @@
 	}
 
 	/**
-	 * Updates the DOM structures of the plugin.
+	 * Draws the user interface.
 	 * @protected
 	 */
-	Navigation.prototype.update = function() {
+	Navigation.prototype.draw = function() {
 		var difference, i, html = '',
 			options = this.core.options,
 			$items = this.core.dom.$oItems,
@@ -3116,25 +3130,26 @@
 			this.controls.$next.toggleClass('disabled', index >= this.core.pos.max);
 		}
 
-		if (options.dots) {
-			difference = this.pages.length - this.$indicators.children().length;
+		this.controls.$previous.toggle(options.nav);
+		this.controls.$next.toggle(options.nav);
 
-			this.page = $.grep(this.pages, function(o) {
-				return o.start <= index && o.end >= index;
-			}).pop();
+		if (options.dots) {
+			difference = this.pages.length - this.controls.$indicators.children().length;
 
 			if (difference > 0) {
 				for (i = 0; i < Math.abs(difference); i++) {
 					html += options.dotData ? $items.eq(i).data('owl-item').dot : this.template;
 				}
-				this.$indicators.append(html);
+				this.controls.$indicators.append(html);
 			} else if (difference < 0) {
-				this.$indicators.children().slice(difference).remove();
+				this.controls.$indicators.children().slice(difference).remove();
 			}
 
-			this.$indicators.find('.active').removeClass('active');
-			this.$indicators.children().eq(this.pages.indexOf(this.page) % $items.length).addClass('active');
+			this.controls.$indicators.find('.active').removeClass('active');
+			this.controls.$indicators.children().eq(this.pages.indexOf(this.getCurrentPage())).addClass('active');
 		}
+
+		this.controls.$indicators.toggle(options.dots);
 	}
 
 	/**
@@ -3146,11 +3161,23 @@
 		var options = this.core.options;
 
 		event.page = {
-			index: this.pages.indexOf(this.page),
+			index: this.pages.indexOf(this.getCurrentPage()),
 			count: this.pages.length,
 			size: options.center || options.autoWidth || options.dotData
 				? 1 : options.dotsEach || options.items
 		};
+	}
+
+	/**
+	 * Gets the current page of the carousel.
+	 * @protected
+	 * @returns {Number}
+	 */
+	Navigation.prototype.getCurrentPage = function() {
+		var index = this.core.pos.current;
+		return $.grep(this.pages, function(o) {
+			return o.start <= index && o.end >= index;
+		}).pop();
 	}
 
 	$.fn.owlCarousel.Constructor.Plugins.Navigation = Navigation;
