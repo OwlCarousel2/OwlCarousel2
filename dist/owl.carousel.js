@@ -2826,11 +2826,11 @@
 			return false;
 		}
 
-		if (!this.owl.options.loop && this.owl.pos.current >= this.owl.pos.max) {
+		if (!this.owl.options.loop && (this.owl.pos.current + this.owl.options.slideBy) > this.owl.pos.max) {
 			window.clearInterval(this.e._autoplay);
 			this.owl.to(0);
 		} else {
-			this.owl.next(this.owl.options.autoplaySpeed);
+			this.owl.to(this.owl.pos.current + this.owl.options.slideBy, this.owl.options.autoplaySpeed);
 		}
 		this.autoplayState = true;
 	};
