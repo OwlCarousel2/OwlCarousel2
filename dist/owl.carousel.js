@@ -3101,13 +3101,10 @@
 			options = this.core.options,
 			lower = this.core.num.cItems / 2,
 			upper = this.core.num.items - lower,
-			items = this.core.num.oItems,
 			size = options.center || options.autoWidth || options.dotData
 				? 1 : options.dotsEach || options.items;
 
 		if (options.nav) {
-			options.navRewind = items > options.items || options.center;
-
 			if (options.slideBy !== 'page') {
 				options.slideBy = Math.min(options.slideBy, options.items);
 			}
