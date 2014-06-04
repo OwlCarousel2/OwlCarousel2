@@ -50,6 +50,16 @@
 		this.$element = this.core.dom.$el;
 
 		/**
+		 * Overridden methods of the carousel.
+		 * @type {Object}
+		 */
+		this.overrides = {
+			next: this.core.next,
+			prev: this.core.prev,
+			to: this.core.to
+		};
+
+		/**
 		 * All event handlers.
 		 * @type {Object}
 		 */
@@ -84,16 +94,7 @@
 					this.update();
 					this.draw();
 				}
-			}, this),
-			'next.owl.navigation': $.proxy(function(e, speed) {
-				this.next(speed);
-			}, this),
-			'prev.owl.navigation': $.proxy(function(e, speed) {
-				this.prev(speed);
-			}, this),
-			'to.owl.navigation': $.proxy(function(e, position, speed) {
-				this.to(position, speed);
-			}, this),
+			}, this)
 		};
 
 		// set default options
@@ -129,11 +130,11 @@
 	}
 
 	/**
-	 * Initializes the layout of the plugin.
+	 * Initializes the layout of the plugin and extends the carousel.
 	 * @protected
 	 */
 	Navigation.prototype.initialize = function() {
-		var $container,
+		var $container, override,
 			options = this.core.options;
 
 		// create the indicator template
@@ -161,10 +162,7 @@
 
 			e.preventDefault();
 
-			this.core.to(
-				this.pages[index].start,
-				options.dotsSpeed
-			);
+			this.to(index, options.dotsSpeed);
 		}, this));
 
 		// create DOM structure for relative navigation
@@ -190,6 +188,11 @@
 			.on(this.core.dragType[2], $.proxy(function(e) {
 				this.next();
 			}, this));
+
+		// override public methods of the carousel
+		for (override in this.overrides) {
+			this.core[override] = $.proxy(this[override], this);
+		}
 	}
 
 	/**
@@ -197,13 +200,16 @@
 	 * @protected
 	 */
 	Navigation.prototype.destroy = function() {
-		var handler, control, property;
+		var handler, control, property, override;
 
 		for (handler in this.handlers) {
 			this.$element.off(handler, this.handlers[handler]);
 		}
 		for (control in this.controls) {
 			this.controls[control].remove();
+		}
+		for (override in this.overides) {
+			this.core[override] = this.overrides[override];
 		}
 		for (property in Object.getOwnPropertyNames(this)) {
 			typeof this[property] != 'function' && (this[property] = null);
@@ -340,7 +346,7 @@
 	 * @param {Number} [speed=false] - The time in milliseconds for the transition.
 	 */
 	Navigation.prototype.next = function(speed) {
-		this.core.to(this.getPosition(true), speed);
+		$.proxy(this.overrides.to, this.core)(this.getPosition(true), speed);
 	}
 
 	/**
@@ -349,7 +355,7 @@
 	 * @param {Number} [speed=false] - The time in milliseconds for the transition.
 	 */
 	Navigation.prototype.prev = function(speed) {
-		this.core.to(this.getPosition(false), speed);
+		$.proxy(this.overrides.to, this.core)(this.getPosition(false), speed);
 	}
 
 	/**
@@ -357,16 +363,17 @@
 	 * @public
 	 * @param {Number} position - The position of the item or page.
 	 * @param {Number} [speed] - The time in milliseconds for the transition.
+	 * @param {Boolean} [standard=false] - Whether to use the standard behaviour or not.
 	 */
-	Navigation.prototype.to = function(position, speed) {
+	Navigation.prototype.to = function(position, speed, standard) {
 		var length,
 			options = this.core.options;
 
-		if (options.slideBy == 'page') {
+		if (options.slideBy == 'page' && !standard) {
 			length = this.pages.length;
-			this.core.to(this.pages[((position % length) + length) % length].start, speed);
+			$.proxy(this.overrides.to, this.core)(this.pages[((position % length) + length) % length].start, speed);
 		} else {
-			this.core.to(position, speed);
+			$.proxy(this.overrides.to, this.core)(position, speed);
 		}
 	}
 
