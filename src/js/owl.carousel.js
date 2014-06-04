@@ -1588,8 +1588,6 @@
       itemsPage = this.slideBy;
     }
 
-    console.log(this.num);
-
     if (position === 'next') {
       position = this.pos.current + itemsPage;
     } else if (position === 'prev') {
