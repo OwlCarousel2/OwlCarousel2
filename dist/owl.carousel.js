@@ -3104,10 +3104,8 @@
 			size = options.center || options.autoWidth || options.dotData
 				? 1 : options.dotsEach || options.items;
 
-		if (options.nav) {
-			if (options.slideBy !== 'page') {
-				options.slideBy = Math.min(options.slideBy, options.items);
-			}
+		if (options.slideBy !== 'page') {
+			options.slideBy = Math.min(options.slideBy, options.items);
 		}
 
 		if (options.dots) {
