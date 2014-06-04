@@ -1583,9 +1583,9 @@
     itemsPage = 1;
 
     if (page) {
-      itemsPage = this.num.active;
-    } else if (this.slideBy && !page) {
-      itemsPage = this.slideBy;
+      itemsPage = this.options.items;
+    } else if (this.options.slideBy && !page) {
+      itemsPage = this.options.slideBy;
     }
 
     if (position === 'next') {
@@ -2849,7 +2849,7 @@
       window.clearInterval(this.e._autoplay);
       this.owl.to(0);
     } else {
-      this.owl.next('next', this.owl.options.autoplaySpeed);
+      this.owl.next(this.owl.options.autoplaySpeed);
     }
     this.autoplayState = true;
   };

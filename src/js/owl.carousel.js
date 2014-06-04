@@ -1583,9 +1583,9 @@
     itemsPage = 1;
 
     if (page) {
-      itemsPage = this.num.active;
-    } else if (this.slideBy && !page) {
-      itemsPage = this.slideBy;
+      itemsPage = this.options.items;
+    } else if (this.options.slideBy && !page) {
+      itemsPage = this.options.slideBy;
     }
 
     if (position === 'next') {

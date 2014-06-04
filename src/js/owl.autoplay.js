@@ -100,7 +100,7 @@
       window.clearInterval(this.e._autoplay);
       this.owl.to(0);
     } else {
-      this.owl.next('next', this.owl.options.autoplaySpeed);
+      this.owl.next(this.owl.options.autoplaySpeed);
     }
     this.autoplayState = true;
   };
