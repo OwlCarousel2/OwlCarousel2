@@ -3160,7 +3160,7 @@
 			}
 
 			this.controls.$indicators.find('.active').removeClass('active');
-			this.controls.$indicators.children().eq(this.pages.indexOf(this.getCurrentPage())).addClass('active');
+			this.controls.$indicators.children().eq($.inArray(this.getCurrentPage(), this.pages)).addClass('active');
 		}
 
 		this.controls.$indicators.toggle(options.dots);
@@ -3175,7 +3175,7 @@
 		var options = this.core.options;
 
 		event.page = {
-			index: this.pages.indexOf(this.getCurrentPage()),
+			index: $.inArray(this.getCurrentPage(), this.pages),
 			count: this.pages.length,
 			size: options.center || options.autoWidth || options.dotData
 				? 1 : options.dotsEach || options.items
@@ -3204,7 +3204,7 @@
 			options = this.core.options;
 
 		if (options.slideBy == 'page') {
-			position = this.pages.indexOf(this.getCurrentPage());
+			position = $.inArray(this.getCurrentPage(), this.pages);
 			length = this.pages.length;
 			successor ? ++position : --position;
 			position = this.pages[((position % length) + length) % length].start;
