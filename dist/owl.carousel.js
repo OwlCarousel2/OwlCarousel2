@@ -1579,22 +1579,24 @@
 	 * @param {Number} [speed] - The time in milliseconds for the transition.
 	 */
 	Owl.prototype.to = function(position, speed, page) {
-    page = page || false;
-    slideBy = this.options.slideBy || 1;
 
-    if (position === 'next') {
-      position = this.pos.current + slideBy;
-    } else if (position === 'prev') {
-      position = this.pos.current - slideBy;
-    } else {
-      position = --position * slideBy;
-    }
+    itemsPage = 1;
 
     if (page) {
-      
+      itemsPage = this.num.active;
+    } else if (this.slideBy && !page) {
+      itemsPage = this.slideBy;
     }
 
-    console.log(position);
+    console.log(this.num);
+
+    if (position === 'next') {
+      position = this.pos.current + itemsPage;
+    } else if (position === 'prev') {
+      position = this.pos.current - itemsPage;
+    } else {
+      position = --position * itemsPage;
+    }
 
 		if (this.options.loop) {
 			var distance = position - this.pos.current,
@@ -1636,7 +1638,7 @@
 	 */
 	Owl.prototype.next = function(speed, page) {
     speed = speed || false;
-		page = page || false;
+    page = page || false;
 		this.to('next', speed, page);
 	};
 
@@ -1647,7 +1649,7 @@
 	 */
 	Owl.prototype.prev = function(speed, page) {
     speed = speed || false;
-		page = page || false;
+    page = page || false;
 		this.to('prev', speed, page);
 	};
 
@@ -3028,7 +3030,8 @@
 
         this.core.to(
           index+1,
-          options.dotsSpeed
+          options.dotsSpeed,
+          'page'
         );
       }, this));
     }

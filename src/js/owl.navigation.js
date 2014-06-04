@@ -134,7 +134,8 @@
 
         this.core.to(
           index+1,
-          options.dotsSpeed
+          options.dotsSpeed,
+          'page'
         );
       }, this));
     }
