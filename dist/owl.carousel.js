@@ -2959,7 +2959,16 @@
 					this.update();
 					this.draw();
 				}
-			}, this)
+			}, this),
+			'next.owl.navigation': $.proxy(function(e, speed) {
+				this.next(speed);
+			}, this),
+			'prev.owl.navigation': $.proxy(function(e, speed) {
+				this.prev(speed);
+			}, this),
+			'to.owl.navigation': $.proxy(function(e, position, speed) {
+				this.to(position, speed);
+			}, this),
 		};
 
 		// set default options
@@ -3046,7 +3055,7 @@
 			.hide()
 			.prependTo($container)
 			.on(this.core.dragType[2], $.proxy(function(e) {
-				this.core.to(this.core.pos.current - options.slideBy);
+				this.prev();
 			}, this));
 		this.controls.$next
 			.addClass(options.navClass[1])
@@ -3054,7 +3063,7 @@
 			.hide()
 			.appendTo($container)
 			.on(this.core.dragType[2], $.proxy(function(e) {
-				this.core.to(this.core.pos.current + options.slideBy);
+				this.next();
 			}, this));
 	}
 
@@ -3092,9 +3101,7 @@
 		if (options.nav) {
 			options.navRewind = items > options.items || options.center;
 
-			if (options.slideBy && options.slideBy === 'page') {
-				options.slideBy = options.items;
-			} else {
+			if (options.slideBy !== 'page') {
 				options.slideBy = Math.min(options.slideBy, options.items);
 			}
 		}
@@ -3178,6 +3185,64 @@
 		return $.grep(this.pages, function(o) {
 			return o.start <= index && o.end >= index;
 		}).pop();
+	}
+
+	/**
+	 * Gets the current succesor/predecessor position.
+	 * @protected
+	 * @return {Number}
+	 */
+	Navigation.prototype.getPosition = function(successor) {
+		var position, length,
+			options = this.core.options;
+
+		if (options.slideBy == 'page') {
+			position = this.pages.indexOf(this.getCurrentPage());
+			length = this.pages.length;
+			successor ? ++position : --position;
+			position = this.pages[((position % length) + length) % length].start;
+		} else {
+			position = this.core.pos.current;
+			length = this.core.num.oItems;
+			successor ? position += options.slideBy : position -= options.slideBy;
+		}
+		return position;
+	}
+
+	/**
+	 * Slides to the next item or page.
+	 * @public
+	 * @param {Number} [speed=false] - The time in milliseconds for the transition.
+	 */
+	Navigation.prototype.next = function(speed) {
+		this.core.to(this.getPosition(true), speed);
+	}
+
+	/**
+	 * Slides to the previous item or page.
+	 * @public
+	 * @param {Number} [speed=false] - The time in milliseconds for the transition.
+	 */
+	Navigation.prototype.prev = function(speed) {
+		this.core.to(this.getPosition(false), speed);
+	}
+
+	/**
+	 * Slides to the specified item or page.
+	 * @public
+	 * @param {Number} position - The position of the item or page.
+	 * @param {Number} [speed] - The time in milliseconds for the transition.
+	 */
+	Navigation.prototype.to = function(position, speed) {
+		var length,
+			options = this.core.options;
+
+		if (options.slideBy == 'page') {
+			length = this.pages.length;
+			this.core.to(this.pages[((position % length) + length) % length].start, speed);
+		} else {
+			this.core.to(position, speed);
+		}
 	}
 
 	$.fn.owlCarousel.Constructor.Plugins.Navigation = Navigation;
