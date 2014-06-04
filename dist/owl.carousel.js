@@ -1492,15 +1492,15 @@
 
 		this.pos.prev = this.pos.currentAbs;
 
-		if (!this.state.revert && !this.options.loop) {
+		var event = this.trigger('change', { property: { name: 'position', value: position } });
+
+		if (event.data !== undefined) {
+			position = event.data;
+		} else if (!this.state.revert && !this.options.loop) {
 			position = position > this.pos.max ? this.pos.max : (position <= 0 ? 0 : position);
 		} else if (!this.state.revert) {
 			position = position >= this.num.oItems ? this.num.oItems - 1 : position;
 		}
-
-		var event = this.trigger('change', { property: { name: 'position', value: position } });
-
-		position = event.data ? event.data : position;
 
 		if (this.state.revert) {
 			this.pos.current = this.dom.$items.eq(position).data('owl-item').index;
