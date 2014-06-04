@@ -59,7 +59,7 @@
 			}
 
 			this.carousel.dom.oStage.scrollLeft = 0;
-			this.carousel.to(position);
+			this.carousel.to(position+1);
 		}, this));
 	}
 

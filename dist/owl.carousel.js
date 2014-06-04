@@ -1578,7 +1578,24 @@
 	 * @param {Number} position - The position of the item.
 	 * @param {Number} [speed] - The time in milliseconds for the transition.
 	 */
-	Owl.prototype.to = function(position, speed) {
+	Owl.prototype.to = function(position, speed, page) {
+
+    itemsPage = 1;
+
+    if (page) {
+      itemsPage = this.options.items;
+    } else if (this.options.slideBy && !page) {
+      itemsPage = this.options.slideBy;
+    }
+
+    if (position === 'next') {
+      position = this.pos.current + itemsPage;
+    } else if (position === 'prev') {
+      position = this.pos.current - itemsPage;
+    } else {
+      position = --position * itemsPage;
+    }
+
 		if (this.options.loop) {
 			var distance = position - this.pos.current,
 				revert = this.pos.currentAbs,
@@ -1617,9 +1634,10 @@
 	 * @public
 	 * @param {Number} [speed=false] - The time in milliseconds for the transition.
 	 */
-	Owl.prototype.next = function(speed) {
-		speed = speed || false;
-		this.to(this.pos.current + 1, speed);
+	Owl.prototype.next = function(speed, page) {
+    speed = speed || false;
+    page = page || false;
+		this.to('next', speed, page);
 	};
 
 	/**
@@ -1627,9 +1645,10 @@
 	 * @public
 	 * @param {Number} [speed=false] - The time in milliseconds for the transition.
 	 */
-	Owl.prototype.prev = function(speed) {
-		speed = speed || false;
-		this.to(this.pos.current - 1, speed);
+	Owl.prototype.prev = function(speed, page) {
+    speed = speed || false;
+    page = page || false;
+		this.to('prev', speed, page);
 	};
 
 	/**
@@ -2736,140 +2755,140 @@
  */
 ;(function($, window, document, undefined) {
 
-	/**
-	 * Creates the autoplay plugin.
-	 * @class The Autoplay Plugin
-	 * @param {Owl} scope - The Owl Carousel
-	 */
-	Autoplay = function(scope) {
-		this.owl = scope;
-		this.owl.options = $.extend({}, Autoplay.Defaults, this.owl.options);
+  /**
+   * Creates the autoplay plugin.
+   * @class The Autoplay Plugin
+   * @param {Owl} scope - The Owl Carousel
+   */
+  Autoplay = function(scope) {
+    this.owl = scope;
+    this.owl.options = $.extend({}, Autoplay.Defaults, this.owl.options);
 
-		this.handlers = {
-			'translated.owl.carousel refreshed.owl.carousel': $.proxy(function() {
-				this.autoplay();
-			}, this),
-			'play.owl.autoplay': $.proxy(function(e, t, s) {
-				this.play(t, s);
-			}, this),
-			'stop.owl.autoplay': $.proxy(function() {
-				this.stop();
-			}, this),
-			'mouseover.owl.autoplay': $.proxy(function() {
-				if (this.owl.options.autoplayHoverPause) {
-					this.pause();
-				}
-			}, this),
-			'mouseleave.owl.autoplay': $.proxy(function() {
-				if (this.owl.options.autoplayHoverPause) {
-					this.autoplay();
-				}
-			}, this)
-		};
+    this.handlers = {
+      'translated.owl.carousel refreshed.owl.carousel': $.proxy(function() {
+        this.autoplay();
+      }, this),
+      'play.owl.autoplay': $.proxy(function(e, t, s) {
+        this.play(t, s);
+      }, this),
+      'stop.owl.autoplay': $.proxy(function() {
+        this.stop();
+      }, this),
+      'mouseover.owl.autoplay': $.proxy(function() {
+        if (this.owl.options.autoplayHoverPause) {
+          this.pause();
+        }
+      }, this),
+      'mouseleave.owl.autoplay': $.proxy(function() {
+        if (this.owl.options.autoplayHoverPause) {
+          this.autoplay();
+        }
+      }, this)
+    };
 
-		this.owl.dom.$el.on(this.handlers);
-	};
+    this.owl.dom.$el.on(this.handlers);
+  };
 
-	/**
-	 * Default options.
-	 * @public
-	 */
-	Autoplay.Defaults = {
-		autoplay: false,
-		autoplayTimeout: 5000,
-		autoplayHoverPause: false,
-		autoplaySpeed: false
-	};
+  /**
+   * Default options.
+   * @public
+   */
+  Autoplay.Defaults = {
+    autoplay: false,
+    autoplayTimeout: 5000,
+    autoplayHoverPause: false,
+    autoplaySpeed: false
+  };
 
-	/**
-	 * @protected
-	 * @todo Must be documented.
-	 */
-	Autoplay.prototype.autoplay = function() {
-		if (this.owl.options.autoplay && !this.owl.state.videoPlay) {
-			window.clearInterval(this.apInterval);
+  /**
+   * @protected
+   * @todo Must be documented.
+   */
+  Autoplay.prototype.autoplay = function() {
+    if (this.owl.options.autoplay && !this.owl.state.videoPlay) {
+      window.clearInterval(this.apInterval);
 
-			this.apInterval = window.setInterval($.proxy(function() {
-				this.play();
-			}, this), this.owl.options.autoplayTimeout);
-		} else {
-			window.clearInterval(this.apInterval);
-			this.autoplayState = false;
-		}
-	};
+      this.apInterval = window.setInterval($.proxy(function() {
+        this.play();
+      }, this), this.owl.options.autoplayTimeout);
+    } else {
+      window.clearInterval(this.apInterval);
+      this.autoplayState = false;
+    }
+  };
 
-	/**
-	 * Starts the autoplay.
-	 * @public
-	 * @param {Number} [timeout] - ...
-	 * @param {Number} [speed] - ...
-	 * @returns {Boolean|undefined} - ...
-	 * @todo Must be documented.
-	 */
-	Autoplay.prototype.play = function(timeout, speed) {
-		// if tab is inactive - doesnt work in <IE10
-		if (document.hidden === true) {
-			return false;
-		}
+  /**
+   * Starts the autoplay.
+   * @public
+   * @param {Number} [timeout] - ...
+   * @param {Number} [speed] - ...
+   * @returns {Boolean|undefined} - ...
+   * @todo Must be documented.
+   */
+  Autoplay.prototype.play = function(timeout, speed) {
+    // if tab is inactive - doesnt work in <IE10
+    if (document.hidden === true) {
+      return false;
+    }
 
-		// overwrite default options (custom options are always priority)
-		if (!this.owl.options.autoplay) {
-			this.owl._options.autoplay = this.owl.options.autoplay = true;
-			this.owl._options.autoplayTimeout = this.owl.options.autoplayTimeout = timeout
-				|| this.owl.options.autoplayTimeout || 4000;
-			this.owl._options.autoplaySpeed = speed || this.owl.options.autoplaySpeed;
-		}
+    // overwrite default options (custom options are always priority)
+    if (!this.owl.options.autoplay) {
+      this.owl._options.autoplay = this.owl.options.autoplay = true;
+      this.owl._options.autoplayTimeout = this.owl.options.autoplayTimeout = timeout
+        || this.owl.options.autoplayTimeout || 4000;
+      this.owl._options.autoplaySpeed = speed || this.owl.options.autoplaySpeed;
+    }
 
-		if (this.owl.options.autoplay === false || this.owl.state.isTouch || this.owl.state.isScrolling
-			|| this.owl.state.isSwiping || this.owl.state.inMotion) {
-			window.clearInterval(this.apInterval);
-			return false;
-		}
+    if (this.owl.options.autoplay === false || this.owl.state.isTouch || this.owl.state.isScrolling
+      || this.owl.state.isSwiping || this.owl.state.inMotion) {
+      window.clearInterval(this.apInterval);
+      return false;
+    }
 
-		if (!this.owl.options.loop && this.owl.pos.current >= this.owl.pos.max) {
-			window.clearInterval(this.e._autoplay);
-			this.owl.to(0);
-		} else {
-			this.owl.next(this.owl.options.autoplaySpeed);
-		}
-		this.autoplayState = true;
-	};
+    if (!this.owl.options.loop && this.owl.pos.current >= this.owl.pos.max) {
+      window.clearInterval(this.e._autoplay);
+      this.owl.to(0);
+    } else {
+      this.owl.next(this.owl.options.autoplaySpeed);
+    }
+    this.autoplayState = true;
+  };
 
-	/**
-	 * Stops the autoplay.
-	 * @public
-	 */
-	Autoplay.prototype.stop = function() {
-		this.owl._options.autoplay = this.owl.options.autoplay = false;
-		this.autoplayState = false;
-		window.clearInterval(this.apInterval);
-	};
+  /**
+   * Stops the autoplay.
+   * @public
+   */
+  Autoplay.prototype.stop = function() {
+    this.owl._options.autoplay = this.owl.options.autoplay = false;
+    this.autoplayState = false;
+    window.clearInterval(this.apInterval);
+  };
 
-	/**
-	 * Pauses the autoplay.
-	 * @public
-	 */
-	Autoplay.prototype.pause = function() {
-		window.clearInterval(this.apInterval);
-	};
+  /**
+   * Pauses the autoplay.
+   * @public
+   */
+  Autoplay.prototype.pause = function() {
+    window.clearInterval(this.apInterval);
+  };
 
-	/**
-	 * Destroys the plugin.
-	 */
-	Autoplay.prototype.destroy = function() {
-		var handler, property;
+  /**
+   * Destroys the plugin.
+   */
+  Autoplay.prototype.destroy = function() {
+    var handler, property;
 
-		window.clearInterval(this.apInterval);
+    window.clearInterval(this.apInterval);
 
-		for (handler in this.handlers) {
-			this.owl.dom.$el.off(handler, this.handlers[handler]);
-		}
-		for (property in Object.getOwnPropertyNames(this)) {
-			typeof this[property] != 'function' && (this[property] = null);
-		}
-	};
+    for (handler in this.handlers) {
+      this.owl.dom.$el.off(handler, this.handlers[handler]);
+    }
+    for (property in Object.getOwnPropertyNames(this)) {
+      typeof this[property] != 'function' && (this[property] = null);
+    }
+  };
 
-	$.fn.owlCarousel.Constructor.Plugins.autoplay = Autoplay;
+  $.fn.owlCarousel.Constructor.Plugins.autoplay = Autoplay;
 
 })(window.Zepto || window.jQuery, window, document);
 
@@ -2880,280 +2899,281 @@
  * @license The MIT License (MIT)
  */
 ;(function($, window, document, undefined) {
-	'use strict';
+  'use strict';
 
-	/**
-	 * Creates the animate plugin.
-	 * @class The Navigation Plugin
-	 * @param {Owl} carousel - The Owl Carousel.
-	 */
-	var Navigation = function(carousel) {
-		// define members
-		this.core = carousel;
-		this.core.options = $.extend({}, Navigation.Defaults, this.core.options);
-		this.refreshing = false;
-		this.initialized = false;
-		this.page = null;
-		this.pages = [];
-		this.controls = {};
-		this.template = null;
-		this.$element = this.core.dom.$el;
+  /**
+   * Creates the animate plugin.
+   * @class The Navigation Plugin
+   * @param {Owl} carousel - The Owl Carousel.
+   */
+  var Navigation = function(carousel) {
+    // define members
+    this.core = carousel;
+    this.core.options = $.extend({}, Navigation.Defaults, this.core.options);
+    this.refreshing = false;
+    this.initialized = false;
+    this.page = null;
+    this.pages = [];
+    this.controls = {};
+    this.template = null;
+    this.$element = this.core.dom.$el;
 
-		// check plugin is enabled
-		if (!this.core.options.nav && !this.core.options.dots) {
-			return false;
-		}
+    // check plugin is enabled
+    if (!this.core.options.nav && !this.core.options.dots) {
+      return false;
+    }
 
-		// define the event handlers
-		this.handlers = {
-			'initialized.owl.carousel': $.proxy(function() {
-				if (!this.initialized) {
-					this.initialize();
-				}
-			}, this),
-			'changed.owl.carousel': $.proxy(function(e) {
-				if (e.property.name == 'items' && this.initialized) {
-					this.update();
-				}
-				if (this.filling) {
-					e.property.value.data('owl-item').dot
-						= $(':first-child', e.property.value).find('[data-dot]').andSelf().data('dot');
-				}
-			}, this),
-			'change.owl.carousel': $.proxy(function(e) {
-				if (e.property.name == 'position' && !this.core.state.revert
-					&& !this.core.options.loop && this.core.options.navRewind) {
-					var position = this.core.pos;
-					e.data = e.property.value > position.max
-						? position.current >= position.max ? position.min : position.max
-						: e.property.value < 0 ? position.max : e.property.value;
-				}
-				this.filling
-					= this.core.options.dotsData && e.property.name == 'item' && e.property.value && e.property.value.is(':empty');
-			}, this),
-			'refresh.owl.carousel refreshed.owl.carousel': $.proxy(function(e) {
-				this.refreshing = e.type == 'refresh';
-			}, this),
-			'refreshed.owl.carousel': $.proxy(function() {
-				if (this.initialized) {
-					this.refresh();
-				}
-			}, this)
-		};
+    // define the event handlers
+    this.handlers = {
+      'initialized.owl.carousel': $.proxy(function() {
+        if (!this.initialized) {
+          this.initialize();
+        }
+      }, this),
+      'changed.owl.carousel': $.proxy(function(e) {
+        if (e.property.name == 'items' && this.initialized) {
+          this.update();
+        }
+        if (this.filling) {
+          e.property.value.data('owl-item').dot
+            = $(':first-child', e.property.value).find('[data-dot]').andSelf().data('dot');
+        }
+      }, this),
+      'change.owl.carousel': $.proxy(function(e) {
+        if (e.property.name == 'position' && !this.core.state.revert
+          && !this.core.options.loop && this.core.options.navRewind) {
+          var position = this.core.pos;
+          e.data = e.property.value > position.max
+            ? position.current >= position.max ? position.min : position.max
+            : e.property.value < 0 ? position.max : e.property.value;
+        }
+        this.filling
+          = this.core.options.dotsData && e.property.name == 'item' && e.property.value && e.property.value.is(':empty');
+      }, this),
+      'refresh.owl.carousel refreshed.owl.carousel': $.proxy(function(e) {
+        this.refreshing = e.type == 'refresh';
+      }, this),
+      'refreshed.owl.carousel': $.proxy(function() {
+        if (this.initialized) {
+          this.refresh();
+        }
+      }, this)
+    };
 
-		// register the event handlers
-		this.$element.on(this.handlers);
-	}
+    // register the event handlers
+    this.$element.on(this.handlers);
+  }
 
-	/**
-	 * Default options.
-	 * @public
-	 * @todo Rename `slideBy` to `navBy`
-	 */
-	Navigation.Defaults = {
-		nav: false,
-		navRewind: true,
-		navText: [ 'prev', 'next' ],
-		navSpeed: false,
-		navElement: 'div',
-		navContainer: false,
-		navContainerClass: 'owl-nav',
-		navClass: [ 'owl-prev', 'owl-next' ],
-		slideBy: 1,
-		dotClass: 'owl-dot',
-		dotsClass: 'owl-dots',
-		dots: true,
-		dotsEach: false,
-		dotData: false,
-		dotsSpeed: false,
-		dotsContainer: false,
-		controlsClass: 'owl-controls'
-	}
+  /**
+   * Default options.
+   * @public
+   * @todo Rename `slideBy` to `navBy`
+   */
+  Navigation.Defaults = {
+    nav: false,
+    navRewind: true,
+    navText: [ 'prev', 'next' ],
+    navSpeed: false,
+    navElement: 'div',
+    navContainer: false,
+    navContainerClass: 'owl-nav',
+    navClass: [ 'owl-prev', 'owl-next' ],
+    slideBy: 1,
+    dotClass: 'owl-dot',
+    dotsClass: 'owl-dots',
+    dots: true,
+    dotsEach: false,
+    dotData: false,
+    dotsSpeed: false,
+    dotsContainer: false,
+    controlsClass: 'owl-controls'
+  }
 
-	/**
-	 * Initializes the plugin.
-	 * @protected
-	 */
-	Navigation.prototype.initialize = function() {
-		var $container,
-			options = this.core.options;
+  /**
+   * Initializes the plugin.
+   * @protected
+   */
+  Navigation.prototype.initialize = function() {
+    var $container,
+      options = this.core.options;
 
-		// refresh internal data
-		this.refresh();
+    // refresh internal data
+    this.refresh();
 
-		// create the indicator template
-		if (!options.dotsData) {
-			this.template = $('<div>')
-				.addClass(options.dotClass)
-				.append($('<span>'))
-				.prop('outerHTML');
-		}
+    // create the indicator template
+    if (!options.dotsData) {
+      this.template = $('<div>')
+        .addClass(options.dotClass)
+        .append($('<span>'))
+        .prop('outerHTML');
+    }
 
-		// create controls container if needed
-		if (!options.navContainer || !options.dotsContainer) {
-			this.controls.$container = $('<div>')
-				.addClass(options.controlsClass)
-				.appendTo(this.$element);
-		}
+    // create controls container if needed
+    if (!options.navContainer || !options.dotsContainer) {
+      this.controls.$container = $('<div>')
+        .addClass(options.controlsClass)
+        .appendTo(this.$element);
+    }
 
-		// create DOM structure for absolute navigation
-		if (options.dots) {
-			this.$indicators = options.dotsContainer ? $(options.dotsContainer)
-				: $('<div>').addClass(options.dotsClass).appendTo(this.controls.$container);
+    // create DOM structure for absolute navigation
+    if (options.dots) {
+      this.$indicators = options.dotsContainer ? $(options.dotsContainer)
+        : $('<div>').addClass(options.dotsClass).appendTo(this.controls.$container);
 
-			this.$indicators.on(this.core.dragType[2], 'div', $.proxy(function(e) {
-				var index = $(e.target).parent().is(this.$indicators)
-					? $(e.target).index() : $(e.target).parent().index();
+      this.$indicators.on(this.core.dragType[2], 'div', $.proxy(function(e) {
+        var index = $(e.target).parent().is(this.$indicators)
+          ? $(e.target).index() : $(e.target).parent().index();
 
-				e.preventDefault();
+        e.preventDefault();
 
-				this.core.to(
-					this.pages[index].start,
-					options.dotsSpeed
-				);
-			}, this));
-		}
+        this.core.to(
+          index+1,
+          options.dotsSpeed,
+          'page'
+        );
+      }, this));
+    }
 
-		// create DOM structure for relative navigation
-		if (options.nav) {
-			$container = options.navContainer ? $(options.navContainer)
-				: $('<div>').addClass(options.navContainerClass).prependTo(this.controls.$container);
+    // create DOM structure for relative navigation
+    if (options.nav) {
+      $container = options.navContainer ? $(options.navContainer)
+        : $('<div>').addClass(options.navContainerClass).prependTo(this.controls.$container);
 
-			this.controls.$next = $('<' + options.navElement + '>');
-			this.controls.$previous = this.controls.$next.clone();
+      this.controls.$next = $('<' + options.navElement + '>');
+      this.controls.$previous = this.controls.$next.clone();
 
-			this.controls.$previous
-				.addClass(options.navClass[0])
-				.text(options.navText[0])
-				.prependTo($container)
-				.on(this.core.dragType[2], $.proxy(function(e) {
-					this.core.to(this.core.pos.current - options.slideBy);
-				}, this));
-			this.controls.$next
-				.addClass(options.navClass[1])
-				.text(options.navText[1])
-				.appendTo($container)
-				.on(this.core.dragType[2], $.proxy(function(e) {
-					this.core.to(this.core.pos.current + options.slideBy);
-				}, this));
-		}
+      this.controls.$previous
+        .addClass(options.navClass[0])
+        .text(options.navText[0])
+        .prependTo($container)
+        .on(this.core.dragType[2], $.proxy(function(e) {
+          this.core.to('prev');
+        }, this));
+      this.controls.$next
+        .addClass(options.navClass[1])
+        .text(options.navText[1])
+        .appendTo($container)
+        .on(this.core.dragType[2], $.proxy(function(e) {
+          this.core.to('next');
+        }, this));
+    }
 
-		// update the created DOM structures
-		this.update();
+    // update the created DOM structures
+    this.update();
 
-		this.initialized = true;
-	}
+    this.initialized = true;
+  }
 
-	/**
-	 * Destroys the plugin.
-	 * @protected
-	 */
-	Navigation.prototype.destroy = function() {
-		var handler, control, property;
+  /**
+   * Destroys the plugin.
+   * @protected
+   */
+  Navigation.prototype.destroy = function() {
+    var handler, control, property;
 
-		for (handler in this.handlers) {
-			this.$element.off(handler, this.handlers[handler]);
-		}
-		for (control in this.controls) {
-			this.controls[control].remove();
-		}
-		for (property in Object.getOwnPropertyNames(this)) {
-			typeof this[property] != 'function' && (this[property] = null);
-		}
-	}
+    for (handler in this.handlers) {
+      this.$element.off(handler, this.handlers[handler]);
+    }
+    for (control in this.controls) {
+      this.controls[control].remove();
+    }
+    for (property in Object.getOwnPropertyNames(this)) {
+      typeof this[property] != 'function' && (this[property] = null);
+    }
+  }
 
-	/**
-	 * Refreshes the internal data of the plugin.
-	 * @protected
-	 */
-	Navigation.prototype.refresh = function() {
-		var i, j, k,
-			options = this.core.options,
-			lower = this.core.num.cItems / 2,
-			upper = this.core.num.items - lower,
-			items = this.core.num.oItems,
-			size = options.center || options.autoWidth || options.dotData
-				? 1 : options.dotsEach || options.items;
+  /**
+   * Refreshes the internal data of the plugin.
+   * @protected
+   */
+  Navigation.prototype.refresh = function() {
+    var i, j, k,
+      options = this.core.options,
+      lower = this.core.num.cItems / 2,
+      upper = this.core.num.items - lower,
+      items = this.core.num.oItems,
+      size = options.center || options.autoWidth || options.dotData
+        ? 1 : options.dotsEach || options.items;
 
-		if (options.nav) {
-			options.navRewind = items > options.items || options.center;
+    if (options.nav) {
+      options.navRewind = items > options.items || options.center;
 
-			if (options.slideBy && options.slideBy === 'page') {
-				options.slideBy = options.items;
-			} else {
-				options.slideBy = Math.min(options.slideBy, options.items);
-			}
-		}
+      if (options.slideBy && options.slideBy === 'page') {
+        options.slideBy = options.items;
+      } else {
+        options.slideBy = Math.min(options.slideBy, options.items);
+      }
+    }
 
-		if (options.dots) {
-			this.pages = [];
+    if (options.dots) {
+      this.pages = [];
 
-			for (i = lower, j = 0, k = 0; i < upper; i++) {
-				if (j >= size || j === 0) {
-					this.pages.push({
-						start: i - lower,
-						end: i - lower + size - 1
-					});
-					j = 0, ++k;
-				}
-				j += this.core.num.merged[i];
-			}
-		}
-	}
+      for (i = lower, j = 0, k = 0; i < upper; i++) {
+        if (j >= size || j === 0) {
+          this.pages.push({
+            start: i - lower,
+            end: i - lower + size - 1
+          });
+          j = 0, ++k;
+        }
+        j += this.core.num.merged[i];
+      }
+    }
+  }
 
-	/**
-	 * Updates the DOM structures of the plugin.
-	 * @protected
-	 */
-	Navigation.prototype.update = function() {
-		var difference, i, html = '',
-			options = this.core.options,
-			$items = this.core.dom.$oItems,
-			index = this.core.pos.current;
+  /**
+   * Updates the DOM structures of the plugin.
+   * @protected
+   */
+  Navigation.prototype.update = function() {
+    var difference, i, html = '',
+      options = this.core.options,
+      $items = this.core.dom.$oItems,
+      index = this.core.pos.current;
 
-		if (options.nav && !options.loop && !options.navRewind) {
-			this.controls.$previous.toggleClass('disabled', index <= 0);
-			this.controls.$next.toggleClass('disabled', index >= this.core.pos.max);
-		}
+    if (options.nav && !options.loop && !options.navRewind) {
+      this.controls.$previous.toggleClass('disabled', index <= 0);
+      this.controls.$next.toggleClass('disabled', index >= this.core.pos.max);
+    }
 
-		if (options.dots) {
-			difference = this.pages.length - this.$indicators.children().length;
+    if (options.dots) {
+      difference = this.pages.length - this.$indicators.children().length;
 
-			this.page = $.grep(this.pages, function(o) {
-				return o.start <= index && o.end >= index;
-			}).pop();
+      this.page = $.grep(this.pages, function(o) {
+        return o.start <= index && o.end >= index;
+      }).pop();
 
-			if (difference > 0) {
-				for (i = 0; i < Math.abs(difference); i++) {
-					html += options.dotData ? $items.eq(i).data('owl-item').dot : this.template;
-				}
-				this.$indicators.append(html);
-			} else if (difference < 0) {
-				this.$indicators.children().slice(difference).remove();
-			}
+      if (difference > 0) {
+        for (i = 0; i < Math.abs(difference); i++) {
+          html += options.dotData ? $items.eq(i).data('owl-item').dot : this.template;
+        }
+        this.$indicators.append(html);
+      } else if (difference < 0) {
+        this.$indicators.children().slice(difference).remove();
+      }
 
-			this.$indicators.find('.active').removeClass('active');
-			this.$indicators.children().eq(this.pages.indexOf(this.page) % $items.length).addClass('active');
-		}
-	}
+      this.$indicators.find('.active').removeClass('active');
+      this.$indicators.children().eq(this.pages.indexOf(this.page) % $items.length).addClass('active');
+    }
+  }
 
-	/**
-	 * Extends event data.
-	 * @protected
-	 * @param {Event} event - The event object which gets thrown.
-	 */
-	Navigation.prototype.onTrigger = function(event) {
-		var options = this.core.options;
+  /**
+   * Extends event data.
+   * @protected
+   * @param {Event} event - The event object which gets thrown.
+   */
+  Navigation.prototype.onTrigger = function(event) {
+    var options = this.core.options;
 
-		event.page = {
-			index: this.pages.indexOf(this.page),
-			count: this.pages.length,
-			size: options.center || options.autoWidth || options.dotData
-				? 1 : options.dotsEach || options.items
-		};
-	}
+    event.page = {
+      index: this.pages.indexOf(this.page),
+      count: this.pages.length,
+      size: options.center || options.autoWidth || options.dotData
+        ? 1 : options.dotsEach || options.items
+    };
+  }
 
-	$.fn.owlCarousel.Constructor.Plugins.Navigation = Navigation;
+  $.fn.owlCarousel.Constructor.Plugins.Navigation = Navigation;
 
 })(window.Zepto || window.jQuery, window, document);
 
@@ -3218,7 +3238,7 @@
 			}
 
 			this.carousel.dom.oStage.scrollLeft = 0;
-			this.carousel.to(position);
+			this.carousel.to(position+1);
 		}, this));
 	}
 

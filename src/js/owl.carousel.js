@@ -1578,7 +1578,24 @@
 	 * @param {Number} position - The position of the item.
 	 * @param {Number} [speed] - The time in milliseconds for the transition.
 	 */
-	Owl.prototype.to = function(position, speed) {
+	Owl.prototype.to = function(position, speed, page) {
+
+    itemsPage = 1;
+
+    if (page) {
+      itemsPage = this.options.items;
+    } else if (this.options.slideBy && !page) {
+      itemsPage = this.options.slideBy;
+    }
+
+    if (position === 'next') {
+      position = this.pos.current + itemsPage;
+    } else if (position === 'prev') {
+      position = this.pos.current - itemsPage;
+    } else {
+      position = --position * itemsPage;
+    }
+
 		if (this.options.loop) {
 			var distance = position - this.pos.current,
 				revert = this.pos.currentAbs,
@@ -1617,9 +1634,10 @@
 	 * @public
 	 * @param {Number} [speed=false] - The time in milliseconds for the transition.
 	 */
-	Owl.prototype.next = function(speed) {
-		speed = speed || false;
-		this.to(this.pos.current + 1, speed);
+	Owl.prototype.next = function(speed, page) {
+    speed = speed || false;
+    page = page || false;
+		this.to('next', speed, page);
 	};
 
 	/**
@@ -1627,9 +1645,10 @@
 	 * @public
 	 * @param {Number} [speed=false] - The time in milliseconds for the transition.
 	 */
-	Owl.prototype.prev = function(speed) {
-		speed = speed || false;
-		this.to(this.pos.current - 1, speed);
+	Owl.prototype.prev = function(speed, page) {
+    speed = speed || false;
+    page = page || false;
+		this.to('prev', speed, page);
 	};
 
 	/**
