@@ -293,7 +293,8 @@
 		this.dom.$el = $(element);
 
 		for (var plugin in Owl.Plugins) {
-			this.plugins[plugin] = new Owl.Plugins[plugin](this);
+			this.plugins[plugin[0].toLowerCase() + plugin.slice(1)]
+				= new Owl.Plugins[plugin](this);
 		}
 
 		this.init();
