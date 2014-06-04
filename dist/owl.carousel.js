@@ -3245,7 +3245,7 @@
 		var length,
 			options = this.core.options;
 
-		if (options.slideBy == 'page' && !standard) {
+		if (!standard) {
 			length = this.pages.length;
 			$.proxy(this.overrides.to, this.core)(this.pages[((position % length) + length) % length].start, speed);
 		} else {
