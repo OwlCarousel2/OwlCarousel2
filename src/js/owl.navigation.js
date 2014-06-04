@@ -176,7 +176,7 @@
 
 		this.controls.$previous
 			.addClass(options.navClass[0])
-			.text(options.navText[0])
+			.html(options.navText[0])
 			.hide()
 			.prependTo($container)
 			.on(this.core.dragType[2], $.proxy(function(e) {
@@ -184,7 +184,7 @@
 			}, this));
 		this.controls.$next
 			.addClass(options.navClass[1])
-			.text(options.navText[1])
+			.html(options.navText[1])
 			.hide()
 			.appendTo($container)
 			.on(this.core.dragType[2], $.proxy(function(e) {
