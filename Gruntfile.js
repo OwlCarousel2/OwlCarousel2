@@ -1,8 +1,8 @@
 /*
- * Owl Carousel 
- * 
+ * Owl Carousel
+ *
  * Bartosz Wojciechowski
- * 
+ *
  * Copyright (c) 2014
  * Licensed under the MIT license.
  */
@@ -141,7 +141,9 @@ module.exports = function(grunt) {
 
 			jscs: {
 				options: {
-					config: 'src/js/.jscsrc'
+					config: 'src/js/.jscsrc',
+					reporter: 'text.js',
+					reporterOutput: 'jscs.report.txt'
 				},
 				dist: {
 					src: [ '<%= app.src.scripts %>', 'Gruntfile.js' ]
@@ -178,6 +180,13 @@ module.exports = function(grunt) {
 					cwd: 'dist/',
 					src: [ '**/*.*' ],
 					dest: '<%= app.docs.dest %>/assets/owlcarousel'
+				},
+
+				srcToDocs: {
+					expand: true,
+					cwd: 'src/js',
+					src: [ '**/*.js' ],
+					dest: '<%= app.docs.dest %>/assets/owlcarousel/src'
 				},
 
 				docsAssets: {
@@ -232,7 +241,7 @@ module.exports = function(grunt) {
 				},
 				js: {
 					files: [ 'src/**/*.js' ],
-					tasks: [ 'jscs:dist', 'uglify:dist', 'concat:dist', 'copy:distToDocs' ]
+					tasks: [ 'jscs:dist', 'uglify:dist', 'concat:dist', 'copy:distToDocs', 'copy:srcToDocs'  ]
 				},
 				helpers: {
 					files: [ '<%= app.src %>/helpers/*.js' ],
@@ -269,4 +278,5 @@ module.exports = function(grunt) {
 	grunt.registerTask('serve', [ 'connect:docs', 'watch' ]);
 
 	grunt.registerTask('zip', [ 'compress' ]);
+
 };
