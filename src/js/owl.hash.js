@@ -43,7 +43,7 @@
 					e.data = this.hashes[window.location.hash.substring(1)];
 				}
 				this.filling = e.property.name == 'item' && e.property.value && e.property.value.is(':empty');
-			}, this),
+			}, this)
 		};
 
 		// register the event handlers
