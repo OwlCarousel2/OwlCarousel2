@@ -17,7 +17,7 @@
 
 		this.handlers = {
 			'refreshed.owl.carousel changed.owl.carousel': $.proxy(function() {
-				if (this.owl.options.autoHeight) {
+				if (this.owl.settings.autoHeight) {
 					this.setHeight();
 				}
 			}, this)
@@ -41,13 +41,13 @@
 	 * @returns {Boolean}
 	 */
 	AutoHeight.prototype.setHeight = function() {
-		var loaded = this.owl.dom.$items.eq(this.owl.pos.currentAbs),
+		var loaded = this.owl.dom.$items.eq(this.owl.current()),
 			stage = this.owl.dom.$oStage,
 			iterations = 0,
 			isLoaded;
 
-		if (!this.owl.dom.$oStage.hasClass(this.owl.options.autoHeightClass)) {
-			this.owl.dom.$oStage.addClass(this.owl.options.autoHeightClass);
+		if (!this.owl.dom.$oStage.hasClass(this.owl.settings.autoHeightClass)) {
+			this.owl.dom.$oStage.addClass(this.owl.settings.autoHeightClass);
 		}
 
 		isLoaded = window.setInterval(function() {

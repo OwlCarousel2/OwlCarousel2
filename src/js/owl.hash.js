@@ -49,7 +49,8 @@
 				}
 			}, this),
 			'change.owl.carousel': $.proxy(function(e) {
-				if (e.property.name == 'position' && e.property.value == 'URLHash') {
+				if (e.property.name == 'position' && this.core.current() === undefined
+					&& this.core.settings.startPosition == 'URLHash') {
 					e.data = this.hashes[window.location.hash.substring(1)];
 				}
 				this.filling = e.property.name == 'item' && e.property.value && e.property.value.is(':empty');
@@ -58,11 +59,6 @@
 
 		// set default options
 		this.core.options = $.extend({}, Hash.Defaults, this.core.options);
-
-		// check plugin is enabled
-		if (!this.core.options.URLhashListener) {
-			return false;
-		}
 
 		// register the event handlers
 		this.$element.on(this.handlers);

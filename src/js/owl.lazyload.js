@@ -15,10 +15,6 @@
 		this.owl = scope;
 		this.owl.options = $.extend({}, LazyLoad.Defaults, this.owl.options);
 
-		if (!this.owl.options.lazyLoad) {
-			return;
-		}
-
 		this.handlers = {
 			'changed.owl.carousel': $.proxy(function(e) {
 				if (e.property.name == 'items' && e.property.value && !e.property.value.is(':empty')) {

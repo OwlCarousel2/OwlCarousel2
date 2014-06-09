@@ -12,8 +12,8 @@
 	 * @param {Owl} scope - The Owl Carousel
 	 */
 	Autoplay = function(scope) {
-		this.owl = scope;
-		this.owl.options = $.extend({}, Autoplay.Defaults, this.owl.options);
+		this.core = scope;
+		this.core.options = $.extend({}, Autoplay.Defaults, this.core.options);
 
 		this.handlers = {
 			'translated.owl.carousel refreshed.owl.carousel': $.proxy(function() {
@@ -26,18 +26,18 @@
 				this.stop();
 			}, this),
 			'mouseover.owl.autoplay': $.proxy(function() {
-				if (this.owl.options.autoplayHoverPause) {
+				if (this.core.settings.autoplayHoverPause) {
 					this.pause();
 				}
 			}, this),
 			'mouseleave.owl.autoplay': $.proxy(function() {
-				if (this.owl.options.autoplayHoverPause) {
+				if (this.core.settings.autoplayHoverPause) {
 					this.autoplay();
 				}
 			}, this)
 		};
 
-		this.owl.dom.$el.on(this.handlers);
+		this.core.dom.$el.on(this.handlers);
 	};
 
 	/**
@@ -56,15 +56,14 @@
 	 * @todo Must be documented.
 	 */
 	Autoplay.prototype.autoplay = function() {
-		if (this.owl.options.autoplay && !this.owl.state.videoPlay) {
-			window.clearInterval(this.apInterval);
+		if (this.core.settings.autoplay && !this.core.state.videoPlay) {
+			window.clearInterval(this.interval);
 
-			this.apInterval = window.setInterval($.proxy(function() {
+			this.interval = window.setInterval($.proxy(function() {
 				this.play();
-			}, this), this.owl.options.autoplayTimeout);
+			}, this), this.core.settings.autoplayTimeout);
 		} else {
-			window.clearInterval(this.apInterval);
-			this.autoplayState = false;
+			window.clearInterval(this.interval);
 		}
 	};
 
@@ -79,30 +78,20 @@
 	Autoplay.prototype.play = function(timeout, speed) {
 		// if tab is inactive - doesnt work in <IE10
 		if (document.hidden === true) {
-			return false;
+			return;
 		}
 
-		// overwrite default options (custom options are always priority)
-		if (!this.owl.options.autoplay) {
-			this.owl._options.autoplay = this.owl.options.autoplay = true;
-			this.owl._options.autoplayTimeout = this.owl.options.autoplayTimeout = timeout
-				|| this.owl.options.autoplayTimeout || 4000;
-			this.owl._options.autoplaySpeed = speed || this.owl.options.autoplaySpeed;
+		if (this.core.state.isTouch || this.core.state.isScrolling
+			|| this.core.state.isSwiping || this.core.state.inMotion) {
+			return;
 		}
 
-		if (this.owl.options.autoplay === false || this.owl.state.isTouch || this.owl.state.isScrolling
-			|| this.owl.state.isSwiping || this.owl.state.inMotion) {
-			window.clearInterval(this.apInterval);
-			return false;
+		if (this.core.settings.autoplay === false) {
+			window.clearInterval(this.interval);
+			return;
 		}
 
-		if (!this.owl.options.loop && this.owl.pos.current >= this.owl.pos.max) {
-			window.clearInterval(this.e._autoplay);
-			this.owl.to(0);
-		} else {
-			this.owl.next(this.owl.options.autoplaySpeed);
-		}
-		this.autoplayState = true;
+		this.core.next(this.core.settings.autoplaySpeed);
 	};
 
 	/**
@@ -110,9 +99,7 @@
 	 * @public
 	 */
 	Autoplay.prototype.stop = function() {
-		this.owl._options.autoplay = this.owl.options.autoplay = false;
-		this.autoplayState = false;
-		window.clearInterval(this.apInterval);
+		window.clearInterval(this.interval);
 	};
 
 	/**
@@ -120,7 +107,7 @@
 	 * @public
 	 */
 	Autoplay.prototype.pause = function() {
-		window.clearInterval(this.apInterval);
+		window.clearInterval(this.interval);
 	};
 
 	/**
@@ -129,10 +116,10 @@
 	Autoplay.prototype.destroy = function() {
 		var handler, property;
 
-		window.clearInterval(this.apInterval);
+		window.clearInterval(this.interval);
 
 		for (handler in this.handlers) {
-			this.owl.dom.$el.off(handler, this.handlers[handler]);
+			this.core.dom.$el.off(handler, this.handlers[handler]);
 		}
 		for (property in Object.getOwnPropertyNames(this)) {
 			typeof this[property] != 'function' && (this[property] = null);

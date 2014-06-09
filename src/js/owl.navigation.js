@@ -80,13 +80,15 @@
 			}, this),
 			'change.owl.carousel': $.proxy(function(e) {
 				if (e.property.name == 'position' && !this.core.state.revert
-					&& !this.core.options.loop && this.core.options.navRewind) {
-					var position = this.core.pos;
-					e.data = e.property.value > position.max
-						? position.current >= position.max ? position.min : position.max
-						: e.property.value < 0 ? position.max : e.property.value;
+					&& !this.core.settings.loop && this.core.settings.navRewind) {
+					var current = this.core.current(),
+						maximum = this.core.maximum(),
+						minimum = this.core.minimum();
+					e.data = e.property.value > maximum
+						? current >= maximum ? minimum : maximum
+						: e.property.value < minimum ? maximum : e.property.value;
 				}
-				this.filling = this.core.options.dotsData && e.property.name == 'item'
+				this.filling = this.core.settings.dotsData && e.property.name == 'item'
 					&& e.property.value && e.property.value.is(':empty');
 			}, this),
 			'refreshed.owl.carousel': $.proxy(function() {
@@ -135,7 +137,7 @@
 	 */
 	Navigation.prototype.initialize = function() {
 		var $container, override,
-			options = this.core.options;
+			options = this.core.settings;
 
 		// create the indicator template
 		if (!options.dotsData) {
@@ -222,7 +224,7 @@
 	 */
 	Navigation.prototype.update = function() {
 		var i, j, k,
-			options = this.core.options,
+			options = this.core.settings,
 			lower = this.core.num.cItems / 2,
 			upper = this.core.num.items - lower,
 			size = options.center || options.autoWidth || options.dotData
@@ -254,13 +256,13 @@
 	 */
 	Navigation.prototype.draw = function() {
 		var difference, i, html = '',
-			options = this.core.options,
+			options = this.core.settings,
 			$items = this.core.dom.$oItems,
-			index = this.core.pos.current;
+			index = this.core.normalize(this.core.current(), true);
 
 		if (options.nav && !options.loop && !options.navRewind) {
 			this.controls.$previous.toggleClass('disabled', index <= 0);
-			this.controls.$next.toggleClass('disabled', index >= this.core.pos.max);
+			this.controls.$next.toggleClass('disabled', index >= this.core.maximum());
 		}
 
 		this.controls.$previous.toggle(options.nav);
@@ -279,7 +281,7 @@
 			}
 
 			this.controls.$indicators.find('.active').removeClass('active');
-			this.controls.$indicators.children().eq($.inArray(this.getCurrentPage(), this.pages)).addClass('active');
+			this.controls.$indicators.children().eq($.inArray(this.current(), this.pages)).addClass('active');
 		}
 
 		this.controls.$indicators.toggle(options.dots);
@@ -291,10 +293,10 @@
 	 * @param {Event} event - The event object which gets thrown.
 	 */
 	Navigation.prototype.onTrigger = function(event) {
-		var options = this.core.options;
+		var options = this.core.settings;
 
 		event.page = {
-			index: $.inArray(this.getCurrentPage(), this.pages),
+			index: $.inArray(this.current(), this.pages),
 			count: this.pages.length,
 			size: options.center || options.autoWidth || options.dotData
 				? 1 : options.dotsEach || options.items
@@ -302,12 +304,12 @@
 	}
 
 	/**
-	 * Gets the current page of the carousel.
+	 * Gets the current page position of the carousel.
 	 * @protected
 	 * @returns {Number}
 	 */
-	Navigation.prototype.getCurrentPage = function() {
-		var index = this.core.pos.current;
+	Navigation.prototype.current = function() {
+		var index = this.core.normalize(this.core.current(), true);
 		return $.grep(this.pages, function(o) {
 			return o.start <= index && o.end >= index;
 		}).pop();
@@ -316,19 +318,19 @@
 	/**
 	 * Gets the current succesor/predecessor position.
 	 * @protected
-	 * @return {Number}
+	 * @returns {Number}
 	 */
 	Navigation.prototype.getPosition = function(successor) {
 		var position, length,
-			options = this.core.options;
+			options = this.core.settings;
 
 		if (options.slideBy == 'page') {
-			position = $.inArray(this.getCurrentPage(), this.pages);
+			position = $.inArray(this.current(), this.pages);
 			length = this.pages.length;
 			successor ? ++position : --position;
 			position = this.pages[((position % length) + length) % length].start;
 		} else {
-			position = this.core.pos.current;
+			position = this.core.normalize(this.core.current(), true);
 			length = this.core.num.oItems;
 			successor ? position += options.slideBy : position -= options.slideBy;
 		}
@@ -361,8 +363,7 @@
 	 * @param {Boolean} [standard=false] - Whether to use the standard behaviour or not.
 	 */
 	Navigation.prototype.to = function(position, speed, standard) {
-		var length,
-			options = this.core.options;
+		var length;
 
 		if (!standard) {
 			length = this.pages.length;
