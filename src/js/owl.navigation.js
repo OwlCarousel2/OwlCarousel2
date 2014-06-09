@@ -8,65 +8,101 @@
 	'use strict';
 
 	/**
-	 * Creates the animate plugin.
+	 * Creates the navigation plugin.
 	 * @class The Navigation Plugin
 	 * @param {Owl} carousel - The Owl Carousel.
 	 */
 	var Navigation = function(carousel) {
-		// define members
+		/**
+		 * Reference to the core.
+		 * @type {Owl}
+		 */
 		this.core = carousel;
-		this.core.options = $.extend({}, Navigation.Defaults, this.core.options);
-		this.refreshing = false;
+
+		/**
+		 * Indicates whether the plugin is initialized or not.
+		 * @type {Boolean}
+		 */
 		this.initialized = false;
-		this.page = null;
+
+		/**
+		 * The current paging indexes.
+		 * @type {Array}
+		 */
 		this.pages = [];
+
+		/**
+		 * All DOM elements of the user interface.
+		 * @type {Object}
+		 */
 		this.controls = {};
+
+		/**
+		 * Markup for an indicator.
+		 * @type {String}
+		 */
 		this.template = null;
+
+		/**
+		 * The carousel element.
+		 * @type {jQuery}
+		 */
 		this.$element = this.core.dom.$el;
 
-		// check plugin is enabled
-		if (!this.core.options.nav && !this.core.options.dots) {
-			return false;
-		}
+		/**
+		 * Overridden methods of the carousel.
+		 * @type {Object}
+		 */
+		this.overrides = {
+			next: this.core.next,
+			prev: this.core.prev,
+			to: this.core.to
+		};
 
-		// define the event handlers
+		/**
+		 * All event handlers.
+		 * @type {Object}
+		 */
 		this.handlers = {
-			'initialized.owl.carousel': $.proxy(function() {
-				if (!this.initialized) {
-					this.initialize();
-				}
-			}, this),
 			'changed.owl.carousel': $.proxy(function(e) {
-				if (e.property.name == 'items' && this.initialized) {
+				if (e.property.name == 'items') {
+					if (!this.initialized) {
+						this.initialize();
+						this.initialized = true;
+					}
 					this.update();
+					this.draw();
 				}
 				if (this.filling) {
-					e.property.value.data('owl-item').dot
-						= $(':first-child', e.property.value).find('[data-dot]').andSelf().data('dot');
+					e.property.value.data('owl-item').dot = $(':first-child', e.property.value)
+						.find('[data-dot]').andSelf().data('dot');
 				}
 			}, this),
 			'change.owl.carousel': $.proxy(function(e) {
 				if (e.property.name == 'position' && !this.core.state.revert
-					&& !this.core.options.loop && this.core.options.navRewind) {
-					var position = this.core.pos;
-					e.data = e.property.value > position.max
-						? position.current >= position.max ? position.min : position.max
-						: e.property.value < 0 ? position.max : e.property.value;
+					&& !this.core.settings.loop && this.core.settings.navRewind) {
+					var current = this.core.current(),
+						maximum = this.core.maximum(),
+						minimum = this.core.minimum();
+					e.data = e.property.value > maximum
+						? current >= maximum ? minimum : maximum
+						: e.property.value < minimum ? maximum : e.property.value;
 				}
-				this.filling
-					= this.core.options.dotsData && e.property.name == 'item' && e.property.value && e.property.value.is(':empty');
-			}, this),
-			'refresh.owl.carousel refreshed.owl.carousel': $.proxy(function(e) {
-				this.refreshing = e.type == 'refresh';
+				this.filling = this.core.settings.dotsData && e.property.name == 'item'
+					&& e.property.value && e.property.value.is(':empty');
 			}, this),
 			'refreshed.owl.carousel': $.proxy(function() {
 				if (this.initialized) {
-					this.refresh();
+					this.update();
+					this.draw();
 				}
 			}, this)
 		};
 
-		// register the event handlers
+		// set default options
+		this.core.options = $.extend({}, Navigation.Defaults, this.core.options);
+
+		// register event handlers
 		this.$element.on(this.handlers);
 	}
 
@@ -96,15 +132,12 @@
 	}
 
 	/**
-	 * Initializes the plugin.
+	 * Initializes the layout of the plugin and extends the carousel.
 	 * @protected
 	 */
 	Navigation.prototype.initialize = function() {
-		var $container,
-			options = this.core.options;
-
-		// refresh internal data
-		this.refresh();
+		var $container, override,
+			options = this.core.settings;
 
 		// create the indicator template
 		if (!options.dotsData) {
@@ -122,51 +155,46 @@
 		}
 
 		// create DOM structure for absolute navigation
-		if (options.dots) {
-			this.$indicators = options.dotsContainer ? $(options.dotsContainer)
-				: $('<div>').addClass(options.dotsClass).appendTo(this.controls.$container);
+		this.controls.$indicators = options.dotsContainer ? $(options.dotsContainer)
+			: $('<div>').hide().addClass(options.dotsClass).appendTo(this.controls.$container);
 
-			this.$indicators.on(this.core.dragType[2], 'div', $.proxy(function(e) {
-				var index = $(e.target).parent().is(this.$indicators)
-					? $(e.target).index() : $(e.target).parent().index();
+		this.controls.$indicators.on(this.core.dragType[2], 'div', $.proxy(function(e) {
+			var index = $(e.target).parent().is(this.controls.$indicators)
+				? $(e.target).index() : $(e.target).parent().index();
 
-				e.preventDefault();
+			e.preventDefault();
 
-				this.core.to(
-					this.pages[index].start,
-					options.dotsSpeed
-				);
-			}, this));
-		}
+			this.to(index, options.dotsSpeed);
+		}, this));
 
 		// create DOM structure for relative navigation
-		if (options.nav) {
-			$container = options.navContainer ? $(options.navContainer)
-				: $('<div>').addClass(options.navContainerClass).prependTo(this.controls.$container);
+		$container = options.navContainer ? $(options.navContainer)
+			: $('<div>').addClass(options.navContainerClass).prependTo(this.controls.$container);
 
-			this.controls.$next = $('<' + options.navElement + '>');
-			this.controls.$previous = this.controls.$next.clone();
+		this.controls.$next = $('<' + options.navElement + '>');
+		this.controls.$previous = this.controls.$next.clone();
 
-			this.controls.$previous
-				.addClass(options.navClass[0])
-				.text(options.navText[0])
-				.prependTo($container)
-				.on(this.core.dragType[2], $.proxy(function(e) {
-					this.core.to(this.core.pos.current - options.slideBy);
-				}, this));
-			this.controls.$next
-				.addClass(options.navClass[1])
-				.text(options.navText[1])
-				.appendTo($container)
-				.on(this.core.dragType[2], $.proxy(function(e) {
-					this.core.to(this.core.pos.current + options.slideBy);
-				}, this));
+		this.controls.$previous
+			.addClass(options.navClass[0])
+			.html(options.navText[0])
+			.hide()
+			.prependTo($container)
+			.on(this.core.dragType[2], $.proxy(function(e) {
+				this.prev();
+			}, this));
+		this.controls.$next
+			.addClass(options.navClass[1])
+			.html(options.navText[1])
+			.hide()
+			.appendTo($container)
+			.on(this.core.dragType[2], $.proxy(function(e) {
+				this.next();
+			}, this));
+
+		// override public methods of the carousel
+		for (override in this.overrides) {
+			this.core[override] = $.proxy(this[override], this);
 		}
-
-		// update the created DOM structures
-		this.update();
-
-		this.initialized = true;
 	}
 
 	/**
@@ -174,7 +202,7 @@
 	 * @protected
 	 */
 	Navigation.prototype.destroy = function() {
-		var handler, control, property;
+		var handler, control, property, override;
 
 		for (handler in this.handlers) {
 			this.$element.off(handler, this.handlers[handler]);
@@ -182,32 +210,28 @@
 		for (control in this.controls) {
 			this.controls[control].remove();
 		}
+		for (override in this.overides) {
+			this.core[override] = this.overrides[override];
+		}
 		for (property in Object.getOwnPropertyNames(this)) {
 			typeof this[property] != 'function' && (this[property] = null);
 		}
 	}
 
 	/**
-	 * Refreshes the internal data of the plugin.
+	 * Updates the internal state.
 	 * @protected
 	 */
-	Navigation.prototype.refresh = function() {
+	Navigation.prototype.update = function() {
 		var i, j, k,
-			options = this.core.options,
+			options = this.core.settings,
 			lower = this.core.num.cItems / 2,
 			upper = this.core.num.items - lower,
-			items = this.core.num.oItems,
 			size = options.center || options.autoWidth || options.dotData
 				? 1 : options.dotsEach || options.items;
 
-		if (options.nav) {
-			options.navRewind = items > options.items || options.center;
-
-			if (options.slideBy && options.slideBy === 'page') {
-				options.slideBy = options.items;
-			} else {
-				options.slideBy = Math.min(options.slideBy, options.items);
-			}
+		if (options.slideBy !== 'page') {
+			options.slideBy = Math.min(options.slideBy, options.items);
 		}
 
 		if (options.dots) {
@@ -227,39 +251,40 @@
 	}
 
 	/**
-	 * Updates the DOM structures of the plugin.
+	 * Draws the user interface.
 	 * @protected
 	 */
-	Navigation.prototype.update = function() {
+	Navigation.prototype.draw = function() {
 		var difference, i, html = '',
-			options = this.core.options,
+			options = this.core.settings,
 			$items = this.core.dom.$oItems,
-			index = this.core.pos.current;
+			index = this.core.normalize(this.core.current(), true);
 
 		if (options.nav && !options.loop && !options.navRewind) {
 			this.controls.$previous.toggleClass('disabled', index <= 0);
-			this.controls.$next.toggleClass('disabled', index >= this.core.pos.max);
+			this.controls.$next.toggleClass('disabled', index >= this.core.maximum());
 		}
 
-		if (options.dots) {
-			difference = this.pages.length - this.$indicators.children().length;
+		this.controls.$previous.toggle(options.nav);
+		this.controls.$next.toggle(options.nav);
 
-			this.page = $.grep(this.pages, function(o) {
-				return o.start <= index && o.end >= index;
-			}).pop();
+		if (options.dots) {
+			difference = this.pages.length - this.controls.$indicators.children().length;
 
 			if (difference > 0) {
 				for (i = 0; i < Math.abs(difference); i++) {
 					html += options.dotData ? $items.eq(i).data('owl-item').dot : this.template;
 				}
-				this.$indicators.append(html);
+				this.controls.$indicators.append(html);
 			} else if (difference < 0) {
-				this.$indicators.children().slice(difference).remove();
+				this.controls.$indicators.children().slice(difference).remove();
 			}
 
-			this.$indicators.find('.active').removeClass('active');
-			this.$indicators.children().eq(this.pages.indexOf(this.page) % $items.length).addClass('active');
+			this.controls.$indicators.find('.active').removeClass('active');
+			this.controls.$indicators.children().eq($.inArray(this.current(), this.pages)).addClass('active');
 		}
+
+		this.controls.$indicators.toggle(options.dots);
 	}
 
 	/**
@@ -268,14 +293,84 @@
 	 * @param {Event} event - The event object which gets thrown.
 	 */
 	Navigation.prototype.onTrigger = function(event) {
-		var options = this.core.options;
+		var options = this.core.settings;
 
 		event.page = {
-			index: this.pages.indexOf(this.page),
+			index: $.inArray(this.current(), this.pages),
 			count: this.pages.length,
 			size: options.center || options.autoWidth || options.dotData
 				? 1 : options.dotsEach || options.items
 		};
+	}
+
+	/**
+	 * Gets the current page position of the carousel.
+	 * @protected
+	 * @returns {Number}
+	 */
+	Navigation.prototype.current = function() {
+		var index = this.core.normalize(this.core.current(), true);
+		return $.grep(this.pages, function(o) {
+			return o.start <= index && o.end >= index;
+		}).pop();
+	}
+
+	/**
+	 * Gets the current succesor/predecessor position.
+	 * @protected
+	 * @returns {Number}
+	 */
+	Navigation.prototype.getPosition = function(successor) {
+		var position, length,
+			options = this.core.settings;
+
+		if (options.slideBy == 'page') {
+			position = $.inArray(this.current(), this.pages);
+			length = this.pages.length;
+			successor ? ++position : --position;
+			position = this.pages[((position % length) + length) % length].start;
+		} else {
+			position = this.core.normalize(this.core.current(), true);
+			length = this.core.num.oItems;
+			successor ? position += options.slideBy : position -= options.slideBy;
+		}
+		return position;
+	}
+
+	/**
+	 * Slides to the next item or page.
+	 * @public
+	 * @param {Number} [speed=false] - The time in milliseconds for the transition.
+	 */
+	Navigation.prototype.next = function(speed) {
+		$.proxy(this.overrides.to, this.core)(this.getPosition(true), speed);
+	}
+
+	/**
+	 * Slides to the previous item or page.
+	 * @public
+	 * @param {Number} [speed=false] - The time in milliseconds for the transition.
+	 */
+	Navigation.prototype.prev = function(speed) {
+		$.proxy(this.overrides.to, this.core)(this.getPosition(false), speed);
+	}
+
+	/**
+	 * Slides to the specified item or page.
+	 * @public
+	 * @param {Number} position - The position of the item or page.
+	 * @param {Number} [speed] - The time in milliseconds for the transition.
+	 * @param {Boolean} [standard=false] - Whether to use the standard behaviour or not.
+	 */
+	Navigation.prototype.to = function(position, speed, standard) {
+		var length;
+
+		if (!standard) {
+			length = this.pages.length;
+			$.proxy(this.overrides.to, this.core)(this.pages[((position % length) + length) % length].start, speed);
+		} else {
+			$.proxy(this.overrides.to, this.core)(position, speed);
+		}
 	}
 
 	$.fn.owlCarousel.Constructor.Plugins.Navigation = Navigation;

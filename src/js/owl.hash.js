@@ -13,18 +13,28 @@
 	 * @param {Owl} carousel - The Owl Carousel
 	 */
 	var Hash = function(carousel) {
-		// define members
-		this.carousel = carousel;
-		this.options = $.extend({}, Hash.Defaults, this.carousel.options);
+		/**
+		 * Reference to the core.
+		 * @type {Owl}
+		 */
+		this.core = carousel;
+
+		/**
+		 * Hash table for the hashes.
+		 * @type {Object}
+		 */
 		this.hashes = {};
-		this.$element = this.carousel.dom.$el;
 
-		// check plugin is enabled
-		if (!this.options.URLhashListener) {
-			return false;
-		}
+		/**
+		 * The carousel element.
+		 * @type {jQuery}
+		 */
+		this.$element = this.core.dom.$el;
 
-		// defines event handlers
+		/**
+		 * All event handlers.
+		 * @type {Object}
+		 */
 		this.handlers = {
 			'initialized.owl.carousel': $.proxy(function() {
 				if (window.location.hash.substring(1)) {
@@ -39,12 +49,16 @@
 				}
 			}, this),
 			'change.owl.carousel': $.proxy(function(e) {
-				if (e.property.name == 'position' && e.property.value == 'URLHash') {
+				if (e.property.name == 'position' && this.core.current() === undefined
+					&& this.core.settings.startPosition == 'URLHash') {
 					e.data = this.hashes[window.location.hash.substring(1)];
 				}
 				this.filling = e.property.name == 'item' && e.property.value && e.property.value.is(':empty');
 			}, this),
 		};
+
+		// set default options
+		this.core.options = $.extend({}, Hash.Defaults, this.core.options);
 
 		// register the event handlers
 		this.$element.on(this.handlers);
@@ -52,14 +66,15 @@
 		// register event listener for hash navigation
 		$(window).on('hashchange.owl.navigation', $.proxy(function() {
 			var hash = window.location.hash.substring(1),
-				position = this.hashes[hash] && this.hashes[hash].index() || 0;
+				items = this.core.dom.$oItems,
+				position = this.hashes[hash] && items.index(this.hashes[hash]) || 0;
 
 			if (!hash) {
 				return false;
 			}
 
-			this.carousel.dom.oStage.scrollLeft = 0;
-			this.carousel.to(position);
+			this.core.dom.oStage.scrollLeft = 0;
+			this.core.to(position, false, true);
 		}, this));
 	}
 

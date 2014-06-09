@@ -11,56 +11,7 @@
  */
 ;(function($, window, document, undefined) {
 
-	var defaults, item, dom, width, num, pos, drag, speed, state, e;
-
-	/**
-	 * Default options for the carousel.
-	 * @private
-	 * @todo Better as public member of `Owl`
-	 */
-	defaults = {
-		items: 3,
-		loop: false,
-		center: false,
-
-		mouseDrag: true,
-		touchDrag: true,
-		pullDrag: true,
-		freeDrag: false,
-
-		margin: 0,
-		stagePadding: 0,
-
-		merge: false,
-		mergeFit: true,
-		autoWidth: false,
-
-		startPosition: 0,
-
-		smartSpeed: 250,
-		fluidSpeed: false,
-		dragEndSpeed: false,
-
-		responsive: {},
-		responsiveRefreshRate: 200,
-		responsiveBaseElement: window,
-		responsiveClass: false,
-
-		fallbackEasing: 'swing',
-
-		info: false,
-
-		nestedItemSelector: false,
-		itemElement: 'div',
-		stageElement: 'div',
-
-		// Classes and Names
-		themeClass: 'owl-theme',
-		baseClass: 'owl-carousel',
-		itemClass: 'owl-item',
-		centerClass: 'center',
-		activeClass: 'active'
-	};
+	var item, dom, width, num, pos, drag, speed, state, e;
 
 	/**
 	 * Template for the data of each item respectively its DOM element.
@@ -124,22 +75,6 @@
 	};
 
 	/**
-	 * Template for some informations about the position.
-	 * @private
-	 */
-	pos = {
-		start: 0,
-		max: 0,
-		maxValue: 0,
-		prev: 0,
-		current: 0,
-		currentAbs: 0,
-		stage: 0,
-		items: [],
-		lsCurrent: 0
-	};
-
-	/**
 	 * Template for status information about drag and touch events.
 	 * @private
 	 */
@@ -157,15 +92,6 @@
 		endTime: 0,
 		updatedX: 0,
 		targetEl: null
-	};
-
-	/**
-	 * Template for some speed informations.
-	 * @private
-	 */
-	speed = {
-		onDragEnd: 300,
-		css2speed: 0
 	};
 
 	/**
@@ -215,13 +141,14 @@
 		 * Current settings for the carousel.
 		 * @protected
 		 */
-		this.options = $.extend({}, defaults, options);
+		this.settings = null;
 
 		/**
+		 *
 		 * @protected
 		 * @todo Must be dosumented.
 		 */
-		this._options = $.extend({}, defaults, this.options);
+		this.options = $.extend({}, Owl.Defaults, options);
 
 		/**
 		 * Template for the data of each item.
@@ -248,21 +175,9 @@
 		this.num = $.extend({}, num);
 
 		/**
-		 * Caches some position informations.
-		 * @protected
-		 */
-		this.pos = $.extend({}, pos);
-
-		/**
 		 * Caches informations about drag and touch events.
 		 */
 		this.drag = $.extend({}, drag);
-
-		/**
-		 * Caches some speed settings.
-		 * @protected
-		 */
-		this.speed = $.extend({}, speed);
 
 		/**
 		 * Caches some status informations.
@@ -285,19 +200,84 @@
 		/**
 		 * Currently suppressed events to prevent them from beeing retriggered.
 		 * @protected
-		 * @see `addTriggerableEvents()`
 		 */
-		this.suppressedEvents = {};
+		this._supress = {};
+
+		/**
+		 * The absolute current position.
+		 * @protected
+		 */
+		this._current = null;
+
+		/**
+		 * The animation speed in milliseconds.
+		 * @protected
+		 */
+		this._speed = null;
+
+		/**
+		 * The coordinates of all items in pixel.
+		 */
+		this._coordinates = null;
 
 		this.dom.el = element;
 		this.dom.$el = $(element);
 
 		for (var plugin in Owl.Plugins) {
-			this.plugins[plugin] = new Owl.Plugins[plugin](this);
+			this.plugins[plugin[0].toLowerCase() + plugin.slice(1)]
+				= new Owl.Plugins[plugin](this);
 		}
 
 		this.init();
 	}
+
+	/**
+	 * Default options for the carousel.
+	 * @public
+	 */
+	Owl.Defaults = {
+		items: 3,
+		loop: false,
+		center: false,
+
+		mouseDrag: true,
+		touchDrag: true,
+		pullDrag: true,
+		freeDrag: false,
+
+		margin: 0,
+		stagePadding: 0,
+
+		merge: false,
+		mergeFit: true,
+		autoWidth: false,
+
+		startPosition: 0,
+
+		smartSpeed: 250,
+		fluidSpeed: false,
+		dragEndSpeed: false,
+
+		responsive: {},
+		responsiveRefreshRate: 200,
+		responsiveBaseElement: window,
+		responsiveClass: false,
+
+		fallbackEasing: 'swing',
+
+		info: false,
+
+		nestedItemSelector: false,
+		itemElement: 'div',
+		stageElement: 'div',
+
+		// Classes and Names
+		themeClass: 'owl-theme',
+		baseClass: 'owl-carousel',
+		itemClass: 'owl-item',
+		centerClass: 'center',
+		activeClass: 'active'
+	};
 
 	/**
 	 * Contains all registered plugins.
@@ -311,36 +291,33 @@
 	 */
 	Owl.prototype.init = function() {
 
+		// Update options.items on given size
+		this.setResponsiveOptions();
+
 		this.trigger('initialize');
 
 		// Add base class
-		if (!this.dom.$el.hasClass(this.options.baseClass)) {
-			this.dom.$el.addClass(this.options.baseClass);
+		if (!this.dom.$el.hasClass(this.settings.baseClass)) {
+			this.dom.$el.addClass(this.settings.baseClass);
 		}
 
 		// Add theme class
-		if (!this.dom.$el.hasClass(this.options.themeClass)) {
-			this.dom.$el.addClass(this.options.themeClass);
+		if (!this.dom.$el.hasClass(this.settings.themeClass)) {
+			this.dom.$el.addClass(this.settings.themeClass);
 		}
 
 		// Add theme class
-		if (this.options.rtl) {
+		if (this.settings.rtl) {
 			this.dom.$el.addClass('owl-rtl');
 		}
 
 		// Check support
 		this.browserSupport();
 
-		// Sort responsive items in array
-		this.sortOptions();
-
-		// Update options.items on given size
-		this.setResponsiveOptions();
-
-		if (this.options.autoWidth && this.state.imagesLoaded !== true) {
+		if (this.settings.autoWidth && this.state.imagesLoaded !== true) {
 			var imgs, nestedSelector, width;
 			imgs = this.dom.$el.find('img');
-			nestedSelector = this.options.nestedItemSelector ? '.' + this.options.nestedItemSelector : undefined;
+			nestedSelector = this.settings.nestedItemSelector ? '.' + this.settings.nestedItemSelector : undefined;
 			width = this.dom.$el.children(nestedSelector).width();
 
 			if (imgs.length && width <= 0) {
@@ -351,7 +328,7 @@
 
 		// Get and store window width
 		// iOS safari likes to trigger unnecessary resize event
-		this.width.prevWindow = this.windowWidth();
+		this.width.prevWindow = this.viewport();
 
 		// create stage object
 		this.createStage();
@@ -376,70 +353,32 @@
 	};
 
 	/**
-	 * Sorts responsive sizes.
-	 * @protected
-	 */
-	Owl.prototype.sortOptions = function() {
-
-		var resOpt, keys = [], i, j, k;
-
-		resOpt = this.options.responsive;
-		this.responsiveSorted = {};
-
-		for (i in resOpt) {
-			keys.push(i);
-		}
-
-		keys = keys.sort(function(a, b) {
-			return a - b;
-		});
-
-		for (j = 0; j < keys.length; j++) {
-			k = keys[j];
-			this.responsiveSorted[k] = resOpt[k];
-		}
-
-	};
-
-	/**
 	 * Sets responsive options.
 	 * @protected
 	 */
 	Owl.prototype.setResponsiveOptions = function() {
-		if (this.options.responsive === false) {
-			return false;
-		}
+		if (!this.options.responsive) {
+			this.settings = $.extend({}, this.options);
+		} else {
+			var viewport = this.viewport(),
+				overwrites = this.options.responsive,
+				match = -1;
 
-		var width, i, j, k, minWidth;
-
-		width = this.windowWidth();
-		resOpt = this.options.responsive;
-
-		// overwrite non resposnive options
-		for (k in this._options) {
-			if (k !== 'responsive') {
-				this.options[k] = this._options[k];
-			}
-		}
-
-		// find responsive width
-		for (i in this.responsiveSorted) {
-			if (i <= width) {
-				minWidth = i;
-				// set responsive options
-				for (j in this.responsiveSorted[minWidth]) {
-					this.options[j] = this.responsiveSorted[minWidth][j];
+			$.each(overwrites, function(breakpoint) {
+				if (breakpoint <= viewport && breakpoint > match) {
+					match = Number(breakpoint);
 				}
+			});
 
+			this.settings = $.extend({}, this.options, overwrites[match]);
+			delete this.settings.responsive;
+
+			// Responsive Class
+			if (this.settings.responsiveClass) {
+				this.dom.$el.attr('class', function(i, c) {
+					return c.replace(/\b owl-responsive-\S+/g, '');
+				}).addClass('owl-responsive-' + match);
 			}
-		}
-		this.num.breakpoint = minWidth;
-
-		// Responsive Class
-		if (this.options.responsiveClass) {
-			this.dom.$el.attr('class', function(i, c) {
-				return c.replace(/\b owl-responsive-\S+/g, '');
-			}).addClass('owl-responsive-' + minWidth);
 		}
 	};
 
@@ -449,16 +388,16 @@
 	 */
 	Owl.prototype.optionsLogic = function() {
 		// Toggle Center class
-		this.dom.$el.toggleClass('owl-center', this.options.center);
+		this.dom.$el.toggleClass('owl-center', this.settings.center);
 
 		// if items number is less than in body
-		if (this.options.loop && this.num.oItems < this.options.items) {
-			this.options.loop = false;
+		if (this.settings.loop && this.num.oItems < this.settings.items) {
+			this.settings.loop = false;
 		}
 
-		if (this.options.autoWidth) {
-			this.options.stagePadding = false;
-			this.options.merge = false;
+		if (this.settings.autoWidth) {
+			this.settings.stagePadding = false;
+			this.settings.merge = false;
 		}
 	};
 
@@ -468,7 +407,7 @@
 	 */
 	Owl.prototype.createStage = function() {
 		var oStage = document.createElement('div'),
-			stage = document.createElement(this.options.stageElement);
+			stage = document.createElement(this.settings.stageElement);
 
 		oStage.className = 'owl-stage-outer';
 		stage.className = 'owl-stage';
@@ -491,8 +430,8 @@
 	 * @returns {jQuery} - The item container.
 	 */
 	Owl.prototype.createItemContainer = function() {
-		var item = document.createElement(this.options.itemElement);
-		item.className = this.options.itemClass;
+		var item = document.createElement(this.settings.itemElement);
+		item.className = this.settings.itemClass;
 		return $(item);
 	};
 
@@ -503,8 +442,8 @@
 	Owl.prototype.fetchContent = function(extContent) {
 		if (extContent) {
 			this.dom.$content = (extContent instanceof jQuery) ? extContent : $(extContent);
-		} else if (this.options.nestedItemSelector) {
-			this.dom.$content = this.dom.$el.find('.' + this.options.nestedItemSelector).not('.owl-stage-outer');
+		} else if (this.settings.nestedItemSelector) {
+			this.dom.$content = this.dom.$el.find('.' + this.settings.nestedItemSelector).not('.owl-stage-outer');
 		} else {
 			this.dom.$content = this.dom.$el.children().not('.owl-stage-outer');
 		}
@@ -611,7 +550,7 @@
 
 		var k, item;
 
-		this.dom.$oItems = this.dom.$stage.find('.' + this.options.itemClass).filter(function() {
+		this.dom.$oItems = this.dom.$stage.find('.' + this.settings.itemClass).filter(function() {
 			return $(this).data('owl-item').clone === false;
 		});
 
@@ -629,16 +568,16 @@
 	 * @protected
 	 */
 	Owl.prototype.loopClone = function() {
-		if (!this.options.loop || this.num.oItems < this.options.items) {
+		if (!this.settings.loop || this.num.oItems < this.settings.items) {
 			return false;
 		}
 
 		var append, prepend, i,
-			items = this.options.items,
+			items = this.settings.items,
 			last = this.num.oItems - 1;
 
 		// if neighbour margin then add one more duplicat
-		if (this.options.stagePadding && this.options.items === 1) {
+		if (this.settings.stagePadding && this.settings.items === 1) {
 			items += 1;
 		}
 		this.num.cItems = items * 2;
@@ -651,7 +590,7 @@
 			this.dom.$stage.prepend(prepend);
 		}
 
-		this.dom.$cItems = this.dom.$stage.find('.' + this.options.itemClass).filter(function() {
+		this.dom.$cItems = this.dom.$stage.find('.' + this.settings.itemClass).filter(function() {
 			return $(this).data('owl-item').clone === true;
 		});
 	};
@@ -664,13 +603,13 @@
 		// remove cloned items
 		if (this.dom.$cItems !== null) { // && (this.num.oItems !== 0 &&
 			// this.num.oItems <=
-			// this.options.items)){
+			// this.settings.items)){
 			this.dom.$cItems.remove();
 			this.dom.$cItems = null;
 			this.num.cItems = 0;
 		}
 
-		if (!this.options.loop) {
+		if (!this.settings.loop) {
 			return;
 		}
 		// generete new elements
@@ -686,35 +625,35 @@
 		var i, j, elMinusMargin, dist, allItems, iWidth,  mergeNumber,  posLeft = 0, fullWidth = 0;
 
 		// element width minus neighbour
-		this.width.el = this.dom.$el.width() - (this.options.stagePadding * 2);
+		this.width.el = this.dom.$el.width() - (this.settings.stagePadding * 2);
 
 		// to check
 		this.width.view = this.dom.$el.width();
 
 		// calculate width minus addition margins
-		elMinusMargin = this.width.el - (this.options.margin * (this.options.items === 1 ? 0 : this.options.items - 1));
+		elMinusMargin = this.width.el - (this.settings.margin * (this.settings.items === 1 ? 0 : this.settings.items - 1));
 
 		// calculate element width and item width
-		this.width.el = this.width.el + this.options.margin;
-		this.width.item = ((elMinusMargin / this.options.items) + this.options.margin).toFixed(3);
+		this.width.el = this.width.el + this.settings.margin;
+		this.width.item = ((elMinusMargin / this.settings.items) + this.settings.margin).toFixed(3);
 
 		this.dom.$items = this.dom.$stage.find('.owl-item');
 		this.num.items = this.dom.$items.length;
 
 		// change to autoWidths
-		if (this.options.autoWidth) {
+		if (this.settings.autoWidth) {
 			this.dom.$items.css('width', '');
 		}
 
 		// Set grid array
-		this.pos.items = [];
+		this._coordinates = [];
 		this.num.merged = [];
 
 		// item distances
-		if (this.options.rtl) {
-			dist = this.options.center ? -((this.width.el) / 2) : 0;
+		if (this.settings.rtl) {
+			dist = this.settings.center ? -((this.width.el) / 2) : 0;
 		} else {
-			dist = this.options.center ? (this.width.el) / 2 : 0;
+			dist = this.settings.center ? (this.width.el) / 2 : 0;
 		}
 
 		this.width.mergeStage = 0;
@@ -724,10 +663,10 @@
 
 			// check merged items
 
-			if (this.options.merge) {
+			if (this.settings.merge) {
 				mergeNumber = this.dom.$items.eq(i).find('[data-merge]').attr('data-merge') || 1;
-				if (this.options.mergeFit && mergeNumber > this.options.items) {
-					mergeNumber = this.options.items;
+				if (this.settings.mergeFit && mergeNumber > this.settings.items) {
+					mergeNumber = this.settings.items;
 				}
 				this.num.merged.push(parseInt(mergeNumber));
 				this.width.mergeStage += this.width.item * this.num.merged[i];
@@ -738,17 +677,17 @@
 			iWidth = this.width.item * this.num.merged[i];
 
 			// autoWidth item size
-			if (this.options.autoWidth) {
-				iWidth = this.dom.$items.eq(i).width() + this.options.margin;
-				if (this.options.rtl) {
-					this.dom.$items[i].style.marginLeft = this.options.margin + 'px';
+			if (this.settings.autoWidth) {
+				iWidth = this.dom.$items.eq(i).width() + this.settings.margin;
+				if (this.settings.rtl) {
+					this.dom.$items[i].style.marginLeft = this.settings.margin + 'px';
 				} else {
-					this.dom.$items[i].style.marginRight = this.options.margin + 'px';
+					this.dom.$items[i].style.marginRight = this.settings.margin + 'px';
 				}
 
 			}
 			// push item position into array
-			this.pos.items.push(dist);
+			this._coordinates.push(dist);
 
 			// update item data
 			this.dom.$items.eq(i).data('owl-item').posLeft = posLeft;
@@ -756,7 +695,7 @@
 
 			// dist starts from middle of stage if center
 			// posLeft always starts from 0
-			if (this.options.rtl) {
+			if (this.settings.rtl) {
 				dist += iWidth;
 				posLeft += iWidth;
 			} else {
@@ -767,14 +706,14 @@
 			fullWidth -= Math.abs(iWidth);
 
 			// update position if center
-			if (this.options.center) {
-				this.pos.items[i] = !this.options.rtl ? this.pos.items[i] - (iWidth / 2) : this.pos.items[i]
+			if (this.settings.center) {
+				this._coordinates[i] = !this.settings.rtl ? this._coordinates[i] - (iWidth / 2) : this._coordinates[i]
 					+ (iWidth / 2);
 			}
 		}
 
-		if (this.options.autoWidth) {
-			this.width.stage = this.options.center ? Math.abs(fullWidth) : Math.abs(dist);
+		if (this.settings.autoWidth) {
+			this.width.stage = this.settings.center ? Math.abs(fullWidth) : Math.abs(dist);
 		} else {
 			this.width.stage = Math.abs(fullWidth);
 		}
@@ -786,72 +725,8 @@
 			this.dom.$items.eq(j).data('owl-item').indexAbs = j;
 		}
 
-		// Set Min and Max
-		this.setMinMax();
-
 		// Recalculate grid
 		this.setSizes();
-	};
-
-	/**
-	 * Updates original items boundaries.
-	 * @protected
-	 */
-	Owl.prototype.setMinMax = function() {
-
-		var i, minimum, revert;
-
-		// set Min
-		minimum = this.dom.$oItems.eq(0).data('owl-item').indexAbs;
-		this.pos.min = 0;
-		this.pos.minValue = this.pos.items[minimum];
-
-		// set max position
-		if (!this.options.loop) {
-			this.pos.max = this.num.oItems - 1;
-		}
-
-		if (this.options.loop) {
-			this.pos.max = this.num.oItems + this.options.items;
-		}
-
-		if (!this.options.loop && !this.options.center) {
-			this.pos.max = this.num.oItems - this.options.items;
-		}
-
-		if (this.options.loop && this.options.center) {
-			this.pos.max = this.num.oItems + this.options.items;
-		}
-
-		// set max value
-		this.pos.maxValue = this.pos.items[this.pos.max];
-
-		// Max for autoWidth content
-		if ((!this.options.loop && !this.options.center && this.options.autoWidth)
-			|| (this.options.merge && !this.options.center)) {
-			revert = this.options.rtl ? 1 : -1;
-			for (i = 0; i < this.pos.items.length; i++) {
-				if ((this.pos.items[i] * revert) < this.width.stage - this.width.el) {
-					this.pos.max = i + 1;
-				}
-			}
-			this.pos.maxValue = this.options.rtl ? this.width.stage - this.width.el
-				: -(this.width.stage - this.width.el);
-			this.pos.items[this.pos.max] = this.pos.maxValue;
-		}
-
-		// Set loop boundries
-		if (this.options.center) {
-			this.pos.loop = this.pos.items[0] - this.pos.items[this.num.oItems];
-		} else {
-			this.pos.loop = -this.pos.items[this.num.oItems];
-		}
-
-		// if is less items
-		if (this.num.oItems < this.options.items && !this.options.center) {
-			this.pos.max = 0;
-			this.pos.maxValue = this.pos.items[0];
-		}
 	};
 
 	/**
@@ -862,13 +737,13 @@
 	Owl.prototype.setSizes = function() {
 
 		// show neighbours
-		if (this.options.stagePadding !== false) {
-			this.dom.oStage.style.paddingLeft = this.options.stagePadding + 'px';
-			this.dom.oStage.style.paddingRight = this.options.stagePadding + 'px';
+		if (this.settings.stagePadding !== false) {
+			this.dom.oStage.style.paddingLeft = this.settings.stagePadding + 'px';
+			this.dom.oStage.style.paddingRight = this.settings.stagePadding + 'px';
 		}
 
 		// if(this.width.stagePrev > this.width.stage){
-		if (this.options.rtl) {
+		if (this.settings.rtl) {
 			window.setTimeout($.proxy(function() {
 				this.dom.stage.style.width = this.width.stage + 'px';
 			}, this), 0);
@@ -879,18 +754,18 @@
 		for (var i = 0; i < this.num.items; i++) {
 
 			// Set items width
-			if (!this.options.autoWidth) {
-				this.dom.$items[i].style.width = this.width.item - (this.options.margin) + 'px';
+			if (!this.settings.autoWidth) {
+				this.dom.$items[i].style.width = this.width.item - (this.settings.margin) + 'px';
 			}
 			// add margin
-			if (this.options.rtl) {
-				this.dom.$items[i].style.marginLeft = this.options.margin + 'px';
+			if (this.settings.rtl) {
+				this.dom.$items[i].style.marginLeft = this.settings.margin + 'px';
 			} else {
-				this.dom.$items[i].style.marginRight = this.options.margin + 'px';
+				this.dom.$items[i].style.marginRight = this.settings.margin + 'px';
 			}
 
-			if (this.num.merged[i] !== 1 && !this.options.autoWidth) {
-				this.dom.$items[i].style.width = (this.width.item * this.num.merged[i]) - (this.options.margin) + 'px';
+			if (this.num.merged[i] !== 1 && !this.settings.autoWidth) {
+				this.dom.$items[i].style.width = (this.width.item * this.num.merged[i]) - (this.settings.margin) + 'px';
 			}
 		}
 
@@ -928,7 +803,8 @@
 	 * Refreshes the carousel primarily for adaptive purposes.
 	 * @public
 	 */
-	Owl.prototype.refresh = function(init) {
+	Owl.prototype.refresh = function() {
+		var current = this.dom.$oItems && this.dom.$oItems.eq(this.normalize(this.current(), true));
 
 		this.trigger('refresh');
 
@@ -959,10 +835,11 @@
 		// aaaand show.
 		this.dom.$stage.removeClass('owl-refresh');
 
-		if (init) {
-			this.initPosition();
+		if (!current) {
+			this.dom.oStage.scrollLeft = 0;
+			this.reset(this.dom.$oItems.eq(0).data('owl-item').indexAbs);
 		} else {
-			this.jumpTo(this.pos.current, false); // fix that
+			this.reset(current.data('owl-item').indexAbs); // fix that
 		}
 
 		this.state.orientation = window.orientation;
@@ -979,53 +856,47 @@
 	Owl.prototype.updateActiveItems = function() {
 		this.trigger('change', { property: { name: 'items', value: this.dom.$items } });
 
-		var i, j, item, ipos, iwidth, outsideView, foundCurrent;
+		var i, j, item, ipos, iwidth, outsideView;
 
 		// clear states
 		for (i = 0; i < this.num.items; i++) {
 			this.dom.$items.eq(i).data('owl-item').active = false;
 			this.dom.$items.eq(i).data('owl-item').current = false;
-			this.dom.$items.eq(i).removeClass(this.options.activeClass).removeClass(this.options.centerClass);
+			this.dom.$items.eq(i).removeClass(this.settings.activeClass).removeClass(this.settings.centerClass);
 		}
 
 		this.num.active = 0;
-		padding = this.options.stagePadding * 2;
-		stageX = this.pos.stage + padding;
-		view = this.options.rtl ? this.width.view : -this.width.view;
+		padding = this.settings.stagePadding * 2;
+		stageX = this.coordinates(this.current()) + padding;
+		view = this.settings.rtl ? this.width.view : -this.width.view;
 
 		for (j = 0; j < this.num.items; j++) {
 
 			item = this.dom.$items.eq(j);
 			ipos = item.data('owl-item').posLeft;
 			iwidth = item.data('owl-item').width;
-			outsideView = this.options.rtl ? ipos - iwidth - padding : ipos - iwidth + padding;
+			outsideView = this.settings.rtl ? ipos - iwidth - padding : ipos - iwidth + padding;
 
 			if ((this.op(ipos, '<=', stageX) && (this.op(ipos, '>', stageX + view)))
 				|| (this.op(outsideView, '<', stageX) && this.op(outsideView, '>', stageX + view))) {
 
 				this.num.active++;
 
-				if (this.options.freeDrag && !foundCurrent) {
-					foundCurrent = true;
-					this.pos.current = item.data('owl-item').index;
-					this.pos.currentAbs = item.data('owl-item').indexAbs;
-				}
-
 				item.data('owl-item').active = true;
 				item.data('owl-item').current = true;
-				item.addClass(this.options.activeClass);
+				item.addClass(this.settings.activeClass);
 
-				if (!this.options.lazyLoad) {
+				if (!this.settings.lazyLoad) {
 					item.data('owl-item').loaded = true;
 				}
-				if (this.options.loop) {
+				if (this.settings.loop) {
 					this.updateClonedItemsState(item.data('owl-item').index);
 				}
 			}
 		}
 
-		if (this.options.center) {
-			this.dom.$items.eq(this.pos.currentAbs).addClass(this.options.centerClass).data('owl-item').center = true;
+		if (this.settings.center) {
+			this.dom.$items.eq(this.current()).addClass(this.settings.centerClass).data('owl-item').center = true;
 		}
 		this.trigger('changed', { property: { name: 'items', value: this.dom.$items } });
 	};
@@ -1038,8 +909,8 @@
 
 		// find cloned center
 		var center, $el, i;
-		if (this.options.center) {
-			center = this.dom.$items.eq(this.pos.currentAbs).data('owl-item').index;
+		if (this.settings.center) {
+			center = this.dom.$items.eq(this.current()).data('owl-item').index;
 		}
 
 		for (i = 0; i < this.num.items; i++) {
@@ -1047,7 +918,7 @@
 			if ($el.data('owl-item').index === activeIndex) {
 				$el.data('owl-item').current = true;
 				if ($el.data('owl-item').index === center) {
-					$el.addClass(this.options.centerClass);
+					$el.addClass(this.settings.centerClass);
 				}
 			}
 		}
@@ -1087,13 +958,13 @@
 	 * @protected
 	 */
 	Owl.prototype.responsiveTimer = function() {
-		if (this.windowWidth() === this.width.prevWindow) {
+		if (this.viewport() === this.width.prevWindow) {
 			return false;
 		}
 		window.clearTimeout(this.resizeTimer);
 
-		this.resizeTimer = window.setTimeout(this.e._responsiveCall, this.options.responsiveRefreshRate);
-		this.width.prevWindow = this.windowWidth();
+		this.resizeTimer = window.setTimeout(this.e._responsiveCall, this.settings.responsiveRefreshRate);
+		this.width.prevWindow = this.viewport();
 	};
 
 	/**
@@ -1112,7 +983,7 @@
 			this.dragType = [ 'mousedown', 'mousemove', 'mouseup' ];
 		}
 
-		if ((isTouch || isTouchIE) && this.options.touchDrag) {
+		if ((isTouch || isTouchIE) && this.settings.touchDrag) {
 			// touch cancel event
 			this.on(document, this.dragType[3], this.e._onDragEnd);
 
@@ -1122,7 +993,7 @@
 				return false;
 			});
 
-			if (this.options.mouseDrag) {
+			if (this.settings.mouseDrag) {
 				// disable text select
 				this.dom.stage.onselectstart = function() {
 					return false;
@@ -1139,7 +1010,7 @@
 		}
 
 		// Responsive
-		if (this.options.responsive !== false) {
+		if (this.settings.responsive !== false) {
 			this.on(window, 'resize', this.e._resizer, false);
 		}
 
@@ -1152,9 +1023,9 @@
 	 */
 	Owl.prototype.dragEvents = function() {
 
-		if (this.options.touchDrag && (this.dragType[0] === 'touchstart' || this.dragType[0] === 'MSPointerDown')) {
+		if (this.settings.touchDrag && (this.dragType[0] === 'touchstart' || this.dragType[0] === 'MSPointerDown')) {
 			this.on(this.dom.stage, this.dragType[0], this.e._onDragStart, false);
-		} else if (this.options.mouseDrag && this.dragType[0] === 'mousedown') {
+		} else if (this.settings.mouseDrag && this.dragType[0] === 'mousedown') {
 			this.on(this.dom.stage, this.dragType[0], this.e._onDragStart, false);
 		} else {
 			this.off(this.dom.stage, this.dragType[0], this.e._onDragStart);
@@ -1182,7 +1053,7 @@
 
 		this.trigger('drag');
 		this.drag.startTime = new Date().getTime();
-		this.setSpeed(0);
+		this.speed(0);
 		this.state.isTouch = true;
 		this.state.isScrolling = false;
 		this.state.isSwiping = false;
@@ -1194,19 +1065,19 @@
 		pageY = isTouchEvent ? event.targetTouches[0].pageY : (ev.pageY || ev.clientY);
 
 		// get stage position left
-		this.drag.offsetX = this.dom.$stage.position().left - this.options.stagePadding;
+		this.drag.offsetX = this.dom.$stage.position().left - this.settings.stagePadding;
 		this.drag.offsetY = this.dom.$stage.position().top;
 
-		if (this.options.rtl) {
+		if (this.settings.rtl) {
 			this.drag.offsetX = this.dom.$stage.position().left + this.width.stage - this.width.el
-				+ this.options.margin;
+				+ this.settings.margin;
 		}
 
 		// catch position // ie to fix
 		if (this.state.inMotion && this.support3d) {
 			animatedPos = this.getTransformProperty();
 			this.drag.offsetX = animatedPos;
-			this.animStage(animatedPos);
+			this.animate(animatedPos);
 		} else if (this.state.inMotion && !this.support3d) {
 			this.state.inMotion = false;
 			return false;
@@ -1231,6 +1102,7 @@
 
 	/**
 	 * Handles the touchmove/mousemove events.
+	 * @todo Simplify
 	 * @protected
 	 * @param {Event} event - The event arguments.
 	 */
@@ -1259,22 +1131,22 @@
 
 		// Check move direction
 		if (this.drag.distance < 0) {
-			this.state.direction = this.options.rtl ? 'right' : 'left';
+			this.state.direction = this.settings.rtl ? 'right' : 'left';
 		} else if (this.drag.distance > 0) {
-			this.state.direction = this.options.rtl ? 'left' : 'right';
+			this.state.direction = this.settings.rtl ? 'left' : 'right';
 		}
 		// Loop
-		if (this.options.loop) {
-			if (this.op(this.drag.currentX, '>', this.pos.minValue) && this.state.direction === 'right') {
-				this.drag.currentX -= this.pos.loop;
-			} else if (this.op(this.drag.currentX, '<', this.pos.maxValue) && this.state.direction === 'left') {
-				this.drag.currentX += this.pos.loop;
+		if (this.settings.loop) {
+			if (this.op(this.drag.currentX, '>', this.coordinates(this.minimum())) && this.state.direction === 'right') {
+				this.drag.currentX -= (this.settings.center && this.coordinates(0)) - this.coordinates(this.num.oItems);
+			} else if (this.op(this.drag.currentX, '<', this.coordinates(this.maximum())) && this.state.direction === 'left') {
+				this.drag.currentX += (this.settings.center && this.coordinates(0)) - this.coordinates(this.num.oItems);
 			}
 		} else {
 			// pull
-			minValue = this.options.rtl ? this.pos.maxValue : this.pos.minValue;
-			maxValue = this.options.rtl ? this.pos.minValue : this.pos.maxValue;
-			pull = this.options.pullDrag ? this.drag.distance / 5 : 0;
+			minValue = this.settings.rtl ? this.coordinates(this.maximum()) : this.coordinates(this.minimum());
+			maxValue = this.settings.rtl ? this.coordinates(this.minimum()) : this.coordinates(this.maximum());
+			pull = this.settings.pullDrag ? this.drag.distance / 5 : 0;
 			this.drag.currentX = Math.max(Math.min(this.drag.currentX, minValue + pull), maxValue + pull);
 		}
 
@@ -1297,7 +1169,7 @@
 			this.drag.updatedX = this.drag.start;
 		}
 
-		this.animStage(this.drag.updatedX);
+		this.animate(this.drag.updatedX);
 	};
 
 	/**
@@ -1344,12 +1216,12 @@
 
 		closest = this.closest(this.drag.updatedX);
 
-		this.setSpeed(this.options.dragEndSpeed, false, true);
-		this.animStage(this.pos.items[closest]);
+		this.speed(this.settings.dragEndSpeed || this.settings.smartSpeed);
+		this.current(closest);
 
 		// if pullDrag is off then fire transitionEnd event manually when stick
 		// to border
-		if (!this.options.pullDrag && this.drag.updatedX === this.pos.items[closest]) {
+		if (!this.settings.pullDrag && this.drag.updatedX === this.coordinates(closest)) {
 			this.transitionEnd();
 		}
 
@@ -1407,169 +1279,213 @@
 	};
 
 	/**
-	 * Gets closest item index for a coordinate.
+	 * Gets absolute position of the closest item for a coordinate.
 	 * @protected
-	 * @param {Number} x - The coordinate on the x axis in pixel.
-	 * @return {Number} - The item's index.
+	 * @param {Number} coordinate - The coordinate in pixel.
+	 * @return {Number} - The absolute position of the closest item.
 	 */
-	Owl.prototype.closest = function(x) {
-		var newX = 0, pull = 30, i;
+	Owl.prototype.closest = function(coordinate) {
+		var position = 0, pull = 30;
 
-		if (!this.options.freeDrag) {
-			// Check closest item
-			for (i = 0; i < this.num.items; i++) {
-				if (x > this.pos.items[i] - pull && x < this.pos.items[i] + pull) {
-					newX = i;
-				} else if (this.op(x, '<', this.pos.items[i])
-					&& this.op(x, '>', this.pos.items[i + 1 || this.pos.items[i] - this.width.el])) {
-					newX = this.state.direction === 'left' ? i + 1 : i;
+		if (!this.settings.freeDrag) {
+			// check closest item
+			$.each(this.coordinates(), $.proxy(function(index, value) {
+				if (coordinate > value - pull && coordinate < value + pull) {
+					position = index;
+				} else if (this.op(coordinate, '<', value)
+					&& this.op(coordinate, '>', this.coordinates(index + 1) || value - this.width.el)) {
+					position = this.state.direction === 'left' ? index + 1 : index;
 				}
-			}
+			}, this));
 		}
-		// non loop boundries
-		if (!this.options.loop) {
-			if (this.op(x, '>', this.pos.minValue)) {
-				newX = x = this.pos.min;
-			} else if (this.op(x, '<', this.pos.maxValue)) {
-				newX = x = this.pos.max;
+
+		if (!this.settings.loop) {
+			// non loop boundries
+			if (this.op(coordinate, '>', this.coordinates(this.minimum()))) {
+				position = coordinate = this.minimum();
+			} else if (this.op(coordinate, '<', this.coordinates(this.maximum()))) {
+				position = coordinate = this.maximum();
 			}
 		}
 
-		if (!this.options.freeDrag) {
-			// set positions
-			this.pos.currentAbs = newX;
-			this.pos.current = this.dom.$items.eq(newX).data('owl-item').index;
-		} else {
-			return x;
-		}
-
-		return newX;
+		return position;
 	};
 
 	/**
-	 * Animates stage position (both css3/css2).
-	 * @protected
-	 * @param {Number} pos - The curent position in pixels.
-	 * @param {Boolean} bypassEvent - Wether the animation end event should be triggered or not.
+	 * Animates the stage.
+	 * @public
+	 * @param {Number} coordinate - The coordinate in pixels.
 	 */
-	Owl.prototype.animStage = function(pos, bypassEvent) {
-
-		if (pos !== this.pos.stage && bypassEvent !== true){
-			this.trigger('translate');
-			this.state.inMotion = true;
-		}
-
-		var posX = this.pos.stage = pos, style = this.dom.stage.style;
+	Owl.prototype.animate = function(coordinate) {
+		this.trigger('translate');
+		this.state.inMotion = this.speed() > 0;
 
 		if (this.support3d) {
-			translate = 'translate3d(' + posX + 'px' + ',0px, 0px)';
-			style[this.transformVendor] = translate;
+			this.dom.$stage.css({
+				transform: 'translate3d(' + coordinate + 'px' + ',0px, 0px)',
+				transition: (this.speed() / 1000) + 's'
+			});
 		} else if (this.state.isTouch) {
-			style.left = posX + 'px';
+			this.dom.$stage.css({
+				left: coordinate + 'px'
+			});
 		} else {
 			this.dom.$stage.animate({
-				left: posX
-			}, this.speed.css2speed, this.options.fallbackEasing, $.proxy(function() {
+				left: coordinate
+			}, this.speed() / 1000, this.settings.fallbackEasing, $.proxy(function() {
 				if (this.state.inMotion) {
 					this.transitionEnd();
 				}
 			}, this));
 		}
-
-		this.onChange();
 	};
 
 	/**
-	 * Updates the current position.
-	 * @protected
-	 * @param {Number} position - The new position.
+	 * Sets the absolute position of the current item.
+	 * @public
+	 * @param {Number} [position] - The new absolute position or nothing to leave it unchanged.
+	 * @returns {Number} - The absolute position of the current item.
 	 */
-	Owl.prototype.updatePosition = function(position) {
-		if (this.num.oItems === 0 || position === undefined) {
-			return false;
+	Owl.prototype.current = function(position) {
+		if (position === undefined) {
+			return this._current;
 		}
 
-		this.pos.prev = this.pos.currentAbs;
-
-		if (!this.state.revert && !this.options.loop) {
-			position = position > this.pos.max ? this.pos.max : (position <= 0 ? 0 : position);
-		} else if (!this.state.revert) {
-			position = position >= this.num.oItems ? this.num.oItems - 1 : position;
+		if (this.num.oItems === 0) {
+			return undefined;
 		}
 
-		var event = this.trigger('change', { property: { name: 'position', value: position } });
+		position = this.normalize(position);
 
-		position = event.data ? event.data : position;
-
-		if (this.state.revert) {
-			this.pos.current = this.dom.$items.eq(position).data('owl-item').index;
-			this.pos.currentAbs = position;
+		if (this._current === position) {
+			this.animate(this.coordinates(this._current));
 		} else {
-			this.pos.current = this.dom.$oItems.eq(position).data('owl-item').index;
-			this.pos.currentAbs = this.dom.$oItems.eq(position).data('owl-item').indexAbs;
-		}
+			var event = this.trigger('change', { property: { name: 'position', value: position } });
 
-		this.trigger('changed', { property: { name: 'position', value: position } });
-	};
-
-	/**
-	 * Sets the animation speed.
-	 * @protected
-	 * @param {Number} speed - The animation speed in milliseconds.
-	 * @param {Number} [pos] - The next position, used to calculate `smartSpeed`
-	 * @param {Boolean} [drag] - Wether the `smartSpeed` should be disabled or not.
-	 */
-	Owl.prototype.setSpeed = function(speed, pos, drag) {
-		var s = speed, nextPos = pos, diff, style;
-
-		if ((s === false && s !== 0 && drag !== true) || s === undefined) {
-
-			// Double check this
-			// var nextPx = this.pos.items[nextPos];
-			// var currPx = this.pos.stage
-			// var diff = Math.abs(nextPx-currPx);
-			// var s = diff/1
-			// if(s>1000){
-			// s = 1000;
-			// }
-
-			diff = Math.abs(nextPos - this.pos.prev);
-			diff = diff === 0 ? 1 : diff;
-			if (diff > 6) {
-				diff = 6;
+			if (event.data !== undefined) {
+				position = this.normalize(event.data);
 			}
-			s = diff * this.options.smartSpeed;
+
+			this._current = position;
+
+			this.animate(this.coordinates(this._current));
+
+			this.updateActiveItems();
+
+			this.trigger('changed', { property: { name: 'position', value: this._current } });
 		}
 
-		if (s === false && drag === true) {
-			s = this.options.smartSpeed;
-		}
-
-		if (s === 0) {
-			s = 0;
-		}
-
-		if (this.support3d) {
-			style = this.dom.stage.style;
-			style.webkitTransitionDuration = style.MsTransitionDuration = style.msTransitionDuration = style.MozTransitionDuration = style.OTransitionDuration = style.transitionDuration = (s / 1000)
-				+ 's';
-		} else {
-			this.speed.css2speed = s;
-		}
-		this.speed.current = s;
-		return s;
+		return this._current;
 	};
 
 	/**
-	 * Jumps to a specified position without animating.
-	 * @protected
-	 * @param {Number} pos - The position to jump to.
-	 * @param {Boolean} bypassEvent - Wether the animation end event shoudl be triggered or not.
+	 * Resets the absolute position of the current item.
+	 * @public
+	 * @param {Number} position - The absolute position of the new item.
 	 */
-	Owl.prototype.jumpTo = function(pos, bypassEvent) {
-		this.updatePosition(pos);
-		this.setSpeed(0);
-		this.animStage(this.pos.items[this.pos.currentAbs], bypassEvent);
+	Owl.prototype.reset = function(position) {
+		this.suppress([ 'change', 'changed' ]);
+		this.speed(0);
+		this.current(position);
+		this.release([ 'change', 'changed' ]);
+	};
+
+	/**
+	 * Normalizes an absolute position for an item.
+	 * @public
+	 * @param {Number} position - The absolute position to normalize.
+	 * @param {Boolean} [relative=false] - Whether to return a relative position or not.
+	 * @return {Number} - The normalized position.
+	 */
+	Owl.prototype.normalize = function(position, relative) {
+		if (position === undefined || !this.dom.$items) {
+			return undefined;
+		}
+
+		if (this.settings.loop) {
+			var n = this.dom.$items.length;
+			position = ((position % n) + n) % n;
+		} else {
+			position = Math.max(this.minimum(), Math.min(this.maximum(), position));
+		}
+
+		return relative ? this.dom.$items.eq(position).data('owl-item').index : position;
+	};
+
+	/**
+	 * Gets the absolute maximum position for an item.
+	 * @public
+	 * @returns {Number}
+	 */
+	Owl.prototype.maximum = function() {
+		var maximum, width,
+			settings = this.settings;
+
+		if (!settings.loop && settings.center) {
+			maximum = this.num.oItems - 1;
+		} else if (!settings.loop && !settings.center) {
+			maximum = this.num.oItems - settings.items;
+		} else if (settings.loop || settings.center) {
+			maximum = this.num.oItems + settings.items;
+		} else if (settings.autoWidth || settings.merge) {
+			revert = settings.rtl ? 1 : -1;
+			width = this.dom.$stage.width() - this.$el.width();
+			$.each(this.coordinates(), function(index, coordinate) {
+				if (coordinate * revert >= width) {
+					return false;
+				}
+				maximum = index + 1;
+			});
+		} else {
+			throw 'Can not detect maximum absolute position.'
+		}
+
+		return maximum;
+	};
+
+	/**
+	 * Gets the absolute minimum position for an item.
+	 * @public
+	 * @returns {Number}
+	 */
+	Owl.prototype.minimum = function() {
+		return this.dom.$oItems.eq(0).data('owl-item').indexAbs;
+	};
+
+	/**
+	 * Sets the current animation speed.
+	 * @public
+	 * @param {Number} [speed] - The animation speed in millisecondsor nothing to leave it unchanged.
+	 * @returns {Number} - The current animation speed in milliseconds.
+	 */
+	Owl.prototype.speed = function(speed) {
+		if (speed !== undefined) {
+			this._speed = speed;
+		}
+
+		return this._speed;
+	};
+
+	/**
+	 * Gets the coordinate for an item.
+	 * @public
+	 * @param {Number} [position] - The absolute position of the item.
+	 * @returns {Number|Array.<Number>} - The coordinate of the item in pixel or all coordinates.
+	 */
+	Owl.prototype.coordinates = function(position) {
+		return position !== undefined ? this._coordinates[position] : this._coordinates;
+	};
+
+	/**
+	 * Calculates the speed for a translation.
+	 * @protected
+	 * @param {Number} from - The absolute position of the start item.
+	 * @param {Number} to - The absolute position of the target item.
+	 * @param {Number} [factor=undefined] - The time factor in milliseconds.
+	 * @returns {Number} - The time in milliseconds for the translation.
+	 */
+	Owl.prototype.duration = function(from, to, factor) {
+		return Math.min(Math.max(Math.abs(to - from), 1), 6) * Math.abs((factor || this.settings.smartSpeed));
 	};
 
 	/**
@@ -1579,81 +1495,49 @@
 	 * @param {Number} [speed] - The time in milliseconds for the transition.
 	 */
 	Owl.prototype.to = function(position, speed) {
-		if (this.options.loop) {
-			var distance = position - this.pos.current,
-				revert = this.pos.currentAbs,
-				before = this.pos.currentAbs,
-				after = this.pos.currentAbs + distance,
+		if (this.settings.loop) {
+			var distance = position - this.normalize(this.current(), true),
+				revert = this.current(),
+				before = this.current(),
+				after = this.current() + distance,
 				direction = before - after < 0 ? true : false;
 
-			this.state.revert = true;
-
-			if (after < this.options.items && direction === false) {
-				this.state.bypass = true;
-				revert = this.num.items - (this.options.items - before) - this.options.items;
-				this.jumpTo(revert, true);
-			} else if (after >= this.num.items - this.options.items && direction === true) {
-				this.state.bypass = true;
+			if (after < this.settings.items && direction === false) {
+				revert = this.num.items - (this.settings.items - before) - this.settings.items;
+				this.reset(revert);
+			} else if (after >= this.num.items - this.settings.items && direction === true) {
 				revert = before - this.num.oItems;
-				this.jumpTo(revert, true);
+				this.reset(revert);
 			}
 			window.clearTimeout(this.e._goToLoop);
 			this.e._goToLoop = window.setTimeout($.proxy(function() {
-				this.state.bypass = false;
-				this.updatePosition(revert + distance);
-				this.setSpeed(speed, this.pos.currentAbs);
-				this.animStage(this.pos.items[this.pos.currentAbs]);
-				this.state.revert = false;
+				this.speed(this.duration(this.current(), revert + distance, speed));
+				this.current(revert + distance);
 			}, this), 30);
 		} else {
-			this.updatePosition(position);
-			this.setSpeed(speed, this.pos.currentAbs);
-			this.animStage(this.pos.items[this.pos.currentAbs]);
+			this.speed(this.duration(this.current(), position, speed));
+			this.current(position);
 		}
 	};
 
 	/**
 	 * Slides to the next item.
 	 * @public
-	 * @param {Number} [speed=false] - The time in milliseconds for the transition.
+	 * @param {Number} [speed] - The time in milliseconds for the transition.
 	 */
 	Owl.prototype.next = function(speed) {
 		speed = speed || false;
-		this.to(this.pos.current + 1, speed);
+		this.to(this.normalize(this.current(), true) + 1, speed);
 	};
 
 	/**
 	 * Slides to the previous item.
 	 * @public
-	 * @param {Number} [speed=false] - The time in milliseconds for the transition.
+	 * @param {Number} [speed] - The time in milliseconds for the transition.
 	 */
 	Owl.prototype.prev = function(speed) {
 		speed = speed || false;
-		this.to(this.pos.current - 1, speed);
-	};
-
-	/**
-	 * Initializes the current position.
-	 * @protected
-	 */
-	Owl.prototype.initPosition = function() {
-		if (!this.dom.$oItems) {
-			return false;
-		}
-
-		var position = this.options.startPosition,
-			event = this.trigger('change', { property: { name: 'position', value: position } });
-
-		position = event.data || position;
-
-		if (typeof position !== 'number' || !this.options.center) {
-			position = 0;
-		}
-
-		this.dom.oStage.scrollLeft = 0;
-		this.jumpTo(position, true);
-
-		this.trigger('changed', { property: { name: 'position', value: position } });
+		this.to(this.normalize(this.current(), true) - 1, speed);
 	};
 
 	/**
@@ -1684,26 +1568,29 @@
 	 * @returns {Booelan}
 	 */
 	Owl.prototype.isElWidthChanged = function() {
-		var newElWidth = this.dom.$el.width() - this.options.stagePadding, // to
+		var newElWidth = this.dom.$el.width() - this.settings.stagePadding, // to
 		// check
-		prevElWidth = this.width.el + this.options.margin;
+		prevElWidth = this.width.el + this.settings.margin;
 		return newElWidth !== prevElWidth;
 	};
 
 	/**
-	 * Gets `window`/`responsiveBaseElement` width.
+	 * Gets viewport width.
 	 * @protected
 	 * @return {Number} - The width in pixel.
 	 */
-	Owl.prototype.windowWidth = function() {
+	Owl.prototype.viewport = function() {
+		var width;
 		if (this.options.responsiveBaseElement !== window) {
-			this.width.window = $(this.options.responsiveBaseElement).width();
+			width = $(this.options.responsiveBaseElement).width();
 		} else if (window.innerWidth) {
-			this.width.window = window.innerWidth;
+			width = window.innerWidth;
 		} else if (document.documentElement && document.documentElement.clientWidth) {
-			this.width.window = document.documentElement.clientWidth;
+			width = document.documentElement.clientWidth;
+		} else {
+			throw 'Can not detect viewport width.';
 		}
-		return this.width.window;
+		return width;
 	};
 
 	/**
@@ -1760,10 +1647,12 @@
 	 */
 	Owl.prototype.addTriggerableEvents = function() {
 		var handler = $.proxy(function(callback, event) {
-			return $.proxy(function() {
-				this.suppressedEvents[event] = true;
-				callback.apply(this, [].slice.call(arguments, 1));
-				delete this.suppressedEvents[event];
+			return $.proxy(function(e) {
+				if (e.relatedTarget !== this) {
+					this.suppress([ event ]);
+					callback.apply(this, [].slice.call(arguments, 1));
+					this.release([ event ]);
+				}
 			}, this);
 		}, this);
 
@@ -1809,40 +1698,6 @@
 	};
 
 	/**
-	 * Handles changes of the carousel.
-	 * @proteted
-	 */
-	Owl.prototype.onChange = function() {
-		if (this.state.isTouch || this.state.bypass) {
-			return;
-		}
-
-		this.updateActiveItems();
-		this.storeInfo();
-	};
-
-	/**
-	 * Store basic information about current states.
-	 * @protected
-	 */
-	Owl.prototype.storeInfo = function() {
-		this.info = {
-			items: this.options.items,
-			allItems: this.num.oItems,
-			currentPosition: this.pos.current,
-			currentPage: this.pos.currentPage,
-			allPages: this.num.allPages,
-			windowWidth: this.width.window,
-			elWidth: this.width.el,
-			breakpoint: this.num.breakpoint
-		};
-
-		if (typeof this.options.info === 'function') {
-			this.options.info.apply(this, [ this.info, this.dom.el ]);
-		}
-	};
-
-	/**
 	 * Preloads images with auto width.
 	 * @protected
 	 * @todo Still to test
@@ -1876,11 +1731,11 @@
 	 */
 	Owl.prototype.destroy = function() {
 
-		if (this.dom.$el.hasClass(this.options.themeClass)) {
-			this.dom.$el.removeClass(this.options.themeClass);
+		if (this.dom.$el.hasClass(this.settings.themeClass)) {
+			this.dom.$el.removeClass(this.settings.themeClass);
 		}
 
-		if (this.options.responsive !== false) {
+		if (this.settings.responsive !== false) {
 			this.off(window, 'resize', this.e._resizer);
 		}
 
@@ -1892,12 +1747,12 @@
 			this.plugins[i].destroy();
 		}
 
-		if (this.options.mouseDrag || this.options.touchDrag) {
+		if (this.settings.mouseDrag || this.settings.touchDrag) {
 			this.off(this.dom.stage, this.dragType[0], this.e._onDragStart);
-			if (this.options.mouseDrag) {
+			if (this.settings.mouseDrag) {
 				this.off(document, this.dragType[3], this.e._onDragStart);
 			}
-			if (this.options.mouseDrag) {
+			if (this.settings.mouseDrag) {
 				this.dom.$stage.off('dragstart', function() {
 					return false;
 				});
@@ -1930,7 +1785,7 @@
 	 * @param {Number} [b] - The right side operand.
 	 */
 	Owl.prototype.op = function(a, o, b) {
-		var rtl = this.options.rtl;
+		var rtl = this.settings.rtl;
 		switch (o) {
 		case '<':
 			return rtl ? a > b : a < b;
@@ -1987,31 +1842,53 @@
 	 */
 	Owl.prototype.trigger = function(name, data, namespace) {
 		var status = {
-			item: { count: this.num.oItems, index: this.pos.current }
+			item: { count: this.num.oItems, index: this.current() }
 		}, handler = $.camelCase(
-			$.grep([ 'on', name, namespace ],
-			function(v) { return v }).join('-').toLowerCase()
+			$.grep([ 'on', name, namespace ], function(v) { return v })
+				.join('-').toLowerCase()
 		), event = $.Event(
 			[ name, 'owl', namespace || 'carousel' ].join('.').toLowerCase(),
-			$.extend(status, data)
+			$.extend({ relatedTarget: this }, status, data)
 		);
 
-		$.each(this.plugins, function(name, plugin) {
-			if (plugin.onTrigger) {
-				plugin.onTrigger(event);
-			}
-		});
+		if (!this._supress[event.type]) {
+			$.each(this.plugins, function(name, plugin) {
+				if (plugin.onTrigger) {
+					plugin.onTrigger(event);
+				}
+			});
 
-		if (!this.suppressedEvents[event.type]) {
 			this.dom.$el.trigger(event);
-		}
 
-		if (typeof this.options[handler] === 'function') {
-			this.options[handler].apply(this, event);
+			if (typeof this.settings[handler] === 'function') {
+				this.settings[handler].apply(this, event);
+			}
 		}
 
 		return event;
 	};
+
+	/**
+	 * Suppresses events.
+	 * @protected
+	 * @param {Array.<String>} events - The events to suppress.
+	 */
+	Owl.prototype.suppress = function(events) {
+		$.each(events, $.proxy(function(index, event) {
+			this._supress[event] = true;
+		}, this));
+	}
+
+	/**
+	 * Releases suppressed events.
+	 * @protected
+	 * @param {Array.<String>} events - The events to release.
+	 */
+	Owl.prototype.release = function(events) {
+		$.each(events, $.proxy(function(index, event) {
+			delete this._supress[event];
+		}, this));
+	}
 
 	/**
 	 * Checks the availability of some browser features.
@@ -2136,10 +2013,6 @@
 		this.owl = scope;
 		this.owl.options = $.extend({}, LazyLoad.Defaults, this.owl.options);
 
-		if (!this.owl.options.lazyLoad) {
-			return;
-		}
-
 		this.handlers = {
 			'changed.owl.carousel': $.proxy(function(e) {
 				if (e.property.name == 'items' && e.property.value && !e.property.value.is(':empty')) {
@@ -2253,7 +2126,7 @@
 
 		this.handlers = {
 			'refreshed.owl.carousel changed.owl.carousel': $.proxy(function() {
-				if (this.owl.options.autoHeight) {
+				if (this.owl.settings.autoHeight) {
 					this.setHeight();
 				}
 			}, this)
@@ -2277,13 +2150,13 @@
 	 * @returns {Boolean}
 	 */
 	AutoHeight.prototype.setHeight = function() {
-		var loaded = this.owl.dom.$items.eq(this.owl.pos.currentAbs),
+		var loaded = this.owl.dom.$items.eq(this.owl.current()),
 			stage = this.owl.dom.$oStage,
 			iterations = 0,
 			isLoaded;
 
-		if (!this.owl.dom.$oStage.hasClass(this.owl.options.autoHeightClass)) {
-			this.owl.dom.$oStage.addClass(this.owl.options.autoHeightClass);
+		if (!this.owl.dom.$oStage.hasClass(this.owl.settings.autoHeightClass)) {
+			this.owl.dom.$oStage.addClass(this.owl.settings.autoHeightClass);
 		}
 
 		isLoaded = window.setInterval(function() {
@@ -2332,7 +2205,7 @@
 
 		this.handlers = {
 			'resize.owl.carousel': $.proxy(function(e) {
-				if (this.owl.options.video && !this.isInFullScreen()) {
+				if (this.owl.settings.video && !this.isInFullScreen()) {
 					e.preventDefault();
 				}
 			}, this),
@@ -2342,7 +2215,7 @@
 				}
 			}, this),
 			'refresh.owl.carousel refreshed.owl.carousel': $.proxy(function(e) {
-				if (!this.owl.options.video) {
+				if (!this.owl.settings.video) {
 					return false;
 				}
 				this.refreshing = e.type == 'refresh';
@@ -2406,8 +2279,8 @@
 		var info, type, id, dimensions,
 			vimeoId = videoEl.data('vimeo-id'),
 			youTubeId = videoEl.data('youtube-id'),
-			width = videoEl.data('width') || this.owl.options.videoWidth,
-			height = videoEl.data('height') || this.owl.options.videoHeight,
+			width = videoEl.data('width') || this.owl.settings.videoWidth,
+			height = videoEl.data('height') || this.owl.settings.videoHeight,
 			url = videoEl.attr('href');
 
 		if (vimeoId) {
@@ -2463,7 +2336,7 @@
 			lazyClass = '',
 			that = this.owl;
 
-		if (this.owl.options.lazyLoad) {
+		if (this.owl.settings.lazyLoad) {
 			srcType = 'data-src';
 			lazyClass = 'owl-lazy';
 		}
@@ -2479,7 +2352,7 @@
 		function addThumbnail(tnPath) {
 			icon = '<div class="owl-video-play-icon"></div>';
 
-			if (that.options.lazyLoad) {
+			if (that.settings.lazyLoad) {
 				tnLink = '<div class="owl-video-tn ' + lazyClass + '" ' + srcType + '="' + tnPath + '"></div>';
 			} else {
 				tnLink = '<div class="owl-video-tn" style="opacity:1;background-image:url(' + tnPath + ')"></div>';
@@ -2500,7 +2373,7 @@
 				success: function(data) {
 					path = data[0].thumbnail_large;
 					addThumbnail(path);
-					if (that.options.loop) {
+					if (that.settings.loop) {
 						that.updateActiveItems();
 					}
 				}
@@ -2533,11 +2406,11 @@
 		}
 		var videoLink, videoWrap, videoType,
 			target = $(ev.target || ev.srcElement),
-			item = target.closest('.' + this.owl.options.itemClass);
+			item = target.closest('.' + this.owl.settings.itemClass);
 
 		videoType = item.data('owl-item').videoType, id = item.data('owl-item').videoId, width = item
 			.data('owl-item').videoWidth
-			|| Math.floor(item.data('owl-item').width - this.owl.options.margin), height = item.data('owl-item').videoHeight
+			|| Math.floor(item.data('owl-item').width - this.owl.settings.margin), height = item.data('owl-item').videoHeight
 			|| this.owl.dom.$stage.height();
 
 		if (videoType === 'youtube') {
@@ -2570,7 +2443,7 @@
 			|| document.webkitFullscreenElement;
 		if (fullscreenElement) {
 			if ($(fullscreenElement.parentNode).hasClass('owl-video-frame')) {
-				this.owl.setSpeed(0);
+				this.owl.speed(0);
 				this.owl.state.isFullScreen = true;
 			}
 		}
@@ -2629,15 +2502,19 @@
 	 * @param {Owl} scope - The Owl Carousel
 	 */
 	Animate = function(scope) {
-		this.owl = scope;
-		this.owl.options = $.extend({}, Animate.Defaults, this.owl.options);
+		this.core = scope;
+		this.core.options = $.extend({}, Animate.Defaults, this.core.options);
 		this.swapping = true;
-
-		if (!this.owl.options.animateIn && !this.owl.options.animateOut) {
-			return;
-		}
+		this.previous = undefined;
+		this.next = undefined;
 
 		this.handlers = {
+			'change.owl.carousel': $.proxy(function(e) {
+				if (e.property.name == 'position') {
+					this.previous = this.core.current();
+					this.next = e.property.value;
+				}
+			}, this),
 			'drag.owl.carousel dragged.owl.carousel translated.owl.carousel': $.proxy(function(e) {
 				this.swapping = e.type == 'translated';
 			}, this),
@@ -2648,7 +2525,7 @@
 			}, this)
 		};
 
-		this.owl.dom.$el.on(this.handlers);
+		this.core.dom.$el.on(this.handlers);
 	};
 
 	/**
@@ -2667,47 +2544,45 @@
 	 */
 	Animate.prototype.swap = function() {
 
-		if (this.owl.options.items !== 1 || !this.owl.support3d) {
-			return false;
+		if (this.core.settings.items !== 1 || !this.core.support3d) {
+			return;
 		}
 
-		this.owl.setSpeed(0);
+		this.core.speed(0);
 
-		var pos, tIn, tOut, that,
-			prevItem = this.owl.dom.$items.eq(this.owl.pos.prev),
-			prevPos = Math.abs(prevItem.data('owl-item').width) * this.owl.pos.prev,
-			currentItem = this.owl.dom.$items.eq(this.owl.pos.currentAbs),
-			currentPos = Math.abs(currentItem.data('owl-item').width) * this.owl.pos.currentAbs;
+		var left,
+			clear = $.proxy(this.clear, this),
+			previous = this.core.dom.$items.eq(this.previous),
+			next = this.core.dom.$items.eq(this.next),
+			incoming = this.core.settings.animateIn,
+			outgoing = this.core.settings.animateOut;
 
-		if (this.owl.pos.currentAbs === this.owl.pos.prev) {
-			return false;
+		if (this.core.current() === this.previous) {
+			return;
 		}
 
-		pos = currentPos - prevPos;
-		tIn = this.owl.options.animateIn;
-		tOut = this.owl.options.animateOut;
-		that = this.owl;
-
-		removeStyles = function() {
-			$(this).css({
-				'left': ''
-			}).removeClass('animated owl-animated-out owl-animated-in').removeClass(tIn).removeClass(tOut);
-
-			that.transitionEnd();
-		};
-
-		if (tOut) {
-			prevItem.css({
-				'left': pos + 'px'
-			}).addClass('animated owl-animated-out ' + tOut).one(
-				'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', removeStyles);
+		if (outgoing) {
+			left = this.core.coordinates(this.previous) - this.core.coordinates(this.next);
+			previous.css( { 'left': left + 'px' } )
+				.addClass('animated owl-animated-out')
+				.addClass(outgoing)
+				.one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', clear);
 		}
 
-		if (tIn) {
-			currentItem.addClass('animated owl-animated-in ' + tIn).one(
-				'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', removeStyles);
+		if (incoming) {
+			next.addClass('animated owl-animated-in')
+				.addClass(incoming)
+				.one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', clear);
 		}
 	};
+
+	Animate.prototype.clear = function(e) {
+		$(e.target).css( { 'left': '' } )
+			.removeClass('animated owl-animated-out owl-animated-in')
+			.removeClass(this.core.settings.animateIn)
+			.removeClass(this.core.settings.animateOut);
+		this.core.transitionEnd();
+	}
 
 	/**
 	 * Destroys the plugin.
@@ -2717,14 +2592,14 @@
 		var handler, property;
 
 		for (handler in this.handlers) {
-			this.owl.dom.$el.off(handler, this.handlers[handler]);
+			this.core.dom.$el.off(handler, this.handlers[handler]);
 		}
 		for (property in Object.getOwnPropertyNames(this)) {
 			typeof this[property] != 'function' && (this[property] = null);
 		}
 	};
 
-	$.fn.owlCarousel.Constructor.Plugins.animate = Animate;
+	$.fn.owlCarousel.Constructor.Plugins.Animate = Animate;
 
 })(window.Zepto || window.jQuery, window, document);
 
@@ -2742,8 +2617,8 @@
 	 * @param {Owl} scope - The Owl Carousel
 	 */
 	Autoplay = function(scope) {
-		this.owl = scope;
-		this.owl.options = $.extend({}, Autoplay.Defaults, this.owl.options);
+		this.core = scope;
+		this.core.options = $.extend({}, Autoplay.Defaults, this.core.options);
 
 		this.handlers = {
 			'translated.owl.carousel refreshed.owl.carousel': $.proxy(function() {
@@ -2756,18 +2631,18 @@
 				this.stop();
 			}, this),
 			'mouseover.owl.autoplay': $.proxy(function() {
-				if (this.owl.options.autoplayHoverPause) {
+				if (this.core.settings.autoplayHoverPause) {
 					this.pause();
 				}
 			}, this),
 			'mouseleave.owl.autoplay': $.proxy(function() {
-				if (this.owl.options.autoplayHoverPause) {
+				if (this.core.settings.autoplayHoverPause) {
 					this.autoplay();
 				}
 			}, this)
 		};
 
-		this.owl.dom.$el.on(this.handlers);
+		this.core.dom.$el.on(this.handlers);
 	};
 
 	/**
@@ -2786,15 +2661,14 @@
 	 * @todo Must be documented.
 	 */
 	Autoplay.prototype.autoplay = function() {
-		if (this.owl.options.autoplay && !this.owl.state.videoPlay) {
-			window.clearInterval(this.apInterval);
+		if (this.core.settings.autoplay && !this.core.state.videoPlay) {
+			window.clearInterval(this.interval);
 
-			this.apInterval = window.setInterval($.proxy(function() {
+			this.interval = window.setInterval($.proxy(function() {
 				this.play();
-			}, this), this.owl.options.autoplayTimeout);
+			}, this), this.core.settings.autoplayTimeout);
 		} else {
-			window.clearInterval(this.apInterval);
-			this.autoplayState = false;
+			window.clearInterval(this.interval);
 		}
 	};
 
@@ -2809,30 +2683,20 @@
 	Autoplay.prototype.play = function(timeout, speed) {
 		// if tab is inactive - doesnt work in <IE10
 		if (document.hidden === true) {
-			return false;
+			return;
 		}
 
-		// overwrite default options (custom options are always priority)
-		if (!this.owl.options.autoplay) {
-			this.owl._options.autoplay = this.owl.options.autoplay = true;
-			this.owl._options.autoplayTimeout = this.owl.options.autoplayTimeout = timeout
-				|| this.owl.options.autoplayTimeout || 4000;
-			this.owl._options.autoplaySpeed = speed || this.owl.options.autoplaySpeed;
+		if (this.core.state.isTouch || this.core.state.isScrolling
+			|| this.core.state.isSwiping || this.core.state.inMotion) {
+			return;
 		}
 
-		if (this.owl.options.autoplay === false || this.owl.state.isTouch || this.owl.state.isScrolling
-			|| this.owl.state.isSwiping || this.owl.state.inMotion) {
-			window.clearInterval(this.apInterval);
-			return false;
+		if (this.core.settings.autoplay === false) {
+			window.clearInterval(this.interval);
+			return;
 		}
 
-		if (!this.owl.options.loop && this.owl.pos.current >= this.owl.pos.max) {
-			window.clearInterval(this.e._autoplay);
-			this.owl.to(0);
-		} else {
-			this.owl.next(this.owl.options.autoplaySpeed);
-		}
-		this.autoplayState = true;
+		this.core.next(this.core.settings.autoplaySpeed);
 	};
 
 	/**
@@ -2840,9 +2704,7 @@
 	 * @public
 	 */
 	Autoplay.prototype.stop = function() {
-		this.owl._options.autoplay = this.owl.options.autoplay = false;
-		this.autoplayState = false;
-		window.clearInterval(this.apInterval);
+		window.clearInterval(this.interval);
 	};
 
 	/**
@@ -2850,7 +2712,7 @@
 	 * @public
 	 */
 	Autoplay.prototype.pause = function() {
-		window.clearInterval(this.apInterval);
+		window.clearInterval(this.interval);
 	};
 
 	/**
@@ -2859,10 +2721,10 @@
 	Autoplay.prototype.destroy = function() {
 		var handler, property;
 
-		window.clearInterval(this.apInterval);
+		window.clearInterval(this.interval);
 
 		for (handler in this.handlers) {
-			this.owl.dom.$el.off(handler, this.handlers[handler]);
+			this.core.dom.$el.off(handler, this.handlers[handler]);
 		}
 		for (property in Object.getOwnPropertyNames(this)) {
 			typeof this[property] != 'function' && (this[property] = null);
@@ -2883,65 +2745,101 @@
 	'use strict';
 
 	/**
-	 * Creates the animate plugin.
+	 * Creates the navigation plugin.
 	 * @class The Navigation Plugin
 	 * @param {Owl} carousel - The Owl Carousel.
 	 */
 	var Navigation = function(carousel) {
-		// define members
+		/**
+		 * Reference to the core.
+		 * @type {Owl}
+		 */
 		this.core = carousel;
-		this.core.options = $.extend({}, Navigation.Defaults, this.core.options);
-		this.refreshing = false;
+
+		/**
+		 * Indicates whether the plugin is initialized or not.
+		 * @type {Boolean}
+		 */
 		this.initialized = false;
-		this.page = null;
+
+		/**
+		 * The current paging indexes.
+		 * @type {Array}
+		 */
 		this.pages = [];
+
+		/**
+		 * All DOM elements of the user interface.
+		 * @type {Object}
+		 */
 		this.controls = {};
+
+		/**
+		 * Markup for an indicator.
+		 * @type {String}
+		 */
 		this.template = null;
+
+		/**
+		 * The carousel element.
+		 * @type {jQuery}
+		 */
 		this.$element = this.core.dom.$el;
 
-		// check plugin is enabled
-		if (!this.core.options.nav && !this.core.options.dots) {
-			return false;
-		}
+		/**
+		 * Overridden methods of the carousel.
+		 * @type {Object}
+		 */
+		this.overrides = {
+			next: this.core.next,
+			prev: this.core.prev,
+			to: this.core.to
+		};
 
-		// define the event handlers
+		/**
+		 * All event handlers.
+		 * @type {Object}
+		 */
 		this.handlers = {
-			'initialized.owl.carousel': $.proxy(function() {
-				if (!this.initialized) {
-					this.initialize();
-				}
-			}, this),
 			'changed.owl.carousel': $.proxy(function(e) {
-				if (e.property.name == 'items' && this.initialized) {
+				if (e.property.name == 'items') {
+					if (!this.initialized) {
+						this.initialize();
+						this.initialized = true;
+					}
 					this.update();
+					this.draw();
 				}
 				if (this.filling) {
-					e.property.value.data('owl-item').dot
-						= $(':first-child', e.property.value).find('[data-dot]').andSelf().data('dot');
+					e.property.value.data('owl-item').dot = $(':first-child', e.property.value)
+						.find('[data-dot]').andSelf().data('dot');
 				}
 			}, this),
 			'change.owl.carousel': $.proxy(function(e) {
 				if (e.property.name == 'position' && !this.core.state.revert
-					&& !this.core.options.loop && this.core.options.navRewind) {
-					var position = this.core.pos;
-					e.data = e.property.value > position.max
-						? position.current >= position.max ? position.min : position.max
-						: e.property.value < 0 ? position.max : e.property.value;
+					&& !this.core.settings.loop && this.core.settings.navRewind) {
+					var current = this.core.current(),
+						maximum = this.core.maximum(),
+						minimum = this.core.minimum();
+					e.data = e.property.value > maximum
+						? current >= maximum ? minimum : maximum
+						: e.property.value < minimum ? maximum : e.property.value;
 				}
-				this.filling
-					= this.core.options.dotsData && e.property.name == 'item' && e.property.value && e.property.value.is(':empty');
-			}, this),
-			'refresh.owl.carousel refreshed.owl.carousel': $.proxy(function(e) {
-				this.refreshing = e.type == 'refresh';
+				this.filling = this.core.settings.dotsData && e.property.name == 'item'
+					&& e.property.value && e.property.value.is(':empty');
 			}, this),
 			'refreshed.owl.carousel': $.proxy(function() {
 				if (this.initialized) {
-					this.refresh();
+					this.update();
+					this.draw();
 				}
 			}, this)
 		};
 
-		// register the event handlers
+		// set default options
+		this.core.options = $.extend({}, Navigation.Defaults, this.core.options);
+
+		// register event handlers
 		this.$element.on(this.handlers);
 	}
 
@@ -2971,15 +2869,12 @@
 	}
 
 	/**
-	 * Initializes the plugin.
+	 * Initializes the layout of the plugin and extends the carousel.
 	 * @protected
 	 */
 	Navigation.prototype.initialize = function() {
-		var $container,
-			options = this.core.options;
-
-		// refresh internal data
-		this.refresh();
+		var $container, override,
+			options = this.core.settings;
 
 		// create the indicator template
 		if (!options.dotsData) {
@@ -2997,51 +2892,46 @@
 		}
 
 		// create DOM structure for absolute navigation
-		if (options.dots) {
-			this.$indicators = options.dotsContainer ? $(options.dotsContainer)
-				: $('<div>').addClass(options.dotsClass).appendTo(this.controls.$container);
+		this.controls.$indicators = options.dotsContainer ? $(options.dotsContainer)
+			: $('<div>').hide().addClass(options.dotsClass).appendTo(this.controls.$container);
 
-			this.$indicators.on(this.core.dragType[2], 'div', $.proxy(function(e) {
-				var index = $(e.target).parent().is(this.$indicators)
-					? $(e.target).index() : $(e.target).parent().index();
+		this.controls.$indicators.on(this.core.dragType[2], 'div', $.proxy(function(e) {
+			var index = $(e.target).parent().is(this.controls.$indicators)
+				? $(e.target).index() : $(e.target).parent().index();
 
-				e.preventDefault();
+			e.preventDefault();
 
-				this.core.to(
-					this.pages[index].start,
-					options.dotsSpeed
-				);
-			}, this));
-		}
+			this.to(index, options.dotsSpeed);
+		}, this));
 
 		// create DOM structure for relative navigation
-		if (options.nav) {
-			$container = options.navContainer ? $(options.navContainer)
-				: $('<div>').addClass(options.navContainerClass).prependTo(this.controls.$container);
+		$container = options.navContainer ? $(options.navContainer)
+			: $('<div>').addClass(options.navContainerClass).prependTo(this.controls.$container);
 
-			this.controls.$next = $('<' + options.navElement + '>');
-			this.controls.$previous = this.controls.$next.clone();
+		this.controls.$next = $('<' + options.navElement + '>');
+		this.controls.$previous = this.controls.$next.clone();
 
-			this.controls.$previous
-				.addClass(options.navClass[0])
-				.text(options.navText[0])
-				.prependTo($container)
-				.on(this.core.dragType[2], $.proxy(function(e) {
-					this.core.to(this.core.pos.current - options.slideBy);
-				}, this));
-			this.controls.$next
-				.addClass(options.navClass[1])
-				.text(options.navText[1])
-				.appendTo($container)
-				.on(this.core.dragType[2], $.proxy(function(e) {
-					this.core.to(this.core.pos.current + options.slideBy);
-				}, this));
+		this.controls.$previous
+			.addClass(options.navClass[0])
+			.html(options.navText[0])
+			.hide()
+			.prependTo($container)
+			.on(this.core.dragType[2], $.proxy(function(e) {
+				this.prev();
+			}, this));
+		this.controls.$next
+			.addClass(options.navClass[1])
+			.html(options.navText[1])
+			.hide()
+			.appendTo($container)
+			.on(this.core.dragType[2], $.proxy(function(e) {
+				this.next();
+			}, this));
+
+		// override public methods of the carousel
+		for (override in this.overrides) {
+			this.core[override] = $.proxy(this[override], this);
 		}
-
-		// update the created DOM structures
-		this.update();
-
-		this.initialized = true;
 	}
 
 	/**
@@ -3049,7 +2939,7 @@
 	 * @protected
 	 */
 	Navigation.prototype.destroy = function() {
-		var handler, control, property;
+		var handler, control, property, override;
 
 		for (handler in this.handlers) {
 			this.$element.off(handler, this.handlers[handler]);
@@ -3057,32 +2947,28 @@
 		for (control in this.controls) {
 			this.controls[control].remove();
 		}
+		for (override in this.overides) {
+			this.core[override] = this.overrides[override];
+		}
 		for (property in Object.getOwnPropertyNames(this)) {
 			typeof this[property] != 'function' && (this[property] = null);
 		}
 	}
 
 	/**
-	 * Refreshes the internal data of the plugin.
+	 * Updates the internal state.
 	 * @protected
 	 */
-	Navigation.prototype.refresh = function() {
+	Navigation.prototype.update = function() {
 		var i, j, k,
-			options = this.core.options,
+			options = this.core.settings,
 			lower = this.core.num.cItems / 2,
 			upper = this.core.num.items - lower,
-			items = this.core.num.oItems,
 			size = options.center || options.autoWidth || options.dotData
 				? 1 : options.dotsEach || options.items;
 
-		if (options.nav) {
-			options.navRewind = items > options.items || options.center;
-
-			if (options.slideBy && options.slideBy === 'page') {
-				options.slideBy = options.items;
-			} else {
-				options.slideBy = Math.min(options.slideBy, options.items);
-			}
+		if (options.slideBy !== 'page') {
+			options.slideBy = Math.min(options.slideBy, options.items);
 		}
 
 		if (options.dots) {
@@ -3102,39 +2988,40 @@
 	}
 
 	/**
-	 * Updates the DOM structures of the plugin.
+	 * Draws the user interface.
 	 * @protected
 	 */
-	Navigation.prototype.update = function() {
+	Navigation.prototype.draw = function() {
 		var difference, i, html = '',
-			options = this.core.options,
+			options = this.core.settings,
 			$items = this.core.dom.$oItems,
-			index = this.core.pos.current;
+			index = this.core.normalize(this.core.current(), true);
 
 		if (options.nav && !options.loop && !options.navRewind) {
 			this.controls.$previous.toggleClass('disabled', index <= 0);
-			this.controls.$next.toggleClass('disabled', index >= this.core.pos.max);
+			this.controls.$next.toggleClass('disabled', index >= this.core.maximum());
 		}
 
-		if (options.dots) {
-			difference = this.pages.length - this.$indicators.children().length;
+		this.controls.$previous.toggle(options.nav);
+		this.controls.$next.toggle(options.nav);
 
-			this.page = $.grep(this.pages, function(o) {
-				return o.start <= index && o.end >= index;
-			}).pop();
+		if (options.dots) {
+			difference = this.pages.length - this.controls.$indicators.children().length;
 
 			if (difference > 0) {
 				for (i = 0; i < Math.abs(difference); i++) {
 					html += options.dotData ? $items.eq(i).data('owl-item').dot : this.template;
 				}
-				this.$indicators.append(html);
+				this.controls.$indicators.append(html);
 			} else if (difference < 0) {
-				this.$indicators.children().slice(difference).remove();
+				this.controls.$indicators.children().slice(difference).remove();
 			}
 
-			this.$indicators.find('.active').removeClass('active');
-			this.$indicators.children().eq(this.pages.indexOf(this.page) % $items.length).addClass('active');
+			this.controls.$indicators.find('.active').removeClass('active');
+			this.controls.$indicators.children().eq($.inArray(this.current(), this.pages)).addClass('active');
 		}
+
+		this.controls.$indicators.toggle(options.dots);
 	}
 
 	/**
@@ -3143,14 +3030,84 @@
 	 * @param {Event} event - The event object which gets thrown.
 	 */
 	Navigation.prototype.onTrigger = function(event) {
-		var options = this.core.options;
+		var options = this.core.settings;
 
 		event.page = {
-			index: this.pages.indexOf(this.page),
+			index: $.inArray(this.current(), this.pages),
 			count: this.pages.length,
 			size: options.center || options.autoWidth || options.dotData
 				? 1 : options.dotsEach || options.items
 		};
+	}
+
+	/**
+	 * Gets the current page position of the carousel.
+	 * @protected
+	 * @returns {Number}
+	 */
+	Navigation.prototype.current = function() {
+		var index = this.core.normalize(this.core.current(), true);
+		return $.grep(this.pages, function(o) {
+			return o.start <= index && o.end >= index;
+		}).pop();
+	}
+
+	/**
+	 * Gets the current succesor/predecessor position.
+	 * @protected
+	 * @returns {Number}
+	 */
+	Navigation.prototype.getPosition = function(successor) {
+		var position, length,
+			options = this.core.settings;
+
+		if (options.slideBy == 'page') {
+			position = $.inArray(this.current(), this.pages);
+			length = this.pages.length;
+			successor ? ++position : --position;
+			position = this.pages[((position % length) + length) % length].start;
+		} else {
+			position = this.core.normalize(this.core.current(), true);
+			length = this.core.num.oItems;
+			successor ? position += options.slideBy : position -= options.slideBy;
+		}
+		return position;
+	}
+
+	/**
+	 * Slides to the next item or page.
+	 * @public
+	 * @param {Number} [speed=false] - The time in milliseconds for the transition.
+	 */
+	Navigation.prototype.next = function(speed) {
+		$.proxy(this.overrides.to, this.core)(this.getPosition(true), speed);
+	}
+
+	/**
+	 * Slides to the previous item or page.
+	 * @public
+	 * @param {Number} [speed=false] - The time in milliseconds for the transition.
+	 */
+	Navigation.prototype.prev = function(speed) {
+		$.proxy(this.overrides.to, this.core)(this.getPosition(false), speed);
+	}
+
+	/**
+	 * Slides to the specified item or page.
+	 * @public
+	 * @param {Number} position - The position of the item or page.
+	 * @param {Number} [speed] - The time in milliseconds for the transition.
+	 * @param {Boolean} [standard=false] - Whether to use the standard behaviour or not.
+	 */
+	Navigation.prototype.to = function(position, speed, standard) {
+		var length;
+
+		if (!standard) {
+			length = this.pages.length;
+			$.proxy(this.overrides.to, this.core)(this.pages[((position % length) + length) % length].start, speed);
+		} else {
+			$.proxy(this.overrides.to, this.core)(position, speed);
+		}
 	}
 
 	$.fn.owlCarousel.Constructor.Plugins.Navigation = Navigation;
@@ -3172,18 +3129,28 @@
 	 * @param {Owl} carousel - The Owl Carousel
 	 */
 	var Hash = function(carousel) {
-		// define members
-		this.carousel = carousel;
-		this.options = $.extend({}, Hash.Defaults, this.carousel.options);
+		/**
+		 * Reference to the core.
+		 * @type {Owl}
+		 */
+		this.core = carousel;
+
+		/**
+		 * Hash table for the hashes.
+		 * @type {Object}
+		 */
 		this.hashes = {};
-		this.$element = this.carousel.dom.$el;
 
-		// check plugin is enabled
-		if (!this.options.URLhashListener) {
-			return false;
-		}
+		/**
+		 * The carousel element.
+		 * @type {jQuery}
+		 */
+		this.$element = this.core.dom.$el;
 
-		// defines event handlers
+		/**
+		 * All event handlers.
+		 * @type {Object}
+		 */
 		this.handlers = {
 			'initialized.owl.carousel': $.proxy(function() {
 				if (window.location.hash.substring(1)) {
@@ -3198,12 +3165,16 @@
 				}
 			}, this),
 			'change.owl.carousel': $.proxy(function(e) {
-				if (e.property.name == 'position' && e.property.value == 'URLHash') {
+				if (e.property.name == 'position' && this.core.current() === undefined
+					&& this.core.settings.startPosition == 'URLHash') {
 					e.data = this.hashes[window.location.hash.substring(1)];
 				}
 				this.filling = e.property.name == 'item' && e.property.value && e.property.value.is(':empty');
 			}, this),
 		};
+
+		// set default options
+		this.core.options = $.extend({}, Hash.Defaults, this.core.options);
 
 		// register the event handlers
 		this.$element.on(this.handlers);
@@ -3211,14 +3182,15 @@
 		// register event listener for hash navigation
 		$(window).on('hashchange.owl.navigation', $.proxy(function() {
 			var hash = window.location.hash.substring(1),
-				position = this.hashes[hash] && this.hashes[hash].index() || 0;
+				items = this.core.dom.$oItems,
+				position = this.hashes[hash] && items.index(this.hashes[hash]) || 0;
 
 			if (!hash) {
 				return false;
 			}
 
-			this.carousel.dom.oStage.scrollLeft = 0;
-			this.carousel.to(position);
+			this.core.dom.oStage.scrollLeft = 0;
+			this.core.to(position, false, true);
 		}, this));
 	}
 

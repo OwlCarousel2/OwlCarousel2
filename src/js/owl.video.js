@@ -17,7 +17,7 @@
 
 		this.handlers = {
 			'resize.owl.carousel': $.proxy(function(e) {
-				if (this.owl.options.video && !this.isInFullScreen()) {
+				if (this.owl.settings.video && !this.isInFullScreen()) {
 					e.preventDefault();
 				}
 			}, this),
@@ -27,7 +27,7 @@
 				}
 			}, this),
 			'refresh.owl.carousel refreshed.owl.carousel': $.proxy(function(e) {
-				if (!this.owl.options.video) {
+				if (!this.owl.settings.video) {
 					return false;
 				}
 				this.refreshing = e.type == 'refresh';
@@ -91,8 +91,8 @@
 		var info, type, id, dimensions,
 			vimeoId = videoEl.data('vimeo-id'),
 			youTubeId = videoEl.data('youtube-id'),
-			width = videoEl.data('width') || this.owl.options.videoWidth,
-			height = videoEl.data('height') || this.owl.options.videoHeight,
+			width = videoEl.data('width') || this.owl.settings.videoWidth,
+			height = videoEl.data('height') || this.owl.settings.videoHeight,
 			url = videoEl.attr('href');
 
 		if (vimeoId) {
@@ -148,7 +148,7 @@
 			lazyClass = '',
 			that = this.owl;
 
-		if (this.owl.options.lazyLoad) {
+		if (this.owl.settings.lazyLoad) {
 			srcType = 'data-src';
 			lazyClass = 'owl-lazy';
 		}
@@ -164,7 +164,7 @@
 		function addThumbnail(tnPath) {
 			icon = '<div class="owl-video-play-icon"></div>';
 
-			if (that.options.lazyLoad) {
+			if (that.settings.lazyLoad) {
 				tnLink = '<div class="owl-video-tn ' + lazyClass + '" ' + srcType + '="' + tnPath + '"></div>';
 			} else {
 				tnLink = '<div class="owl-video-tn" style="opacity:1;background-image:url(' + tnPath + ')"></div>';
@@ -185,7 +185,7 @@
 				success: function(data) {
 					path = data[0].thumbnail_large;
 					addThumbnail(path);
-					if (that.options.loop) {
+					if (that.settings.loop) {
 						that.updateActiveItems();
 					}
 				}
@@ -218,11 +218,11 @@
 		}
 		var videoLink, videoWrap, videoType,
 			target = $(ev.target || ev.srcElement),
-			item = target.closest('.' + this.owl.options.itemClass);
+			item = target.closest('.' + this.owl.settings.itemClass);
 
 		videoType = item.data('owl-item').videoType, id = item.data('owl-item').videoId, width = item
 			.data('owl-item').videoWidth
-			|| Math.floor(item.data('owl-item').width - this.owl.options.margin), height = item.data('owl-item').videoHeight
+			|| Math.floor(item.data('owl-item').width - this.owl.settings.margin), height = item.data('owl-item').videoHeight
 			|| this.owl.dom.$stage.height();
 
 		if (videoType === 'youtube') {
@@ -255,7 +255,7 @@
 			|| document.webkitFullscreenElement;
 		if (fullscreenElement) {
 			if ($(fullscreenElement.parentNode).hasClass('owl-video-frame')) {
-				this.owl.setSpeed(0);
+				this.owl.speed(0);
 				this.owl.state.isFullScreen = true;
 			}
 		}
