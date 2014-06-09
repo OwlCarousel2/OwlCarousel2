@@ -29,7 +29,7 @@
 				this.swapping = e.type == 'translated';
 			}, this),
 			'translate.owl.carousel': $.proxy(function(e) {
-				if (this.swapping) {
+				if (this.swapping && (this.core.options.animateOut || this.core.options.animateIn)) {
 					this.swap();
 				}
 			}, this)
