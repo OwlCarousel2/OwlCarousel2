@@ -1078,6 +1078,7 @@
 			animatedPos = this.getTransformProperty();
 			this.drag.offsetX = animatedPos;
 			this.animate(animatedPos);
+			this.state.inMotion = true;
 		} else if (this.state.inMotion && !this.support3d) {
 			this.state.inMotion = false;
 			return false;

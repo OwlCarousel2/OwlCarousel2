@@ -16,8 +16,8 @@
 		this.owl.options = $.extend({}, AutoHeight.Defaults, this.owl.options);
 
 		this.handlers = {
-			'refreshed.owl.carousel changed.owl.carousel': $.proxy(function() {
-				if (this.owl.settings.autoHeight) {
+			'changed.owl.carousel': $.proxy(function(e) {
+				if (e.property.name == 'position' && this.owl.settings.autoHeight){
 					this.setHeight();
 				}
 			}, this)

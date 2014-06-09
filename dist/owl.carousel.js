@@ -1078,6 +1078,7 @@
 			animatedPos = this.getTransformProperty();
 			this.drag.offsetX = animatedPos;
 			this.animate(animatedPos);
+			this.state.inMotion = true;
 		} else if (this.state.inMotion && !this.support3d) {
 			this.state.inMotion = false;
 			return false;
@@ -2125,8 +2126,8 @@
 		this.owl.options = $.extend({}, AutoHeight.Defaults, this.owl.options);
 
 		this.handlers = {
-			'refreshed.owl.carousel changed.owl.carousel': $.proxy(function() {
-				if (this.owl.settings.autoHeight) {
+			'changed.owl.carousel': $.proxy(function(e) {
+				if (e.property.name == 'position' && this.owl.settings.autoHeight){
 					this.setHeight();
 				}
 			}, this)
@@ -2519,7 +2520,7 @@
 				this.swapping = e.type == 'translated';
 			}, this),
 			'translate.owl.carousel': $.proxy(function(e) {
-				if (this.swapping) {
+				if (this.swapping && (this.core.options.animateOut || this.core.options.animateIn)) {
 					this.swap();
 				}
 			}, this)
