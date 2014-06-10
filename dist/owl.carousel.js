@@ -2918,7 +2918,7 @@
 			.hide()
 			.prependTo($container)
 			.on(this.core.dragType[2], $.proxy(function(e) {
-				this.prev();
+				this.prev(options.navSpeed);
 			}, this));
 		this.controls.$next
 			.addClass(options.navClass[1])
@@ -2926,7 +2926,7 @@
 			.hide()
 			.appendTo($container)
 			.on(this.core.dragType[2], $.proxy(function(e) {
-				this.next();
+				this.next(options.navSpeed);
 			}, this));
 
 		// override public methods of the carousel
