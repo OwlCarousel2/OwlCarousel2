@@ -1608,10 +1608,11 @@
 	/**
 	 * Adds an item.
 	 * @public
-	 * @param {HTMLElement|jQuery|String} content - The item content to add.
+	 * @param {HTMLElement|jQuery|String} content - The content of the item to add.
 	 * @param {Number} [position=0] - The position at which to insert the item.
+	 * @param {Boolean} [after=false] - Whether the content should be added before or after the position.
 	 */
-	Owl.prototype.addItem = function(content, position) {
+	Owl.prototype.add = function(content, position, after) {
 		var $item = this.createItemContainer();
 
 		position = position || 0;
@@ -1622,10 +1623,10 @@
 			this.dom.$stage.append($item);
 		} else {
 			// append item
-			if (pos !== -1) {
-				this.dom.$oItems.eq(position).before($item);
-			} else {
+			if (after) {
 				this.dom.$oItems.eq(position).after($item);
+			} else {
+				this.dom.$oItems.eq(position).before($item);
 			}
 		}
 		// update and calculate carousel
@@ -1637,8 +1638,8 @@
 	 * @public
 	 * @param {Number} pos - The position of the item.
 	 */
-	Owl.prototype.removeItem = function(pos) {
-		this.dom.$oItems.eq(pos).remove();
+	Owl.prototype.remove = function(position) {
+		this.dom.$oItems.eq(position).remove();
 		this.refresh();
 	};
 
@@ -1664,8 +1665,8 @@
 			'destroy': this.destroy,
 			'refresh': this.refresh,
 			'replace': this.insertContent,
-			'add': this.addItem,
-			'remove': this.removeItem
+			'add': this.add,
+			'remove': this.remove
 		}, $.proxy(function(event, callback) {
 			this.dom.$el.on(event + '.owl.carousel', handler(callback, event + '.owl.carousel'));
 		}, this));
