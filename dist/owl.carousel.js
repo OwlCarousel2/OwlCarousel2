@@ -3213,7 +3213,7 @@
 		$(window).off('hashchange.owl.navigation');
 
 		for (handler in this.handlers) {
-			this.owl.dom.$el.off(handler, this.handlers[handler]);
+			this.core.dom.$el.off(handler, this.handlers[handler]);
 		}
 		for (property in Object.getOwnPropertyNames(this)) {
 			typeof this[property] != 'function' && (this[property] = null);
