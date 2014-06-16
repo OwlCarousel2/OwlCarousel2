@@ -968,6 +968,24 @@
 	};
 
 	/**
+	 * Checks for touch/mouse drag event type and add run event handlers.
+	 * @protected
+	 */
+	Owl.prototype.eventsRouter = function(event) {
+		var type = event.type;
+
+		if (type === "mousedown" || type === "touchstart") {
+			this.onDragStart(event);
+		} else if (type === "mousemove" || type === "touchmove") {
+			this.onDragMove(event);
+		} else if (type === "mouseup" || type === "touchend") {
+			this.onDragEnd(event);
+		} else if (type === "touchcancel") {
+			this.onDragEnd(event);
+		}
+	};
+
+	/**
 	 * Checks for touch/mouse drag options and add necessery event handlers.
 	 * @protected
 	 */
@@ -975,33 +993,20 @@
 		var isTouch = isTouchSupport(),
 			isTouchIE = isTouchSupportIE();
 
-		if (isTouch && !isTouchIE) {
-			this.dragType = [ 'touchstart', 'touchmove', 'touchend', 'touchcancel' ];
-		} else if (isTouch && isTouchIE) {
-			this.dragType = [ 'MSPointerDown', 'MSPointerMove', 'MSPointerUp', 'MSPointerCancel' ];
-		} else {
-			this.dragType = [ 'mousedown', 'mousemove', 'mouseup' ];
-		}
-
-		if ((isTouch || isTouchIE) && this.settings.touchDrag) {
-			// touch cancel event
-			this.on(document, this.dragType[3], this.e._onDragEnd);
-
-		} else {
-			// firefox startdrag fix - addeventlistener doesnt work here :/
+		if (this.settings.mouseDrag){
+			this.dom.$stage.on('mousedown', $.proxy(function(event) {this.eventsRouter(event)},this));
 			this.dom.$stage.on('dragstart', function() {
 				return false;
 			});
+			this.dom.stage.onselectstart = function() {
+				return false;
+			};
+		} else {
+			this.dom.$el.addClass('owl-text-select-on');
+		}
 
-			if (this.settings.mouseDrag) {
-				// disable text select
-				this.dom.stage.onselectstart = function() {
-					return false;
-				};
-			} else {
-				// enable text select
-				this.dom.$el.addClass('owl-text-select-on');
-			}
+		if (this.settings.touchDrag && !isTouchIE){
+			this.dom.$stage.on('touchstart touchcancel', $.proxy(function(event) {this.eventsRouter(event)},this));
 		}
 
 		// Catch transitionEnd event
@@ -1014,22 +1019,6 @@
 			this.on(window, 'resize', this.e._resizer, false);
 		}
 
-		this.dragEvents();
-	};
-
-	/**
-	 * Triggers event handlers for drag events.
-	 * @protected
-	 */
-	Owl.prototype.dragEvents = function() {
-
-		if (this.settings.touchDrag && (this.dragType[0] === 'touchstart' || this.dragType[0] === 'MSPointerDown')) {
-			this.on(this.dom.stage, this.dragType[0], this.e._onDragStart, false);
-		} else if (this.settings.mouseDrag && this.dragType[0] === 'mousedown') {
-			this.on(this.dom.stage, this.dragType[0], this.e._onDragStart, false);
-		} else {
-			this.off(this.dom.stage, this.dragType[0], this.e._onDragStart);
-		}
 	};
 
 	/**
@@ -1043,11 +1032,11 @@
 		ev = event.originalEvent || event || window.event;
 
 		// prevent right click
-		if (ev.which === 3) {
+		if (ev.which === 3 || this.state.isTouch) {
 			return false;
 		}
 
-		if (this.dragType[0] === 'mousedown') {
+		if (ev.type === 'mousedown') {
 			this.dom.$stage.addClass('owl-grab');
 		}
 
@@ -1059,10 +1048,8 @@
 		this.state.isSwiping = false;
 		this.drag.distance = 0;
 
-		// if is 'touchstart'
-		isTouchEvent = ev.type === 'touchstart';
-		pageX = isTouchEvent ? event.targetTouches[0].pageX : (ev.pageX || ev.clientX);
-		pageY = isTouchEvent ? event.targetTouches[0].pageY : (ev.pageY || ev.clientY);
+        pageX = getTouches(ev).x;
+        pageY = getTouches(ev).y;
 
 		// get stage position left
 		this.drag.offsetX = this.dom.$stage.position().left - this.settings.stagePadding;
@@ -1097,8 +1084,7 @@
 			this.drag.targetEl.draggable = false;
 		}
 
-		this.on(document, this.dragType[1], this.e._onDragMove, false);
-		this.on(document, this.dragType[2], this.e._onDragEnd, false);
+		$(document).on('mousemove.owl.dragEvents mouseup.owl.dragEvents touchmove.owl.dragEvents touchend.owl.dragEvents', $.proxy(function(event) {this.eventsRouter(event)},this));
 	};
 
 	/**
@@ -1120,10 +1106,8 @@
 
 		ev = event.originalEvent || event || window.event;
 
-		// if is 'touchstart'
-		isTouchEvent = ev.type == 'touchmove';
-		pageX = isTouchEvent ? ev.targetTouches[0].pageX : (ev.pageX || ev.clientX);
-		pageY = isTouchEvent ? ev.targetTouches[0].pageY : (ev.pageY || ev.clientY);
+        pageX = getTouches(ev).x;
+        pageY = getTouches(ev).y;
 
 		// Drag Direction
 		this.drag.currentX = pageX - this.drag.startX;
@@ -1177,13 +1161,13 @@
 	 * Handles the touchend/mouseup events.
 	 * @protected
 	 */
-	Owl.prototype.onDragEnd = function() {
+	Owl.prototype.onDragEnd = function(event) {
 		var compareTimes, distanceAbs, closest;
 
 		if (!this.state.isTouch) {
 			return;
 		}
-		if (this.dragType[0] === 'mousedown') {
+		if (event.type === 'mouseup') {
 			this.dom.$stage.removeClass('owl-grab');
 		}
 
@@ -1228,8 +1212,7 @@
 
 		this.drag.distance = 0;
 
-		this.off(document, this.dragType[1], this.e._onDragMove);
-		this.off(document, this.dragType[2], this.e._onDragEnd);
+		$(document).off('.owl.dragEvents');
 	};
 
 	/**
@@ -1749,17 +1732,13 @@
 		}
 
 		if (this.settings.mouseDrag || this.settings.touchDrag) {
-			this.off(this.dom.stage, this.dragType[0], this.e._onDragStart);
-			if (this.settings.mouseDrag) {
-				this.off(document, this.dragType[3], this.e._onDragStart);
-			}
-			if (this.settings.mouseDrag) {
-				this.dom.$stage.off('dragstart', function() {
-					return false;
-				});
-				this.dom.stage.onselectstart = function() {
-				};
-			}
+
+			this.dom.$stage.off('mousedown touchstart touchcancel');
+			$(document).off('.owl.dragEvents');
+			this.dom.stage.onselectstart = function() {};
+			this.dom.$stage.off('dragstart', function() {
+				return false;
+			});
 		}
 
 		// Remove event handlers in the ".owl.carousel" namespace
@@ -1912,6 +1891,38 @@
 
 		this.state.orientation = window.orientation;
 	};
+
+	/**
+	 * Get touch/drag coordinats.
+	 * @private
+	 * @param {event} - mousedown/touchstart event
+	 * @returns {object} - Contains X and Y of current mouse/touch position
+	 */
+
+	function getTouches(event) {
+		if (event.touches !== undefined) {
+			return {
+				x: event.touches[0].pageX,
+				y: event.touches[0].pageY
+			};
+		}
+
+		if (event.touches === undefined) {
+			if (event.pageX !== undefined) {
+				return {
+					x: event.pageX,
+					y: event.pageY
+				};
+			}
+
+		if (event.pageX === undefined) {
+			return {
+					x: event.clientX,
+					y: event.clientY
+				};
+			}
+		}
+	}
 
 	/**
 	 * Checks for CSS support.
@@ -2896,7 +2907,7 @@
 		this.controls.$indicators = options.dotsContainer ? $(options.dotsContainer)
 			: $('<div>').hide().addClass(options.dotsClass).appendTo(this.controls.$container);
 
-		this.controls.$indicators.on(this.core.dragType[2], 'div', $.proxy(function(e) {
+		this.controls.$indicators.on('click', 'div', $.proxy(function(e) {
 			var index = $(e.target).parent().is(this.controls.$indicators)
 				? $(e.target).index() : $(e.target).parent().index();
 
@@ -2917,7 +2928,7 @@
 			.html(options.navText[0])
 			.hide()
 			.prependTo($container)
-			.on(this.core.dragType[2], $.proxy(function(e) {
+			.on('click', $.proxy(function(e) {
 				this.prev(options.navSpeed);
 			}, this));
 		this.controls.$next
@@ -2925,7 +2936,7 @@
 			.html(options.navText[1])
 			.hide()
 			.appendTo($container)
-			.on(this.core.dragType[2], $.proxy(function(e) {
+			.on('click', $.proxy(function(e) {
 				this.next(options.navSpeed);
 			}, this));
 

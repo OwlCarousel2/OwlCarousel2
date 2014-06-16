@@ -158,7 +158,7 @@
 		this.controls.$indicators = options.dotsContainer ? $(options.dotsContainer)
 			: $('<div>').hide().addClass(options.dotsClass).appendTo(this.controls.$container);
 
-		this.controls.$indicators.on(this.core.dragType[2], 'div', $.proxy(function(e) {
+		this.controls.$indicators.on('click', 'div', $.proxy(function(e) {
 			var index = $(e.target).parent().is(this.controls.$indicators)
 				? $(e.target).index() : $(e.target).parent().index();
 
@@ -179,7 +179,7 @@
 			.html(options.navText[0])
 			.hide()
 			.prependTo($container)
-			.on(this.core.dragType[2], $.proxy(function(e) {
+			.on('click', $.proxy(function(e) {
 				this.prev(options.navSpeed);
 			}, this));
 		this.controls.$next
@@ -187,7 +187,7 @@
 			.html(options.navText[1])
 			.hide()
 			.appendTo($container)
-			.on(this.core.dragType[2], $.proxy(function(e) {
+			.on('click', $.proxy(function(e) {
 				this.next(options.navSpeed);
 			}, this));
 
