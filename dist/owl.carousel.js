@@ -967,8 +967,11 @@
 		this.width.prevWindow = this.viewport();
 	};
 
+	/**
+	 * Checks for touch/mouse drag event type and add run event handlers.
+	 * @protected
+	 */
 	Owl.prototype.eventsRouter = function(event) {
-
 		var type = event.type;
 
 		if (type === "mousedown" || type === "touchstart") {
@@ -977,7 +980,7 @@
 			this.onDragMove(event);
 		} else if (type === "mouseup" || type === "touchend") {
 			this.onDragEnd(event);
-		} else if (type === "MSPointerCancel" || type === "touchcancel") {
+		} else if (type === "touchcancel") {
 			this.onDragEnd(event);
 		}
 	};
@@ -1003,8 +1006,7 @@
 		}
 
 		if (this.settings.touchDrag && !isTouchIE){
-			this.dom.$stage.on('touchstart', $.proxy(function(event) {this.eventsRouter(event)},this));
-			this.dom.$stage.on('touchcancel MSPointerCancel', $.proxy(function(event) {this.eventsRouter(event)},this));
+			this.dom.$stage.on('touchstart touchcancel', $.proxy(function(event) {this.eventsRouter(event)},this));
 		}
 
 		// Catch transitionEnd event
@@ -1018,31 +1020,6 @@
 		}
 
 	};
-
-	function getTouches(event) {
-		if (event.touches !== undefined) {
-			return {
-				x: event.touches[0].pageX,
-				y: event.touches[0].pageY
-			};
-		}
-
-		if (event.touches === undefined) {
-			if (event.pageX !== undefined) {
-				return {
-					x: event.pageX,
-					y: event.pageY
-				};
-			}
-
-		if (event.pageX === undefined) {
-			return {
-					x: event.clientX,
-					y: event.clientY
-				};
-			}
-		}
-	}
 
 	/**
 	 * Handles touchstart/mousedown event.
@@ -1756,7 +1733,7 @@
 
 		if (this.settings.mouseDrag || this.settings.touchDrag) {
 
-			this.dom.$stage.off('mousedown touchstart');
+			this.dom.$stage.off('mousedown touchstart touchcancel');
 			$(document).off('.owl.dragEvents');
 			this.dom.stage.onselectstart = function() {};
 			this.dom.$stage.off('dragstart', function() {
@@ -1914,6 +1891,38 @@
 
 		this.state.orientation = window.orientation;
 	};
+
+	/**
+	 * Get touch/drag coordinats.
+	 * @private
+	 * @param {event} - mousedown/touchstart event
+	 * @returns {object} - Contains X and Y of current mouse/touch position
+	 */
+
+	function getTouches(event) {
+		if (event.touches !== undefined) {
+			return {
+				x: event.touches[0].pageX,
+				y: event.touches[0].pageY
+			};
+		}
+
+		if (event.touches === undefined) {
+			if (event.pageX !== undefined) {
+				return {
+					x: event.pageX,
+					y: event.pageY
+				};
+			}
+
+		if (event.pageX === undefined) {
+			return {
+					x: event.clientX,
+					y: event.clientY
+				};
+			}
+		}
+	}
 
 	/**
 	 * Checks for CSS support.
