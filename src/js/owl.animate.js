@@ -11,7 +11,7 @@
 	 * @class The Navigation Plugin
 	 * @param {Owl} scope - The Owl Carousel
 	 */
-	Animate = function(scope) {
+	var Animate = function(scope) {
 		this.core = scope;
 		this.core.options = $.extend({}, Animate.Defaults, this.core.options);
 		this.swapping = true;
@@ -35,7 +35,7 @@
 			}, this)
 		};
 
-		this.core.dom.$el.on(this.handlers);
+		this.core.$element.on(this.handlers);
 	};
 
 	/**
@@ -62,8 +62,8 @@
 
 		var left,
 			clear = $.proxy(this.clear, this),
-			previous = this.core.dom.$items.eq(this.previous),
-			next = this.core.dom.$items.eq(this.next),
+			previous = this.core.$stage.children().eq(this.previous),
+			next = this.core.$stage.children().eq(this.next),
 			incoming = this.core.settings.animateIn,
 			outgoing = this.core.settings.animateOut;
 
@@ -102,7 +102,7 @@
 		var handler, property;
 
 		for (handler in this.handlers) {
-			this.core.dom.$el.off(handler, this.handlers[handler]);
+			this.core.$element.off(handler, this.handlers[handler]);
 		}
 		for (property in Object.getOwnPropertyNames(this)) {
 			typeof this[property] != 'function' && (this[property] = null);

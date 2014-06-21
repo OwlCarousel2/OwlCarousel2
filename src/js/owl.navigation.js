@@ -15,95 +15,111 @@
 	var Navigation = function(carousel) {
 		/**
 		 * Reference to the core.
+		 * @protected
 		 * @type {Owl}
 		 */
-		this.core = carousel;
+		this._core = carousel;
 
 		/**
 		 * Indicates whether the plugin is initialized or not.
+		 * @protected
 		 * @type {Boolean}
 		 */
-		this.initialized = false;
+		this._initialized = false;
 
 		/**
 		 * The current paging indexes.
+		 * @protected
 		 * @type {Array}
 		 */
-		this.pages = [];
+		this._pages = [];
 
 		/**
 		 * All DOM elements of the user interface.
+		 * @protected
 		 * @type {Object}
 		 */
-		this.controls = {};
+		this._controls = {};
 
 		/**
 		 * Markup for an indicator.
-		 * @type {String}
+		 * @protected
+		 * @type {Array.<String>}
 		 */
-		this.template = null;
+		this._templates = [];
 
 		/**
 		 * The carousel element.
 		 * @type {jQuery}
 		 */
-		this.$element = this.core.dom.$el;
+		this.$element = this._core.$element;
 
 		/**
 		 * Overridden methods of the carousel.
+		 * @protected
 		 * @type {Object}
 		 */
-		this.overrides = {
-			next: this.core.next,
-			prev: this.core.prev,
-			to: this.core.to
+		this._overrides = {
+			next: this._core.next,
+			prev: this._core.prev,
+			to: this._core.to
 		};
 
 		/**
 		 * All event handlers.
+		 * @protected
 		 * @type {Object}
 		 */
-		this.handlers = {
-			'changed.owl.carousel': $.proxy(function(e) {
-				if (e.property.name == 'items') {
-					if (!this.initialized) {
-						this.initialize();
-						this.initialized = true;
-					}
-					this.update();
-					this.draw();
+		this._handlers = {
+			'prepared.owl.carousel': $.proxy(function(e) {
+				if (this._core.settings.dotsData) {
+					this._templates.push($(e.content).find('[data-dot]').andSelf('[data-dot]').attr('data-dot'));
 				}
-				if (this.filling) {
-					e.property.value.data('owl-item').dot = $(':first-child', e.property.value)
-						.find('[data-dot]').andSelf().data('dot');
+			}, this),
+			'add.owl.carousel': $.proxy(function(e) {
+				if (this._core.settings.dotsData) {
+					this._templates.splice(e.position, 0, $(e.content).find('[data-dot]').andSelf('[data-dot]').attr('data-dot'));
+				}
+			}, this),
+			'remove.owl.carousel prepared.owl.carousel': $.proxy(function(e) {
+				if (this._core.settings.dotsData) {
+					this._templates.splice(e.position, 1);
 				}
 			}, this),
 			'change.owl.carousel': $.proxy(function(e) {
-				if (e.property.name == 'position' && !this.core.state.revert
-					&& !this.core.settings.loop && this.core.settings.navRewind) {
-					var current = this.core.current(),
-						maximum = this.core.maximum(),
-						minimum = this.core.minimum();
-					e.data = e.property.value > maximum
-						? current >= maximum ? minimum : maximum
-						: e.property.value < minimum ? maximum : e.property.value;
+				if (e.property.name == 'position') {
+					if (!this._core.state.revert && !this._core.settings.loop && this._core.settings.navRewind) {
+						var current = this._core.current(),
+							maximum = this._core.maximum(),
+							minimum = this._core.minimum();
+						e.data = e.property.value > maximum
+							? current >= maximum ? minimum : maximum
+							: e.property.value < minimum ? maximum : e.property.value;
+					}
 				}
-				this.filling = this.core.settings.dotsData && e.property.name == 'item'
-					&& e.property.value && e.property.value.is(':empty');
 			}, this),
-			'refreshed.owl.carousel': $.proxy(function() {
-				if (this.initialized) {
-					this.update();
+			'changed.owl.carousel': $.proxy(function(e) {
+				if (e.property.name == 'position') {
 					this.draw();
 				}
+			}, this),
+			'refreshed.owl.carousel': $.proxy(function() {
+				if (!this._initialized) {
+					this.initialize();
+					this._initialized = true;
+				}
+				this._core.trigger('refresh', null, 'navigation');
+				this.update();
+				this.draw();
+				this._core.trigger('refreshed', null, 'navigation');
 			}, this)
 		};
 
 		// set default options
-		this.core.options = $.extend({}, Navigation.Defaults, this.core.options);
+		this._core.options = $.extend({}, Navigation.Defaults, this._core.options);
 
 		// register event handlers
-		this.$element.on(this.handlers);
+		this.$element.on(this._handlers);
 	}
 
 	/**
@@ -137,29 +153,29 @@
 	 */
 	Navigation.prototype.initialize = function() {
 		var $container, override,
-			options = this.core.settings;
+			options = this._core.settings;
 
 		// create the indicator template
 		if (!options.dotsData) {
-			this.template = $('<div>')
+			this._templates = [ $('<div>')
 				.addClass(options.dotClass)
 				.append($('<span>'))
-				.prop('outerHTML');
+				.prop('outerHTML') ];
 		}
 
 		// create controls container if needed
 		if (!options.navContainer || !options.dotsContainer) {
-			this.controls.$container = $('<div>')
+			this._controls.$container = $('<div>')
 				.addClass(options.controlsClass)
 				.appendTo(this.$element);
 		}
 
 		// create DOM structure for absolute navigation
-		this.controls.$indicators = options.dotsContainer ? $(options.dotsContainer)
-			: $('<div>').hide().addClass(options.dotsClass).appendTo(this.controls.$container);
+		this._controls.$indicators = options.dotsContainer ? $(options.dotsContainer)
+			: $('<div>').hide().addClass(options.dotsClass).appendTo(this._controls.$container);
 
-		this.controls.$indicators.on('click', 'div', $.proxy(function(e) {
-			var index = $(e.target).parent().is(this.controls.$indicators)
+		this._controls.$indicators.on('click', 'div', $.proxy(function(e) {
+			var index = $(e.target).parent().is(this._controls.$indicators)
 				? $(e.target).index() : $(e.target).parent().index();
 
 			e.preventDefault();
@@ -169,12 +185,12 @@
 
 		// create DOM structure for relative navigation
 		$container = options.navContainer ? $(options.navContainer)
-			: $('<div>').addClass(options.navContainerClass).prependTo(this.controls.$container);
+			: $('<div>').addClass(options.navContainerClass).prependTo(this._controls.$container);
 
-		this.controls.$next = $('<' + options.navElement + '>');
-		this.controls.$previous = this.controls.$next.clone();
+		this._controls.$next = $('<' + options.navElement + '>');
+		this._controls.$previous = this._controls.$next.clone();
 
-		this.controls.$previous
+		this._controls.$previous
 			.addClass(options.navClass[0])
 			.html(options.navText[0])
 			.hide()
@@ -182,7 +198,7 @@
 			.on('click', $.proxy(function(e) {
 				this.prev(options.navSpeed);
 			}, this));
-		this.controls.$next
+		this._controls.$next
 			.addClass(options.navClass[1])
 			.html(options.navText[1])
 			.hide()
@@ -192,8 +208,8 @@
 			}, this));
 
 		// override public methods of the carousel
-		for (override in this.overrides) {
-			this.core[override] = $.proxy(this[override], this);
+		for (override in this._overrides) {
+			this._core[override] = $.proxy(this[override], this);
 		}
 	}
 
@@ -204,14 +220,14 @@
 	Navigation.prototype.destroy = function() {
 		var handler, control, property, override;
 
-		for (handler in this.handlers) {
-			this.$element.off(handler, this.handlers[handler]);
+		for (handler in this._handlers) {
+			this.$element.off(handler, this._handlers[handler]);
 		}
-		for (control in this.controls) {
-			this.controls[control].remove();
+		for (control in this._controls) {
+			this._controls[control].remove();
 		}
 		for (override in this.overides) {
-			this.core[override] = this.overrides[override];
+			this._core[override] = this._overrides[override];
 		}
 		for (property in Object.getOwnPropertyNames(this)) {
 			typeof this[property] != 'function' && (this[property] = null);
@@ -224,9 +240,9 @@
 	 */
 	Navigation.prototype.update = function() {
 		var i, j, k,
-			options = this.core.settings,
-			lower = this.core.num.cItems / 2,
-			upper = this.core.num.items - lower,
+			options = this._core.settings,
+			lower = this._core.clones().length / 2,
+			upper = lower + this._core.items().length,
 			size = options.center || options.autoWidth || options.dotData
 				? 1 : options.dotsEach || options.items;
 
@@ -235,56 +251,60 @@
 		}
 
 		if (options.dots) {
-			this.pages = [];
+			this._pages = [];
 
 			for (i = lower, j = 0, k = 0; i < upper; i++) {
 				if (j >= size || j === 0) {
-					this.pages.push({
+					this._pages.push({
 						start: i - lower,
 						end: i - lower + size - 1
 					});
 					j = 0, ++k;
 				}
-				j += this.core.num.merged[i];
+				j += this._core.mergers(this._core.relative(i));
 			}
 		}
 	}
 
 	/**
 	 * Draws the user interface.
+	 * @todo The option `dotData` wont work.
 	 * @protected
 	 */
 	Navigation.prototype.draw = function() {
 		var difference, i, html = '',
-			options = this.core.settings,
-			$items = this.core.dom.$oItems,
-			index = this.core.normalize(this.core.current(), true);
+			options = this._core.settings,
+			$items = this._core.$stage.children(),
+			index = this._core.relative(this._core.current());
 
 		if (options.nav && !options.loop && !options.navRewind) {
-			this.controls.$previous.toggleClass('disabled', index <= 0);
-			this.controls.$next.toggleClass('disabled', index >= this.core.maximum());
+			this._controls.$previous.toggleClass('disabled', index <= 0);
+			this._controls.$next.toggleClass('disabled', index >= this._core.maximum());
 		}
 
-		this.controls.$previous.toggle(options.nav);
-		this.controls.$next.toggle(options.nav);
+		this._controls.$previous.toggle(options.nav);
+		this._controls.$next.toggle(options.nav);
 
 		if (options.dots) {
-			difference = this.pages.length - this.controls.$indicators.children().length;
+			difference = this._pages.length - this._controls.$indicators.children().length;
 
-			if (difference > 0) {
-				for (i = 0; i < Math.abs(difference); i++) {
-					html += options.dotData ? $items.eq(i).data('owl-item').dot : this.template;
+			if (options.dotData && difference !== 0) {
+				for (i = 0; i < this._controls.$indicators.children().length; i++) {
+					html += this._templates[this._core.relative(i)];
 				}
-				this.controls.$indicators.append(html);
+				this._controls.$indicators.html(html);
+			} else if (difference > 0) {
+				html = new Array(difference + 1).join(this._templates[0]);
+				this._controls.$indicators.append(html);
 			} else if (difference < 0) {
-				this.controls.$indicators.children().slice(difference).remove();
+				this._controls.$indicators.children().slice(difference).remove();
 			}
 
-			this.controls.$indicators.find('.active').removeClass('active');
-			this.controls.$indicators.children().eq($.inArray(this.current(), this.pages)).addClass('active');
+			this._controls.$indicators.find('.active').removeClass('active');
+			this._controls.$indicators.children().eq($.inArray(this.current(), this._pages)).addClass('active');
 		}
 
-		this.controls.$indicators.toggle(options.dots);
+		this._controls.$indicators.toggle(options.dots);
 	}
 
 	/**
@@ -293,13 +313,13 @@
 	 * @param {Event} event - The event object which gets thrown.
 	 */
 	Navigation.prototype.onTrigger = function(event) {
-		var options = this.core.settings;
+		var settings = this._core.settings;
 
 		event.page = {
-			index: $.inArray(this.current(), this.pages),
-			count: this.pages.length,
-			size: options.center || options.autoWidth || options.dotData
-				? 1 : options.dotsEach || options.items
+			index: $.inArray(this.current(), this._pages),
+			count: this._pages.length,
+			size: settings && (settings.center || settings.autoWidth || settings.dotData
+				? 1 : settings.dotsEach || settings.items)
 		};
 	}
 
@@ -309,8 +329,8 @@
 	 * @returns {Number}
 	 */
 	Navigation.prototype.current = function() {
-		var index = this.core.normalize(this.core.current(), true);
-		return $.grep(this.pages, function(o) {
+		var index = this._core.relative(this._core.current());
+		return $.grep(this._pages, function(o) {
 			return o.start <= index && o.end >= index;
 		}).pop();
 	}
@@ -322,16 +342,16 @@
 	 */
 	Navigation.prototype.getPosition = function(successor) {
 		var position, length,
-			options = this.core.settings;
+			options = this._core.settings;
 
 		if (options.slideBy == 'page') {
-			position = $.inArray(this.current(), this.pages);
-			length = this.pages.length;
+			position = $.inArray(this.current(), this._pages);
+			length = this._pages.length;
 			successor ? ++position : --position;
-			position = this.pages[((position % length) + length) % length].start;
+			position = this._pages[((position % length) + length) % length].start;
 		} else {
-			position = this.core.normalize(this.core.current(), true);
-			length = this.core.num.oItems;
+			position = this._core.relative(this._core.current());
+			length = this._core.items().length;
 			successor ? position += options.slideBy : position -= options.slideBy;
 		}
 		return position;
@@ -343,7 +363,8 @@
 	 * @param {Number} [speed=false] - The time in milliseconds for the transition.
 	 */
 	Navigation.prototype.next = function(speed) {
-		$.proxy(this.overrides.to, this.core)(this.getPosition(true), speed);
+		console.log(this.getPosition(true));
+		$.proxy(this._overrides.to, this._core)(this.getPosition(true), speed);
 	}
 
 	/**
@@ -352,7 +373,8 @@
 	 * @param {Number} [speed=false] - The time in milliseconds for the transition.
 	 */
 	Navigation.prototype.prev = function(speed) {
-		$.proxy(this.overrides.to, this.core)(this.getPosition(false), speed);
+		console.log(this.getPosition(false));
+		$.proxy(this._overrides.to, this._core)(this.getPosition(false), speed);
 	}
 
 	/**
@@ -366,10 +388,10 @@
 		var length;
 
 		if (!standard) {
-			length = this.pages.length;
-			$.proxy(this.overrides.to, this.core)(this.pages[((position % length) + length) % length].start, speed);
+			length = this._pages.length;
+			$.proxy(this._overrides.to, this._core)(this._pages[((position % length) + length) % length].start, speed);
 		} else {
-			$.proxy(this.overrides.to, this.core)(position, speed);
+			$.proxy(this._overrides.to, this._core)(position, speed);
 		}
 	}
 
