@@ -11,7 +11,7 @@
 	 * @class The Autoplay Plugin
 	 * @param {Owl} scope - The Owl Carousel
 	 */
-	Autoplay = function(scope) {
+	var Autoplay = function(scope) {
 		this.core = scope;
 		this.core.options = $.extend({}, Autoplay.Defaults, this.core.options);
 
@@ -37,7 +37,7 @@
 			}, this)
 		};
 
-		this.core.dom.$el.on(this.handlers);
+		this.core.$element.on(this.handlers);
 	};
 
 	/**
@@ -119,7 +119,7 @@
 		window.clearInterval(this.interval);
 
 		for (handler in this.handlers) {
-			this.core.dom.$el.off(handler, this.handlers[handler]);
+			this.core.$element.off(handler, this.handlers[handler]);
 		}
 		for (property in Object.getOwnPropertyNames(this)) {
 			typeof this[property] != 'function' && (this[property] = null);
