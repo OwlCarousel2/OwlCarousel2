@@ -69,13 +69,6 @@
 	 */
 	function Owl(element, options) {
 
-		// add basic Owl information to dom element
-		element.owlCarousel = {
-			'name': 'Owl Carousel',
-			'author': 'Bartosz Wojciechowski',
-			'version': '2.0.0-beta.2.1'
-		};
-
 		/**
 		 * Current settings for the carousel.
 		 * @public
@@ -647,24 +640,6 @@
 		this.refresh();
 
 		this.trigger('resized');
-	};
-
-	/**
-	 * Checks for touch/mouse drag event type and add run event handlers.
-	 * @protected
-	 */
-	Owl.prototype.eventsRouter = function(event) {
-		var type = event.type;
-
-		if (type === "mousedown" || type === "touchstart") {
-			this.onDragStart(event);
-		} else if (type === "mousemove" || type === "touchmove") {
-			this.onDragMove(event);
-		} else if (type === "mouseup" || type === "touchend") {
-			this.onDragEnd(event);
-		} else if (type === "touchcancel") {
-			this.onDragEnd(event);
-		}
 	};
 
 	/**

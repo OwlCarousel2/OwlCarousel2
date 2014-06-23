@@ -96,8 +96,7 @@ Good pull requests are a fantastic help. They should remain focused in scope and
 
 **Please ask first** before embarking on any significant pull request (e.g. implementing features, refactoring code, porting to a different language), otherwise you risk spending a lot of time working on something that the project's developers might not want to merge into the project.
 
-Adhering to the following process is the best way to get your work
-included in the project:
+Adhering to the following process is the best way to get your work included in the project:
 
   1. [Fork](http://help.github.com/fork-a-repo/) the project, clone your fork, and configure the remotes:
 
@@ -120,21 +119,27 @@ included in the project:
     git checkout -b <topic-branch-name>
     ```
 
-  4. Commit your changes in logical chunks. Please adhere to these [guidelines](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html). Use Git's [interactive rebase](https://help.github.com/articles/interactive-rebase) feature to tidy up your commits before making them public.
+  4. Build the distribution before committing to ensure your changes follow the coding standards and all build files are up to date.
 
-  5. Locally merge (or rebase) the upstream development branch into your topic branch:
+    ```bash
+    grunt dist
+    ```
+
+  5. Commit your changes in logical chunks. Please adhere to these [guidelines](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html). Use Git's [interactive rebase](https://help.github.com/articles/interactive-rebase) feature to tidy up your commits before making them public.
+
+  6. Locally merge (or rebase) the upstream development branch into your topic branch:
 
     ```bash
     git pull [--rebase] upstream develop
     ```
 
-  6. Push your topic branch up to your fork:
+  7. Push your topic branch up to your fork:
 
     ```bash
     git push origin <topic-branch-name>
     ```
 
-  7. [Open a Pull Request](https://help.github.com/articles/using-pull-requests/) with a clear title and description against the `develop` branch.
+  8. [Open a Pull Request](https://help.github.com/articles/using-pull-requests/) with a clear title and description against the `develop` branch.
 
 **By submitting a patch, you agree to allow the project owner to
 license your work under the terms of the [MIT License](LICENSE).**
