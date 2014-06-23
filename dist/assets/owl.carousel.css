@@ -131,10 +131,10 @@
   cursor: -ms-grab;
   cursor: grab;
 }
-.owl-carousel .owl-rtl {
+.owl-carousel.owl-rtl {
   direction: rtl;
 }
-.owl-carousel .owl-rtl .owl-item {
+.owl-carousel.owl-rtl .owl-item {
   float: right;
 }
 
