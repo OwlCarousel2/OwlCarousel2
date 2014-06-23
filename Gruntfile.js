@@ -1,4 +1,4 @@
-/*
+/**
  * Owl Carousel
  *
  * Bartosz Wojciechowski
@@ -197,7 +197,7 @@ module.exports = function(grunt) {
 				},
 				readme: {
 					files: [ {
-						'dist/LICENSE-MIT': 'LICENSE-MIT',
+						'dist/LICENSE': 'LICENSE',
 						'dist/README.md': 'README.md'
 					} ]
 				}
