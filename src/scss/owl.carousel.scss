@@ -91,11 +91,11 @@
 		cursor: grab;
 	}
 
-	.owl-rtl {
+	&.owl-rtl {
 		direction: rtl;
 	}
 
-	.owl-rtl .owl-item {
+	&.owl-rtl .owl-item {
 		float: right;
 	}
 

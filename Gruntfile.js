@@ -233,7 +233,7 @@ module.exports = function(grunt) {
 				},
 				sassDist: {
 					files: [ 'src/**/*.scss' ],
-					tasks: [ 'sass:dist', 'concat:dist', 'cssmin:dist', 'copy:themes' ]
+					tasks: [ 'sass:dist', 'concat:dist', 'cssmin:dist', 'copy:themes','copy:distToDocs' ]
 				},
 				jsDocs: {
 					files: [ '<%= app.docs.src %>/assets/**/*.js' ],
@@ -241,7 +241,7 @@ module.exports = function(grunt) {
 				},
 				js: {
 					files: [ 'src/**/*.js' ],
-					tasks: [ 'jscs:dist', 'uglify:dist', 'concat:dist', 'copy:distToDocs', 'copy:srcToDocs'  ]
+					tasks: [ 'jscs:dist', 'uglify:dist', 'concat:dist', 'copy:distToDocs', 'copy:srcToDocs' ]
 				},
 				helpers: {
 					files: [ '<%= app.src %>/helpers/*.js' ],
