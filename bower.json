@@ -8,6 +8,7 @@
     "jquery": ">= 1.7.1"
   },
   "devDependencies": {
-    "foundation": "5.2.2"
+    "foundation": "5.2.2",
+    "qunit": "1.14.0"
   }
 }
