@@ -50,9 +50,9 @@ This package comes with [Grunt](http://gruntjs.com/) and [Bower](http://bower.io
   * `default` compiles the CSS and JS into `/dist` and builds the doc.
   * `dist` compiles the CSS and JS into `/dist` only.
   * `watch` watches source files and builds them automatically whenever you save.
+  * `test` runs [JSHint](http://www.jshint.com/) and [QUnit](http://qunitjs.com/) tests headlessly in [PhantomJS](http://phantomjs.org/).
 
 To define which plugins are build into the distribution just edit `/_config.json` to fit your needs.
-    
 
 ## Contributing
 
