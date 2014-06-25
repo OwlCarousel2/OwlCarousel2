@@ -138,7 +138,7 @@ module.exports = function(grunt) {
 					src: [ '<%= app.src.scripts %>', 'Gruntfile.js' ]
 				}
 			},
-			
+
 			qunit: {
 				dist: [ 'test/*.html' ]
 			},
