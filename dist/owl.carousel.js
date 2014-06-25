@@ -2812,7 +2812,7 @@
 			options.slideBy = Math.min(options.slideBy, options.items);
 		}
 
-		if (options.dots) {
+		if (options.dots || options.slideBy == 'page') {
 			this._pages = [];
 
 			for (i = lower, j = 0, k = 0; i < upper; i++) {
