@@ -272,15 +272,21 @@
 	}, {
 		filter: [ 'items', 'settings' ],
 		run: function() {
+			var cached = this._clones,
+				clones = this.$stage.children('.cloned');
+
+			if (clones.length !== cached.length || (!this.settings.loop && cached.length > 0)) {
+				this.$stage.children('.cloned').remove();
+				this._clones = [];
+			}
+		}
+	}, {
+		filter: [ 'items', 'settings' ],
+		run: function() {
 			var i, n,
 				clones = this._clones,
 				items = this._items,
 				delta = this.settings.loop ? clones.length - Math.max(this.settings.items * 2, 4) : 0;
-
-			if (this.$stage.children('.cloned').length !== clones.length || (!this.settings.loop && clones.length > 0)) {
-				this.$stage.children('.cloned').remove();
-				this._clones = [];
-			}
 
 			for (i = 0, n = Math.abs(delta / 2); i < n; i++) {
 				if (delta > 0) {
