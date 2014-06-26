@@ -363,7 +363,6 @@
 	 * @param {Number} [speed=false] - The time in milliseconds for the transition.
 	 */
 	Navigation.prototype.next = function(speed) {
-		console.log(this.getPosition(true));
 		$.proxy(this._overrides.to, this._core)(this.getPosition(true), speed);
 	}
 
@@ -373,7 +372,6 @@
 	 * @param {Number} [speed=false] - The time in milliseconds for the transition.
 	 */
 	Navigation.prototype.prev = function(speed) {
-		console.log(this.getPosition(false));
 		$.proxy(this._overrides.to, this._core)(this.getPosition(false), speed);
 	}
 

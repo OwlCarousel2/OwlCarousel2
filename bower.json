@@ -5,7 +5,7 @@
     "./dist/"
   ],
   "dependencies": {
-    "jquery": ">= 1.7.1"
+    "jquery": ">= 1.8.3"
   },
   "devDependencies": {
     "foundation": "5.2.2",
