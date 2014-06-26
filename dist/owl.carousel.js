@@ -1366,7 +1366,9 @@
 			content = content.find('.' + this.settings.nestedItemSelector);
 		}
 
-		content.each($.proxy(function(index, item) {
+		content.filter(function() {
+			return this.nodeType === 1;
+		}).each($.proxy(function(index, item) {
 			item = this.prepare(item);
 			this.$stage.append(item);
 			this._items.push(item);
