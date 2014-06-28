@@ -1456,6 +1456,7 @@
 			'add': this.add,
 			'remove': this.remove
 		}, $.proxy(function(event, callback) {
+			this.register(event);
 			this.$element.on(event + '.owl.carousel', handler(callback, event + '.owl.carousel'));
 		}, this));
 
@@ -1612,11 +1613,11 @@
 	};
 
 	/**
-	 * Triggers an public event.
+	 * Triggers a public event.
 	 * @protected
 	 * @param {String} name - The event name.
 	 * @param {*} [data=null] - The event data.
-	 * @param {String} [namespace=.owl.carousel] - The event namespace.
+	 * @param {String} [namespace=carousel] - The event namespace.
 	 * @returns {Event} - The event arguments.
 	 */
 	Owl.prototype.trigger = function(name, data, namespace) {
@@ -1637,6 +1638,7 @@
 				}
 			});
 
+			this.register(event);
 			this.$element.trigger(event);
 
 			if (this.settings && typeof this.settings[handler] === 'function') {
@@ -1645,6 +1647,28 @@
 		}
 
 		return event;
+	};
+
+	/**
+	 * Registers a public event.
+	 * @public
+	 * @param {String} name - The event name to register.
+	 */
+	Owl.prototype.register = function(name) {
+		if (!$.event.special[name]) {
+			$.event.special[name] = {};
+		}
+
+		if (!$.event.special[name].owl) {
+			var _default = $.event.special[name]._default;
+			$.event.special[name]._default = function(e) {
+				if (_default && _default.apply && (!e.namespace || e.namespace.indexOf('owl') === -1)) {
+					return _default.apply(this, arguments);
+				}
+				return e.namespace && e.namespace.indexOf('owl') > -1;
+			};
+			$.event.special[name].owl = true;
+		}
 	};
 
 	/**
