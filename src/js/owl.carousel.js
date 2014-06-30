@@ -342,6 +342,13 @@
 			}
 		}
 	}, {
+		filter: [ 'items' ],
+		run: function() {
+			if (this._items.length < 1) {
+				this.$stage.removeAttr('style');
+			}
+		}
+	}, {
 		filter: [ 'width', 'items', 'settings' ],
 		run: function(cache) {
 			cache.current && this.reset(this.$stage.children().index(cache.current));
@@ -560,12 +567,6 @@
 	 * @public
 	 */
 	Owl.prototype.refresh = function() {
-		if (this._items.length === 0) {
-			return false;
-		}
-
-		var start = new Date().getTime();
-
 		this.trigger('refresh');
 
 		this.setup();
