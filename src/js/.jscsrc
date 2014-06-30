@@ -42,6 +42,5 @@
     "disallowSpaceBeforeBinaryOperators": [ ",", ":" ],
 
     "disallowMultipleLineBreaks": true,
-    "requireLineFeedAtFileEnd": true,
-    "validateLineBreaks": "LF"
+    "requireLineFeedAtFileEnd": true
 }

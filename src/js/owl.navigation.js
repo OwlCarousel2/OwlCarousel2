@@ -342,7 +342,9 @@
 	 */
 	Navigation.prototype.getPosition = function(successor) {
 		var position, length,
-			options = this._core.settings;
+			options = this._core.settings,
+			maximum = this._core.maximum(),
+			minimum = this._core.minimum();
 
 		if (options.slideBy == 'page') {
 			position = $.inArray(this.current(), this._pages);
@@ -354,6 +356,11 @@
 			length = this._core.items().length;
 			successor ? position += options.slideBy : position -= options.slideBy;
 		}
+
+		if (options.navRewind && !options.loop) {
+			position = position > maximum ? minimum : position < minimum ? maximum : position;
+		}
+
 		return position;
 	}
 
