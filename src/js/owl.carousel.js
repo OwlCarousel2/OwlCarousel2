@@ -265,6 +265,11 @@
 	 * Update pipe.
 	 */
 	Owl.Pipe = [ {
+		filter: [ 'width', 'settings' ],
+		run: function() {
+			this._width = this.$element.width();
+		}
+	}, {
 		filter: [ 'width', 'items', 'settings' ],
 		run: function(cache) {
 			cache.current = this._items && this._items[this.relative(this._current)];
@@ -418,9 +423,6 @@
 
 		// append content
 		this.replace(this.$element.children().not(this.$stage.parent()));
-
-		// set view width
-		this._width = this.$element.width();
 
 		// update view
 		this.refresh();
@@ -638,8 +640,6 @@
 		if (this.trigger('resize').isDefaultPrevented()) {
 			return false;
 		}
-
-		this._width = this.$element.width();
 
 		this.invalidate('width');
 
