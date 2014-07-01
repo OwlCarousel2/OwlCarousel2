@@ -305,7 +305,7 @@
 			if (index == this._core.num.items - this._core.num.active)
 				this._controls.$indicators.children().last().addClass('active');
 			else
-				this._controls.$indicators.children().eq($.inArray(this.current(), this.pages)).addClass('active');
+				this._controls.$indicators.children().eq($.inArray(this.current(), this._pages)).addClass('active');
 
 		}
 
