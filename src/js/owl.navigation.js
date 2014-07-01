@@ -300,8 +300,13 @@
 				this._controls.$indicators.children().slice(difference).remove();
 			}
 
-			this._controls.$indicators.find('.active').removeClass('active');
-			this._controls.$indicators.children().eq($.inArray(this.current(), this._pages)).addClass('active');
+			this.controls.$indicators.find('.active').removeClass('active');
+			var index = this.core.normalize(this.core.current(), true);
+			if (index == this.core.num.items - this.core.num.active)
+				this.controls.$indicators.children().last().addClass('active');
+			else
+				this.controls.$indicators.children().eq($.inArray(this.current(), this.pages)).addClass('active');
+
 		}
 
 		this._controls.$indicators.toggle(options.dots);
