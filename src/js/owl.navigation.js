@@ -300,12 +300,12 @@
 				this._controls.$indicators.children().slice(difference).remove();
 			}
 
-			this.controls.$indicators.find('.active').removeClass('active');
-			var index = this.core.normalize(this.core.current(), true);
-			if (index == this.core.num.items - this.core.num.active)
-				this.controls.$indicators.children().last().addClass('active');
+			this._controls.$indicators.find('.active').removeClass('active');
+			var index = this._core.normalize(this._core.current());
+			if (index == this._core.num.items - this._core.num.active)
+				this._controls.$indicators.children().last().addClass('active');
 			else
-				this.controls.$indicators.children().eq($.inArray(this.current(), this.pages)).addClass('active');
+				this._controls.$indicators.children().eq($.inArray(this.current(), this.pages)).addClass('active');
 
 		}
 
