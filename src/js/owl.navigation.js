@@ -301,11 +301,11 @@
 			}
 
 			this._controls.$indicators.find('.active').removeClass('active');
-			var index = this._core.normalize(this._core.current());
-			if (index == this._core.num.items - this._core.num.active)
+			if (!options.loop && options.items + index == $items.length) {
 				this._controls.$indicators.children().last().addClass('active');
-			else
+			} else {
 				this._controls.$indicators.children().eq($.inArray(this.current(), this._pages)).addClass('active');
+			}
 
 		}
 
