@@ -301,7 +301,12 @@
 			}
 
 			this._controls.$indicators.find('.active').removeClass('active');
-			this._controls.$indicators.children().eq($.inArray(this.current(), this._pages)).addClass('active');
+			if (!options.loop && options.items + index == $items.length) {
+				this._controls.$indicators.children().last().addClass('active');
+			} else {
+				this._controls.$indicators.children().eq($.inArray(this.current(), this._pages)).addClass('active');
+			}
+
 		}
 
 		this._controls.$indicators.toggle(options.dots);
