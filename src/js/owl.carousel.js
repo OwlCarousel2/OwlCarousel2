@@ -234,6 +234,7 @@
 		nestedItemSelector: false,
 		itemElement: 'div',
 		stageElement: 'div',
+		userItem: false,
 
 		// Classes and Names
 		themeClass: 'owl-theme',
@@ -429,7 +430,11 @@
 		this.$element.append(this.$stage.parent());
 
 		// append content
-		this.replace(this.$element.children().not(this.$stage.parent()));
+		if (this.settings.userItem) {
+			this.replace(this.$element.find(this.settings.userItem).not(this.$stage.parent()));
+		} else {
+			this.replace(this.$element.children().not(this.$stage.parent()));
+		}
 
 		// update view
 		this.refresh();
