@@ -1823,10 +1823,20 @@
 	 * The jQuery Plugin for the Owl Carousel
 	 * @public
 	 */
-	$.fn.owlCarousel = function(options) {
+	$.fn.owlCarousel = function(option) {
+		var args = Array.prototype.slice.call(arguments, 1);
+
 		return this.each(function() {
-			if (!$(this).data('owlCarousel')) {
-				$(this).data('owlCarousel', new Owl(this, options));
+			var $this = $(this),
+				data = $this.data('owl.carousel');
+
+			if (!data) {
+				data = new Owl(this, typeof option == 'object' && option);
+				$this.data('owl.carousel', data);
+			}
+
+			if (typeof option == 'string' && option.charAt(0) !== '_') {
+				data[option].apply(data, args);
 			}
 		});
 	};
