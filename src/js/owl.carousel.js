@@ -608,6 +608,9 @@
 		this.e._onResize = $.proxy(function(e) {
 			this.onResize(e);
 		}, this);
+		this.e._onThrottledResize = $.proxy(function(e) {
+			this.onThrottledResize(e);
+		}, this);
 		this.e._transitionEnd = $.proxy(function(e) {
 			this.transitionEnd(e);
 		}, this);
@@ -694,7 +697,7 @@
 
 		// responsive
 		if (this.settings.responsive !== false) {
-			this.on(window, 'resize', $.proxy(this.onThrottledResize, this));
+			this.on(window, 'resize', this.e._onThrottledResize);
 		}
 	};
 
@@ -1532,7 +1535,7 @@
 
 		if (this.settings.responsive !== false) {
 			window.clearTimeout(this.resizeTimer);
-			$(window).off('resize.owl.carousel');
+			this.off(window, 'resize', this.e._onThrottledResize);
 		}
 
 		if (this.transitionEndVendor) {
