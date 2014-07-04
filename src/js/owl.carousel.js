@@ -1531,6 +1531,7 @@
 		}
 
 		if (this.settings.responsive !== false) {
+			window.clearTimeout(this.resizeTimer);
 			$(window).off('resize.owl.carousel');
 		}
 
