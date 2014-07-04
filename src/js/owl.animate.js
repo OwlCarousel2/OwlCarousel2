@@ -20,9 +20,7 @@
 
 		this.handlers = {
 			'change.owl.carousel': $.proxy(function(e) {
-				if (!e.property) return;
-
-				if (e.property.name == 'position') {
+				if (e.property && e.property.name == 'position') {
 					this.previous = this.core.current();
 					this.next = e.property.value;
 				}
