@@ -1390,8 +1390,11 @@
 	 */
 	Owl.prototype.add = function(content, position) {
 		position = position === undefined ? this._items.length : this.normalize(position, true);
+		content = content instanceof jQuery ? content : $(content);
 
 		this.trigger('add', { content: content, position: position });
+
+		content = this.prepare(content);
 
 		if (this._items.length === 0 || position === this._items.length) {
 			this.$stage.append(content);
