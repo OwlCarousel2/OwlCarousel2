@@ -87,6 +87,8 @@
 				}
 			}, this),
 			'change.owl.carousel': $.proxy(function(e) {
+				if (!e.property) return;
+
 				if (e.property.name == 'position') {
 					if (!this._core.state.revert && !this._core.settings.loop && this._core.settings.navRewind) {
 						var current = this._core.current(),
