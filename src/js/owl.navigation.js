@@ -329,10 +329,12 @@
 	 * @returns {Number}
 	 */
 	Navigation.prototype.current = function() {
-		var index = this._core.relative(this._core.current());
-		return $.grep(this._pages, function(o) {
-			return o.start <= index && o.end >= index;
-		}).pop();
+		var current = this._core.relative(this._core.current());
+		return $.grep(this._pages, $.proxy(function(page, index) {
+			return current === this._core.maximum() && !this._core.settings.loop
+				? index === this._pages.length - 1
+				: page.start <= current && page.end >= current;
+		}, this)).pop();
 	}
 
 	/**
