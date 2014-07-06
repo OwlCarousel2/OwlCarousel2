@@ -1045,11 +1045,15 @@
 
 	/**
 	 * Invalidates the given part of the update routine.
-	 * @param {String} part - The part to invalidate.
+	 * @param {String} [part] - The part to invalidate.
+	 * @returns {Array.<String>} - The invalidated parts.
 	 */
 	Owl.prototype.invalidate = function(part) {
-		this._invalidated[part] = true;
-	}
+		if ($.type(part) === 'string') {
+			this._invalidated[part] = true;
+		}
+		return $.map(this._invalidated, function(v, i) { return i });
+	};
 
 	/**
 	 * Resets the absolute position of the current item.

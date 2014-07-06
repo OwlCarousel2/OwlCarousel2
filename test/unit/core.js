@@ -94,3 +94,29 @@ function before_and_after_remove_add(options) {
 	
 	equal(simple.html(), expected, 'Inner HTML before and after `remove()` and `add()` equals.');
 }
+
+test('invalidate', function() {
+	expect(6);
+	
+	var carousel = $('#simple').owlCarousel().data('owl.carousel');
+	
+	deepEqual(carousel.invalidate(), [], 'No invalid parts after initializing.');
+
+	carousel.invalidate('first');
+	
+	deepEqual(carousel.invalidate(), [ 'first' ], 'One invalid part after invalidating one.');
+	
+	carousel.invalidate('second');
+	
+	deepEqual(carousel.invalidate(), [ 'first', 'second' ], 'Two invalid parts after invalidating a second one.');
+	
+	carousel.invalidate('second')
+	
+	deepEqual(carousel.invalidate(), [ 'first', 'second' ], 'Two invalid parts after invalidating a part twice.');
+	
+	carousel.update();
+	
+	deepEqual(carousel.invalidate(), [], 'No invalid parts after updating.');
+	
+	deepEqual(carousel.invalidate('first'), [ 'first' ], 'Invalidating one part returns it directly.');
+});
