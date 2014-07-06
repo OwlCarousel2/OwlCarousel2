@@ -56,7 +56,6 @@
 		_transitionEnd: null,
 		_resizer: null,
 		_responsiveCall: null,
-		_goToLoop: null,
 		_checkVisibile: null
 	};
 
@@ -431,8 +430,14 @@
 		// append content
 		this.replace(this.$element.children().not(this.$stage.parent()));
 
-		// update view
-		this.refresh();
+		// check visibility
+		if (this.$element.is(':visible')) {
+			// update view
+			this.refresh();
+		} else {
+			// invalidate width
+			this.invalidate('width');
+		}
 
 		this.$element.removeClass('owl-loading').addClass('owl-loaded');
 
@@ -585,8 +590,6 @@
 
 		this.state.orientation = window.orientation;
 
-		this.watchVisibility();
-
 		this.trigger('refreshed');
 	};
 
@@ -638,6 +641,10 @@
 		}
 
 		if (this._width === this.$element.width()) {
+			return false;
+		}
+
+		if (!this.$element.is(':visible')) {
 			return false;
 		}
 
@@ -1284,15 +1291,14 @@
 				revert = before - this._items.length;
 				this.reset(revert);
 			}
-			window.clearTimeout(this.e._goToLoop);
-			this.e._goToLoop = window.setTimeout($.proxy(function() {
-				this.speed(this.duration(this.current(), revert + distance, speed));
-				this.current(revert + distance);
-				this.update();
-			}, this), 30);
-		} else {
-			this.speed(this.duration(this.current(), position, speed));
-			this.current(position);
+
+			position = revert + distance;
+		}
+
+		this.speed(this.duration(this.current(), position, speed));
+		this.current(position);
+
+		if (this.$element.is(':visible')) {
 			this.update();
 		}
 	};
@@ -1471,32 +1477,6 @@
 			this.$element.on(event + '.owl.carousel', handler(callback, event + '.owl.carousel'));
 		}, this));
 
-	};
-
-	/**
-	 * Watches the visibility of the carousel element.
-	 * @protected
-	 */
-	Owl.prototype.watchVisibility = function() {
-
-		// test on zepto
-		if (!isElVisible(this.$element.get(0))) {
-			this.$element.addClass('owl-hidden');
-			window.clearInterval(this.e._checkVisibile);
-			this.e._checkVisibile = window.setInterval($.proxy(checkVisible, this), 500);
-		}
-
-		function isElVisible(el) {
-			return el.offsetWidth > 0 && el.offsetHeight > 0;
-		}
-
-		function checkVisible() {
-			if (isElVisible(this.$element.get(0))) {
-				this.$element.removeClass('owl-hidden');
-				this.refresh();
-				window.clearInterval(this.e._checkVisibile);
-			}
-		}
 	};
 
 	/**
