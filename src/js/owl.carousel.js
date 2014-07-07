@@ -1558,7 +1558,7 @@
 
 		this.$stage.children('.cloned').remove();
 		this.e = null;
-		this.$element.removeData('owlCarousel');
+		this.$element.removeData('owl.carousel');
 
 		this.$stage.children().contents().unwrap();
 		this.$stage.children().unwrap();
