@@ -1630,7 +1630,7 @@
 				}
 			});
 
-			this.register(event);
+			this.register(name);
 			this.$element.trigger(event);
 
 			if (this.settings && typeof this.settings[handler] === 'function') {
