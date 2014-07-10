@@ -1008,7 +1008,7 @@
 		} else {
 			this.$stage.animate({
 				left: coordinate
-			}, this.speed() / 1000, this.settings.fallbackEasing, $.proxy(function() {
+			}, this.speed(), this.settings.fallbackEasing, $.proxy(function() {
 				if (this.state.inMotion) {
 					this.transitionEnd();
 				}
