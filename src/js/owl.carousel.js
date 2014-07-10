@@ -1634,7 +1634,7 @@
 			this.$element.trigger(event);
 
 			if (this.settings && typeof this.settings[handler] === 'function') {
-				this.settings[handler].apply(this, event);
+				this.settings[handler].call(this, event);
 			}
 		}
 
