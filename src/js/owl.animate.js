@@ -44,7 +44,8 @@
 	 */
 	Animate.Defaults = {
 		animateOut: false,
-		animateIn: false
+		animateIn: false,
+        animationTime: 250
 	};
 
 	/**
@@ -54,7 +55,7 @@
 	 */
 	Animate.prototype.swap = function() {
 
-		if (this.core.settings.items !== 1 || !this.core.support3d) {
+		if (this.core.settings.items !== 1) {
 			return;
 		}
 
@@ -84,6 +85,20 @@
 				.addClass(incoming)
 				.one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', clear);
 		}
+
+        if (!this.core.support3d) {
+            previous.animate({
+                opacity: 0
+            }, this.core.settings.animationTime, $.proxy(function() {
+                previous.trigger('animationend');
+            }, this));
+
+            next.animate({
+                opacity: 1
+            }, this.core.settings.animationTime, $.proxy(function() {
+                next.trigger('animationend');
+            }, this));
+        }
 	};
 
 	Animate.prototype.clear = function(e) {
