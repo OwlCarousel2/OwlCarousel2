@@ -90,10 +90,10 @@
     "desc":     "Show next/prev buttons."
   },
   {
-    "name":     "navRewind",
+    "name":     "rewind",
     "type":     "Boolean",
     "Default":  "true",
-    "desc":     "Go to first/last."
+    "desc":     "Go backwards when the boundary has reached."
   },
   {
     "name":     "navText",
