@@ -240,9 +240,10 @@
 	 */
 	Navigation.prototype.update = function() {
 		var i, j, k,
-			options = this._core.settings,
 			lower = this._core.clones().length / 2,
 			upper = lower + this._core.items().length,
+			maximum = this._core.maximum(true),
+			options = this._core.settings,
 			size = options.center || options.autoWidth || options.dotData
 				? 1 : options.dotsEach || options.items;
 
@@ -256,9 +257,12 @@
 			for (i = lower, j = 0, k = 0; i < upper; i++) {
 				if (j >= size || j === 0) {
 					this._pages.push({
-						start: i - lower,
+						start: Math.min(maximum, i - lower),
 						end: i - lower + size - 1
 					});
+					if (Math.min(maximum, i - lower) === maximum) {
+						break;
+					}
 					j = 0, ++k;
 				}
 				j += this._core.mergers(this._core.relative(i));
@@ -331,9 +335,7 @@
 	Navigation.prototype.current = function() {
 		var current = this._core.relative(this._core.current());
 		return $.grep(this._pages, $.proxy(function(page, index) {
-			return current === this._core.maximum() && !this._core.settings.loop
-				? index === this._pages.length - 1
-				: page.start <= current && page.end >= current;
+			return page.start <= current && page.end >= current;
 		}, this)).pop();
 	}
 
