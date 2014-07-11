@@ -86,18 +86,6 @@
 					this._templates.splice(e.position, 1);
 				}
 			}, this),
-			'change.owl.carousel': $.proxy(function(e) {
-				if (e.property.name == 'position') {
-					if (!this._core.state.revert && !this._core.settings.loop && this._core.settings.navRewind) {
-						var current = this._core.current(),
-							maximum = this._core.maximum(),
-							minimum = this._core.minimum();
-						e.data = e.property.value > maximum
-							? current >= maximum ? minimum : maximum
-							: e.property.value < minimum ? maximum : e.property.value;
-					}
-				}
-			}, this),
 			'changed.owl.carousel': $.proxy(function(e) {
 				if (e.property.name == 'position') {
 					this.draw();
@@ -129,7 +117,6 @@
 	 */
 	Navigation.Defaults = {
 		nav: false,
-		navRewind: true,
 		navText: [ 'prev', 'next' ],
 		navSpeed: false,
 		navElement: 'div',
@@ -277,9 +264,9 @@
 			$items = this._core.$stage.children(),
 			index = this._core.relative(this._core.current());
 
-		if (options.nav && !options.loop && !options.navRewind) {
-			this._controls.$previous.toggleClass('disabled', index <= 0);
-			this._controls.$next.toggleClass('disabled', index >= this._core.maximum());
+		if (options.nav && !options.loop && !options.rewind) {
+			this._controls.$previous.toggleClass('disabled', index <= this._core.minimum(true));
+			this._controls.$next.toggleClass('disabled', index >= this._core.maximum(true));
 		}
 
 		this._controls.$previous.toggle(options.nav);
@@ -344,9 +331,7 @@
 	 */
 	Navigation.prototype.getPosition = function(successor) {
 		var position, length,
-			options = this._core.settings,
-			maximum = this._core.maximum(),
-			minimum = this._core.minimum();
+			options = this._core.settings;
 
 		if (options.slideBy == 'page') {
 			position = $.inArray(this.current(), this._pages);
@@ -357,10 +342,6 @@
 			position = this._core.relative(this._core.current());
 			length = this._core.items().length;
 			successor ? position += options.slideBy : position -= options.slideBy;
-		}
-
-		if (options.navRewind && !options.loop) {
-			position = position > maximum ? minimum : position < minimum ? maximum : position;
 		}
 
 		return position;

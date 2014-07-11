@@ -201,6 +201,7 @@
 		items: 3,
 		loop: false,
 		center: false,
+		rewind: false,
 
 		mouseDrag: true,
 		touchDrag: true,
@@ -290,7 +291,8 @@
 			var i, n,
 				clones = this._clones,
 				items = this._items,
-				delta = this.settings.loop ? clones.length - Math.max(this.settings.items * 2, 4) : 0;
+				delta = this.settings.loop ? clones.length - (this.settings.rewind ?
+					Math.max(this.settings.items * 2, 4) : Math.ceil(items.length / 2) * 2) : 0;
 
 			for (i = 0, n = Math.abs(delta / 2); i < n; i++) {
 				if (delta > 0) {
@@ -355,7 +357,9 @@
 	}, {
 		filter: [ 'width', 'items', 'settings' ],
 		run: function(cache) {
-			cache.current && this.reset(this.$stage.children().index(cache.current));
+			cache.current = cache.current ? this.$stage.children().index(cache.current) : 0;
+			cache.current = Math.max(this.minimum(), Math.min(this.maximum(), cache.current));
+			this.reset(cache.current);
 		}
 	}, {
 		filter: [ 'position' ],
@@ -1085,88 +1089,77 @@
 	};
 
 	/**
-	 * Normalizes an absolute or a relative position for an item.
+	 * Normalizes an absolute or a relative position of an item.
 	 * @public
 	 * @param {Number} position - The absolute or relative position to normalize.
 	 * @param {Boolean} [relative=false] - Whether the given position is relative or not.
 	 * @returns {Number} - The normalized position.
 	 */
 	Owl.prototype.normalize = function(position, relative) {
-		var n = (relative ? this._items.length : this._items.length + this._clones.length);
+		var n = this._items.length,
+			m = relative ? 0 : this._clones.length;
 
 		if (!$.isNumeric(position) || n < 1) {
-			return undefined;
-		}
-
-		if (this._clones.length) {
-			position = ((position % n) + n) % n;
-		} else {
-			position = Math.max(this.minimum(relative), Math.min(this.maximum(relative), position));
+			position = undefined;
+		} else if (position < 0 || position >= n + m) {
+			position = ((position - m / 2) % n + n) % n + m / 2;
 		}
 
 		return position;
 	};
 
 	/**
-	 * Converts an absolute position for an item into a relative position.
+	 * Converts an absolute position of an item into a relative one.
 	 * @public
 	 * @param {Number} position - The absolute position to convert.
 	 * @returns {Number} - The converted position.
 	 */
 	Owl.prototype.relative = function(position) {
-		position = this.normalize(position);
-		position = position - this._clones.length / 2;
+		position -= this._clones.length / 2;
 		return this.normalize(position, true);
 	};
 
 	/**
-	 * Gets the maximum position for an item.
+	 * Gets the maximum position for the current item.
 	 * @public
 	 * @param {Boolean} [relative=false] - Whether to return an absolute position or a relative position.
 	 * @returns {Number}
 	 */
 	Owl.prototype.maximum = function(relative) {
-		var maximum, width, i = 0, coordinate,
-			settings = this.settings;
+		var settings = this.settings,
+			maximum = this._coordinates.length,
+			boundary = Math.abs(this._coordinates[maximum - 1]) - this._width,
+			i = -1, j;
 
-		if (relative) {
-			return this._items.length - 1;
+		if (settings.loop) {
+			maximum = this._clones.length / 2 + this._items.length - 1;
+		} else if (settings.autoWidth || settings.merge) {
+			// binary search
+			while (maximum - i > 1) {
+				Math.abs(this._coordinates[j = maximum + i >> 1]) < boundary
+					? i = j : maximum = j;
+			}
+		} else if (settings.center) {
+			maximum = this._items.length - 1;
+		} else {
+			maximum = this._items.length - settings.items;
 		}
 
-		if (!settings.loop && settings.center) {
-			maximum = this._items.length - 1;
-		} else if (!settings.loop && !settings.center) {
-			maximum = this._items.length - settings.items;
-		} else if (settings.loop || settings.center) {
-			maximum = this._items.length + settings.items;
-		} else if (settings.autoWidth || settings.merge) {
-			revert = settings.rtl ? 1 : -1;
-			width = this.$stage.width() - this.$element.width();
-			while (coordinate = this.coordinates(i)) {
-				if (coordinate * revert >= width) {
-					break;
-				}
-				maximum = ++i;
-			}
-		} else {
-			throw 'Can not detect maximum absolute position.'
+		if (relative) {
+			maximum -= this._clones.length / 2;
 		}
 
 		return maximum;
 	};
 
 	/**
-	 * Gets the minimum position for an item.
+	 * Gets the minimum position for the current item.
 	 * @public
 	 * @param {Boolean} [relative=false] - Whether to return an absolute position or a relative position.
 	 * @returns {Number}
 	 */
 	Owl.prototype.minimum = function(relative) {
-		if (relative) {
-			return 0;
-		}
-
-		return this._clones.length / 2;
+		return relative ? 0 : this._clones.length / 2;
 	};
 
 	/**
@@ -1276,26 +1269,35 @@
 	 * @param {Number} [speed] - The time in milliseconds for the transition.
 	 */
 	Owl.prototype.to = function(position, speed) {
-		if (this.settings.loop) {
-			var distance = position - this.relative(this.current()),
-				revert = this.current(),
-				before = this.current(),
-				after = this.current() + distance,
-				direction = before - after < 0 ? true : false,
-				items = this._clones.length + this._items.length;
+		var current = this.current(),
+			revert = null,
+			distance = position - this.relative(current),
+			direction = (distance > 0) - (distance < 0),
+			items = this._items.length,
+			minimum = this.minimum(),
+			maximum = this.maximum();
 
-			if (after < this.settings.items && direction === false) {
-				revert = before + this._items.length;
-				this.reset(revert);
-			} else if (after >= items - this.settings.items && direction === true) {
-				revert = before - this._items.length;
-				this.reset(revert);
+		if (this.settings.loop) {
+			if (!this.settings.rewind && Math.abs(distance) > items / 2) {
+				distance += direction * -1 * items;
 			}
 
-			position = revert + distance;
+			position = current + distance;
+			revert = ((position - minimum) % items + items) % items + minimum;
+
+			if (revert !== position && revert - distance <= maximum && revert - distance > 0) {
+				current = revert - distance;
+				position = revert;
+				this.reset(current);
+			}
+		} else if (this.settings.rewind) {
+			maximum += 1;
+			position = (position % maximum + maximum) % maximum;
+		} else {
+			position = Math.max(minimum, Math.min(maximum, position));
 		}
 
-		this.speed(this.duration(this.current(), position, speed));
+		this.speed(this.duration(current, position, speed));
 		this.current(position);
 
 		if (this.$element.is(':visible')) {
