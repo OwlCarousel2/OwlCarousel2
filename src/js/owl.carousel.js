@@ -718,16 +718,16 @@
 	 * @param {Event} event - The event arguments.
 	 */
 	Owl.prototype.onDragStart = function(event) {
-		var ev, isTouchEvent, pageX, pageY, animatedPos;
+		var pageX, pageY, animatedPos;
 
-		ev = event.originalEvent || event || window.event;
+		event = event.originalEvent || event || window.event;
 
 		// prevent right click
-		if (ev.which === 3 || this.state.isTouch) {
+		if (event.which === 3 || this.state.isTouch) {
 			return false;
 		}
 
-		if (ev.type === 'mousedown') {
+		if (event.type === 'mousedown') {
 			this.$stage.addClass('owl-grab');
 		}
 
@@ -739,8 +739,8 @@
 		this.state.isSwiping = false;
 		this.drag.distance = 0;
 
-		pageX = getTouches(ev).x;
-		pageY = getTouches(ev).y;
+		pageX = getTouches(event).x;
+		pageY = getTouches(event).y;
 
 		// get stage position left
 		this.drag.offsetX = this.$stage.position().left;
@@ -766,7 +766,7 @@
 		this.drag.startY = pageY - this.drag.offsetY;
 
 		this.drag.start = pageX - this.drag.startX;
-		this.drag.targetEl = ev.target || ev.srcElement;
+		this.drag.targetEl = event.target || event.srcElement;
 		this.drag.updatedX = this.drag.start;
 
 		// to do/check
@@ -785,7 +785,7 @@
 	 * @param {Event} event - The event arguments.
 	 */
 	Owl.prototype.onDragMove = function(event) {
-		var ev, isTouchEvent, pageX, pageY, minValue, maxValue, pull;
+		var pageX, pageY, minimum, maximum, pull;
 
 		if (!this.state.isTouch) {
 			return;
@@ -795,51 +795,48 @@
 			return;
 		}
 
-		ev = event.originalEvent || event || window.event;
+		event = event.originalEvent || event || window.event;
 
-		pageX = getTouches(ev).x;
-		pageY = getTouches(ev).y;
+		pageX = getTouches(event).x;
+		pageY = getTouches(event).y;
 
-		// Drag Direction
+		// drag direction
 		this.drag.currentX = pageX - this.drag.startX;
 		this.drag.currentY = pageY - this.drag.startY;
 		this.drag.distance = this.drag.currentX - this.drag.offsetX;
 
-		// Check move direction
+		// save move direction
 		if (this.drag.distance < 0) {
 			this.state.direction = this.settings.rtl ? 'right' : 'left';
 		} else if (this.drag.distance > 0) {
 			this.state.direction = this.settings.rtl ? 'left' : 'right';
 		}
-		// Loop
+
+		// handle boundaries
 		if (this.settings.loop) {
-			if (this.op(this.drag.currentX, '>', this.coordinates(this.minimum())) && this.state.direction === 'right') {
-				this.drag.currentX -= (this.settings.center && this.coordinates(0)) - this.coordinates(this._items.length);
-			} else if (this.op(this.drag.currentX, '<', this.coordinates(this.maximum())) && this.state.direction === 'left') {
-				this.drag.currentX += (this.settings.center && this.coordinates(0)) - this.coordinates(this._items.length);
-			}
+			minimum = this.coordinates(this.minimum());
+			maximum = this.coordinates(this.maximum() + 1) - minimum;
+			this.drag.currentX = (((this.drag.currentX - minimum) % maximum + maximum) % maximum) + minimum;
 		} else {
-			// pull
-			minValue = this.settings.rtl ? this.coordinates(this.maximum()) : this.coordinates(this.minimum());
-			maxValue = this.settings.rtl ? this.coordinates(this.minimum()) : this.coordinates(this.maximum());
+			minimum = this.settings.rtl ? this.coordinates(this.maximum()) : this.coordinates(this.minimum());
+			maximum = this.settings.rtl ? this.coordinates(this.minimum()) : this.coordinates(this.maximum());
 			pull = this.settings.pullDrag ? this.drag.distance / 5 : 0;
-			this.drag.currentX = Math.max(Math.min(this.drag.currentX, minValue + pull), maxValue + pull);
+			this.drag.currentX = Math.max(Math.min(this.drag.currentX, minimum + pull), maximum + pull);
 		}
 
-		// Lock browser if swiping horizontal
-
+		// lock browser if swiping horizontal
 		if ((this.drag.distance > 8 || this.drag.distance < -8)) {
-			if (ev.preventDefault !== undefined) {
-				ev.preventDefault();
+			if (event.preventDefault !== undefined) {
+				event.preventDefault();
 			} else {
-				ev.returnValue = false;
+				event.returnValue = false;
 			}
 			this.state.isSwiping = true;
 		}
 
 		this.drag.updatedX = this.drag.currentX;
 
-		// Lock Owl if scrolling
+		// lock Owl if scrolling
 		if ((this.drag.currentY > 16 || this.drag.currentY < -16) && this.state.isSwiping === false) {
 			this.state.isScrolling = true;
 			this.drag.updatedX = this.drag.start;
