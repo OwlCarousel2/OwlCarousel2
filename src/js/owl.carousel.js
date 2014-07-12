@@ -301,9 +301,9 @@
 					this.$stage.children().eq(0).remove();
 					clones.pop();
 				} else {
-					clones.push(clones.length / 2);
+					clones.push(this.normalize(clones.length / 2, true));
 					this.$stage.append(items[clones[clones.length - 1]].clone().addClass('cloned'));
-					clones.push(items.length - 1 - (clones.length - 1) / 2);
+					clones.push(this.normalize(items.length - 1 - (clones.length - 1) / 2, true));
 					this.$stage.prepend(items[clones[clones.length - 1]].clone().addClass('cloned'));
 				}
 			}
