@@ -52,7 +52,8 @@
 
 					while (i++ < n) {
 						this.load(clones / 2 + this._core.relative(position));
-						clones && $.each(this._core.clones(this._core.relative(position++)), load);
+						clones && $.each(this._core.clones(this._core.relative(position)), load);
+						position++;
 					}
 				}
 			}, this)
