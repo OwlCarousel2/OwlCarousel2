@@ -1454,7 +1454,7 @@
 	Owl.prototype.addTriggerableEvents = function() {
 		var handler = $.proxy(function(callback, event) {
 			return $.proxy(function(e) {
-				if (e.relatedTarget !== this) {
+				if (e.namespace && e.relatedTarget !== this) {
 					this.suppress([ event ]);
 					callback.apply(this, [].slice.call(arguments, 1));
 					this.release([ event ]);

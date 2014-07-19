@@ -39,14 +39,16 @@
 		 * @type {Object}
 		 */
 		this._handlers = {
-			'initialized.owl.carousel': $.proxy(function() {
-				if (this._core.settings.startPosition == 'URLHash') {
+			'initialized.owl.carousel': $.proxy(function(e) {
+				if (e.namespace && this._core.settings.startPosition == 'URLHash') {
 					$(window).trigger('hashchange.owl.navigation');
 				}
 			}, this),
 			'prepared.owl.carousel': $.proxy(function(e) {
-				var hash = $(e.content).find('[data-hash]').andSelf('[data-hash]').attr('data-hash');
-				this._hashes[hash] = e.content;
+				if (e.namespace) {
+					var hash = $(e.content).find('[data-hash]').andSelf('[data-hash]').attr('data-hash');
+					this._hashes[hash] = e.content;
+				}
 			}, this)
 		};
 

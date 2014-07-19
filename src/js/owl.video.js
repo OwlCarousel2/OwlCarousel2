@@ -47,17 +47,22 @@
 		 */
 		this._handlers = {
 			'resize.owl.carousel': $.proxy(function(e) {
-				if (this._core.settings.video && !this.isInFullScreen()) {
+				if (e.namespace && this._core.settings.video && !this.isInFullScreen()) {
 					e.preventDefault();
 				}
 			}, this),
 			'refresh.owl.carousel changed.owl.carousel': $.proxy(function(e) {
-				if (this._playing) {
+				if (e.namespace && this._playing) {
 					this.stop();
 				}
 			}, this),
 			'prepared.owl.carousel': $.proxy(function(e) {
+				if (!e.namespace) {
+					return;
+				}
+
 				var $element = $(e.content).find('.owl-video');
+
 				if ($element.length) {
 					$element.css('display', 'none');
 					this.fetch($element, $(e.content));

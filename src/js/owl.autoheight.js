@@ -25,18 +25,18 @@
 		 * @type {Object}
 		 */
 		this._handlers = {
-			'initialized.owl.carousel': $.proxy(function() {
-				if (this._core.settings.autoHeight) {
+			'initialized.owl.carousel': $.proxy(function(e) {
+				if (e.namespace && this._core.settings.autoHeight) {
 					this.update();
 				}
 			}, this),
 			'changed.owl.carousel': $.proxy(function(e) {
-				if (this._core.settings.autoHeight && e.property.name == 'position'){
+				if (e.namespace && this._core.settings.autoHeight && e.property.name == 'position'){
 					this.update();
 				}
 			}, this),
 			'loaded.owl.lazy': $.proxy(function(e) {
-				if (this._core.settings.autoHeight && e.element.closest('.' + this._core.settings.itemClass)
+				if (e.namespace && this._core.settings.autoHeight && e.element.closest('.' + this._core.settings.itemClass)
 					=== this._core.$stage.children().eq(this._core.current())) {
 					this.update();
 				}

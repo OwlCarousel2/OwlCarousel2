@@ -20,16 +20,18 @@
 
 		this.handlers = {
 			'change.owl.carousel': $.proxy(function(e) {
-				if (e.property.name == 'position') {
+				if (e.namespace && e.property.name == 'position') {
 					this.previous = this.core.current();
 					this.next = e.property.value;
 				}
 			}, this),
 			'drag.owl.carousel dragged.owl.carousel translated.owl.carousel': $.proxy(function(e) {
-				this.swapping = e.type == 'translated';
+				if (e.namespace) {
+					this.swapping = e.type == 'translated';
+				}
 			}, this),
 			'translate.owl.carousel': $.proxy(function(e) {
-				if (this.swapping && (this.core.options.animateOut || this.core.options.animateIn)) {
+				if (e.namespace && this.swapping && (this.core.options.animateOut || this.core.options.animateIn)) {
 					this.swap();
 				}
 			}, this)

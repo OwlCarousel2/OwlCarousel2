@@ -16,14 +16,20 @@
 		this.core.options = $.extend({}, Autoplay.Defaults, this.core.options);
 
 		this.handlers = {
-			'translated.owl.carousel refreshed.owl.carousel': $.proxy(function() {
-				this.autoplay();
+			'translated.owl.carousel refreshed.owl.carousel': $.proxy(function(e) {
+				if (e.namespace) {
+					this.autoplay();
+				}
 			}, this),
 			'play.owl.autoplay': $.proxy(function(e, t, s) {
-				this.play(t, s);
+				if (e.namespace) {
+					this.play(t, s);
+				}
 			}, this),
-			'stop.owl.autoplay': $.proxy(function() {
-				this.stop();
+			'stop.owl.autoplay': $.proxy(function(e) {
+				if (e.namespace) {
+					this.stop();
+				}
 			}, this),
 			'mouseover.owl.autoplay': $.proxy(function() {
 				if (this.core.settings.autoplayHoverPause) {

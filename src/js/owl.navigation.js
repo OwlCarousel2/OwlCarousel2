@@ -72,30 +72,35 @@
 		 */
 		this._handlers = {
 			'prepared.owl.carousel': $.proxy(function(e) {
-				if (this._core.settings.dotsData) {
+				if (e.namespace && this._core.settings.dotsData) {
 					this._templates.push($(e.content).find('[data-dot]').andSelf('[data-dot]').attr('data-dot'));
 				}
 			}, this),
 			'add.owl.carousel': $.proxy(function(e) {
-				if (this._core.settings.dotsData) {
+				if (e.namespace && this._core.settings.dotsData) {
 					this._templates.splice(e.position, 0, $(e.content).find('[data-dot]').andSelf('[data-dot]').attr('data-dot'));
 				}
 			}, this),
 			'remove.owl.carousel prepared.owl.carousel': $.proxy(function(e) {
-				if (this._core.settings.dotsData) {
+				if (e.namespace && this._core.settings.dotsData) {
 					this._templates.splice(e.position, 1);
 				}
 			}, this),
 			'changed.owl.carousel': $.proxy(function(e) {
-				if (e.property.name == 'position') {
+				if (e.namespace && e.property.name == 'position') {
 					this.draw();
 				}
 			}, this),
-			'refreshed.owl.carousel': $.proxy(function() {
+			'refreshed.owl.carousel': $.proxy(function(e) {
+				if (!e.namespace) {
+					return;
+				}
+
 				if (!this._initialized) {
 					this.initialize();
 					this._initialized = true;
 				}
+
 				this._core.trigger('refresh', null, 'navigation');
 				this.update();
 				this.draw();
