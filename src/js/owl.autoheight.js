@@ -25,7 +25,7 @@
 		 * @type {Object}
 		 */
 		this._handlers = {
-			'initialized.owl.carousel': $.proxy(function(e) {
+			'initialized.owl.carousel resized.owl.carousel': $.proxy(function(e) {
 				if (e.namespace && this._core.settings.autoHeight) {
 					this.update();
 				}
