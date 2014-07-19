@@ -36,8 +36,8 @@
 				}
 			}, this),
 			'loaded.owl.lazy': $.proxy(function(e) {
-				if (e.namespace && this._core.settings.autoHeight && e.element.closest('.' + this._core.settings.itemClass)
-					=== this._core.$stage.children().eq(this._core.current())) {
+				if (e.namespace && this._core.settings.autoHeight
+					&& e.element.closest('.' + this._core.settings.itemClass).index() === this._core.current()) {
 					this.update();
 				}
 			}, this)
