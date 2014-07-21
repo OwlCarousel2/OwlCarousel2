@@ -73,15 +73,16 @@
 		this._handlers = {
 			'prepared.owl.carousel': $.proxy(function(e) {
 				if (e.namespace && this._core.settings.dotsData) {
-					this._templates.push($(e.content).find('[data-dot]').andSelf('[data-dot]').attr('data-dot'));
+					this._templates.push('<div class="' + this._core.settings.dotClass + '">' +
+						$(e.content).find('[data-dot]').andSelf('[data-dot]').attr('data-dot') + '</div>');
 				}
 			}, this),
-			'add.owl.carousel': $.proxy(function(e) {
+			'added.owl.carousel': $.proxy(function(e) {
 				if (e.namespace && this._core.settings.dotsData) {
-					this._templates.splice(e.position, 0, $(e.content).find('[data-dot]').andSelf('[data-dot]').attr('data-dot'));
+					this._templates.splice(e.position, 0, this._templates.pop());
 				}
 			}, this),
-			'remove.owl.carousel prepared.owl.carousel': $.proxy(function(e) {
+			'remove.owl.carousel': $.proxy(function(e) {
 				if (e.namespace && this._core.settings.dotsData) {
 					this._templates.splice(e.position, 1);
 				}
@@ -268,9 +269,8 @@
 	 * @protected
 	 */
 	Navigation.prototype.draw = function() {
-		var difference, i, html = '',
+		var difference,
 			options = this._core.settings,
-			$items = this._core.$stage.children(),
 			index = this._core.relative(this._core.current());
 
 		if (options.nav && !options.loop && !options.rewind) {
@@ -285,13 +285,9 @@
 			difference = this._pages.length - this._controls.$indicators.children().length;
 
 			if (options.dotsData && difference !== 0) {
-				for (i = 0; i < this._controls.$indicators.children().length; i++) {
-					html += this._templates[this._core.relative(i)];
-				}
-				this._controls.$indicators.html(html);
+				this._controls.$indicators.html(this._templates.join(''));
 			} else if (difference > 0) {
-				html = new Array(difference + 1).join(this._templates[0]);
-				this._controls.$indicators.append(html);
+				this._controls.$indicators.append(new Array(difference + 1).join(this._templates[0]));
 			} else if (difference < 0) {
 				this._controls.$indicators.children().slice(difference).remove();
 			}
