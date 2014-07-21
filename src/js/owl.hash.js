@@ -68,7 +68,7 @@
 				return false;
 			}
 
-			this._core.to(position, false, true);
+			this._core.to(this._core.relative(position), false, true);
 		}, this));
 	}
 
