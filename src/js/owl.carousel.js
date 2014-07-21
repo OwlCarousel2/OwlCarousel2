@@ -1148,7 +1148,7 @@
 			maximum -= this._clones.length / 2;
 		}
 
-		return maximum;
+		return Math.max(maximum, 0);
 	};
 
 	/**
