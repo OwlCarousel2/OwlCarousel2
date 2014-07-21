@@ -133,7 +133,7 @@
 		dotsClass: 'owl-dots',
 		dots: true,
 		dotsEach: false,
-		dotData: false,
+		dotsData: false,
 		dotsSpeed: false,
 		dotsContainer: false,
 		controlsClass: 'owl-controls'
@@ -236,7 +236,7 @@
 			upper = lower + this._core.items().length,
 			maximum = this._core.maximum(true),
 			options = this._core.settings,
-			size = options.center || options.autoWidth || options.dotData
+			size = options.center || options.autoWidth || options.dotsData
 				? 1 : options.dotsEach || options.items;
 
 		if (options.slideBy !== 'page') {
@@ -264,7 +264,7 @@
 
 	/**
 	 * Draws the user interface.
-	 * @todo The option `dotData` wont work.
+	 * @todo The option `dotsData` wont work.
 	 * @protected
 	 */
 	Navigation.prototype.draw = function() {
@@ -284,7 +284,7 @@
 		if (options.dots) {
 			difference = this._pages.length - this._controls.$indicators.children().length;
 
-			if (options.dotData && difference !== 0) {
+			if (options.dotsData && difference !== 0) {
 				for (i = 0; i < this._controls.$indicators.children().length; i++) {
 					html += this._templates[this._core.relative(i)];
 				}
@@ -314,7 +314,7 @@
 		event.page = {
 			index: $.inArray(this.current(), this._pages),
 			count: this._pages.length,
-			size: settings && (settings.center || settings.autoWidth || settings.dotData
+			size: settings && (settings.center || settings.autoWidth || settings.dotsData
 				? 1 : settings.dotsEach || settings.items)
 		};
 	}
