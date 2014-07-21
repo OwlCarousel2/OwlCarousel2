@@ -291,8 +291,10 @@
 			var i, n,
 				clones = this._clones,
 				items = this._items,
-				delta = this.settings.loop ? clones.length - (this.settings.rewind ?
-					Math.max(this.settings.items * 2, 4) : Math.ceil(items.length / 2) * 2) : 0;
+				settings = this.settings,
+				view = Math.max(settings.items * 2, 4),
+				size = settings.rewind ? view : Math.max(view, Math.ceil(items.length / 2) * 2),
+				delta = settings.loop ? clones.length - size : 0;
 
 			for (i = 0, n = Math.abs(delta / 2); i < n; i++) {
 				if (delta > 0) {
