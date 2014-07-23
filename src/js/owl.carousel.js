@@ -277,38 +277,29 @@
 	}, {
 		filter: [ 'items', 'settings' ],
 		run: function() {
-			var cached = this._clones,
-				clones = this.$stage.children('.cloned');
-
-			if (clones.length !== cached.length || (!this.settings.loop && cached.length > 0)) {
-				this.$stage.children('.cloned').remove();
-				this._clones = [];
-			}
-		}
-	}, {
-		filter: [ 'items', 'settings' ],
-		run: function() {
-			var i, n,
-				clones = this._clones,
+			var clones = [],
 				items = this._items,
 				settings = this.settings,
 				view = Math.max(settings.items * 2, 4),
-				size = settings.rewind ? view : Math.max(view, Math.ceil(items.length / 2) * 2),
-				delta = settings.loop ? clones.length - size : 0;
+				size = Math.ceil(items.length / 2) * 2,
+				repeat = settings.loop ? settings.rewind ? view : Math.max(view, size) : 0,
+				append = '',
+				prepend = '';
 
-			for (i = 0, n = Math.abs(delta / 2); i < n; i++) {
-				if (delta > 0) {
-					this.$stage.children().eq(items.length + clones.length - 1).remove();
-					clones.pop();
-					this.$stage.children().eq(0).remove();
-					clones.pop();
-				} else {
-					clones.push(this.normalize(clones.length / 2, true));
-					this.$stage.append(items[clones[clones.length - 1]].clone().addClass('cloned'));
-					clones.push(this.normalize(items.length - 1 - (clones.length - 1) / 2, true));
-					this.$stage.prepend(items[clones[clones.length - 1]].clone().addClass('cloned'));
-				}
+			repeat /= 2;
+
+			while (repeat--) {
+				clones.push(this.normalize(clones.length / 2, true));
+				append = append + items[clones[clones.length - 1]][0].outerHTML;
+				clones.push(this.normalize(items.length - 1 - (clones.length - 1) / 2, true));
+				prepend = items[clones[clones.length - 1]][0].outerHTML + prepend;
 			}
+
+			this._clones = clones;
+			this.$stage.children('.cloned').remove();
+
+			$(append).addClass('cloned').appendTo(this.$stage);
+			$(prepend).addClass('cloned').prependTo(this.$stage);
 		}
 	}, {
 		filter: [ 'width', 'items', 'settings' ],
@@ -1403,6 +1394,8 @@
 	 * @param {Number} [position] - The relative position at which to insert the item otherwise the item will be added to the end.
 	 */
 	Owl.prototype.add = function(content, position) {
+		var current = this.relative(this._current);
+
 		position = position === undefined ? this._items.length : this.normalize(position, true);
 		content = content instanceof jQuery ? content : $(content);
 
@@ -1411,7 +1404,7 @@
 		content = this.prepare(content);
 
 		if (this._items.length === 0 || position === this._items.length) {
-			this.$stage.append(content);
+			this._items[position - 1].after(content);
 			this._items.push(content);
 			this._mergers.push(content.find('[data-merge]').andSelf('[data-merge]').attr('data-merge') * 1 || 1);
 		} else {
@@ -1419,6 +1412,8 @@
 			this._items.splice(position, 0, content);
 			this._mergers.splice(position, 0, content.find('[data-merge]').andSelf('[data-merge]').attr('data-merge') * 1 || 1);
 		}
+
+		this.reset(this._items[current].index());
 
 		this.invalidate('items');
 
