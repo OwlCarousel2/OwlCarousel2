@@ -120,3 +120,14 @@ test('invalidate', function() {
 	
 	deepEqual(carousel.invalidate('first'), [ 'first' ], 'Invalidating one part returns it directly.');
 });
+
+test('destroy', function() {
+	expect(1);
+	
+	var simple = $('#simple'),
+		expected = simple.get(0).outerHTML.replace(/\s{2,}/g, '');
+	
+	simple.owlCarousel().owlCarousel('destroy');
+	
+	equal(simple.get(0).outerHTML.replace(/\s{2,}/g, ''), expected, 'Outer HTML before create and after destroy is equal.');
+});

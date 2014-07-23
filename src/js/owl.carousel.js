@@ -225,7 +225,6 @@
 		responsive: {},
 		responsiveRefreshRate: 200,
 		responsiveBaseElement: window,
-		responsiveClass: false,
 
 		fallbackEasing: 'swing',
 
@@ -235,12 +234,16 @@
 		itemElement: 'div',
 		stageElement: 'div',
 
-		// Classes and Names
-		themeClass: 'owl-theme',
-		baseClass: 'owl-carousel',
+		refreshClass: 'owl-refresh',
+		loadedClass: 'owl-loaded',
+		loadingClass: 'owl-loading',
+		rtlClass: 'owl-rtl',
+		responsiveClass: 'owl-responsive',
+		dragClass: 'owl-drag',
 		itemClass: 'owl-item',
-		centerClass: 'center',
-		activeClass: 'active'
+		stageClass: 'owl-stage',
+		stageOuterClass: 'owl-stage-outer',
+		grabClass: 'owl-grab'
 	};
 
 	/**
@@ -378,12 +381,12 @@
 				}
 			}
 
-			this.$stage.children('.' + this.settings.activeClass).removeClass(this.settings.activeClass);
-			this.$stage.children(':eq(' + matches.join('), :eq(') + ')').addClass(this.settings.activeClass);
+			this.$stage.children('.active').removeClass('.active');
+			this.$stage.children(':eq(' + matches.join('), :eq(') + ')').addClass('.active');
 
 			if (this.settings.center) {
-				this.$stage.children('.' + this.settings.centerClass).removeClass(this.settings.centerClass);
-				this.$stage.children().eq(this.current()).addClass(this.settings.centerClass);
+				this.$stage.children('.center').removeClass('.center');
+				this.$stage.children().eq(this.current()).addClass('.center');
 			}
 		}
 	} ];
@@ -395,10 +398,7 @@
 	Owl.prototype.initialize = function() {
 		this.trigger('initialize');
 
-		this.$element
-			.addClass(this.settings.baseClass)
-			.addClass(this.settings.themeClass)
-			.toggleClass('owl-rtl', this.settings.rtl);
+		this.$element.toggleClass(this.settings.rtlClass, this.settings.rtl);
 
 		// check support
 		this.browserSupport();
@@ -415,11 +415,11 @@
 			}
 		}
 
-		this.$element.addClass('owl-loading');
+		this.$element.addClass(this.options.loadingClass);
 
 		// create stage
-		this.$stage = $('<' + this.settings.stageElement + ' class="owl-stage"/>')
-			.wrap('<div class="owl-stage-outer">');
+		this.$stage = $('<' + this.settings.stageElement + ' class="' + this.settings.stageClass + '"/>')
+			.wrap('<div class="' + this.settings.stageOuterClass + '"/>');
 
 		// append stage
 		this.$element.append(this.$stage.parent());
@@ -436,7 +436,9 @@
 			this.invalidate('width');
 		}
 
-		this.$element.removeClass('owl-loading').addClass('owl-loaded');
+		this.$element
+			.removeClass(this.options.loadingClass)
+			.addClass(this.options.loadedClass);
 
 		// attach generic events
 		this.eventsCall();
@@ -476,9 +478,9 @@
 
 			// responsive class
 			if (settings.responsiveClass) {
-				this.$element.attr('class', function(i, c) {
-					return c.replace(/\b owl-responsive-\S+/g, '');
-				}).addClass('owl-responsive-' + match);
+				this.$element.attr('class',
+					this.$element.attr('class').replace(new RegExp('(' + this.options.responsiveClass + '-)\S+\s', 'g'), '$1' + match)
+				);
 			}
 		}
 
@@ -496,9 +498,6 @@
 	 * @protected
 	 */
 	Owl.prototype.optionsLogic = function() {
-		// Toggle Center class
-		this.$element.toggleClass('owl-center', this.settings.center);
-
 		// if items number is less than in body
 		if (this.settings.loop && this._items.length < this.settings.items) {
 			this.settings.loop = false;
@@ -521,7 +520,7 @@
 
 		if (!event.data) {
 			event.data = $('<' + this.settings.itemElement + '/>')
-				.addClass(this.settings.itemClass).append(item)
+				.addClass(this.options.itemClass).append(item)
 		}
 
 		this.trigger('prepared', { content: event.data });
@@ -577,13 +576,11 @@
 
 		this.optionsLogic();
 
-		// hide and show methods helps here to set a proper widths,
-		// this prevents scrollbar to be calculated in stage width
-		this.$stage.addClass('owl-refresh');
+		this.$element.addClass(this.options.refreshClass);
 
 		this.update();
 
-		this.$stage.removeClass('owl-refresh');
+		this.$element.removeClass(this.options.refreshClass);
 
 		this.state.orientation = window.orientation;
 
@@ -679,19 +676,16 @@
 	 * @protected
 	 */
 	Owl.prototype.internalEvents = function() {
-		var isTouch = isTouchSupport(),
-			isTouchIE = isTouchSupportIE();
+		var isTouchIE = isTouchSupportIE();
 
-		if (this.settings.mouseDrag){
-			this.$stage.on('mousedown', $.proxy(function(event) { this.eventsRouter(event) }, this));
-			this.$stage.on('dragstart', function() { return false });
-			this.$stage.get(0).onselectstart = function() { return false };
-		} else {
-			this.$element.addClass('owl-text-select-on');
+		if (this.settings.mouseDrag) {
+			this.$element.addClass(this.options.dragClass);
+			this.$stage.on('mousedown.owl.core', $.proxy(function(event) { this.eventsRouter(event) }, this));
+			this.$stage.on('dragstart.owl.core selectstart.owl.core', function() { return false });
 		}
 
 		if (this.settings.touchDrag && !isTouchIE){
-			this.$stage.on('touchstart touchcancel', $.proxy(function(event) { this.eventsRouter(event) }, this));
+			this.$stage.on('touchstart.owl.core touchcancel.owl.core', $.proxy(function(event) { this.eventsRouter(event) }, this));
 		}
 
 		// catch transitionEnd event
@@ -721,7 +715,7 @@
 		}
 
 		if (event.type === 'mousedown') {
-			this.$stage.addClass('owl-grab');
+			this.$element.addClass(this.options.grabClass);
 		}
 
 		this.trigger('drag');
@@ -768,7 +762,7 @@
 			this.drag.targetEl.draggable = false;
 		}
 
-		$(document).on('mousemove.owl.dragEvents mouseup.owl.dragEvents touchmove.owl.dragEvents touchend.owl.dragEvents', $.proxy(function(event) {this.eventsRouter(event)},this));
+		$(document).on('mousemove.owl.core mouseup.owl.core touchmove.owl.core touchend.owl.core', $.proxy(function(event) {this.eventsRouter(event)},this));
 	};
 
 	/**
@@ -850,13 +844,13 @@
 		}
 
 		if (event.type === 'mouseup') {
-			this.$stage.removeClass('owl-grab');
+			this.$element.removeClass(this.options.grabClass);
 		}
 
 		this.trigger('dragged');
 
 		// prevent links and images dragging;
-		this.drag.targetEl.removeAttribute("draggable");
+		this.drag.targetEl.removeAttribute('draggable');
 
 		// remove drag event listeners
 
@@ -896,7 +890,7 @@
 
 		this.drag.distance = 0;
 
-		$(document).off('.owl.dragEvents');
+		$(document).off('.owl.core');
 	};
 
 	/**
@@ -906,10 +900,10 @@
 	 */
 	Owl.prototype.removeClick = function(target) {
 		this.drag.targetEl = target;
-		$(target).on('click.preventClick', this.e._preventClick);
+		$(target).on('click.owl.core', this.e._preventClick);
 		// to make sure click is removed:
 		window.setTimeout(function() {
-			$(target).off('click.preventClick');
+			$(target).off('click.owl.core');
 		}, 300);
 	};
 
@@ -927,7 +921,7 @@
 		if (ev.stopPropagation) {
 			ev.stopPropagation();
 		}
-		$(ev.target).off('click.preventClick');
+		$(ev.target).off('click.owl.core');
 	};
 
 	/**
@@ -1471,7 +1465,7 @@
 			'remove': this.remove
 		}, $.proxy(function(event, callback) {
 			this.register(event);
-			this.$element.on(event + '.owl.carousel', handler(callback, event + '.owl.carousel'));
+			this.$element.on(event + '.owl.carousel.core', handler(callback, event));
 		}, this));
 
 	};
@@ -1510,9 +1504,9 @@
 	 */
 	Owl.prototype.destroy = function() {
 
-		if (this.$element.hasClass(this.settings.themeClass)) {
-			this.$element.removeClass(this.settings.themeClass);
-		}
+		this.$element.off('.owl.core');
+		this.$stage.off('.owl.core');
+		$(document).off('.owl.core');
 
 		if (this.settings.responsive !== false) {
 			window.clearTimeout(this.resizeTimer);
@@ -1523,27 +1517,25 @@
 			this.off(this.$stage.get(0), this.transitionEndVendor, this.e._transitionEnd);
 		}
 
-		for ( var i in this._plugins) {
+		for (var i in this._plugins) {
 			this._plugins[i].destroy();
 		}
 
-		if (this.settings.mouseDrag || this.settings.touchDrag) {
-			this.$stage.off('mousedown touchstart touchcancel');
-			$(document).off('.owl.dragEvents');
-			this.$stage.get(0).onselectstart = function() {};
-			this.$stage.off('dragstart', function() { return false });
-		}
-
-		// remove event handlers in the ".owl.carousel" namespace
-		this.$element.off('.owl');
-
 		this.$stage.children('.cloned').remove();
-		this.e = null;
-		this.$element.removeData('owl.carousel');
 
+		this.$stage.unwrap();
 		this.$stage.children().contents().unwrap();
 		this.$stage.children().unwrap();
-		this.$stage.unwrap();
+
+		this.$element
+			.removeClass(this.options.refreshClass)
+			.removeClass(this.options.loadingClass)
+			.removeClass(this.options.loadedClass)
+			.removeClass(this.options.rtlClass)
+			.removeClass(this.options.dragClass)
+			.removeClass(this.options.grabClass)
+			.attr('class', this.$element.attr('class').replace(new RegExp(this.options.responsiveClass + '-\S+\s', 'g'), ''))
+			.removeData('owl.carousel');
 	};
 
 	/**
