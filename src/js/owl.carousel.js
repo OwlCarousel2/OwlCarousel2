@@ -1404,7 +1404,8 @@
 		content = this.prepare(content);
 
 		if (this._items.length === 0 || position === this._items.length) {
-			this._items[position - 1].after(content);
+			this._items.length === 0 && this.$stage.append(content);
+			this._items.length !== 0 && this._items[position - 1].after(content);
 			this._items.push(content);
 			this._mergers.push(content.find('[data-merge]').andSelf('[data-merge]').attr('data-merge') * 1 || 1);
 		} else {
@@ -1413,7 +1414,7 @@
 			this._mergers.splice(position, 0, content.find('[data-merge]').andSelf('[data-merge]').attr('data-merge') * 1 || 1);
 		}
 
-		this.reset(this._items[current].index());
+		this._items[current] && this.reset(this._items[current].index());
 
 		this.invalidate('items');
 
