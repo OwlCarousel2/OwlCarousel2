@@ -1679,7 +1679,11 @@
 	 * @protected
 	 */
 	Owl.prototype.browserSupport = function() {
-		this.support3d = isPerspective();
+		if (typeof Modernizr != 'undefined' && typeof Modernizr.csstransforms3d != 'undefined') {
+			this.support3d = Modernizr.csstransforms3d;
+		} else {
+			this.support3d = isPerspective();
+		}
 
 		if (this.support3d) {
 			this.transformVendor = isTransform();
