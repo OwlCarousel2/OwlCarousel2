@@ -285,7 +285,7 @@
 				settings = this.settings,
 				view = Math.max(settings.items * 2, 4),
 				size = Math.ceil(items.length / 2) * 2,
-				repeat = settings.loop ? settings.rewind ? view : Math.max(view, size) : 0,
+				repeat = settings.loop && items.length ? settings.rewind ? view : Math.max(view, size) : 0,
 				append = '',
 				prepend = '';
 
@@ -498,11 +498,6 @@
 	 * @protected
 	 */
 	Owl.prototype.optionsLogic = function() {
-		// if items number is less than in body
-		if (this.settings.loop && this._items.length < this.settings.items) {
-			this.settings.loop = false;
-		}
-
 		if (this.settings.autoWidth) {
 			this.settings.stagePadding = false;
 			this.settings.merge = false;
