@@ -165,7 +165,7 @@
 
 		// create DOM structure for absolute navigation
 		this._controls.$indicators = options.dotsContainer ? $(options.dotsContainer)
-			: $('<div>').hide().addClass(options.dotsClass).appendTo(this._controls.$container);
+			: $('<div>').addClass('disabled').addClass(options.dotsClass).appendTo(this._controls.$container);
 
 		this._controls.$indicators.on('click', 'div', $.proxy(function(e) {
 			var index = $(e.target).parent().is(this._controls.$indicators)
@@ -185,16 +185,16 @@
 
 		this._controls.$previous
 			.addClass(options.navClass[0])
+			.addClass('disabled')
 			.html(options.navText[0])
-			.hide()
 			.prependTo($container)
 			.on('click', $.proxy(function(e) {
 				this.prev(options.navSpeed);
 			}, this));
 		this._controls.$next
 			.addClass(options.navClass[1])
+			.addClass('disabled')
 			.html(options.navText[1])
-			.hide()
 			.appendTo($container)
 			.on('click', $.proxy(function(e) {
 				this.next(options.navSpeed);
@@ -273,13 +273,14 @@
 			options = this._core.settings,
 			index = this._core.relative(this._core.current());
 
+		this._controls.$container.toggleClass('disabled', this._core.items().length <= options.items);
+
 		if (options.nav && !options.loop && !options.rewind) {
 			this._controls.$previous.toggleClass('disabled', index <= this._core.minimum(true));
 			this._controls.$next.toggleClass('disabled', index >= this._core.maximum(true));
 		}
 
-		this._controls.$previous.toggle(options.nav);
-		this._controls.$next.toggle(options.nav);
+		this._controls.$next.parent().toggleClass('disabled', !options.nav);
 
 		if (options.dots) {
 			difference = this._pages.length - this._controls.$indicators.children().length;
@@ -296,7 +297,7 @@
 			this._controls.$indicators.children().eq($.inArray(this.current(), this._pages)).addClass('active');
 		}
 
-		this._controls.$indicators.toggle(options.dots);
+		this._controls.$indicators.toggleClass('disabled', !options.dots);
 	}
 
 	/**
