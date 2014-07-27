@@ -146,26 +146,26 @@
 	 */
 	Navigation.prototype.initialize = function() {
 		var $container, override,
-			options = this._core.settings;
+			settings = this._core.settings;
 
 		// create the indicator template
-		if (!options.dotsData) {
+		if (!settings.dotsData) {
 			this._templates = [ $('<div>')
-				.addClass(options.dotClass)
+				.addClass(settings.dotClass)
 				.append($('<span>'))
 				.prop('outerHTML') ];
 		}
 
 		// create controls container if needed
-		if (!options.navContainer || !options.dotsContainer) {
+		if (!settings.navContainer || !settings.dotsContainer) {
 			this._controls.$container = $('<div>')
-				.addClass(options.controlsClass)
+				.addClass(settings.controlsClass)
 				.appendTo(this.$element);
 		}
 
 		// create DOM structure for absolute navigation
-		this._controls.$indicators = options.dotsContainer ? $(options.dotsContainer)
-			: $('<div>').addClass('disabled').addClass(options.dotsClass).appendTo(this._controls.$container);
+		this._controls.$indicators = settings.dotsContainer ? $(settings.dotsContainer)
+			: $('<div>').addClass('disabled').addClass(settings.dotsClass).appendTo(this._controls.$container);
 
 		this._controls.$indicators.on('click', 'div', $.proxy(function(e) {
 			var index = $(e.target).parent().is(this._controls.$indicators)
@@ -173,31 +173,31 @@
 
 			e.preventDefault();
 
-			this.to(index, options.dotsSpeed);
+			this.to(index, settings.dotsSpeed);
 		}, this));
 
 		// create DOM structure for relative navigation
-		$container = options.navContainer ? $(options.navContainer)
-			: $('<div>').addClass(options.navContainerClass).prependTo(this._controls.$container);
+		$container = settings.navContainer ? $(settings.navContainer)
+			: $('<div>').addClass(settings.navContainerClass).prependTo(this._controls.$container);
 
-		this._controls.$next = $('<' + options.navElement + '>');
+		this._controls.$next = $('<' + settings.navElement + '>');
 		this._controls.$previous = this._controls.$next.clone();
 
 		this._controls.$previous
-			.addClass(options.navClass[0])
+			.addClass(settings.navClass[0])
 			.addClass('disabled')
-			.html(options.navText[0])
+			.html(settings.navText[0])
 			.prependTo($container)
 			.on('click', $.proxy(function(e) {
-				this.prev(options.navSpeed);
+				this.prev(settings.navSpeed);
 			}, this));
 		this._controls.$next
-			.addClass(options.navClass[1])
+			.addClass(settings.navClass[1])
 			.addClass('disabled')
-			.html(options.navText[1])
+			.html(settings.navText[1])
 			.appendTo($container)
 			.on('click', $.proxy(function(e) {
-				this.next(options.navSpeed);
+				this.next(settings.navSpeed);
 			}, this));
 
 		// override public methods of the carousel
@@ -236,15 +236,15 @@
 			lower = this._core.clones().length / 2,
 			upper = lower + this._core.items().length,
 			maximum = this._core.maximum(true),
-			options = this._core.settings,
-			size = options.center || options.autoWidth || options.dotsData
-				? 1 : options.dotsEach || options.items;
+			settings = this._core.settings,
+			size = settings.center || settings.autoWidth || settings.dotsData
+				? 1 : settings.dotsEach || settings.items;
 
-		if (options.slideBy !== 'page') {
-			options.slideBy = Math.min(options.slideBy, options.items);
+		if (settings.slideBy !== 'page') {
+			settings.slideBy = Math.min(settings.slideBy, settings.items);
 		}
 
-		if (options.dots || options.slideBy == 'page') {
+		if (settings.dots || settings.slideBy == 'page') {
 			this._pages = [];
 
 			for (i = lower, j = 0, k = 0; i < upper; i++) {
@@ -270,22 +270,22 @@
 	 */
 	Navigation.prototype.draw = function() {
 		var difference,
-			options = this._core.settings,
+			settings = this._core.settings,
 			index = this._core.relative(this._core.current());
 
-		this._controls.$container.toggleClass('disabled', this._core.items().length <= options.items);
+		this._controls.$container.toggleClass('disabled', this._core.items().length <= settings.items);
 
-		if (options.nav && !options.loop && !options.rewind) {
+		if (settings.nav && !settings.loop && !settings.rewind) {
 			this._controls.$previous.toggleClass('disabled', index <= this._core.minimum(true));
 			this._controls.$next.toggleClass('disabled', index >= this._core.maximum(true));
 		}
 
-		this._controls.$next.parent().toggleClass('disabled', !options.nav);
+		this._controls.$next.parent().toggleClass('disabled', !settings.nav);
 
-		if (options.dots) {
+		if (settings.dots) {
 			difference = this._pages.length - this._controls.$indicators.children().length;
 
-			if (options.dotsData && difference !== 0) {
+			if (settings.dotsData && difference !== 0) {
 				this._controls.$indicators.html(this._templates.join(''));
 			} else if (difference > 0) {
 				this._controls.$indicators.append(new Array(difference + 1).join(this._templates[0]));
@@ -297,7 +297,7 @@
 			this._controls.$indicators.children().eq($.inArray(this.current(), this._pages)).addClass('active');
 		}
 
-		this._controls.$indicators.toggleClass('disabled', !options.dots);
+		this._controls.$indicators.toggleClass('disabled', !settings.dots);
 	}
 
 	/**
@@ -335,9 +335,9 @@
 	 */
 	Navigation.prototype.getPosition = function(successor) {
 		var position, length,
-			options = this._core.settings;
+			settings = this._core.settings;
 
-		if (options.slideBy == 'page') {
+		if (settings.slideBy == 'page') {
 			position = $.inArray(this.current(), this._pages);
 			length = this._pages.length;
 			successor ? ++position : --position;
@@ -345,7 +345,7 @@
 		} else {
 			position = this._core.relative(this._core.current());
 			length = this._core.items().length;
-			successor ? position += options.slideBy : position -= options.slideBy;
+			successor ? position += settings.slideBy : position -= settings.slideBy;
 		}
 
 		return position;
