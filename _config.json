@@ -19,7 +19,8 @@
 			"src/js/owl.animate.js",
 			"src/js/owl.autoplay.js",
 			"src/js/owl.navigation.js",
-			"src/js/owl.hash.js"
+			"src/js/owl.hash.js",
+			"src/js/owl.browsersupport.js"
 		]
 	},
 

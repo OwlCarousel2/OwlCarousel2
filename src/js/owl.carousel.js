@@ -932,8 +932,8 @@
 	Owl.prototype.getTransformProperty = function() {
 		var transform, matrix3d;
 
-		transform = window.getComputedStyle(this.$stage.get(0), null).getPropertyValue(this.vendorName + 'transform');
-		// var transform = this.$stage.css(this.vendorName + 'transform')
+		transform = window.getComputedStyle(this.$stage.get(0), null).getPropertyValue(this.vendorPrefixed('transform'));
+		// var transform = this.$stage.css(this.vendorPrefixed('transform'))
 		transform = transform.replace(/matrix(3d)?\(|\)/g, '').split(',');
 		matrix3d = transform.length === 16;
 
@@ -1679,23 +1679,17 @@
 	 * @protected
 	 */
 	Owl.prototype.browserSupport = function() {
-		if (typeof Modernizr != 'undefined' && typeof Modernizr.csstransforms3d != 'undefined') {
-			this.support3d = Modernizr.csstransforms3d;
-		} else {
-			this.support3d = isPerspective();
+		if (!this.getSupport3d) {
+			throw new Error('You must either include BrowserSupport or Modernizr plugin');
 		}
+        this.support3d = this.getSupport3d();
 
-		if (this.support3d) {
-			this.transformVendor = isTransform();
-
-			// take transitionend event name by detecting transition
-			var endVendors = [ 'transitionend', 'webkitTransitionEnd', 'transitionend', 'oTransitionEnd' ];
-			this.transitionEndVendor = endVendors[isTransition()];
-
-			// take vendor name from transform name
-			this.vendorName = this.transformVendor.replace(/Transform/i, '');
-			this.vendorName = this.vendorName !== '' ? '-' + this.vendorName.toLowerCase() + '-' : '';
-		}
+		var transEndEventNames = {
+			'WebkitTransition': 'webkitTransitionEnd',// Saf 6, Android Browser
+			'MozTransition':    'transitionend',      // only for FF < 15
+			'transition':       'transitionend'       // IE10, Opera, Chrome, FF 15+, Saf 7+
+		};
+		this.transitionEndVendor = transEndEventNames[ this.vendorPrefixed('transition') ];
 
 		this.state.orientation = window.orientation;
 	};
@@ -1730,52 +1724,6 @@
 				};
 			}
 		}
-	}
-
-	/**
-	 * Checks for CSS support.
-	 * @private
-	 * @param {Array} array - The CSS properties to check for.
-	 * @returns {Array} - Contains the supported CSS property name and its index or `false`.
-	 */
-	function isStyleSupported(array) {
-		var p, s, fake = document.createElement('div'), list = array;
-		for (p in list) {
-			s = list[p];
-			if (typeof fake.style[s] !== 'undefined') {
-				fake = null;
-				return [ s, p ];
-			}
-		}
-		return [ false ];
-	}
-
-	/**
-	 * Checks for CSS transition support.
-	 * @private
-	 * @todo Realy bad design
-	 * @returns {Number}
-	 */
-	function isTransition() {
-		return isStyleSupported([ 'transition', 'WebkitTransition', 'MozTransition', 'OTransition' ])[1];
-	}
-
-	/**
-	 * Checks for CSS transform support.
-	 * @private
-	 * @returns {String} The supported property name or false.
-	 */
-	function isTransform() {
-		return isStyleSupported([ 'transform', 'WebkitTransform', 'MozTransform', 'OTransform', 'msTransform' ])[0];
-	}
-
-	/**
-	 * Checks for CSS perspective support.
-	 * @private
-	 * @returns {String} The supported property name or false.
-	 */
-	function isPerspective() {
-		return isStyleSupported([ 'perspective', 'webkitPerspective', 'MozPerspective', 'OPerspective', 'MsPerspective' ])[0];
 	}
 
 	/**
