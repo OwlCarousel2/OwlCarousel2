@@ -44,15 +44,14 @@
 		-webkit-transform-style: preserve-3d;
 	}
 	
-	.owl-controls.disabled,
-	.owl-controls .owl-nav.disabled,
-	.owl-controls .owl-dots.disabled {
+	.owl-nav.disabled,
+	.owl-dots.disabled {
 		display: none;
 	}
 
-	.owl-controls .owl-nav .owl-prev,
-	.owl-controls .owl-nav .owl-next,
-	.owl-controls .owl-dot {
+	.owl-nav .owl-prev,
+	.owl-nav .owl-next,
+	.owl-dot {
 		cursor: pointer;
 		cursor: hand;
 		-webkit-user-select: none;
