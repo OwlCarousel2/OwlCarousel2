@@ -479,7 +479,7 @@
 			// responsive class
 			if (settings.responsiveClass) {
 				this.$element.attr('class',
-					this.$element.attr('class').replace(new RegExp('(' + this.options.responsiveClass + '-)\S+\s', 'g'), '$1' + match)
+					this.$element.attr('class').replace(new RegExp('(' + this.options.responsiveClass + '-)\\S+\\s', 'g'), '$1' + match)
 				);
 			}
 		}
@@ -1529,7 +1529,7 @@
 			.removeClass(this.options.rtlClass)
 			.removeClass(this.options.dragClass)
 			.removeClass(this.options.grabClass)
-			.attr('class', this.$element.attr('class').replace(new RegExp(this.options.responsiveClass + '-\S+\s', 'g'), ''))
+			.attr('class', this.$element.attr('class').replace(new RegExp(this.options.responsiveClass + '-\\S+\\s', 'g'), ''))
 			.removeData('owl.carousel');
 	};
 

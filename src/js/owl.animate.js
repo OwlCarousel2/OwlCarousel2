@@ -94,7 +94,7 @@
 			.removeClass(this.core.settings.animateIn)
 			.removeClass(this.core.settings.animateOut);
 		this.core.transitionEnd();
-	}
+	};
 
 	/**
 	 * Destroys the plugin.

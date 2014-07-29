@@ -127,7 +127,7 @@
 		for (property in Object.getOwnPropertyNames(this)) {
 			typeof this[property] != 'function' && (this[property] = null);
 		}
-	}
+	};
 
 	$.fn.owlCarousel.Constructor.Plugins.Lazy = Lazy;
 
