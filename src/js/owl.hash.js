@@ -62,11 +62,11 @@
 		$(window).on('hashchange.owl.navigation', $.proxy(function() {
 			var hash = window.location.hash.substring(1),
 				items = this._core.$stage.children(),
-                position = this._hashes[hash] && items.index(this._hashes[hash]);
+				position = this._hashes[hash] && items.index(this._hashes[hash]);
 
-            if (!hash || position === false) {
-                return false;
-            }
+			if (!hash || position === false) {
+				return false;
+			}
 
 			this._core.to(this._core.relative(position), false, true);
 		}, this));
