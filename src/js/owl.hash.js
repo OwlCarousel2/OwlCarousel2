@@ -64,7 +64,7 @@
 				items = this._core.$stage.children(),
 				position = this._hashes[hash] && items.index(this._hashes[hash]);
 
-			if (!hash || position === false) {
+			if (position === undefined) {
 				return false;
 			}
 
