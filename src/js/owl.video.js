@@ -202,6 +202,8 @@
 		this._playing.find('.owl-video-frame').remove();
 		this._playing.removeClass('owl-video-playing');
 		this._playing = null;
+		this._core.leave('playing');
+		this._core.trigger('stopped', null, 'video');
 	};
 
 	/**
@@ -210,11 +212,12 @@
 	 * @param {Event} ev - The event arguments.
 	 */
 	Video.prototype.play = function(ev) {
-		this._core.trigger('play', null, 'video');
-
 		if (this._playing) {
-			this.stop();
+			return;
 		}
+
+		this._core.enter('playing');
+		this._core.trigger('play', null, 'video');
 
 		var target = $(ev.target || ev.srcElement),
 			item = target.closest('.' + this._core.settings.itemClass),
@@ -265,14 +268,6 @@
 		if (this._fullscreen) {
 			this._fullscreen = false;
 			return false;
-		}
-
-		// check full screen mode and window orientation
-		if (this._playing) {
-			if (this._core.state.orientation !== window.orientation) {
-				this._core.state.orientation = window.orientation;
-				return false;
-			}
 		}
 
 		return true;

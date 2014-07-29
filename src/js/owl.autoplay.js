@@ -62,7 +62,7 @@
 	 * @todo Must be documented.
 	 */
 	Autoplay.prototype.autoplay = function() {
-		if (this.core.settings.autoplay && !this.core.state.videoPlay) {
+		if (this.core.settings.autoplay && !this.core.is('busy')) {
 			window.clearInterval(this.interval);
 
 			this.interval = window.setInterval($.proxy(function() {
@@ -87,8 +87,7 @@
 			return;
 		}
 
-		if (this.core.state.isTouch || this.core.state.isScrolling
-			|| this.core.state.isSwiping || this.core.state.inMotion) {
+		if (this.core.is('busy')) {
 			return;
 		}
 
