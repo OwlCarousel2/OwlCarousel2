@@ -46,6 +46,11 @@
 		 * @type {Object}
 		 */
 		this._handlers = {
+			'initialized.owl.carousel': $.proxy(function(e) {
+				if (e.namespace) {
+					this._core.register({ type: 'event', name: 'playing', tags: [ 'interacting' ] });
+				}
+			}, this),
 			'resize.owl.carousel': $.proxy(function(e) {
 				if (e.namespace && this._core.settings.video && !this.isInFullScreen()) {
 					e.preventDefault();
