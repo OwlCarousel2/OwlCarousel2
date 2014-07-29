@@ -92,20 +92,23 @@
 					this.draw();
 				}
 			}, this),
-			'refreshed.owl.carousel': $.proxy(function(e) {
-				if (!e.namespace) {
-					return;
-				}
-
-				if (!this._initialized) {
+			'initialized.owl.carousel': $.proxy(function(e) {
+				if (e.namespace && !this._initialized) {
+					this._core.trigger('initialize', null, 'navigation');
 					this.initialize();
+					this.update();
+					this.draw();
 					this._initialized = true;
+					this._core.trigger('initialized', null, 'navigation');
 				}
-
-				this._core.trigger('refresh', null, 'navigation');
-				this.update();
-				this.draw();
-				this._core.trigger('refreshed', null, 'navigation');
+			}, this),
+			'refreshed.owl.carousel': $.proxy(function(e) {
+				if (e.namespace && this._initialized) {
+					this._core.trigger('refresh', null, 'navigation');
+					this.update();
+					this.draw();
+					this._core.trigger('refreshed', null, 'navigation');
+				}
 			}, this)
 		};
 
