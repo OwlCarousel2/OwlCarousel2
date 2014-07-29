@@ -412,7 +412,7 @@
 		// check support
 		this.browserSupport();
 
-		if (this.settings.autoWidth && this.state.imagesLoaded !== true) {
+		if (this.settings.autoWidth && !this.is('pre-loading')) {
 			var imgs, nestedSelector, width;
 			imgs = this.$element.find('img');
 			nestedSelector = this.settings.nestedItemSelector ? '.' + this.settings.nestedItemSelector : undefined;
@@ -420,7 +420,6 @@
 
 			if (imgs.length && width <= 0) {
 				this.preloadAutoWidthImages(imgs);
-				return false;
 			}
 		}
 
@@ -1473,13 +1472,13 @@
 	 */
 	Owl.prototype.preloadAutoWidthImages = function(images) {
 		images.each($.proxy(function(i, element) {
-			this.enter('loading');
+			this.enter('pre-loading');
 			element = $(element);
 			$(new Image()).one('load', $.proxy(function(e) {
 				element.attr('src', e.target.src);
 				element.css('opacity', 1);
-				this.leave('loading');
-				!this.is('loading') && this.refresh();
+				this.leave('pre-loading');
+				!this.is('pre-loading') && !this.is('initializing') && this.refresh();
 			}, this)).attr('src', element.attr('src') || element.attr('data-src') || element.attr('data-src-retina'));
 		}, this));
 	};
