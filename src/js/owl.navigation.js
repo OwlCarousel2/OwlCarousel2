@@ -117,7 +117,7 @@
 
 		// register event handlers
 		this.$element.on(this._handlers);
-	}
+	};
 
 	/**
 	 * Default options.
@@ -140,7 +140,7 @@
 		dotsData: false,
 		dotsSpeed: false,
 		dotsContainer: false
-	}
+	};
 
 	/**
 	 * Initializes the layout of the plugin and extends the carousel.
@@ -193,7 +193,7 @@
 		for (override in this._overrides) {
 			this._core[override] = $.proxy(this[override], this);
 		}
-	}
+	};
 
 	/**
 	 * Destroys the plugin.
@@ -214,7 +214,7 @@
 		for (property in Object.getOwnPropertyNames(this)) {
 			typeof this[property] != 'function' && (this[property] = null);
 		}
-	}
+	};
 
 	/**
 	 * Updates the internal state.
@@ -250,7 +250,7 @@
 				j += this._core.mergers(this._core.relative(i));
 			}
 		}
-	}
+	};
 
 	/**
 	 * Draws the user interface.
@@ -288,7 +288,7 @@
 			this._controls.$absolute.find('.active').removeClass('active');
 			this._controls.$absolute.children().eq($.inArray(this.current(), this._pages)).addClass('active');
 		}
-	}
+	};
 
 	/**
 	 * Extends event data.
@@ -304,7 +304,7 @@
 			size: settings && (settings.center || settings.autoWidth || settings.dotsData
 				? 1 : settings.dotsEach || settings.items)
 		};
-	}
+	};
 
 	/**
 	 * Gets the current page position of the carousel.
@@ -316,7 +316,7 @@
 		return $.grep(this._pages, $.proxy(function(page, index) {
 			return page.start <= current && page.end >= current;
 		}, this)).pop();
-	}
+	};
 
 	/**
 	 * Gets the current succesor/predecessor position.
@@ -339,7 +339,7 @@
 		}
 
 		return position;
-	}
+	};
 
 	/**
 	 * Slides to the next item or page.
@@ -348,7 +348,7 @@
 	 */
 	Navigation.prototype.next = function(speed) {
 		$.proxy(this._overrides.to, this._core)(this.getPosition(true), speed);
-	}
+	};
 
 	/**
 	 * Slides to the previous item or page.
@@ -357,7 +357,7 @@
 	 */
 	Navigation.prototype.prev = function(speed) {
 		$.proxy(this._overrides.to, this._core)(this.getPosition(false), speed);
-	}
+	};
 
 	/**
 	 * Slides to the specified item or page.
@@ -375,7 +375,7 @@
 		} else {
 			$.proxy(this._overrides.to, this._core)(position, speed);
 		}
-	}
+	};
 
 	$.fn.owlCarousel.Constructor.Plugins.Navigation = Navigation;
 
