@@ -647,7 +647,10 @@
 			return false;
 		}
 
+		this.enter('resizing');
+
 		if (this.trigger('resize').isDefaultPrevented()) {
+			this.leave('resizing');
 			return false;
 		}
 
@@ -655,6 +658,7 @@
 
 		this.refresh();
 
+		this.leave('resizing');
 		this.trigger('resized');
 	};
 
