@@ -82,17 +82,21 @@ test('remove and add without loop', function() {
 
 function before_and_after_remove_add(options) {
 	var simple = $('#simple'),
-		expected = null;
+		simpleClone = $('#simple').clone().removeAttr('id').insertAfter('#simple');
+
+    //move the text along as 'add' adds the new element to the add as expected.
+    simpleClone.children(':eq(0)').text('2');
+    simpleClone.children(':eq(1)').text('3');
+    simpleClone.children(':eq(2)').text('1');
 
 	simple.owlCarousel(options);
-	
-	expected = simple.html();
-	
+    simpleClone.owlCarousel(options);
+
 	simple.trigger('remove.owl.carousel', [ 0 ]);
 	simple.trigger('add.owl.carousel', [ '<li>1</li>' ]);
 	simple.trigger('refresh.owl.carousel');
 	
-	equal(simple.html(), expected, 'Inner HTML before and after `remove()` and `add()` equals.');
+	equal(simple.html(), simpleClone.html(), 'Inner HTML before and after `remove()` and `add()` equals.');
 }
 
 test('invalidate', function() {
@@ -110,7 +114,7 @@ test('invalidate', function() {
 	
 	deepEqual(carousel.invalidate(), [ 'first', 'second' ], 'Two invalid parts after invalidating a second one.');
 	
-	carousel.invalidate('second')
+	carousel.invalidate('second');
 	
 	deepEqual(carousel.invalidate(), [ 'first', 'second' ], 'Two invalid parts after invalidating a part twice.');
 	
