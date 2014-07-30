@@ -974,10 +974,23 @@
 		}
 
 		if (this.support3d) {
-			this.$stage.css({
-				transform: 'translate3d(' + coordinate + 'px' + ',0px, 0px)',
-				transition: (this.speed() / 1000) + 's'
-			});
+			var transform_property = 'translate3d(' + coordinate + 'px' + ',0px, 0px)';
+			var transition_property = (this.speed() / 1000) + 's';
+
+			var stage_transition_css = {
+				WebkitTransform : transform_property,
+				MozTransform : transform_property,
+				MsTransform : transform_property,
+				OTransform : transform_property,
+				transform : transform_property,
+				WebkitTransition : transition_property,
+				MozTransition : transition_property,
+				MsTransition : transition_property,
+				OTransition : transition_property,
+				transition : transition_property
+			};
+
+			this.$stage.css( stage_transition_css );
 		} else if (this.is('dragging')) {
 			this.$stage.css({
 				left: coordinate + 'px'
