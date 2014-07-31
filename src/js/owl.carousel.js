@@ -687,15 +687,13 @@
 	 * @protected
 	 */
 	Owl.prototype.internalEvents = function() {
-		var isTouchIE = isTouchSupportIE();
-
 		if (this.settings.mouseDrag) {
 			this.$element.addClass(this.options.dragClass);
 			this.$stage.on('mousedown.owl.core', $.proxy(function(event) { this.eventsRouter(event) }, this));
 			this.$stage.on('dragstart.owl.core selectstart.owl.core', function() { return false });
 		}
 
-		if (this.settings.touchDrag && !isTouchIE){
+		if (this.settings.touchDrag && !Owl.Support.pointer){
 			this.$stage.on('touchstart.owl.core touchcancel.owl.core', $.proxy(function(event) { this.eventsRouter(event) }, this));
 		}
 
@@ -1730,15 +1728,6 @@
 				};
 			}
 		}
-	}
-
-	/**
-	 * Checks wether touch is supported or not for IE.
-	 * @private
-	 * @returns {Boolean}
-	 */
-	function isTouchSupportIE() {
-		return window.navigator.msPointerEnabled;
 	}
 
 	/**
