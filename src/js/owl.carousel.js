@@ -413,8 +413,6 @@
 			throw new Error('You must either include owl.support.js or owl.support.modernizr.js plugin');
 		}
 
-		this.state.orientation = window.orientation;
-
 		if (this.settings.autoWidth && !this.is('pre-loading')) {
 			var imgs, nestedSelector, width;
 			imgs = this.$element.find('img');
