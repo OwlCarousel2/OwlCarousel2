@@ -409,10 +409,6 @@
 
 		this.$element.toggleClass(this.settings.rtlClass, this.settings.rtl);
 
-		if (!Owl.Support) {
-			throw new Error('You must either include owl.support.js or owl.support.modernizr.js plugin');
-		}
-
 		if (this.settings.autoWidth && !this.is('pre-loading')) {
 			var imgs, nestedSelector, width;
 			imgs = this.$element.find('img');
@@ -682,6 +678,7 @@
 
 	/**
 	 * Checks for touch/mouse drag options and add necessery event handlers.
+	 * @todo Check `msPointerEnabled`
 	 * @protected
 	 */
 	Owl.prototype.internalEvents = function() {
@@ -691,13 +688,13 @@
 			this.$stage.on('dragstart.owl.core selectstart.owl.core', function() { return false });
 		}
 
-		if (this.settings.touchDrag && !Owl.Support.pointer){
+		if (this.settings.touchDrag){
 			this.$stage.on('touchstart.owl.core touchcancel.owl.core', $.proxy(function(event) { this.eventsRouter(event) }, this));
 		}
 
 		// catch transitionEnd event
-		if (Owl.Support.transition) {
-			this.on(this.$stage.get(0), Owl.Support.transition, this.e._transitionEnd, false);
+		if ($.support.transition) {
+			this.on(this.$stage.get(0), $.support.transition.end, this.e._transitionEnd, false);
 		}
 
 		// responsive
@@ -712,7 +709,7 @@
 	 * @param {Event} event - The event arguments.
 	 */
 	Owl.prototype.onDragStart = function(event) {
-		var pageX, pageY, animatedPos;
+		var pageX, pageY, position;
 
 		event = event.originalEvent || event || window.event;
 
@@ -742,11 +739,11 @@
 		}
 
 		// catch position // ie to fix
-		if (this.is('animating') && Owl.Support.transform && Owl.Support.transform['3d']) {
-			animatedPos = this.getTransformProperty();
-			this.drag.offsetX = animatedPos;
-			this.animate(animatedPos);
-		} else if (this.is('animating') && !(Owl.Support.transform && Owl.Support.transform['3d'])) {
+		if (this.is('animating') && $.support.transform3d) {
+			position = this.$stage.css('transform').replace(/.*\(|\)| /g, '').split(',');
+			this.drag.offsetX = position.length === 16 ? position[12] : position[4];
+			this.animate(this.drag.offsetX);
+		} else if (this.is('animating')) {
 			return false;
 		}
 
@@ -903,22 +900,6 @@
 	};
 
 	/**
-	 * Catches stage position while animate (only CSS3).
-	 * @protected
-	 * @returns
-	 */
-	Owl.prototype.getTransformProperty = function() {
-		var transform, matrix3d;
-
-		transform = window.getComputedStyle(this.$stage.get(0), null).getPropertyValue(this.vendorPrefixed('transform'));
-		// var transform = this.$stage.css(this.vendorPrefixed('transform'))
-		transform = transform.replace(/matrix(3d)?\(|\)/g, '').split(',');
-		matrix3d = transform.length === 16;
-
-		return matrix3d !== true ? transform[4] : transform[12];
-	};
-
-	/**
 	 * Gets absolute position of the closest item for a coordinate.
 	 * @todo Setting `freeDrag` makes `closest` not reusable. See #165.
 	 * @protected
@@ -959,6 +940,7 @@
 
 	/**
 	 * Animates the stage.
+	 * @todo #270
 	 * @public
 	 * @param {Number} coordinate - The coordinate in pixels.
 	 */
@@ -972,9 +954,9 @@
 			this.trigger('translate');
 		}
 
-		if (Owl.Support.transform && Owl.Support.transform['3d']) {
+		if ($.support.transform3d && $.support.transition) {
 			this.$stage.css({
-				transform: 'translate3d(' + coordinate + 'px' + ',0px, 0px)',
+				transform: 'translate3d(' + coordinate + 'px,0px,0px)',
 				transition: (this.speed() / 1000) + 's'
 			});
 		} else if (this.is('dragging')) {
@@ -1497,8 +1479,8 @@
 			this.off(window, 'resize', this.e._onThrottledResize);
 		}
 
-		if (Owl.Support.transition) {
-			this.off(this.$stage.get(0), Owl.Support.transition, this.e._transitionEnd);
+		if ($.support.transition) {
+			this.off(this.$stage.get(0), $.support.transition.end, this.e._transitionEnd);
 		}
 
 		for (var i in this._plugins) {

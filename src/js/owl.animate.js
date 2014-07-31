@@ -56,7 +56,11 @@
 	 */
 	Animate.prototype.swap = function() {
 
-		if (this.core.settings.items !== 1 || !(this.core.Support.transform && this.core.Support.transform['3d'])) {
+		if (this.core.settings.items !== 1) {
+			return;
+		}
+
+		if (!$.support.animation || !$.support.transition) {
 			return;
 		}
 
@@ -75,16 +79,16 @@
 
 		if (outgoing) {
 			left = this.core.coordinates(this.previous) - this.core.coordinates(this.next);
-			previous.css( { 'left': left + 'px' } )
+			previous.one($.support.animation.end, clear)
+				.css( { 'left': left + 'px' } )
 				.addClass('animated owl-animated-out')
-				.addClass(outgoing)
-				.one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', clear);
+				.addClass(outgoing);
 		}
 
 		if (incoming) {
-			next.addClass('animated owl-animated-in')
-				.addClass(incoming)
-				.one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', clear);
+			next.one($.support.animation.end, clear)
+				.addClass('animated owl-animated-in')
+				.addClass(incoming);
 		}
 	};
 
@@ -93,7 +97,7 @@
 			.removeClass('animated owl-animated-out owl-animated-in')
 			.removeClass(this.core.settings.animateIn)
 			.removeClass(this.core.settings.animateOut);
-		this.core.transitionEnd();
+		this.core.onTransitionEnd();
 	};
 
 	/**
