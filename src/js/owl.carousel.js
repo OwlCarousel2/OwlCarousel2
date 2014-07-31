@@ -409,8 +409,9 @@
 
 		this.$element.toggleClass(this.settings.rtlClass, this.settings.rtl);
 
-		// check support
-		this.browserSupport();
+		if (!Owl.Support) {
+			throw new Error('You must either include owl.support.js or owl.support.modernizr.js plugin');
+		}
 
 		if (this.settings.autoWidth && !this.is('pre-loading')) {
 			var imgs, nestedSelector, width;
@@ -684,21 +685,19 @@
 	 * @protected
 	 */
 	Owl.prototype.internalEvents = function() {
-		var isTouchIE = isTouchSupportIE();
-
 		if (this.settings.mouseDrag) {
 			this.$element.addClass(this.options.dragClass);
 			this.$stage.on('mousedown.owl.core', $.proxy(function(event) { this.eventsRouter(event) }, this));
 			this.$stage.on('dragstart.owl.core selectstart.owl.core', function() { return false });
 		}
 
-		if (this.settings.touchDrag && !isTouchIE){
+		if (this.settings.touchDrag && !Owl.Support.pointer){
 			this.$stage.on('touchstart.owl.core touchcancel.owl.core', $.proxy(function(event) { this.eventsRouter(event) }, this));
 		}
 
 		// catch transitionEnd event
-		if (this.transitionEndVendor) {
-			this.on(this.$stage.get(0), this.transitionEndVendor, this.e._transitionEnd, false);
+		if (Owl.Support.transition) {
+			this.on(this.$stage.get(0), Owl.Support.transition, this.e._transitionEnd, false);
 		}
 
 		// responsive
@@ -743,11 +742,11 @@
 		}
 
 		// catch position // ie to fix
-		if (this.is('animating') && this.support3d) {
+		if (this.is('animating') && Owl.Support.transform && Owl.Support.transform['3d']) {
 			animatedPos = this.getTransformProperty();
 			this.drag.offsetX = animatedPos;
 			this.animate(animatedPos);
-		} else if (this.is('animating') && !this.support3d) {
+		} else if (this.is('animating') && !(Owl.Support.transform && Owl.Support.transform['3d'])) {
 			return false;
 		}
 
@@ -911,8 +910,8 @@
 	Owl.prototype.getTransformProperty = function() {
 		var transform, matrix3d;
 
-		transform = window.getComputedStyle(this.$stage.get(0), null).getPropertyValue(this.vendorName + 'transform');
-		// var transform = this.$stage.css(this.vendorName + 'transform')
+		transform = window.getComputedStyle(this.$stage.get(0), null).getPropertyValue(this.vendorPrefixed('transform'));
+		// var transform = this.$stage.css(this.vendorPrefixed('transform'))
 		transform = transform.replace(/matrix(3d)?\(|\)/g, '').split(',');
 		matrix3d = transform.length === 16;
 
@@ -973,7 +972,7 @@
 			this.trigger('translate');
 		}
 
-		if (this.support3d) {
+		if (Owl.Support.transform && Owl.Support.transform['3d']) {
 			this.$stage.css({
 				transform: 'translate3d(' + coordinate + 'px' + ',0px, 0px)',
 				transition: (this.speed() / 1000) + 's'
@@ -1498,8 +1497,8 @@
 			this.off(window, 'resize', this.e._onThrottledResize);
 		}
 
-		if (this.transitionEndVendor) {
-			this.off(this.$stage.get(0), this.transitionEndVendor, this.e._transitionEnd);
+		if (Owl.Support.transition) {
+			this.off(this.$stage.get(0), Owl.Support.transition, this.e._transitionEnd);
 		}
 
 		for (var i in this._plugins) {
@@ -1699,26 +1698,6 @@
 	}
 
 	/**
-	 * Checks the availability of some browser features.
-	 * @protected
-	 */
-	Owl.prototype.browserSupport = function() {
-		this.support3d = isPerspective();
-
-		if (this.support3d) {
-			this.transformVendor = isTransform();
-
-			// take transitionend event name by detecting transition
-			var endVendors = [ 'transitionend', 'webkitTransitionEnd', 'transitionend', 'oTransitionEnd' ];
-			this.transitionEndVendor = endVendors[isTransition()];
-
-			// take vendor name from transform name
-			this.vendorName = this.transformVendor.replace(/Transform/i, '');
-			this.vendorName = this.vendorName !== '' ? '-' + this.vendorName.toLowerCase() + '-' : '';
-		}
-	};
-
-	/**
 	 * Get touch/drag coordinats.
 	 * @private
 	 * @param {event} - mousedown/touchstart event
@@ -1747,70 +1726,6 @@
 				};
 			}
 		}
-	}
-
-	/**
-	 * Checks for CSS support.
-	 * @private
-	 * @param {Array} array - The CSS properties to check for.
-	 * @returns {Array} - Contains the supported CSS property name and its index or `false`.
-	 */
-	function isStyleSupported(array) {
-		var p, s, fake = document.createElement('div'), list = array;
-		for (p in list) {
-			s = list[p];
-			if (typeof fake.style[s] !== 'undefined') {
-				fake = null;
-				return [ s, p ];
-			}
-		}
-		return [ false ];
-	}
-
-	/**
-	 * Checks for CSS transition support.
-	 * @private
-	 * @todo Realy bad design
-	 * @returns {Number}
-	 */
-	function isTransition() {
-		return isStyleSupported([ 'transition', 'WebkitTransition', 'MozTransition', 'OTransition' ])[1];
-	}
-
-	/**
-	 * Checks for CSS transform support.
-	 * @private
-	 * @returns {String} The supported property name or false.
-	 */
-	function isTransform() {
-		return isStyleSupported([ 'transform', 'WebkitTransform', 'MozTransform', 'OTransform', 'msTransform' ])[0];
-	}
-
-	/**
-	 * Checks for CSS perspective support.
-	 * @private
-	 * @returns {String} The supported property name or false.
-	 */
-	function isPerspective() {
-		return isStyleSupported([ 'perspective', 'webkitPerspective', 'MozPerspective', 'OPerspective', 'MsPerspective' ])[0];
-	}
-
-	/**
-	 * Checks wether touch is supported or not.
-	 * @private
-	 * @returns {Boolean}
-	 */
-	function isTouchSupport() {
-		return 'ontouchstart' in window || !!(navigator.msMaxTouchPoints);
-	}
-
-	/**
-	 * Checks wether touch is supported or not for IE.
-	 * @private
-	 * @returns {Boolean}
-	 */
-	function isTouchSupportIE() {
-		return window.navigator.msPointerEnabled;
 	}
 
 	/**

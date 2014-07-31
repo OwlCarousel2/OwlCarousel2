@@ -56,7 +56,7 @@
 	 */
 	Animate.prototype.swap = function() {
 
-		if (this.core.settings.items !== 1 || !this.core.support3d) {
+		if (this.core.settings.items !== 1 || !(this.core.Support.transform && this.core.Support.transform['3d'])) {
 			return;
 		}
 
