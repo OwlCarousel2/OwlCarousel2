@@ -7,6 +7,10 @@
  */
 ;(function($, Modernizr, window, document, undefined) {
 
+	var Owl = $.fn.owlCarousel.Constructor,
+		transition = false,
+		transform = false,
+		transEndEventNames;
 	if (!Modernizr) {
 		throw new Error('Modernizr is not loaded.');
 	}
@@ -26,7 +30,6 @@
 		throw new Error('Modernizr csstransforms3d test is not loaded.');
 	}
 
-	var Owl = $.fn.owlCarousel.Constructor;
 	Owl.Support = {};
 
 	/**
@@ -41,9 +44,8 @@
 	*/
 	Owl.Support.pointer = Modernizr.pointerevents;
 
-	var transition = false;
 	if (Modernizr.csstransitions) {
-		var transEndEventNames = {
+		transEndEventNames = {
 			'WebkitTransition': 'webkitTransitionEnd',// Saf 6, Android Browser
 			'MozTransition':    'transitionend',      // only for FF < 15
 			'transition':       'transitionend'       // IE10, Opera, Chrome, FF 15+, Saf 7+
@@ -58,7 +60,6 @@
 	*/
 	Owl.Support.transition = transition;
 
-	var transform = false;
 	if (Modernizr.csstransforms) {
 		transform = {
 			'2d': Modernizr.csstransforms,
@@ -74,6 +75,5 @@
 	* @see http://www.paulirish.com/2012/why-moving-elements-with-translate-is-better-than-posabs-topleft/
 	*/
 	Owl.Support.transform = transform;
-
 
 })(window.Zepto || window.jQuery, window.Modernizr, window, document);

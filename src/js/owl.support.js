@@ -8,49 +8,36 @@
  */
 ;(function($, window, document, undefined) {
 
+	var Owl = $.fn.owlCarousel.Constructor,
+		transition = false,
+		transform = false,
+		transEndEventNames,
+		Modernizr;
+
 	/* Modernizr 2.8.3 (Custom Build) | MIT & BSD
 	* Build: http://modernizr.com/download/#-csstransforms-csstransforms3d-csstransitions-touch-prefixed-teststyles-testprop-testallprops-prefixes-domprefixes-css_pointerevents
 	*/
-	var Modernizr = (function( window, document, undefined ) {
+	Modernizr = (function( window, document, undefined ) {
 
 		var version = '2.8.3',
-
 		Modernizr = {},
-
-
 		docElement = document.documentElement,
-
 		mod = 'modernizr',
 		modElem = document.createElement(mod),
 		mStyle = modElem.style,
-
-		inputElem  ,
-
-
+		inputElem,
 		toString = {}.toString,
-
 		prefixes = ' -webkit- -moz- -o- -ms- '.split(' '),
-
-
-
 		omPrefixes = 'Webkit Moz O ms',
-
 		cssomPrefixes = omPrefixes.split(' '),
-
 		domPrefixes = omPrefixes.toLowerCase().split(' '),
-
-
 		tests = {},
 		inputs = {},
 		attrs = {},
-
 		classes = [],
-
 		slice = classes.slice,
-
 		featureName,
-
-
+		feature,
 		injectElementWithStyles = function( rule, callback, nodes, testnames ) {
 
 		var style, ret, node, docOverflow,
@@ -66,7 +53,7 @@
 			}
 		}
 
-					style = ['&#173;','<style id="s', mod, '">', rule, '</style>'].join('');
+					style = [ '&#173;','<style id="s', mod, '">', rule, '</style>' ].join('');
 		div.id = mod;
 			(body ? div : fakeBody).innerHTML += style;
 		fakeBody.appendChild(div);
@@ -92,56 +79,12 @@
 		_hasOwnProperty = ({}).hasOwnProperty, hasOwnProp;
 
 		if ( !is(_hasOwnProperty, 'undefined') && !is(_hasOwnProperty.call, 'undefined') ) {
-		hasOwnProp = function (object, property) {
+		hasOwnProp = function(object, property) {
 			return _hasOwnProperty.call(object, property);
 		};
-		}
-		else {
-		hasOwnProp = function (object, property) {
+		} else {
+		hasOwnProp = function(object, property) {
 			return ((property in object) && is(object.constructor.prototype[property], 'undefined'));
-		};
-		}
-
-
-		if (!Function.prototype.bind) {
-		Function.prototype.bind = function bind(that) {
-
-			var target = this;
-
-			if (typeof target != "function") {
-				throw new TypeError();
-			}
-
-			var args = slice.call(arguments, 1),
-				bound = function () {
-
-				if (this instanceof bound) {
-
-				var F = function(){};
-				F.prototype = target.prototype;
-				var self = new F();
-
-				var result = target.apply(
-					self,
-					args.concat(slice.call(arguments))
-				);
-				if (Object(result) === result) {
-					return result;
-				}
-				return self;
-
-				} else {
-
-				return target.apply(
-					that,
-					args.concat(slice.call(arguments))
-				);
-
-				}
-
-			};
-
-			return bound;
 		};
 		}
 
@@ -162,8 +105,9 @@
 		}
 
 		function testProps( props, prefixed ) {
-			for ( var i in props ) {
-				var prop = props[i];
+			var i, prop;
+			for ( i in props ) {
+				prop = props[i];
 				if ( !contains(prop, "-") && mStyle[prop] !== undefined ) {
 					return prefixed == 'pfx' ? prop : true;
 				}
@@ -172,14 +116,15 @@
 		}
 
 		function testDOMProps( props, obj, elem ) {
-			for ( var i in props ) {
-				var item = obj[props[i]];
+			var i, item;
+			for ( i in props ) {
+				item = obj[props[i]];
 				if ( item !== undefined) {
 
-								if (elem === false) return props[i];
+								if (elem === false) { return props[i]; }
 
-								if (is(item, 'function')){
-									return item.bind(elem || obj);
+								if (is(item, 'function')) {
+									return $.proxy(item, elem || obj);
 					}
 
 								return item;
@@ -193,7 +138,7 @@
 			var ucProp  = prop.charAt(0).toUpperCase() + prop.slice(1),
 				props   = (prop + ' ' + cssomPrefixes.join(ucProp + ' ') + ucProp).split(' ');
 
-				if(is(prefixed, "string") || is(prefixed, "undefined")) {
+				if (is(prefixed, "string") || is(prefixed, "undefined")) {
 			return testProps(props, prefixed);
 
 				} else {
@@ -203,10 +148,10 @@
 		}    tests['touch'] = function() {
 			var bool;
 
-			if(('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch) {
+			if (('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch) {
 			bool = true;
 			} else {
-			injectElementWithStyles(['@media (',prefixes.join('touch-enabled),('),mod,')','{#modernizr{top:9px;position:absolute}}'].join(''), function( node ) {
+			injectElementWithStyles([ '@media (',prefixes.join('touch-enabled),('),mod,')','{#modernizr{top:9px;position:absolute}}' ].join(''), function( node ) {
 				bool = node.offsetTop === 9;
 			});
 			}
@@ -214,12 +159,9 @@
 			return bool;
 		};
 
-
-
 		tests['csstransforms'] = function() {
 			return !!testPropsAll('transform');
 		};
-
 
 		tests['csstransforms3d'] = function() {
 
@@ -234,14 +176,11 @@
 			return ret;
 		};
 
-
 		tests['csstransitions'] = function() {
 			return testPropsAll('transition');
 		};
 
-
-
-		for ( var feature in tests ) {
+		for ( feature in tests ) {
 			if ( hasOwnProp(tests, feature) ) {
 										featureName  = feature.toLowerCase();
 				Modernizr[featureName] = tests[feature]();
@@ -250,9 +189,7 @@
 			}
 		}
 
-
-
-		Modernizr.addTest = function ( feature, test ) {
+		Modernizr.addTest = function( feature, test ) {
 		if ( typeof feature == 'object' ) {
 			for ( var key in feature ) {
 			if ( hasOwnProp( feature, key ) ) {
@@ -279,36 +216,28 @@
 		return Modernizr;
 		};
 
-
 		setCss('');
 		modElem = inputElem = null;
 
-
 		Modernizr._version      = version;
-
 		Modernizr._prefixes     = prefixes;
 		Modernizr._domPrefixes  = domPrefixes;
 		Modernizr._cssomPrefixes  = cssomPrefixes;
 
-
-
-		Modernizr.testProp      = function(prop){
-			return testProps([prop]);
+		Modernizr.testProp      = function(prop) {
+			return testProps([ prop ]);
 		};
 
 		Modernizr.testAllProps  = testPropsAll;
 
-
 		Modernizr.testStyles    = injectElementWithStyles;
-		Modernizr.prefixed      = function(prop, obj, elem){
-		if(!obj) {
+		Modernizr.prefixed      = function(prop, obj, elem) {
+		if (!obj) {
 			return testPropsAll(prop, 'pfx');
 		} else {
 				return testPropsAll(prop, obj, elem);
 		}
 		};
-
-
 
 		return Modernizr;
 
@@ -321,13 +250,12 @@
 	// github.com/ausi/Feature-detection-technique-for-pointer-events/wiki
 	// github.com/Modernizr/Modernizr/issues/80
 
-
-	Modernizr.addTest('pointerevents', function(){
+	Modernizr.addTest('pointerevents', function() {
 		var element = document.createElement('x'),
 			documentElement = document.documentElement,
 			getComputedStyle = window.getComputedStyle,
 			supports;
-		if(!('pointerEvents' in element.style)){
+		if (!('pointerEvents' in element.style)) {
 			return false;
 		}
 		element.style.pointerEvents = 'auto';
@@ -342,8 +270,6 @@
 
 	// END Modernizr build
 
-
-	var Owl = $.fn.owlCarousel.Constructor;
 	Owl.Support = {};
 
 	/**
@@ -358,9 +284,8 @@
 	*/
 	Owl.Support.pointer = Modernizr.pointerevents;
 
-	var transition = false;
 	if (Modernizr.csstransitions) {
-		var transEndEventNames = {
+		transEndEventNames = {
 			'WebkitTransition': 'webkitTransitionEnd',// Saf 6, Android Browser
 			'MozTransition':    'transitionend',      // only for FF < 15
 			'transition':       'transitionend'       // IE10, Opera, Chrome, FF 15+, Saf 7+
@@ -375,7 +300,6 @@
 	*/
 	Owl.Support.transition = transition;
 
-	var transform = false;
 	if (Modernizr.csstransforms) {
 		transform = {
 			'2d': Modernizr.csstransforms,
