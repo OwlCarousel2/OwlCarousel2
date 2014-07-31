@@ -9,9 +9,8 @@
 ;(function($, window, document, undefined) {
 
 	/* Modernizr 2.8.3 (Custom Build) | MIT & BSD
-	* Build: http://modernizr.com/download/#-csstransforms3d-prefixed-teststyles-testprop-testallprops-prefixes-domprefixes
+	* Build: http://modernizr.com/download/#-csstransforms-csstransforms3d-csstransitions-touch-prefixed-teststyles-testprop-testallprops-prefixes-domprefixes-css_pointerevents
 	*/
-
 	var Modernizr = (function( window, document, undefined ) {
 
 		var version = '2.8.3',
@@ -201,7 +200,28 @@
 			props = (prop + ' ' + (domPrefixes).join(ucProp + ' ') + ucProp).split(' ');
 			return testDOMProps(props, prefixed, elem);
 			}
-		}    tests['csstransforms3d'] = function() {
+		}    tests['touch'] = function() {
+			var bool;
+
+			if(('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch) {
+			bool = true;
+			} else {
+			injectElementWithStyles(['@media (',prefixes.join('touch-enabled),('),mod,')','{#modernizr{top:9px;position:absolute}}'].join(''), function( node ) {
+				bool = node.offsetTop === 9;
+			});
+			}
+
+			return bool;
+		};
+
+
+
+		tests['csstransforms'] = function() {
+			return !!testPropsAll('transform');
+		};
+
+
+		tests['csstransforms3d'] = function() {
 
 			var ret = !!testPropsAll('perspective');
 
@@ -213,6 +233,14 @@
 			}
 			return ret;
 		};
+
+
+		tests['csstransitions'] = function() {
+			return testPropsAll('transition');
+		};
+
+
+
 		for ( var feature in tests ) {
 			if ( hasOwnProp(tests, feature) ) {
 										featureName  = feature.toLowerCase();
@@ -286,11 +314,82 @@
 
 	})(window, document);
 
-	$.fn.owlCarousel.Constructor.prototype.vendorPrefixed = function(property) {
-		return Modernizr.prefixed(property);
-	};
-	$.fn.owlCarousel.Constructor.prototype.getSupport3d = function() {
-		return Modernizr.csstransforms3d;
-	};
+	// developer.mozilla.org/en/CSS/pointer-events
+
+	// Test and project pages:
+	// ausi.github.com/Feature-detection-technique-for-pointer-events/
+	// github.com/ausi/Feature-detection-technique-for-pointer-events/wiki
+	// github.com/Modernizr/Modernizr/issues/80
+
+
+	Modernizr.addTest('pointerevents', function(){
+		var element = document.createElement('x'),
+			documentElement = document.documentElement,
+			getComputedStyle = window.getComputedStyle,
+			supports;
+		if(!('pointerEvents' in element.style)){
+			return false;
+		}
+		element.style.pointerEvents = 'auto';
+		element.style.pointerEvents = 'x';
+		documentElement.appendChild(element);
+		supports = getComputedStyle &&
+			getComputedStyle(element, '').pointerEvents === 'auto';
+		documentElement.removeChild(element);
+		return !!supports;
+	});
+	;
+
+	// END Modernizr build
+
+
+	var Owl = $.fn.owlCarousel.Constructor;
+	Owl.Support = {};
+
+	/**
+	* Indicates whether touch events are supported or not.
+	* @type {Boolean}
+	*/
+	Owl.Support.touch = Modernizr.touch;
+
+	/**
+	* Indicates whether pointer events are supported or not.
+	* @type {Boolean}
+	*/
+	Owl.Support.pointer = Modernizr.pointerevents;
+
+	var transition = false;
+	if (Modernizr.csstransitions) {
+		var transEndEventNames = {
+			'WebkitTransition': 'webkitTransitionEnd',// Saf 6, Android Browser
+			'MozTransition':    'transitionend',      // only for FF < 15
+			'transition':       'transitionend'       // IE10, Opera, Chrome, FF 15+, Saf 7+
+		};
+		transition = transEndEventNames[ Modernizr.prefixed('transition') ];
+	}
+	/**
+	* Is `false` when CSS3 transitions are not supported or an object which
+	* includes a `end` property with the available `transitionend` event name.
+	* Similiar to Twitter's Bootstrap.
+	* @type {Boolean|Object}
+	*/
+	Owl.Support.transition = transition;
+
+	var transform = false;
+	if (Modernizr.csstransforms) {
+		transform = {
+			'2d': Modernizr.csstransforms,
+			'3d': Modernizr.csstransforms3d
+		};
+	}
+	/**
+	* Is `false` when CSS3 transforms are not supported at all. Otherwise it's an object
+	* with two boolean members `2d` and `3d` which indicates the availability of CSS3
+	* 2D and 3D tranformations.
+	* @type {Boolean|Object}
+	* @todo I'm not sure if 2D and 3D would make sense to check
+	* @see http://www.paulirish.com/2012/why-moving-elements-with-translate-is-better-than-posabs-topleft/
+	*/
+	Owl.Support.transform = transform;
 
 })(window.Zepto || window.jQuery, window, document);

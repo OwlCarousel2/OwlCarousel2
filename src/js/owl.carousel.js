@@ -400,8 +400,11 @@
 
 		this.$element.toggleClass(this.settings.rtlClass, this.settings.rtl);
 
-		// check support
-		this.browserSupport();
+		if (!Owl.Support) {
+			throw new Error('You must either include owl.support.js or owl.support.modernizr.js plugin');
+		}
+
+		this.state.orientation = window.orientation;
 
 		if (this.settings.autoWidth && this.state.imagesLoaded !== true) {
 			var imgs, nestedSelector, width;
@@ -689,8 +692,8 @@
 		}
 
 		// catch transitionEnd event
-		if (this.transitionEndVendor) {
-			this.on(this.$stage.get(0), this.transitionEndVendor, this.e._transitionEnd, false);
+		if (Owl.Support.transition) {
+			this.on(this.$stage.get(0), Owl.Support.transition, this.e._transitionEnd, false);
 		}
 
 		// responsive
@@ -739,12 +742,12 @@
 		}
 
 		// catch position // ie to fix
-		if (this.state.inMotion && this.support3d) {
+		if (this.state.inMotion && Owl.Support.transform && Owl.Support.transform['3d']) {
 			animatedPos = this.getTransformProperty();
 			this.drag.offsetX = animatedPos;
 			this.animate(animatedPos);
 			this.state.inMotion = true;
-		} else if (this.state.inMotion && !this.support3d) {
+		} else if (this.state.inMotion && !(Owl.Support.transform && Owl.Support.transform['3d'])) {
 			this.state.inMotion = false;
 			return false;
 		}
@@ -984,7 +987,7 @@
 		this.trigger('translate');
 		this.state.inMotion = this.speed() > 0;
 
-		if (this.support3d) {
+		if (Owl.Support.transform && Owl.Support.transform['3d']) {
 			this.$stage.css({
 				transform: 'translate3d(' + coordinate + 'px' + ',0px, 0px)',
 				transition: (this.speed() / 1000) + 's'
@@ -1513,8 +1516,8 @@
 			this.off(window, 'resize', this.e._onThrottledResize);
 		}
 
-		if (this.transitionEndVendor) {
-			this.off(this.$stage.get(0), this.transitionEndVendor, this.e._transitionEnd);
+		if (Owl.Support.transition) {
+			this.off(this.$stage.get(0), Owl.Support.transition, this.e._transitionEnd);
 		}
 
 		for (var i in this._plugins) {
@@ -1675,26 +1678,6 @@
 	}
 
 	/**
-	 * Checks the availability of some browser features.
-	 * @protected
-	 */
-	Owl.prototype.browserSupport = function() {
-		if (!this.getSupport3d) {
-			throw new Error('You must either include BrowserSupport or Modernizr plugin');
-		}
-        this.support3d = this.getSupport3d();
-
-		var transEndEventNames = {
-			'WebkitTransition': 'webkitTransitionEnd',// Saf 6, Android Browser
-			'MozTransition':    'transitionend',      // only for FF < 15
-			'transition':       'transitionend'       // IE10, Opera, Chrome, FF 15+, Saf 7+
-		};
-		this.transitionEndVendor = transEndEventNames[ this.vendorPrefixed('transition') ];
-
-		this.state.orientation = window.orientation;
-	};
-
-	/**
 	 * Get touch/drag coordinats.
 	 * @private
 	 * @param {event} - mousedown/touchstart event
@@ -1724,15 +1707,6 @@
 				};
 			}
 		}
-	}
-
-	/**
-	 * Checks wether touch is supported or not.
-	 * @private
-	 * @returns {Boolean}
-	 */
-	function isTouchSupport() {
-		return 'ontouchstart' in window || !!(navigator.msMaxTouchPoints);
 	}
 
 	/**
