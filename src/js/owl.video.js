@@ -34,25 +34,29 @@
 		this._playing = null;
 
 		/**
-		 * Whether this is in fullscreen or not.
-		 * @protected
-		 * @type {Boolean}
-		 */
-		this._fullscreen = false;
-
-		/**
 		 * All event handlers.
+		 * @todo The cloned content removale is too late
 		 * @protected
 		 * @type {Object}
 		 */
 		this._handlers = {
+			'initialized.owl.carousel': $.proxy(function(e) {
+				if (e.namespace) {
+					this._core.register({ type: 'state', name: 'playing', tags: [ 'interacting' ] });
+				}
+			}, this),
 			'resize.owl.carousel': $.proxy(function(e) {
-				if (e.namespace && this._core.settings.video && !this.isInFullScreen()) {
+				if (e.namespace && this._core.settings.video && this.isInFullScreen()) {
 					e.preventDefault();
 				}
 			}, this),
-			'refresh.owl.carousel changed.owl.carousel': $.proxy(function(e) {
-				if (e.namespace && this._playing) {
+			'refreshed.owl.carousel': $.proxy(function(e) {
+				if (e.namespace && this._core.is('resizing')) {
+					this._core.$stage.find('.cloned .owl-video-frame').remove();
+				}
+			}, this),
+			'changed.owl.carousel': $.proxy(function(e) {
+				if (e.namespace && e.property.name === 'position' && this._playing) {
 					this.stop();
 				}
 			}, this),
@@ -98,7 +102,6 @@
 	 * @param {jQuery} item - The item containing the video.
 	 */
 	Video.prototype.fetch = function(target, item) {
-
 		var type = target.attr('data-vimeo-id') ? 'vimeo' : 'youtube',
 			id = target.attr('data-vimeo-id') || target.attr('data-youtube-id'),
 			width = target.attr('data-width') || this._core.settings.videoWidth,
@@ -140,7 +143,6 @@
 	 * @see `fetch`
 	 */
 	Video.prototype.thumbnail = function(target, video) {
-
 		var tnLink,
 			icon,
 			path,
@@ -202,42 +204,46 @@
 		this._playing.find('.owl-video-frame').remove();
 		this._playing.removeClass('owl-video-playing');
 		this._playing = null;
+		this._core.leave('playing');
+		this._core.trigger('stopped', null, 'video');
 	};
 
 	/**
 	 * Starts the current video.
 	 * @public
-	 * @param {Event} ev - The event arguments.
+	 * @param {Event} event - The event arguments.
 	 */
-	Video.prototype.play = function(ev) {
-		this._core.trigger('play', null, 'video');
-
-		if (this._playing) {
-			this.stop();
-		}
-
-		var target = $(ev.target || ev.srcElement),
+	Video.prototype.play = function(event) {
+		var target = $(event.target),
 			item = target.closest('.' + this._core.settings.itemClass),
 			video = this._videos[item.attr('data-video')],
 			width = video.width || '100%',
 			height = video.height || this._core.$stage.height(),
-			html, wrap;
+			html;
 
-		if (video.type === 'youtube') {
-			html = '<iframe width="' + width + '" height="' + height + '" src="http://www.youtube.com/embed/'
-				+ video.id + '?autoplay=1&v=' + video.id + '" frameborder="0" allowfullscreen></iframe>';
-		} else if (video.type === 'vimeo') {
-			html = '<iframe src="http://player.vimeo.com/video/' + video.id + '?autoplay=1" width="' + width
-				+ '" height="' + height
-				+ '" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+		if (this._playing) {
+			return;
 		}
 
-		item.addClass('owl-video-playing');
-		this._playing = item;
+		this._core.enter('playing');
+		this._core.trigger('play', null, 'video');
 
-		wrap = $('<div style="height:' + height + 'px; width:' + width + 'px" class="owl-video-frame">'
-			+ html + '</div>');
-		target.after(wrap);
+		item = this._core.items(this._core.relative(item.index()));
+
+		this._core.reset(item.index());
+
+		if (video.type === 'youtube') {
+			html = '<iframe width="' + width + '" height="' + height + '" src="http://www.youtube.com/embed/' +
+				video.id + '?autoplay=1&v=' + video.id + '" frameborder="0" allowfullscreen></iframe>';
+		} else if (video.type === 'vimeo') {
+			html = '<iframe src="http://player.vimeo.com/video/' + video.id +
+				'?autoplay=1" width="' + width + '" height="' + height +
+				'" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+		}
+
+		$('<div class="owl-video-frame">' + html + '</div>').insertAfter(item.find('.owl-video'));
+
+		this._playing = item.addClass('owl-video-playing');
 	};
 
 	/**
@@ -247,35 +253,10 @@
 	 * @returns {Boolean}
 	 */
 	Video.prototype.isInFullScreen = function() {
+		var element = document.fullscreenElement || document.mozFullScreenElement ||
+				document.webkitFullscreenElement;
 
-		// if Vimeo Fullscreen mode
-		var element = document.fullscreenElement || document.mozFullScreenElement
-			|| document.webkitFullscreenElement;
-
-		if (element && $(element).parent().hasClass('owl-video-frame')) {
-			this._core.speed(0);
-			this._fullscreen = true;
-		}
-
-		if (element && this._fullscreen && this._playing) {
-			return false;
-		}
-
-		// comming back from fullscreen
-		if (this._fullscreen) {
-			this._fullscreen = false;
-			return false;
-		}
-
-		// check full screen mode and window orientation
-		if (this._playing) {
-			if (this._core.state.orientation !== window.orientation) {
-				this._core.state.orientation = window.orientation;
-				return false;
-			}
-		}
-
-		return true;
+		return element && $(element).parent().hasClass('owl-video-frame');
 	};
 
 	/**

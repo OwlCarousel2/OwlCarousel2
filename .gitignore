@@ -1,5 +1,7 @@
+*.iml
 .sass-cache
 .bowerrc
+.idea
 /bower_components
 /docs
 /node_modules

@@ -45,7 +45,7 @@ module.exports = function(grunt) {
 				},
 				index: {
 					options: {
-						layout: 'home.hbs',
+						layout: 'home.hbs'
 					},
 					files: [ {
 						expand: true,

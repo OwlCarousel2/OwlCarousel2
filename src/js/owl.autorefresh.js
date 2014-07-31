@@ -22,7 +22,7 @@
 		/**
 		 * Refresh interval.
 		 * @protected
-		 * @type {}
+		 * @type {number}
 		 */
 		this._interval = null;
 
