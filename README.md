@@ -56,9 +56,9 @@ To define which plugins are build into the distribution just edit `/_config.json
 
 ## Contributing
 
-Please take a moment to review this chapter in order to make the contribution process easy and effective for everyone involved.
-
 The [issue tracker](https://github.com/OwlFonk/OwlCarousel2/issues) is the preferred channel for bug reports, features requests and submitting pull requests.
+
+**Please do not use the issue tracker for personal support requests. Stack Overflow ([`owl-carousel`](http://stackoverflow.com/questions/tagged/owl-carousel)) is a better place to get help.**
 
 ### Bug reports
 
