@@ -31,7 +31,7 @@
 		throw new Error('Modernizr is not loaded.');
 	}
 
-	$.each([ 'csstransitions', 'csstransforms', 'csstransforms3d', 'prefixed' ], function(i, property) {
+	$.each([ 'cssanimations', 'csstransitions', 'csstransforms', 'csstransforms3d', 'prefixed' ], function(i, property) {
 		if (!Modernizr[property]) {
 			throw new Error([ 'Modernizr "', property, '" is not loaded.' ].join(''));
 		}
