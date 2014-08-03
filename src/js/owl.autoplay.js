@@ -149,7 +149,7 @@
 		this.stop();
 
 		for (handler in this._handlers) {
-			this._core.$element.off(handler, this.handlers[handler]);
+			this._core.$element.off(handler, this._handlers[handler]);
 		}
 		for (property in Object.getOwnPropertyNames(this)) {
 			typeof this[property] != 'function' && (this[property] = null);
