@@ -266,9 +266,9 @@
 		this._controls.$relative.toggleClass('disabled', !settings.nav || disabled);
 
 		if (settings.nav && !settings.loop && !settings.rewind) {
-			this._controls.$relative.find(settings.navClass[0])
+			this._controls.$relative.find('.' + settings.navClass[0])
 				.toggleClass('disabled', index <= this._core.minimum(true));
-			this._controls.$relative.find(settings.navClass[0])
+			this._controls.$relative.find('.' + settings.navClass[1])
 				.toggleClass('disabled', index >= this._core.maximum(true));
 		}
 
