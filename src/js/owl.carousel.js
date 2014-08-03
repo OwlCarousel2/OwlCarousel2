@@ -11,42 +11,6 @@
  */
 ;(function($, window, document, undefined) {
 
-	var drag, e;
-
-	/**
-	 * Template for status information about drag and touch events.
-	 * @private
-	 */
-	drag = {
-		start: 0,
-		startX: 0,
-		startY: 0,
-		current: 0,
-		currentX: 0,
-		currentY: 0,
-		offsetX: 0,
-		offsetY: 0,
-		distance: null,
-		startTime: 0,
-		endTime: 0,
-		updatedX: 0,
-		targetEl: null
-	};
-
-	/**
-	 * Event functions references.
-	 * @private
-	 */
-	e = {
-		_onDragStart: null,
-		_onDragMove: null,
-		_onDragEnd: null,
-		_transitionEnd: null,
-		_resizer: null,
-		_responsiveCall: null,
-		_checkVisibile: null
-	};
-
 	/**
 	 * Creates a carousel.
 	 * @class The Owl Carousel.
@@ -75,16 +39,10 @@
 		this.$element = $(element);
 
 		/**
-		 * Caches informations about drag and touch events.
-		 * @todo Remove from the core
-		 */
-		this.drag = $.extend({}, drag);
-
-		/**
+		 * Proxied event handlers.
 		 * @protected
-		 * @todo Must be documented
 		 */
-		this.e = $.extend({}, e);
+		this._handlers = {};
 
 		/**
 		 * References to the running plugins of this carousel.
@@ -161,6 +119,22 @@
 		this._pipe = [];
 
 		/**
+		 * Current state information for the drag operation.
+		 * @todo #261
+		 * @protected
+		 */
+		this._drag = {
+			time: null,
+			target: null,
+			pointer: null,
+			stage: {
+				start: null,
+				current: null
+			},
+			direction: null
+		};
+
+		/**
 		 * Current state information and their tags.
 		 * @type {Object}
 		 * @protected
@@ -173,6 +147,10 @@
 				'dragging': [ 'interacting' ]
 			}
 		};
+
+		$.each([ 'onResize', 'onThrottledResize' ], $.proxy(function(i, handler) {
+			this._handlers[handler] = $.proxy(this[handler], this);
+		}, this));
 
 		$.each(Owl.Plugins, $.proxy(function(key, plugin) {
 			this._plugins[key[0].toLowerCase() + key.slice(1)]
@@ -445,14 +423,8 @@
 			.removeClass(this.options.loadingClass)
 			.addClass(this.options.loadedClass);
 
-		// attach generic events
-		this.eventsCall();
-
-		// attach generic events
-		this.internalEvents();
-
-		// attach custom control events
-		this.addTriggerableEvents();
+		// register event handlers
+		this.registerEventHandlers();
 
 		this.leave('initializing');
 		this.trigger('initialized');
@@ -547,6 +519,8 @@
 		}
 
 		this._invalidated = {};
+
+		!this.is('valid') && this.enter('valid');
 	};
 
 	/**
@@ -589,41 +563,12 @@
 	};
 
 	/**
-	 * Save internal event references and add event based functions.
-	 * @protected
-	 */
-	Owl.prototype.eventsCall = function() {
-		// Save events references
-		this.e._onDragStart = $.proxy(function(e) {
-			this.onDragStart(e);
-		}, this);
-		this.e._onDragMove = $.proxy(function(e) {
-			this.onDragMove(e);
-		}, this);
-		this.e._onDragEnd = $.proxy(function(e) {
-			this.onDragEnd(e);
-		}, this);
-		this.e._onResize = $.proxy(function(e) {
-			this.onResize(e);
-		}, this);
-		this.e._onThrottledResize = $.proxy(function(e) {
-			this.onThrottledResize(e);
-		}, this);
-		this.e._transitionEnd = $.proxy(function(e) {
-			this.transitionEnd(e);
-		}, this);
-		this.e._preventClick = $.proxy(function(e) {
-			this.preventClick(e);
-		}, this);
-	};
-
-	/**
 	 * Checks window `resize` event.
 	 * @protected
 	 */
 	Owl.prototype.onThrottledResize = function() {
 		window.clearTimeout(this.resizeTimer);
-		this.resizeTimer = window.setTimeout(this.e._onResize, this.settings.responsiveRefreshRate);
+		this.resizeTimer = window.setTimeout(this._handlers.onResize, this.settings.responsiveRefreshRate);
 	};
 
 	/**
@@ -659,244 +604,158 @@
 	};
 
 	/**
-	 * Checks for touch/mouse drag event type and add run event handlers.
-	 * @protected
-	 */
-	Owl.prototype.eventsRouter = function(event) {
-		var type = event.type;
-
-		if (type === "mousedown" || type === "touchstart") {
-			this.onDragStart(event);
-		} else if (type === "mousemove" || type === "touchmove") {
-			this.onDragMove(event);
-		} else if (type === "mouseup" || type === "touchend") {
-			this.onDragEnd(event);
-		} else if (type === "touchcancel") {
-			this.onDragEnd(event);
-		}
-	};
-
-	/**
-	 * Checks for touch/mouse drag options and add necessery event handlers.
+	 * Registers event handlers.
 	 * @todo Check `msPointerEnabled`
+	 * @todo #261
 	 * @protected
 	 */
-	Owl.prototype.internalEvents = function() {
+	Owl.prototype.registerEventHandlers = function() {
+		if ($.support.transition) {
+			this.$stage.on($.support.transition.end + '.owl.core', $.proxy(this.onTransitionEnd, this));
+		}
+
+		if (this.settings.responsive !== false) {
+			this.on(window, 'resize', this._handlers.onThrottledResize);
+		}
+
 		if (this.settings.mouseDrag) {
 			this.$element.addClass(this.options.dragClass);
-			this.$stage.on('mousedown.owl.core', $.proxy(function(event) { this.eventsRouter(event) }, this));
+			this.$stage.on('mousedown.owl.core', $.proxy(this.onDragStart, this));
 			this.$stage.on('dragstart.owl.core selectstart.owl.core', function() { return false });
 		}
 
 		if (this.settings.touchDrag){
-			this.$stage.on('touchstart.owl.core touchcancel.owl.core', $.proxy(function(event) { this.eventsRouter(event) }, this));
-		}
-
-		// catch transitionEnd event
-		if ($.support.transition) {
-			this.on(this.$stage.get(0), $.support.transition.end, this.e._transitionEnd, false);
-		}
-
-		// responsive
-		if (this.settings.responsive !== false) {
-			this.on(window, 'resize', this.e._onThrottledResize);
+			this.$stage.on('touchstart.owl.core', $.proxy(this.onDragStart, this));
+			this.$stage.on('touchcancel.owl.core', $.proxy(this.onDragEnd, this));
 		}
 	};
 
 	/**
-	 * Handles touchstart/mousedown event.
+	 * Handles `touchstart` and `mousedown` events.
+	 * @todo #261
 	 * @protected
 	 * @param {Event} event - The event arguments.
 	 */
 	Owl.prototype.onDragStart = function(event) {
-		var pageX, pageY, position;
+		var stage = null;
 
-		event = event.originalEvent || event || window.event;
-
-		// prevent right click
 		if (event.which === 3 || this.is('dragging')) {
 			return false;
 		}
 
-		this.$element.toggleClass(this.options.grabClass, event.type === 'mousedown');
+		event.preventDefault();
 
 		this.enter('dragging');
 		this.trigger('drag');
-		this.drag.startTime = new Date().getTime();
+
+		if ($.support.transform) {
+			stage = this.$stage.css('transform').replace(/.*\(|\)| /g, '').split(',');
+			stage = {
+				x: stage[stage.length === 16 ? 12 : 4],
+				y: stage[stage.length === 16 ? 13 : 5]
+			};
+		} else {
+			stage = this.$stage.position();
+			stage = {
+				x: this.settings.rtl ?
+					stage.left + this.$stage.width() - this.width() + this.settings.margin :
+					stage.left,
+				y: stage.top
+			};
+		}
+
+		if (this.is('animating')) {
+			$.support.transform ? this.animate(stage.x) : this.$stage.stop()
+			this.invalidate('position');
+		}
+
+		this.$element.toggleClass(this.options.grabClass, event.type === 'mousedown');
+
 		this.speed(0);
-		this.drag.distance = 0;
 
-		pageX = getTouches(event).x;
-		pageY = getTouches(event).y;
+		this._drag.time = new Date().getTime();
+		this._drag.target = $(event.target);
+		this._drag.stage.start = stage;
+		this._drag.stage.current = stage;
+		this._drag.pointer = this.pointer(event);
 
-		// get stage position left
-		this.drag.offsetX = this.$stage.position().left;
-		this.drag.offsetY = this.$stage.position().top;
-
-		if (this.settings.rtl) {
-			this.drag.offsetX = this.$stage.position().left + this.$stage.width() - this.width()
-				+ this.settings.margin;
-		}
-
-		// catch position // ie to fix
-		if (this.is('animating') && $.support.transform3d) {
-			position = this.$stage.css('transform').replace(/.*\(|\)| /g, '').split(',');
-			this.drag.offsetX = position.length === 16 ? position[12] : position[4];
-			this.animate(this.drag.offsetX);
-		} else if (this.is('animating')) {
-			return false;
-		}
-
-		this.drag.startX = pageX - this.drag.offsetX;
-		this.drag.startY = pageY - this.drag.offsetY;
-
-		this.drag.start = pageX - this.drag.startX;
-		this.drag.targetEl = event.target || event.srcElement;
-		this.drag.updatedX = this.drag.start;
-
-		// to do/check
-		// prevent links and images dragging;
-		if (this.drag.targetEl.tagName === "IMG" || this.drag.targetEl.tagName === "A") {
-			this.drag.targetEl.draggable = false;
-		}
-
-		$(document).on('mousemove.owl.core mouseup.owl.core touchmove.owl.core touchend.owl.core', $.proxy(function(event) {this.eventsRouter(event)},this));
+		$(document).on('mousemove.owl.core touchmove.owl.core', $.proxy(this.onDragMove, this));
+		$(document).on('mouseup.owl.core touchend.owl.core', $.proxy(this.onDragEnd, this));
 	};
 
 	/**
-	 * Handles the touchmove/mousemove events.
+	 * Handles the `touchmove` and `mousemove` events.
 	 * @todo Horizontal swipe threshold as option
+	 * @todo #261
 	 * @protected
 	 * @param {Event} event - The event arguments.
 	 */
 	Owl.prototype.onDragMove = function(event) {
-		var pageX, pageY, minimum, maximum, pull;
+		var minimum = null,
+			maximum = null,
+			pull = null,
+			delta = this.difference(this._drag.pointer, this.pointer(event)),
+			stage = this.difference(this._drag.stage.start, delta);
 
 		if (!this.is('dragging')) {
 			return;
 		}
 
-		event = event.originalEvent || event || window.event;
-
-		pageX = getTouches(event).x;
-		pageY = getTouches(event).y;
-
-		// drag direction
-		this.drag.currentX = pageX - this.drag.startX;
-		this.drag.currentY = pageY - this.drag.startY;
-		this.drag.distance = this.drag.currentX - this.drag.offsetX;
-
-		// handle boundaries
 		if (this.settings.loop) {
 			minimum = this.coordinates(this.minimum());
 			maximum = this.coordinates(this.maximum() + 1) - minimum;
-			this.drag.currentX = (((this.drag.currentX - minimum) % maximum + maximum) % maximum) + minimum;
+			stage.x = (((stage.x - minimum) % maximum + maximum) % maximum) + minimum;
 		} else {
 			minimum = this.settings.rtl ? this.coordinates(this.maximum()) : this.coordinates(this.minimum());
 			maximum = this.settings.rtl ? this.coordinates(this.minimum()) : this.coordinates(this.maximum());
-			pull = this.settings.pullDrag ? this.drag.distance / 5 : 0;
-			this.drag.currentX = Math.max(Math.min(this.drag.currentX, minimum + pull), maximum + pull);
+			pull = this.settings.pullDrag ? -1 * delta.x / 5 : 0;
+			stage.x = Math.max(Math.min(stage.x, minimum + pull), maximum + pull);
 		}
 
-		// lock browser if swiping horizontal
-		if ((this.drag.distance > 8 || this.drag.distance < -8)) {
-			event.preventDefault && event.preventDefault();
-			event.returnValue = false;
+		if (delta.x > 8 || delta.x < -8) {
+			event.preventDefault();
 		}
 
-		this.drag.updatedX = this.drag.currentX;
+		this.animate(stage.x);
 
-		this.animate(this.drag.updatedX);
+		this._drag.stage.current = stage;
 	};
 
 	/**
-	 * Handles the touchend/mouseup events.
+	 * Handles the `touchend` and `mouseup` events.
+	 * @todo #261
+	 * @todo Threshold for click event
 	 * @protected
+	 * @param {Event} event - The event arguments.
 	 */
 	Owl.prototype.onDragEnd = function(event) {
-		var compareTimes,
-			distanceAbs,
-			direction;
+		var delta = this.difference(this._drag.pointer, this.pointer(event)),
+			stage = this._drag.stage.current,
+			direction = delta.x > 0 ^ this.settings.rtl ? 'left' : 'right';
 
 		if (!this.is('dragging')) {
 			return;
 		}
 
-		if (event.type === 'mouseup') {
-			this.$element.removeClass(this.options.grabClass);
-		}
+		this.$element.removeClass(this.options.grabClass);
 
-		this.leave('dragging');
-		this.trigger('dragged');
+		if (delta.x !== 0 || !this.is('valid')) {
+			if (Math.abs(delta.x) > 3 || new Date().getTime() - this._drag.time > 300) {
+				this._drag.target.one('click.owl.core', function() { return false; });
+			}
 
-		// prevent links and images dragging;
-		this.drag.targetEl.removeAttribute('draggable');
+			this.speed(this.settings.dragEndSpeed || this.settings.smartSpeed);
+			this.current(this.closest(stage.x, delta.x !== 0 ? direction : this._drag.direction));
+			this.invalidate('position');
+			this.update();
 
-		// to check
-		if (this.drag.distance === 0 && !this.is('animating')) {
-			return false;
-		}
-
-		// prevent clicks while scrolling
-		this.drag.endTime = new Date().getTime();
-		compareTimes = this.drag.endTime - this.drag.startTime;
-		distanceAbs = Math.abs(this.drag.distance);
-
-		// to test
-		if (distanceAbs > 3 || compareTimes > 300) {
-			this.removeClick(this.drag.targetEl);
-		}
-
-		if (this.drag.distance < 0) {
-			direction = this.settings.rtl ? 'right' : 'left';
-		} else if (this.drag.distance > 0) {
-			direction = this.settings.rtl ? 'left' : 'right';
-		}
-
-		this.drag.distance = 0;
-
-		this.speed(this.settings.dragEndSpeed || this.settings.smartSpeed);
-		this.current(this.closest(this.drag.updatedX, direction));
-		this.invalidate('position');
-		this.update();
-
-		// if pullDrag is off then fire transitionEnd event manually when stick to border
-		if (!this.settings.pullDrag && this.drag.updatedX === this.coordinates(closest)) {
-			this.transitionEnd();
+			this._drag.direction = direction;
 		}
 
 		$(document).off('.owl.core');
-	};
 
-	/**
-	 * Attaches `preventClick` to disable link while swipping.
-	 * @protected
-	 * @param {HTMLElement} [target] - The target of the `click` event.
-	 */
-	Owl.prototype.removeClick = function(target) {
-		this.drag.targetEl = target;
-		$(target).on('click.owl.core', this.e._preventClick);
-		// to make sure click is removed:
-		window.setTimeout(function() {
-			$(target).off('click.owl.core');
-		}, 300);
-	};
-
-	/**
-	 * Suppresses click event.
-	 * @protected
-	 * @param {Event} ev - The event arguments.
-	 */
-	Owl.prototype.preventClick = function(ev) {
-		if (ev.preventDefault) {
-			ev.preventDefault();
-		} else {
-			ev.returnValue = false;
-		}
-		if (ev.stopPropagation) {
-			ev.stopPropagation();
-		}
-		$(ev.target).off('click.owl.core');
+		this.leave('dragging');
+		this.trigger('dragged');
 	};
 
 	/**
@@ -947,7 +806,7 @@
 	Owl.prototype.animate = function(coordinate) {
 		var animate = this.speed() > 0;
 
-		this.is('animating') && this.transitionEnd();
+		this.is('animating') && this.onTransitionEnd();
 
 		if (animate) {
 			this.enter('animating');
@@ -959,16 +818,14 @@
 				transform: 'translate3d(' + coordinate + 'px,0px,0px)',
 				transition: (this.speed() / 1000) + 's'
 			});
-		} else if (this.is('dragging')) {
+		} else if (animate) {
+			this.$stage.animate({
+				left: coordinate + 'px'
+			}, this.speed(), this.settings.fallbackEasing, $.proxy(this.onTransitionEnd, this));
+		} else {
 			this.$stage.css({
 				left: coordinate + 'px'
 			});
-		} else {
-			this.$stage.animate({
-				left: coordinate
-			}, this.speed(), this.settings.fallbackEasing, $.proxy(function() {
-				animate && this.transitionEnd();
-			}, this));
 		}
 	};
 
@@ -1023,6 +880,7 @@
 	Owl.prototype.invalidate = function(part) {
 		if ($.type(part) === 'string') {
 			this._invalidated[part] = true;
+			this.is('valid') && this.leave('valid');
 		}
 		return $.map(this._invalidated, function(v, i) { return i });
 	};
@@ -1291,7 +1149,7 @@
 	 * @protected
 	 * @param {Event} event - The event arguments.
 	 */
-	Owl.prototype.transitionEnd = function(event) {
+	Owl.prototype.onTransitionEnd = function(event) {
 
 		// if css2 animation then event object is undefined
 		if (event !== undefined) {
@@ -1417,36 +1275,6 @@
 	};
 
 	/**
-	 * Adds triggerable events.
-	 * @protected
-	 */
-	Owl.prototype.addTriggerableEvents = function() {
-		var handler = $.proxy(function(callback, event) {
-			return $.proxy(function(e) {
-				if (e.namespace && e.relatedTarget !== this) {
-					this.suppress([ event ]);
-					callback.apply(this, [].slice.call(arguments, 1));
-					this.release([ event ]);
-				}
-			}, this);
-		}, this);
-
-		$.each({
-			'next': this.next,
-			'prev': this.prev,
-			'to': this.to,
-			'destroy': this.destroy,
-			'refresh': this.refresh,
-			'replace': this.replace,
-			'add': this.add,
-			'remove': this.remove
-		}, $.proxy(function(event, callback) {
-			this.register({ type: Owl.Type.Event, name: event });
-			this.$element.on(event + '.owl.carousel.core', handler(callback, event));
-		}, this));
-	};
-
-	/**
 	 * Preloads images with auto width.
 	 * @todo Replace by a more generic approach
 	 * @protected
@@ -1476,11 +1304,7 @@
 
 		if (this.settings.responsive !== false) {
 			window.clearTimeout(this.resizeTimer);
-			this.off(window, 'resize', this.e._onThrottledResize);
-		}
-
-		if ($.support.transition) {
-			this.off(this.$stage.get(0), $.support.transition.end, this.e._transitionEnd);
+			this.off(window, 'resize', this._handlers.onThrottledResize);
 		}
 
 		for (var i in this._plugins) {
@@ -1666,7 +1490,7 @@
 		$.each(events, $.proxy(function(index, event) {
 			this._supress[event] = true;
 		}, this));
-	}
+	};
 
 	/**
 	 * Releases suppressed events.
@@ -1677,41 +1501,53 @@
 		$.each(events, $.proxy(function(index, event) {
 			delete this._supress[event];
 		}, this));
-	}
+	};
 
 	/**
-	 * Get touch/drag coordinats.
-	 * @private
-	 * @param {event} - mousedown/touchstart event
-	 * @returns {object} - Contains X and Y of current mouse/touch position
+	 * Gets unified pointer coordinates from event.
+	 * @todo #261
+	 * @protected
+	 * @param {Event} - The `mousedown` or `touchstart` event.
+	 * @returns {Object} - Contains `x` and `y` coordinates of current pointer position.
 	 */
-	function getTouches(event) {
-		if (event.touches !== undefined) {
-			return {
-				x: event.touches[0].pageX,
-				y: event.touches[0].pageY
-			};
+	Owl.prototype.pointer = function(event) {
+		var result = { x: null, y: null };
+
+		event = event.originalEvent || event || window.event;
+
+		event = event.touches && event.touches.length ?
+			event.touches[0] : event.changedTouches && event.changedTouches.length ?
+				event.changedTouches[0] : event;
+
+		if (event.pageX) {
+			result.x = event.pageX;
+			result.y = event.pageY;
+		} else {
+			result.x = event.clientX;
+			result.y = event.clientY;
 		}
 
-		if (event.touches === undefined) {
-			if (event.pageX !== undefined) {
-				return {
-					x: event.pageX,
-					y: event.pageY
-				};
-			}
+		return result;
+	};
 
-		if (event.pageX === undefined) {
-			return {
-					x: event.clientX,
-					y: event.clientY
-				};
-			}
-		}
-	}
+	/**
+	 * Gets the difference of two vectors.
+	 * @todo #261
+	 * @protected
+	 * @param {Object} - The first vector.
+	 * @param {Object} - The second vector.
+	 * @returns {Object} - The difference.
+	 */
+	Owl.prototype.difference = function(first, second) {
+		return {
+			x: first.x - second.x,
+			y: first.y - second.y
+		};
+	};
 
 	/**
 	 * The jQuery Plugin for the Owl Carousel
+	 * @todo Navigation plugin `next` and `prev`
 	 * @public
 	 */
 	$.fn.owlCarousel = function(option) {
@@ -1724,6 +1560,19 @@
 			if (!data) {
 				data = new Owl(this, typeof option == 'object' && option);
 				$this.data('owl.carousel', data);
+
+				$.each([
+					'next', 'prev', 'to', 'destroy', 'refresh', 'replace', 'add', 'remove'
+				], function(i, event) {
+					data.register({ type: Owl.Type.Event, name: event });
+					data.$element.on(event + '.owl.carousel.core', $.proxy(function(e) {
+						if (e.namespace && e.relatedTarget !== this) {
+							this.suppress([ event ]);
+							data[event].apply(this, [].slice.call(arguments, 1));
+							this.release([ event ]);
+						}
+					}, data));
+				});
 			}
 
 			if (typeof option == 'string' && option.charAt(0) !== '_') {
