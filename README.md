@@ -70,7 +70,7 @@ Guidelines for bug reports:
 
   2. Check if the issue has been fixed — try to reproduce it using the latest `develop` branch in the repository.
 
-  3. Isolate the problem — ideally create a reduced test case and a live example. This [JSFiddle](http://jsfiddle.net/u3FTZ/) and this [JS Bin](http://jsbin.com/runohozi/1) are helpful templates you can fork or clone.
+  3. Isolate the problem — ideally create a reduced test case and a live example. This [JSFiddle](http://jsfiddle.net/Fq4SN/) and this [JS Bin](http://jsbin.com/xuxozu/1) are helpful templates you can fork or clone.
 
 Example:
 
