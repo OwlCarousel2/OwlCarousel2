@@ -32,7 +32,7 @@
 	}
 
 	$.each([ 'cssanimations', 'csstransitions', 'csstransforms', 'csstransforms3d', 'prefixed' ], function(i, property) {
-		if (!Modernizr[property]) {
+		if (typeof Modernizr[property] == 'undefined') {
 			throw new Error([ 'Modernizr "', property, '" is not loaded.' ].join(''));
 		}
 	});
