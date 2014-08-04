@@ -55,7 +55,7 @@
 					.children()
 					.eq(this._core.current())
 					.find('[data-hash]')
-					.attr('data-hash')
+					.attr('data-hash');
 				if (hash) {
 					window.location.hash = hash;
 				}
