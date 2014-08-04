@@ -49,7 +49,13 @@
 					var hash = $(e.content).find('[data-hash]').andSelf('[data-hash]').attr('data-hash');
 					this._hashes[hash] = e.content;
 				}
-			}, this)
+			}, this),
+            'changed.owl.carousel': $.proxy(function(e) {
+                var newHash = $('.owl-item.active.center [data-hash]', e.target).attr('data-hash');
+                if (newHash){
+                    document.location.hash = newHash;
+                }
+            })
 		};
 
 		// set default options
