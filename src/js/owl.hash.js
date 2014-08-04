@@ -49,7 +49,17 @@
 					var hash = $(e.content).find('[data-hash]').andSelf('[data-hash]').attr('data-hash');
 					this._hashes[hash] = e.content;
 				}
-			}, this)
+			}, this),
+			'translated.owl.carousel': $.proxy(function(e) {
+				var hash = this._core.$stage
+					.children()
+					.eq(this._core.current())
+					.find('[data-hash]')
+					.attr('data-hash');
+				if (hash) {
+					window.location.hash = hash;
+				}
+			})
 		};
 
 		// set default options
