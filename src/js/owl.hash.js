@@ -4,8 +4,7 @@
  * @author Artus Kolanowski
  * @license The MIT License (MIT)
  */
-;
-(function ($, window, document, undefined) {
+;(function($, window, document, undefined) {
 	'use strict';
 
 	/**
@@ -13,7 +12,7 @@
 	 * @class The Hash Plugin
 	 * @param {Owl} carousel - The Owl Carousel
 	 */
-	var Hash = function (carousel) {
+	var Hash = function(carousel) {
 		/**
 		 * Reference to the core.
 		 * @protected
@@ -40,21 +39,25 @@
 		 * @type {Object}
 		 */
 		this._handlers = {
-			'initialized.owl.carousel': $.proxy(function (e) {
+			'initialized.owl.carousel': $.proxy(function(e) {
 				if (e.namespace && this._core.settings.startPosition == 'URLHash') {
 					$(window).trigger('hashchange.owl.navigation');
 				}
 			}, this),
-			'prepared.owl.carousel': $.proxy(function (e) {
+			'prepared.owl.carousel': $.proxy(function(e) {
 				if (e.namespace) {
 					var hash = $(e.content).find('[data-hash]').andSelf('[data-hash]').attr('data-hash');
 					this._hashes[hash] = e.content;
 				}
 			}, this),
-			'changed.owl.carousel': $.proxy(function (e) {
-				var newHash = $('.owl-item.active.center [data-hash]', e.target).attr('data-hash');
-				if (newHash) {
-					document.location.hash = newHash;
+			'translated.owl.carousel': $.proxy(function(e) {
+				var hash = this._core.$stage
+					.children()
+					.eq(this._core.current())
+					.find('[data-hash]')
+					.attr('data-hash')
+				if (hash) {
+					window.location.hash = hash;
 				}
 			})
 		};
@@ -66,7 +69,7 @@
 		this.$element.on(this._handlers);
 
 		// register event listener for hash navigation
-		$(window).on('hashchange.owl.navigation', $.proxy(function () {
+		$(window).on('hashchange.owl.navigation', $.proxy(function() {
 			var hash = window.location.hash.substring(1),
 				items = this._core.$stage.children(),
 				position = this._hashes[hash] && items.index(this._hashes[hash]);
@@ -91,7 +94,7 @@
 	 * Destroys the plugin.
 	 * @public
 	 */
-	Hash.prototype.destroy = function () {
+	Hash.prototype.destroy = function() {
 		var handler, property;
 
 		$(window).off('hashchange.owl.navigation');
