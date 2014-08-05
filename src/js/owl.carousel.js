@@ -632,6 +632,7 @@
 
 	/**
 	 * Handles `touchstart` and `mousedown` events.
+	 * @todo Horizontal swipe threshold as option
 	 * @todo #261
 	 * @protected
 	 * @param {Event} event - The event arguments.
@@ -639,12 +640,9 @@
 	Owl.prototype.onDragStart = function(event) {
 		var stage = null;
 
-		if (event.which === 3 || this.is('dragging')) {
-			return false;
+		if (event.which === 3) {
+			return;
 		}
-
-		this.enter('dragging');
-		this.trigger('drag');
 
 		if ($.support.transform) {
 			stage = this.$stage.css('transform').replace(/.*\(|\)| /g, '').split(',');
@@ -677,13 +675,25 @@
 		this._drag.stage.current = stage;
 		this._drag.pointer = this.pointer(event);
 
-		$(document).on('mousemove.owl.core touchmove.owl.core', $.proxy(this.onDragMove, this));
-		$(document).on('mouseup.owl.core touchend.owl.core', $.proxy(this.onDragEnd, this));
+		$(document).one('mousemove.owl.core touchmove.owl.core', $.proxy(function(event) {
+			var delta = this.difference(this._drag.pointer, this.pointer(event));
+
+			$(document).on('mousemove.owl.core touchmove.owl.core', $.proxy(this.onDragMove, this));
+			$(document).on('mouseup.owl.core touchend.owl.core', $.proxy(this.onDragEnd, this));
+
+			if (Math.abs(delta.x) < Math.abs(delta.y)) {
+				return;
+			}
+
+			event.preventDefault();
+
+			this.enter('dragging');
+			this.trigger('drag');
+		}, this));
 	};
 
 	/**
 	 * Handles the `touchmove` and `mousemove` events.
-	 * @todo Horizontal swipe threshold as option
 	 * @todo #261
 	 * @protected
 	 * @param {Event} event - The event arguments.
@@ -699,6 +709,8 @@
 			return;
 		}
 
+		event.preventDefault();
+
 		if (this.settings.loop) {
 			minimum = this.coordinates(this.minimum());
 			maximum = this.coordinates(this.maximum() + 1) - minimum;
@@ -710,13 +722,9 @@
 			stage.x = Math.max(Math.min(stage.x, minimum + pull), maximum + pull);
 		}
 
-		if (delta.x > 8 || delta.x < -8) {
-			event.preventDefault();
-		}
+		this._drag.stage.current = stage;
 
 		this.animate(stage.x);
-
-		this._drag.stage.current = stage;
 	};
 
 	/**
@@ -731,26 +739,26 @@
 			stage = this._drag.stage.current,
 			direction = delta.x > 0 ^ this.settings.rtl ? 'left' : 'right';
 
-		if (!this.is('dragging')) {
-			return;
-		}
-
 		this.$element.removeClass(this.options.grabClass);
 
-		if (delta.x !== 0 || !this.is('valid')) {
-			if (Math.abs(delta.x) > 3 || new Date().getTime() - this._drag.time > 300) {
-				this._drag.target.one('click.owl.core', function() { return false; });
-			}
-
+		if (delta.x !== 0 && this.is('dragging') || !this.is('valid')) {
 			this.speed(this.settings.dragEndSpeed || this.settings.smartSpeed);
 			this.current(this.closest(stage.x, delta.x !== 0 ? direction : this._drag.direction));
 			this.invalidate('position');
 			this.update();
 
 			this._drag.direction = direction;
+
+			if (Math.abs(delta.x) > 3 || new Date().getTime() - this._drag.time > 300) {
+				this._drag.target.one('click.owl.core', function() { return false; });
+			}
 		}
 
 		$(document).off('.owl.core');
+
+		if (!this.is('dragging')) {
+			return;
+		}
 
 		this.leave('dragging');
 		this.trigger('dragged');
