@@ -675,11 +675,12 @@
 		this._drag.stage.current = stage;
 		this._drag.pointer = this.pointer(event);
 
+		$(document).on('mouseup.owl.core touchend.owl.core', $.proxy(this.onDragEnd, this));
+
 		$(document).one('mousemove.owl.core touchmove.owl.core', $.proxy(function(event) {
 			var delta = this.difference(this._drag.pointer, this.pointer(event));
 
 			$(document).on('mousemove.owl.core touchmove.owl.core', $.proxy(this.onDragMove, this));
-			$(document).on('mouseup.owl.core touchend.owl.core', $.proxy(this.onDragEnd, this));
 
 			if (Math.abs(delta.x) < Math.abs(delta.y)) {
 				return;
@@ -739,6 +740,8 @@
 			stage = this._drag.stage.current,
 			direction = delta.x > 0 ^ this.settings.rtl ? 'left' : 'right';
 
+		$(document).off('.owl.core');
+
 		this.$element.removeClass(this.options.grabClass);
 
 		if (delta.x !== 0 && this.is('dragging') || !this.is('valid')) {
@@ -753,8 +756,6 @@
 				this._drag.target.one('click.owl.core', function() { return false; });
 			}
 		}
-
-		$(document).off('.owl.core');
 
 		if (!this.is('dragging')) {
 			return;
