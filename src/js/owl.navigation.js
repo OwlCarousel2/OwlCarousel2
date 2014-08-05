@@ -132,6 +132,7 @@
 		navContainer: false,
 		navContainerClass: 'owl-nav',
 		navClass: [ 'owl-prev', 'owl-next' ],
+		navDisabledContainerClass: 'disabled',
 		slideBy: 1,
 		dotClass: 'owl-dot',
 		dotsClass: 'owl-dots',
@@ -152,7 +153,7 @@
 
 		// create DOM structure for relative navigation
 		this._controls.$relative = (settings.navContainer ? $(settings.navContainer)
-			: $('<div>').addClass(settings.navContainerClass).appendTo(this.$element)).addClass('disabled');
+			: $('<div>').addClass(settings.navContainerClass).appendTo(this.$element)).addClass(settings.navDisabledContainerClass);
 
 		this._controls.$previous = $('<' + settings.navElement + '>')
 			.addClass(settings.navClass[0])
@@ -178,7 +179,7 @@
 		}
 
 		this._controls.$absolute = (settings.dotsContainer ? $(settings.dotsContainer)
-			: $('<div>').addClass(settings.dotsClass).appendTo(this.$element)).addClass('disabled');
+			: $('<div>').addClass(settings.dotsClass).appendTo(this.$element)).addClass(settings.navDisabledContainerClass);
 
 		this._controls.$absolute.on('click', 'div', $.proxy(function(e) {
 			var index = $(e.target).parent().is(this._controls.$absolute)
@@ -263,14 +264,14 @@
 			disabled = this._core.items().length <= settings.items,
 			index = this._core.relative(this._core.current());
 
-		this._controls.$relative.toggleClass('disabled', !settings.nav || disabled);
+		this._controls.$relative.toggleClass(settings.navDisabledContainerClass, !settings.nav || disabled);
 
 		if (settings.nav && !settings.loop && !settings.rewind) {
-			this._controls.$previous.toggleClass('disabled', index <= this._core.minimum(true));
-			this._controls.$next.toggleClass('disabled', index >= this._core.maximum(true));
+			this._controls.$previous.toggleClass(settings.navDisabledContainerClass, index <= this._core.minimum(true));
+			this._controls.$next.toggleClass(settings.navDisabledContainerClass, index >= this._core.maximum(true));
 		}
 
-		this._controls.$absolute.toggleClass('disabled', !settings.dots || disabled);
+		this._controls.$absolute.toggleClass(settings.navDisabledContainerClass, !settings.dots || disabled);
 
 		if (settings.dots) {
 			difference = this._pages.length - this._controls.$absolute.children().length;
@@ -283,8 +284,8 @@
 				this._controls.$absolute.children().slice(difference).remove();
 			}
 
-			this._controls.$absolute.find('.active').removeClass('active');
-			this._controls.$absolute.children().eq($.inArray(this.current(), this._pages)).addClass('active');
+			this._controls.$absolute.find('.' + this._core.options.activeClass).removeClass(this._core.options.activeClass);
+			this._controls.$absolute.children().eq($.inArray(this.current(), this._pages)).addClass(this._core.options.activeClass);
 		}
 	};
 

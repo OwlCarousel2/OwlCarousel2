@@ -54,6 +54,12 @@
     "desc":     "Navigation container class."
   },
   {
+    "name":     "navDisabledContainerClass",
+    "type":     "String",
+    "Default":  "disabled",
+    "desc":     "Additional class for disabled navigation container."
+  },
+  {
     "name":     "navClass",
     "type":     "Array",
     "Default":  "['owl-prev','owl-next']",
@@ -84,9 +90,39 @@
     "desc":     "Auto height class."
   },
   {
+    "name":     "activeClass",
+    "type":     "String",
+    "Default":  "active",
+    "desc":     "Active slide(s) class. Attached to slides that are currently visible."
+  },
+  {
+    "name":     "centerClass",
+    "type":     "String",
+    "Default":  "center",
+    "desc":     "Centered slide(s) class. Attached to slides that are currently centered. Only works with center option."
+  },
+  {
+    "name":     "clonedClass",
+    "type":     "String",
+    "Default":  "cloned",
+    "desc":     "Cloned slides class. Attached to slides that were cloned in case loop option is used."
+  },
+  {
     "name":     "responsiveClass",
     "type":     "String|Boolean",
     "Default":  "false",
     "desc":     "Optional helper class. Add '<responsiveClass>-<breakpoint>' class to main element. Can be used to stylize content on given breakpoint."
+  },
+  {
+    "name":     "videoFrameClass",
+    "type":     "String",
+    "Default":  "owl-video-frame",
+    "desc":     "Video frame class."
+  },
+  {
+    "name":     "videoPlayingClass",
+    "type":     "String",
+    "Default":  "owl-video-playing",
+    "desc":     "Attached to slide that is currently playing a video."
   }
 ]

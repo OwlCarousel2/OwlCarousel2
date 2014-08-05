@@ -218,7 +218,10 @@
 		itemClass: 'owl-item',
 		stageClass: 'owl-stage',
 		stageOuterClass: 'owl-stage-outer',
-		grabClass: 'owl-grab'
+		grabClass: 'owl-grab',
+		clonedClass: 'cloned',
+		activeClass: 'active',
+		centerClass: 'center'
 	};
 
 	/**
@@ -285,10 +288,10 @@
 			}
 
 			this._clones = clones;
-			this.$stage.children('.cloned').remove();
+			this.$stage.children('.' + this.options.clonedClass).remove();
 
-			$(append).addClass('cloned').appendTo(this.$stage);
-			$(prepend).addClass('cloned').prependTo(this.$stage);
+			$(append).addClass(this.options.clonedClass).appendTo(this.$stage);
+			$(prepend).addClass(this.options.clonedClass).prependTo(this.$stage);
 		}
 	}, {
 		filter: [ 'width', 'items', 'settings' ],
@@ -367,12 +370,12 @@
 				}
 			}
 
-			this.$stage.children('.active').removeClass('active');
-			this.$stage.children(':eq(' + matches.join('), :eq(') + ')').addClass('active');
+			this.$stage.children('.' + this.options.activeClass).removeClass(this.options.activeClass);
+			this.$stage.children(':eq(' + matches.join('), :eq(') + ')').addClass(this.options.activeClass);
 
 			if (this.settings.center) {
-				this.$stage.children('.center').removeClass('center');
-				this.$stage.children().eq(this.current()).addClass('center');
+				this.$stage.children('.' + this.options.centerClass).removeClass(this.options.centerClass);
+				this.$stage.children().eq(this.current()).addClass(this.options.centerClass);
 			}
 		}
 	} ];
@@ -1309,7 +1312,7 @@
 			this._plugins[i].destroy();
 		}
 
-		this.$stage.children('.cloned').remove();
+		this.$stage.children('.' + this.options.clonedClass).remove();
 
 		this.$stage.unwrap();
 		this.$stage.children().contents().unwrap();
