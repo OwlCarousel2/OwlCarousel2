@@ -643,8 +643,6 @@
 			return false;
 		}
 
-		event.preventDefault();
-
 		this.enter('dragging');
 		this.trigger('drag');
 
