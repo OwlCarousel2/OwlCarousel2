@@ -484,19 +484,18 @@
 
 	/**
 	 * Prepares an item before add.
-	 * @todo Rename event parameter `content` to `item`.
 	 * @protected
 	 * @returns {jQuery|HTMLElement} - The item container.
 	 */
-	Owl.prototype.prepare = function(item) {
-		var event = this.trigger('prepare', { content: item });
+	Owl.prototype.prepare = function(item, index) {
+		var event = this.trigger('prepare', { item: item, index: index });
 
 		if (!event.data) {
 			event.data = $('<' + this.settings.itemElement + '/>')
 				.addClass(this.options.itemClass).append(item)
 		}
 
-		this.trigger('prepared', { content: event.data });
+		this.trigger('prepared', { item: event.data, index: index });
 
 		return event.data;
 	};
@@ -1202,7 +1201,7 @@
 		content.filter(function() {
 			return this.nodeType === 1;
 		}).each($.proxy(function(index, item) {
-			item = this.prepare(item);
+			item = this.prepare(item, index);
 			this.$stage.append(item);
 			this._items.push(item);
 			this._mergers.push(item.find('[data-merge]').andSelf('[data-merge]').attr('data-merge') * 1 || 1);
@@ -1215,7 +1214,6 @@
 
 	/**
 	 * Adds an item.
-	 * @todo Use `item` instead of `content` for the event arguments.
 	 * @public
 	 * @param {HTMLElement|jQuery|String} content - The item content to add.
 	 * @param {Number} [position] - The relative position at which to insert the item otherwise the item will be added to the end.
@@ -1224,33 +1222,32 @@
 		var current = this.relative(this._current);
 
 		position = position === undefined ? this._items.length : this.normalize(position, true);
-		content = content instanceof jQuery ? content : $(content);
+		item = content instanceof jQuery ? content : $(content);
 
-		this.trigger('add', { content: content, position: position });
+		this.trigger('add', { item: item, position: position });
 
-		content = this.prepare(content);
+		item = this.prepare(item, position);
 
 		if (this._items.length === 0 || position === this._items.length) {
-			this._items.length === 0 && this.$stage.append(content);
-			this._items.length !== 0 && this._items[position - 1].after(content);
-			this._items.push(content);
-			this._mergers.push(content.find('[data-merge]').andSelf('[data-merge]').attr('data-merge') * 1 || 1);
+			this._items.length === 0 && this.$stage.append(item);
+			this._items.length !== 0 && this._items[position - 1].after(item);
+			this._items.push(item);
+			this._mergers.push(item.find('[data-merge]').andSelf('[data-merge]').attr('data-merge') * 1 || 1);
 		} else {
-			this._items[position].before(content);
-			this._items.splice(position, 0, content);
-			this._mergers.splice(position, 0, content.find('[data-merge]').andSelf('[data-merge]').attr('data-merge') * 1 || 1);
+			this._items[position].before(item);
+			this._items.splice(position, 0, item);
+			this._mergers.splice(position, 0, item.find('[data-merge]').andSelf('[data-merge]').attr('data-merge') * 1 || 1);
 		}
 
 		this._items[current] && this.reset(this._items[current].index());
 
 		this.invalidate('items');
 
-		this.trigger('added', { content: content, position: position });
+		this.trigger('added', { item: item, position: position });
 	};
 
 	/**
 	 * Removes an item by its position.
-	 * @todo Use `item` instead of `content` for the event arguments.
 	 * @public
 	 * @param {Number} position - The relative position of the item to remove.
 	 */
@@ -1261,7 +1258,7 @@
 			return;
 		}
 
-		this.trigger('remove', { content: this._items[position], position: position });
+		this.trigger('remove', { item: this._items[position], position: position });
 
 		this._items[position].remove();
 		this._items.splice(position, 1);
@@ -1269,7 +1266,7 @@
 
 		this.invalidate('items');
 
-		this.trigger('removed', { content: null, position: position });
+		this.trigger('removed', { item: null, position: position });
 	};
 
 	/**
