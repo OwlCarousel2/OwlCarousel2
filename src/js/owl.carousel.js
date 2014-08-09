@@ -107,6 +107,11 @@
 		this._mergers = [];
 
 		/**
+		 * Widths of all items.
+		 */
+		this._widths = [];
+
+		/**
 		 * Invalidated parts within the update process.
 		 * @protected
 		 */
@@ -157,7 +162,7 @@
 				= new plugin(this);
 		}, this));
 
-		$.each(Owl.Pipe, $.proxy(function(priority, worker) {
+		$.each(Owl.Workers, $.proxy(function(priority, worker) {
 			this._pipe.push({
 				'filter': worker.filter,
 				'run': $.proxy(worker.run, this)
@@ -251,9 +256,9 @@
 	Owl.Plugins = {};
 
 	/**
-	 * Update pipe.
+	 * List of workers involved in the update process.
 	 */
-	Owl.Pipe = [ {
+	Owl.Workers = [ {
 		filter: [ 'width', 'settings' ],
 		run: function() {
 			this._width = this.$element.width();
@@ -262,6 +267,52 @@
 		filter: [ 'width', 'items', 'settings' ],
 		run: function(cache) {
 			cache.current = this._items && this._items[this.relative(this._current)];
+		}
+	}, {
+		filter: [ 'items', 'settings' ],
+		run: function() {
+			this.$stage.children('.cloned').remove();
+		}
+	}, {
+		filter: [ 'width', 'items', 'settings' ],
+		run: function(cache) {
+			var margin = this.settings.margin || '',
+				grid = !this.settings.autoWidth,
+				rtl = this.settings.rtl,
+				css = {
+					'width': 'auto',
+					'margin-left': rtl ? margin : '',
+					'margin-right': rtl ? '' : margin
+				};
+
+			!grid && this.$stage.children().css(css);
+
+			cache.css = css;
+		}
+	}, {
+		filter: [ 'width', 'items', 'settings' ],
+		run: function(cache) {
+			var width = (this.width() / this.settings.items).toFixed(3) - this.settings.margin,
+				merge = null,
+				iterator = this._items.length,
+				grid = !this.settings.autoWidth,
+				widths = [];
+
+			cache.items = {
+				merge: false,
+				width: width
+			};
+
+			while (iterator--) {
+				merge = this._mergers[iterator];
+				merge = this.settings.mergeFit && Math.min(merge, this.settings.items) || merge;
+
+				cache.items.merge = merge > 1 || cache.items.merge;
+
+				widths[iterator] = !grid ? this._items[iterator].width() : width * merge;
+			}
+
+			this._widths = widths;
 		}
 	}, {
 		filter: [ 'items', 'settings' ],
@@ -285,7 +336,6 @@
 			}
 
 			this._clones = clones;
-			this.$stage.children('.cloned').remove();
 
 			$(append).addClass('cloned').appendTo(this.$stage);
 			$(prepend).addClass('cloned').prependTo(this.$stage);
@@ -293,48 +343,55 @@
 	}, {
 		filter: [ 'width', 'items', 'settings' ],
 		run: function() {
-			var rtl = (this.settings.rtl ? 1 : -1),
-				width = (this.width() / this.settings.items).toFixed(3),
-				coordinate = 0, merge, i, n;
+			var rtl = this.settings.rtl ? 1 : -1,
+				size = this._clones.length + this._items.length,
+				iterator = -1,
+				previous = 0,
+				current = 0,
+				coordinates = [];
 
-			this._coordinates = [];
-			for (i = 0, n = this._clones.length + this._items.length; i < n; i++) {
-				merge = this._mergers[this.relative(i)];
-				merge = (this.settings.mergeFit && Math.min(merge, this.settings.items)) || merge;
-				coordinate += (this.settings.autoWidth ? this._items[this.relative(i)].width() + this.settings.margin : width * merge) * rtl;
-
-				this._coordinates.push(coordinate);
+			while (++iterator < size) {
+				previous = coordinates[iterator - 1] || 0;
+				current = this._widths[this.relative(iterator)] + this.settings.margin;
+				coordinates.push(previous + current * rtl);
 			}
+
+			this._coordinates = coordinates;
 		}
 	}, {
 		filter: [ 'width', 'items', 'settings' ],
 		run: function() {
-			var i, n, width = (this.width() / this.settings.items).toFixed(3), css = {
-				'width': Math.ceil(Math.abs(this._coordinates[this._coordinates.length - 1])) + this.settings.stagePadding * 2,
-				'padding-left': this.settings.stagePadding || '',
-				'padding-right': this.settings.stagePadding || ''
-			};
+			var padding = this.settings.stagePadding,
+				coordinates = this._coordinates,
+				css = {
+					'width': Math.ceil(Math.abs(coordinates[coordinates.length - 1])) + padding * 2,
+					'padding-left': padding || '',
+					'padding-right': padding || ''
+				};
 
 			this.$stage.css(css);
+		}
+	}, {
+		filter: [ 'width', 'items', 'settings' ],
+		run: function(cache) {
+			var iterator = this._coordinates.length,
+				grid = !this.settings.autoWidth,
+				items = this.$stage.children();
 
-			css = { 'width': this.settings.autoWidth ? 'auto' : width - this.settings.margin };
-			css[this.settings.rtl ? 'margin-left' : 'margin-right'] = this.settings.margin;
-
-			if (!this.settings.autoWidth && $.grep(this._mergers, function(v) { return v > 1 }).length > 0) {
-				for (i = 0, n = this._coordinates.length; i < n; i++) {
-					css.width = Math.abs(this._coordinates[i]) - Math.abs(this._coordinates[i - 1] || 0) - this.settings.margin;
-					this.$stage.children().eq(i).css(css);
+			if (grid && cache.items.merge) {
+				while (iterator--) {
+					cache.css.width = this._widths[this.relative(iterator)];
+					items.eq(iterator).css(cache.css);
 				}
-			} else {
-				this.$stage.children().css(css);
+			} else if (grid) {
+				cache.css.width = cache.items.width;
+				items.css(cache.css);
 			}
 		}
 	}, {
 		filter: [ 'items' ],
 		run: function() {
-			if (this._items.length < 1) {
-				this.$stage.removeAttr('style');
-			}
+			this._coordinates.length < 1 && this.$stage.removeAttr('style');
 		}
 	}, {
 		filter: [ 'width', 'items', 'settings' ],
