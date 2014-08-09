@@ -348,28 +348,17 @@
 				iterator = -1,
 				previous = 0,
 				current = 0,
-				coordinates = [];
+				coordinates = [],
+				padding = this.settings.stagePadding || 0,
+				margin = this.settings.margin || 0;
 
 			while (++iterator < size) {
-				previous = coordinates[iterator - 1] || 0;
-				current = this._widths[this.relative(iterator)] + this.settings.margin;
+				previous = coordinates[iterator - 1] || -padding * rtl;
+				current = this._widths[this.relative(iterator)] + margin;
 				coordinates.push(previous + current * rtl);
 			}
 
 			this._coordinates = coordinates;
-		}
-	}, {
-		filter: [ 'width', 'items', 'settings' ],
-		run: function() {
-			var padding = this.settings.stagePadding,
-				coordinates = this._coordinates,
-				css = {
-					'width': Math.ceil(Math.abs(coordinates[coordinates.length - 1])) + padding * 2,
-					'padding-left': padding || '',
-					'padding-right': padding || ''
-				};
-
-			this.$stage.css(css);
 		}
 	}, {
 		filter: [ 'width', 'items', 'settings' ],
