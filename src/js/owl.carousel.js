@@ -469,19 +469,6 @@
 
 		this.$element.toggleClass(this.settings.rtlClass, this.settings.rtl);
 
-		if (this.settings.autoWidth && !this.is('pre-loading')) {
-			var imgs, nestedSelector, width;
-			imgs = this.$element.find('img');
-			nestedSelector = this.settings.nestedItemSelector ? '.' + this.settings.nestedItemSelector : undefined;
-			width = this.$element.children(nestedSelector).width();
-
-			if (imgs.length && width <= 0) {
-				this.preloadAutoWidthImages(imgs);
-			}
-		}
-
-		this.$element.addClass(this.options.loadingClass);
-
 		// create stage
 		this.$stage = $('<' + this.settings.stageElement + ' class="' + this.settings.stageClass + '"/>')
 			.wrap('<div class="' + this.settings.stageOuterClass + '"/>');
@@ -619,6 +606,7 @@
 
 	/**
 	 * Refreshes the carousel primarily for adaptive purposes.
+	 * @todo Add parameter `part` for `invalidate`, so the additional call of it before will be no longer necessary.
 	 * @public
 	 */
 	Owl.prototype.refresh = function() {
@@ -1383,24 +1371,6 @@
 		this.invalidate('items');
 
 		this.trigger('removed', { item: null, position: position });
-	};
-
-	/**
-	 * Preloads images with auto width.
-	 * @todo Replace by a more generic approach
-	 * @protected
-	 */
-	Owl.prototype.preloadAutoWidthImages = function(images) {
-		images.each($.proxy(function(i, element) {
-			this.enter('pre-loading');
-			element = $(element);
-			$(new Image()).one('load', $.proxy(function(e) {
-				element.attr('src', e.target.src);
-				element.css('opacity', 1);
-				this.leave('pre-loading');
-				!this.is('pre-loading') && !this.is('initializing') && this.refresh();
-			}, this)).attr('src', element.attr('src') || element.attr('data-src') || element.attr('data-src-retina'));
-		}, this));
 	};
 
 	/**
