@@ -1509,14 +1509,12 @@
 	 * @returns {Event} - The event arguments.
 	 */
 	Owl.prototype.trigger = function(name, data, namespace, state, enter) {
-		var status = {
-			item: { count: this._items.length, index: this.current() }
-		}, handler = $.camelCase(
+		var handler = $.camelCase(
 			$.grep([ 'on', name, namespace ], function(v) { return v })
 				.join('-').toLowerCase()
 		), event = $.Event(
 			[ name, 'owl', namespace || 'carousel' ].join('.').toLowerCase(),
-			$.extend({ relatedTarget: this }, status, data)
+			$.extend({ relatedTarget: this }, data)
 		);
 
 		if (!this._supress[name]) {
