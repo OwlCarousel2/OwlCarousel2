@@ -1,68 +1,92 @@
 [
   {
-    "name":     "themeClass",
-    "type":     "Class/String",
-    "Default":  "owl-theme",
-    "desc":     "Theme Class."
+    "name":     "refreshClass",
+    "type":     "String",
+    "Default":  "owl-refresh",
+    "desc":     "Class during refresh."
   },
   {
-    "name":     "baseClass",
-    "type":     "Class/String",
-    "Default":  "owl-carousel",
-    "desc":     "Base element Class."
+    "name":     "loadingClass",
+    "type":     "String",
+    "Default":  "owl-loading",
+    "desc":     "Class during load."
   },
   {
-    "name":     "itemClass",
-    "type":     "Class/String",
-    "Default":  "owl-item",
-    "desc":     "Item Class."
+    "name":     "loadedClass",
+    "type":     "String",
+    "Default":  "owl-loaded",
+    "desc":     "Class after load."
   },
   {
-    "name":     "centerClass",
-    "type":     "Class/String",
-    "Default":  "center",
-    "desc":     "Center Class."
+    "name":     "rtlClass",
+    "type":     "String",
+    "Default":  "owl-rtl",
+    "desc":     "Class for right to left mode."
   },
   {
-    "name":     "activeClass",
-    "type":     "Class/String",
-    "Default":  "active",
-    "desc":     "Active Class."
+    "name":     "dragClass",
+    "type":     "String",
+    "Default":  "owl-drag",
+    "desc":     "Class for mouse drag mode."
+  },
+  {
+    "name":     "grabClass",
+    "type":     "String",
+    "Default":  "owl-grab",
+    "desc":     "Class during mouse drag."
+  },
+  {
+    "name":     "stageClass",
+    "type":     "String",
+    "Default":  "owl-stage",
+    "desc":     "Stage class."
+  },
+  {
+    "name":     "stageOuterClass",
+    "type":     "String",
+    "Default":  "owl-stage-outer",
+    "desc":     "Stage outer class."
   },
   {
     "name":     "navContainerClass",
-    "type":     "Class/String",
+    "type":     "String",
     "Default":  "owl-nav",
-    "desc":     "Nav container Class."
+    "desc":     "Navigation container class."
   },
   {
     "name":     "navClass",
-    "type":     "Array/Class/String",
+    "type":     "Array",
     "Default":  "['owl-prev','owl-next']",
-    "desc":     "Nav buttons Classes."
+    "desc":     "Navigation buttons classes."
   },
   {
     "name":     "controlsClass",
-    "type":     "Class/String",
+    "type":     "String",
     "Default":  "owl-controls",
-    "desc":     "Controls Class - wrapper for navs and dots."
+    "desc":     "Controls container class - wrapper for navs and dots."
   },
   {
     "name":     "dotClass",
-    "type":     "Class/String",
+    "type":     "String",
     "Default":  "owl-dot",
     "desc":     "Dot Class."
   },
   {
     "name":     "dotsClass",
-    "type":     "Class/String",
+    "type":     "String",
     "Default":  "owl-dots",
-    "desc":     "Dots Class - Container for dots.."
+    "desc":     "Dots container class."
   },
   {
     "name":     "autoHeightClass",
-    "type":     "Class/String",
+    "type":     "String",
     "Default":  "owl-height",
-    "desc":     "Auto height Class."
+    "desc":     "Auto height class."
+  },
+  {
+    "name":     "responsiveClass",
+    "type":     "String|Boolean",
+    "Default":  "false",
+    "desc":     "Optional helper class. Add '<responsiveClass>-<breakpoint>' class to main element. Can be used to stylize content on given breakpoint."
   }
 ]

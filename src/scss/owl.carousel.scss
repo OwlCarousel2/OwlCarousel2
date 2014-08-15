@@ -29,10 +29,29 @@
 		/* fix for flashing background */
 		-webkit-transform: translate3d(0px, 0px, 0px);
 	}
+	
+	.owl-item {
+		position: relative;
+		min-height: 1px;
+		float: left;
+		-webkit-backface-visibility: hidden;
+		-webkit-tap-highlight-color: transparent;
+		-webkit-touch-callout: none;
+	}
+	.owl-item img {
+		display: block;
+		width: 100%;
+		-webkit-transform-style: preserve-3d;
+	}
+	
+	.owl-nav.disabled,
+	.owl-dots.disabled {
+		display: none;
+	}
 
-	.owl-controls .owl-nav .owl-prev,
-	.owl-controls .owl-nav .owl-next,
-	.owl-controls .owl-dot {
+	.owl-nav .owl-prev,
+	.owl-nav .owl-next,
+	.owl-dot {
 		cursor: pointer;
 		cursor: hand;
 		-webkit-user-select: none;
@@ -55,35 +74,18 @@
 		opacity: 0;
 	}
 
-	.owl-refresh .owl-item {
+	&.owl-refresh .owl-item {
 		display: none;
 	}
-
-	.owl-item {
-		position: relative;
-		min-height: 1px;
-		float: left;
-		-webkit-backface-visibility: hidden;
-		-webkit-tap-highlight-color: transparent;
-		-webkit-touch-callout: none;
+	
+	&.owl-drag .owl-item {
 		-webkit-user-select: none;
 		-moz-user-select: none;
 		-ms-user-select: none;
 		user-select: none;
 	}
-	.owl-item img {
-		display: block;
-		width: 100%;
-		-webkit-transform-style: preserve-3d;
-	}
-	&.owl-text-select-on .owl-item {
-		-webkit-user-select: auto;
-		-moz-user-select: auto;
-		-ms-user-select: auto;
-		user-select: auto;
-	}
 
-	.owl-grab {
+	&.owl-grab {
 		cursor: move;
 		cursor: -webkit-grab;
 		cursor: -o-grab;
@@ -91,14 +93,13 @@
 		cursor: grab;
 	}
 
-	.owl-rtl {
+	&.owl-rtl {
 		direction: rtl;
 	}
 
-	.owl-rtl .owl-item {
+	&.owl-rtl .owl-item {
 		float: right;
 	}
-
 }
 
 /* No Js */

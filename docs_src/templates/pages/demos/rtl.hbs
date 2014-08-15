@@ -1,9 +1,9 @@
 ---
-title: Stage Padding Demo
-subTitle: stagePadding
+title: RTL Demo
+subTitle: Right To Left
 nav: demos
-description: Stage Padding usage demo
-sort: 8
+description: RTL usage demo
+sort: 9
 
 tags: 
 - demo
@@ -28,17 +28,17 @@ tags:
 {{#markdown }}
 ### Overview
 
-Stage padding option adds left and right padding style (in pixels) onto stage-wrapper.
+By adding `rtl:true` Owl will change direction from Right to left.
 
-Option:
+Default:
 ```
-stagePadding: Number
+rtl: false
 ```
 
 ### Setup
 ```
 $('.owl-carousel').owlCarousel({
-	stagePadding: 50,
+	rtl:true,
 	loop:true,
 	margin:10,
 	nav:true,
@@ -80,7 +80,7 @@ $(document).ready(function(){
 	var owl = $('.owl-carousel');
 
 	owl.owlCarousel({
-		stagePadding: 50,
+		rtl:true,
 		margin:10,
 		nav:true,
 		loop:true,
