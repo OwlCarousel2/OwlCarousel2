@@ -108,8 +108,15 @@
 
 		/**
 		 * Widths of all items.
+		 * @protected
 		 */
 		this._widths = [];
+
+		/**
+		 * Paging indexes.
+		 * @protected
+		 */
+		this._pages = [];
 
 		/**
 		 * Invalidated parts within the update process.
@@ -378,6 +385,35 @@
 			}
 		}
 	}, {
+		filter: [ 'width', 'items', 'settings' ],
+		run: function() {
+			var maximum = this.maximum(true),
+				iterator = -1,
+				page = 0,
+				items = this._items.length,
+				settings = this.settings,
+				size = settings.center || settings.autoWidth
+					? 1 : settings.items;
+
+			this._pages = [];
+
+			while (++iterator < items) {
+				if (page >= size || page === 0) {
+					this._pages.push({
+						start: Math.min(maximum, iterator),
+						end: iterator + size - 1
+					});
+
+					if (Math.min(maximum, iterator) === maximum) {
+						break;
+					}
+					page = 0;
+				}
+
+				page += this._mergers[iterator];
+			}
+		}
+	}, {
 		filter: [ 'items' ],
 		run: function() {
 			this._coordinates.length < 1 && this.$stage.removeAttr('style');
@@ -464,10 +500,6 @@
 			// invalidate width
 			this.invalidate('width');
 		}
-
-		this.$element
-			.removeClass(this.options.loadingClass)
-			.addClass(this.options.loadedClass);
 
 		// register event handlers
 		this.registerEventHandlers();
@@ -894,35 +926,43 @@
 	/**
 	 * Sets the absolute position of the current item.
 	 * @public
-	 * @param {Number} [position] - The new absolute position or nothing to leave it unchanged.
-	 * @returns {Number} - The absolute position of the current item.
+	 * @param {Number|String} [position=item] - The new absolute position if it's a number. Use 'item' or 'page' to leave it unchanged.
+	 * @returns {Number} - The absolute position of the current item or page.
 	 */
 	Owl.prototype.current = function(position) {
-		if (position === undefined) {
-			return this._current;
-		}
+		var current = null,
+			event = null;
 
 		if (this._items.length === 0) {
 			return undefined;
 		}
 
-		position = this.normalize(position);
+		if ($.isNumeric(position)) {
+			position = this.normalize(position);
 
-		if (this._current !== position) {
-			var event = this.trigger('change', { property: { name: 'position', value: position } });
+			if (this._current !== position) {
+				event = this.trigger('change', { property: { name: 'position', value: position } });
 
-			if (event.data !== undefined) {
-				position = this.normalize(event.data);
+				if (event.data !== undefined) {
+					position = this.normalize(event.data);
+				}
+
+				this._current = current = position;
+
+				this.invalidate('position');
+
+				this.trigger('changed', { property: { name: 'position', value: position } });
 			}
-
-			this._current = position;
-
-			this.invalidate('position');
-
-			this.trigger('changed', { property: { name: 'position', value: this._current } });
+		} else if (position === undefined || position === 'item') {
+			current = this._current;
+		} else if (position === 'page') {
+			current = this.relative(this._current);
+			current = $.inArray($.grep(this._pages, function(page, index) {
+				return page.start <= current && page.end >= current;
+			}).pop(), this._pages);
 		}
 
-		return this._current;
+		return current;
 	};
 
 	/**
@@ -1050,6 +1090,22 @@
 	};
 
 	/**
+	 * Gets a page index at the specified position.
+	 * @public
+	 * @param {Number} [position] - The relative position of the item.
+	 * @return {jQuery|Array.<jQuery>} - The item at the given position or all items if no position was given.
+	 */
+	Owl.prototype.pages = function(position) {
+		var length = this._pages.length;
+
+		if (position === undefined) {
+			return this._pages.slice();
+		}
+
+		return this._pages[((position % length) + length) % length];
+	};
+
+	/**
 	 * Gets an item at the specified relative position.
 	 * @public
 	 * @param {Number} [position] - The relative position of the item.
@@ -1139,8 +1195,11 @@
 	 * @public
 	 * @param {Number} position - The position of the item.
 	 * @param {Number} [speed] - The time in milliseconds for the transition.
+	 * @param {Number|String} [offset=1] - The offset between items. Use 'page' to slide by visible items.
 	 */
-	Owl.prototype.to = function(position, speed) {
+	Owl.prototype.to = function(position, speed, offset) {
+		position = offset === 'page' ? this.pages(position).start : position * (offset || 1);
+
 		var current = this.current(),
 			revert = null,
 			distance = position - this.relative(current),
@@ -1181,20 +1240,22 @@
 	 * Slides to the next item.
 	 * @public
 	 * @param {Number} [speed] - The time in milliseconds for the transition.
+	 * @param {Number|String} [offset=1] - The offset between items. Use 'page' for the next non visible item.
 	 */
-	Owl.prototype.next = function(speed) {
-		speed = speed || false;
-		this.to(this.relative(this.current()) + 1, speed);
+	Owl.prototype.next = function(speed, offset) {
+		var current = offset === 'page' ? this.current(offset) : this.relative(this.current());
+		this.to(current + 1, speed, offset);
 	};
 
 	/**
 	 * Slides to the previous item.
 	 * @public
 	 * @param {Number} [speed] - The time in milliseconds for the transition.
+	 * @param {Number|String} [offset=1] - The offset between items. Use 'page' to slide until the current item is hidden.
 	 */
-	Owl.prototype.prev = function(speed) {
-		speed = speed || false;
-		this.to(this.relative(this.current()) - 1, speed);
+	Owl.prototype.prev = function(speed, offset) {
+		var current = offset === 'page' ? this.current(offset) : this.relative(this.current());
+		this.to(current - 1, speed, offset);
 	};
 
 	/**
