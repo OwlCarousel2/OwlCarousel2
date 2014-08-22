@@ -5,5 +5,5 @@
 @import 'mixins';
 
 .owl-height {
-	@include transition(height, 500ms, ease-in-out)
+	@include owlTransition(height, 500ms, ease-in-out)
 }
