@@ -14,7 +14,7 @@
 			background: $nav-background;
 			display: inline-block;
 			cursor: pointer;
-			@include rounded($nav-rounded);
+			@include owl-rounded($nav-rounded);
 
 			&:hover {
 				background: $nav-background-hover;
@@ -48,8 +48,8 @@
 				background: $dot-background;
 				display: block;
 				-webkit-backface-visibility: visible;
-				@include transition(opacity, 200ms, ease);
-				@include rounded($dot-rounded);
+				@include owl-transition(opacity, 200ms, ease);
+				@include owl-rounded($dot-rounded);
 			}
 
 			&.active,
