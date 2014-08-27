@@ -502,9 +502,9 @@
 			settings = $.extend({}, this.options);
 		} else {
 			$.each(overwrites, function(breakpoint) {
-				if (breakpoint <= viewport && breakpoint > match) {
-					match = Number(breakpoint);
-				}
+        if (window.matchMedia(breakpoint).matches) {
+          match = breakpoint;
+        }
 			});
 
 			settings = $.extend({}, this.options, overwrites[match]);
