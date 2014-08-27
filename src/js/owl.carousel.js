@@ -204,7 +204,6 @@
 
 		responsive: {},
 		responsiveRefreshRate: 200,
-		responsiveBaseElement: window,
 
 		fallbackEasing: 'swing',
 
@@ -501,7 +500,7 @@
 			settings = $.extend({}, this.options);
 		} else {
 			$.each(overwrites, function(breakpoint) {
-        if (this.options.responsiveBaseElement.matchMedia(breakpoint).matches) {
+        if (window.matchMedia(breakpoint).matches) {
           match = breakpoint;
         }
 			});
@@ -1227,9 +1226,7 @@
 	 */
 	Owl.prototype.viewport = function() {
 		var width;
-		if (this.options.responsiveBaseElement !== window) {
-			width = $(this.options.responsiveBaseElement).width();
-		} else if (window.innerWidth) {
+		if (window.innerWidth) {
 			width = window.innerWidth;
 		} else if (document.documentElement && document.documentElement.clientWidth) {
 			width = document.documentElement.clientWidth;
