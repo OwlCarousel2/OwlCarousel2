@@ -489,7 +489,6 @@
 
 	/**
 	 * Setups the current settings.
-	 * @todo Remove responsive classes. Why should adaptive designs be brought into IE8?
 	 * @todo Support for media queries by using `matchMedia` would be nice.
 	 * @public
 	 */
@@ -510,13 +509,6 @@
 
 			settings = $.extend({}, this.options, overwrites[match]);
 			delete settings.responsive;
-
-			// responsive class
-			if (settings.responsiveClass) {
-				this.$element.attr('class',
-					this.$element.attr('class').replace(new RegExp('(' + this.options.responsiveClass + '-)\\S+\\s', 'g'), '$1' + match)
-				);
-			}
 		}
 
 		if (this.settings === null || this._breakpoint !== match) {
