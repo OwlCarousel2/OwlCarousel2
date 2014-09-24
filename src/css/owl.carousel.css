@@ -1,4 +1,4 @@
-/* 
+/*
  *  Core Owl Carousel CSS File
  */
 .owl-carousel {
@@ -24,6 +24,10 @@
 .owl-carousel .owl-stage-outer {
   position: relative;
   overflow: hidden;
+  cursor: -webkit-grab;
+  cursor: -o-grab;
+  cursor: -ms-grab;
+  cursor: grab;
   /* fix for flashing background */
   -webkit-transform: translate3d(0px, 0px, 0px);
 }
@@ -76,10 +80,10 @@
 }
 .owl-carousel.owl-grab {
   cursor: move;
-  cursor: -webkit-grab;
-  cursor: -o-grab;
-  cursor: -ms-grab;
-  cursor: grab;
+  cursor: -webkit-grabbing;
+  cursor: -o-grabbing;
+  cursor: -ms-grabbing;
+  cursor: grabbing;
 }
 .owl-carousel.owl-rtl {
   direction: rtl;
