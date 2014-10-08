@@ -46,7 +46,7 @@
 					var settings = this._core.settings,
 						n = (settings.center && Math.ceil(settings.items / 2) || settings.items),
 						i = ((settings.center && n * -1) || 0),
-						position = ((e.property && e.property.value) || this._core.current()) + i,
+						position = (e.property && e.property.value !== undefined ? e.property.value : this._core.current()) + i,
 						clones = this._core.clones().length,
 						load = $.proxy(function(i, v) { this.load(v) }, this);
 
