@@ -30,6 +30,7 @@
     "grunt-contrib-watch": "^0.6.1",
     "grunt-jscs-checker": "~0.4.2",
     "grunt-contrib-jshint": "^0.10.0",
+    "grunt-contrib-qunit": ">=0.2.1",
     "load-grunt-tasks": "^0.4.0",
     "pretty": "^0.1.2"
    
