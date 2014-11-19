@@ -835,7 +835,7 @@
 		// aaaand show.
 		this.dom.$stage.removeClass('owl-refresh');
 
-		if (!current) {
+		if (!current || current.length == 0) {
 			this.dom.oStage.scrollLeft = 0;
 			this.reset(this.dom.$oItems.eq(0).data('owl-item').indexAbs);
 		} else {
