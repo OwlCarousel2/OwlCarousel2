@@ -1773,8 +1773,10 @@
 		delete this.dom.el.owlCarousel;
 
 		this.dom.$stage.unwrap();
-		this.dom.$items.unwrap();
-		this.dom.$items.contents().unwrap();
+		if (this.dom.$items) {
+			this.dom.$items.unwrap();
+			this.dom.$items.contents().unwrap();
+		}
 		this.dom = null;
 	};
 
@@ -3213,7 +3215,7 @@
 		$(window).off('hashchange.owl.navigation');
 
 		for (handler in this.handlers) {
-			this.owl.dom.$el.off(handler, this.handlers[handler]);
+			this.core.dom.$el.off(handler, this.handlers[handler]);
 		}
 		for (property in Object.getOwnPropertyNames(this)) {
 			typeof this[property] != 'function' && (this[property] = null);

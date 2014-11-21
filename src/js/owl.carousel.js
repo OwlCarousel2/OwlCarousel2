@@ -1773,8 +1773,10 @@
 		delete this.dom.el.owlCarousel;
 
 		this.dom.$stage.unwrap();
-		this.dom.$items.unwrap();
-		this.dom.$items.contents().unwrap();
+		if (this.dom.$items) {
+			this.dom.$items.unwrap();
+			this.dom.$items.contents().unwrap();
+		}
 		this.dom = null;
 	};
 
