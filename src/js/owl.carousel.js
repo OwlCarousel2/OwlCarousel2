@@ -194,6 +194,7 @@
 		merge: false,
 		mergeFit: true,
 		autoWidth: false,
+		itemsScaleUp: false,
 
 		startPosition: 0,
 		rtl: false,
@@ -292,6 +293,12 @@
 	}, {
 		filter: [ 'width', 'items', 'settings' ],
 		run: function(cache) {
+			
+			// itemsScaleUp Implementation: if number of items is less than declared
+			if (this.settings.items > this._items.length && this.options.itemsScaleUp === true) {
+				this.settings.items = this._items.length;
+			}
+			
 			var width = (this.width() / this.settings.items).toFixed(3) - this.settings.margin,
 				merge = null,
 				iterator = this._items.length,
