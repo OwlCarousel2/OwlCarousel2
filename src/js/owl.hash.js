@@ -46,7 +46,7 @@
 			}, this),
 			'prepared.owl.carousel': $.proxy(function(e) {
 				if (e.namespace) {
-					var hash = $(e.content).find('[data-hash]').andSelf('[data-hash]').attr('data-hash');
+					var hash = $(e.content).find('[data-hash]').addBack('[data-hash]').attr('data-hash');
 
 					if (!hash) {
 						return;
