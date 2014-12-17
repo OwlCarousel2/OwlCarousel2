@@ -63,8 +63,16 @@
 	 * Updates the view.
 	 */
 	AutoHeight.prototype.update = function() {
+		var maxHeight, visibleChildren, childIndex, childHeight, visibleCount;
+		maxHeight = 0;
+		start = this._core.current();
+		visibleCount = this._core.settings.items;
+		for (childIndex = 0; childIndex < visibleCount; childIndex++) {
+			childHeight = $(this._core.$stage.children()[start + childIndex]).height();
+			maxHeight = Math.max(maxHeight, childHeight);
+		}
 		this._core.$stage.parent()
-			.height(this._core.$stage.children().eq(this._core.current()).height())
+			.height(maxHeight)
 			.addClass(this._core.settings.autoHeightClass);
 	};
 
