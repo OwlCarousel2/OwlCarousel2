@@ -1,4 +1,15 @@
-# Owl Carousel 2 Beta
+## Announcement.
+
+Hello everyone.
+
+For a past few months i was out of the work and i could not maintain Owl. At the moment im in situation that i dont have time to work on this project anymore and im changing direction of my future carrer. 
+
+I would like to give that project with all assets and rights to some reliable person who can finish and maintain the code.
+If you are interested then please give me a shout: zly.ojciec@gmail.com
+
+Thank you.
+
+## Owl Carousel 2 Beta
 
 Touch enabled [jQuery](http://jquery.com/) plugin that lets you createbeautiful responsive carousel slider. **To get started, check out http://owlcarousel.owlgraphic.com.**
 
