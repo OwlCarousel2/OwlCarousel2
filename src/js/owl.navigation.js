@@ -269,19 +269,27 @@
 		this.controls.$next.toggle(options.nav);
 
 		if (options.dots) {
-			difference = this.pages.length - this.controls.$indicators.children().length;
+			if (this.pages.length > 1) {
+				difference = this.pages.length - this.controls.$indicators.children().length;
 
-			if (difference > 0) {
-				for (i = 0; i < Math.abs(difference); i++) {
-					html += options.dotData ? $items.eq(i).data('owl-item').dot : this.template;
+				if (difference > 0) {
+					for (i = 0; i < Math.abs(difference); i++) {
+						html += options.dotData ? $items.eq(i).data('owl-item').dot : this.template;
+					}
+					this.controls.$indicators.append(html);
+				} else if (difference < 0) {
+					this.controls.$indicators.children().slice(difference).remove();
 				}
-				this.controls.$indicators.append(html);
-			} else if (difference < 0) {
-				this.controls.$indicators.children().slice(difference).remove();
-			}
 
-			this.controls.$indicators.find('.active').removeClass('active');
-			this.controls.$indicators.children().eq($.inArray(this.current(), this.pages)).addClass('active');
+				this.controls.$indicators.find('.active').removeClass('active');
+				this.controls.$indicators.children().eq($.inArray(this.current(), this.pages)).addClass('active');
+			} else {
+				this.controls.$indicators.children().remove();
+
+				if (this.core.plugins.autoplay) {
+					this.core.plugins.autoplay.stop();
+				}
+			}
 		}
 
 		this.controls.$indicators.toggle(options.dots);
