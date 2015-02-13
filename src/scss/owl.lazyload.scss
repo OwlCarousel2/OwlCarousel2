@@ -8,7 +8,7 @@
 	.owl-item {
 		.owl-lazy {
   			opacity: 0;
-  			@include transition(opacity, 400ms, ease);
+  			@include owlTransition(opacity, 400ms, ease);
   		}
 		img{
 			transform-style: preserve-3d;

@@ -697,7 +697,7 @@
 	Owl.prototype.onDragStart = function(event) {
 		var stage = null;
 
-		if (event.which === 3) {
+		if (event.which === 3 || this._states.tags.disabled) {
 			return;
 		}
 
@@ -763,7 +763,7 @@
 			delta = this.difference(this._drag.pointer, this.pointer(event)),
 			stage = this.difference(this._drag.stage.start, delta);
 
-		if (!this.is('dragging')) {
+		if (!this.is('dragging') || this._states.tags.disabled) {
 			return;
 		}
 
@@ -1609,6 +1609,15 @@
 		};
 	};
 
+  /**
+   * Sets the state of events in the app
+   * @protected
+   * @param {Boolean} isDisabled - Sets whether events are disabled or not
+   */
+  Owl.prototype.setEventsState = function (isDisabled) {
+    this._states.tags.disabled = isDisabled;
+  };
+
 	/**
 	 * The jQuery Plugin for the Owl Carousel
 	 * @todo Navigation plugin `next` and `prev`
@@ -1626,7 +1635,7 @@
 				$this.data('owl.carousel', data);
 
 				$.each([
-					'next', 'prev', 'to', 'destroy', 'refresh', 'replace', 'add', 'remove'
+					'next', 'prev', 'to', 'destroy', 'refresh', 'replace', 'add', 'remove', 'setEventsState'
 				], function(i, event) {
 					data.register({ type: Owl.Type.Event, name: event });
 					data.$element.on(event + '.owl.carousel.core', $.proxy(function(e) {
