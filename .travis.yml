@@ -1,0 +1,19 @@
+language: node_js
+node_js:
+  - '0.10'
+
+before_install:
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
+
+before_script:
+  - npm install -g bower grunt-cli
+  - bower install
+  - npm run update-webdriver
+
+script:
+  - grunt test
+
+notifications:
+  slack:
+    secure: cB6ZJ3XgsE+KX9S11/Q+Nz7Tkpp0dUonww08OCkqXiR0IO3OE5hTz0lqZalNG8UzA9R+g78zJELj37CD7rr/vM57MpZtA9lftm//xXDdrytvt1TV273W88p8685P4Y1QtvQJoM/wfYEEiRHsQqpW/Ij+DsUMCNABulhknhoYtT0=
