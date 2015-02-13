@@ -1,3 +1,5 @@
+[![Stories in Ready](https://badge.waffle.io/smashingboxes/OwlCarousel2.png?label=ready&title=Ready)](http://waffle.io/smashingboxes/OwlCarousel2)
+
 ## Announcement.
 
 Big announcement comming about maintainance of this project.  Stay tuned!
