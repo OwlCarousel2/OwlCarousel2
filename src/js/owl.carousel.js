@@ -158,7 +158,7 @@
 		}, this));
 
 		$.each(Owl.Plugins, $.proxy(function(key, plugin) {
-			this._plugins[key[0].toLowerCase() + key.slice(1)]
+			this._plugins[key.charAt(0).toLowerCase() + key.slice(1)]
 				= new plugin(this);
 		}, this));
 
