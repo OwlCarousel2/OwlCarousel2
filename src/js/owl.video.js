@@ -25,7 +25,7 @@
 		 * @type {Object}
 		 */
 		this._videos = {};
-		this._urlParameters = {};
+
 		/**
 		 * Current playing item.
 		 * @protected
@@ -113,11 +113,6 @@
 
 			if (id[3].indexOf('youtu') > -1) {
 				type = 'youtube';
-
-				var splittedUrl = url.split(/\?/),
-		        	params = splittedUrl[1] ? splittedUrl[1] : null;
-		        this._urlParameters[url] = params;
-
 			} else if (id[3].indexOf('vimeo') > -1) {
 				type = 'vimeo';
 			} else {
@@ -222,7 +217,6 @@
 		var target = $(event.target),
 			item = target.closest('.' + this._core.settings.itemClass),
 			video = this._videos[item.attr('data-video')],
-			params = this._urlParameters[item.attr('data-video')],
 			width = video.width || '100%',
 			height = video.height || this._core.$stage.height(),
 			html;
@@ -239,13 +233,8 @@
 		this._core.reset(item.index());
 
 		if (video.type === 'youtube') {
-			if(params){
-				html = '<iframe width="' + width + '" height="' + height + '" src="http://www.youtube.com/embed/' +
-				video.id + '?autoplay=1&' + params + '" frameborder="0" allowfullscreen></iframe>';
-			}else{
-				html = '<iframe width="' + width + '" height="' + height + '" src="http://www.youtube.com/embed/' +
+			html = '<iframe width="' + width + '" height="' + height + '" src="http://www.youtube.com/embed/' +
 				video.id + '?autoplay=1&v=' + video.id + '" frameborder="0" allowfullscreen></iframe>';
-			}
 		} else if (video.type === 'vimeo') {
 			html = '<iframe src="http://player.vimeo.com/video/' + video.id +
 				'?autoplay=1" width="' + width + '" height="' + height +
