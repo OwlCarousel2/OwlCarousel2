@@ -6,6 +6,14 @@
 	transition: $prop $time $easing;
 }
 
+@mixin transition-transform($time, $easing){
+	-webkit-transition: -webkit-transform $time $easing;
+	-moz-transition: -moz-transform $time $easing;
+	-ms-transition: -ms-transform $time $easing;
+	-o-transition: -o-transform $time $easing;
+	transition: transform $time $easing;
+}
+
 @mixin rounded($value){
 	-webkit-border-radius: $value;
 	-moz-border-radius: $value;
@@ -13,9 +21,9 @@
 }
 
 @mixin transform($prop){
-	-webkit-transition: $prop;
-	-moz-transition: $prop;
-	-ms-transition: $prop;
-	-o-transition: $prop;
-	transition: $prop;
+	-webkit-transform: $prop;
+	-moz-transform: $prop;
+	-ms-transform: $prop;
+	-o-transform: $prop;
+	transform: $prop;
 }
