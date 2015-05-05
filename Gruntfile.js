@@ -88,8 +88,8 @@ module.exports = function(grunt) {
 			sass: {
 				docs: {
 					options: {
-						style: 'compressed',
-						loadPath: [ '<%= app.docs.src %>/assets/scss/', 'bower_components/foundation/scss' ]
+						outputStyle: 'compressed',
+						includePaths: [ '<%= app.docs.src %>/assets/scss/', 'bower_components/foundation/scss' ]
 					},
 					files: {
 						'<%= app.docs.dest %>/assets/css/docs.theme.min.css': '<%= app.docs.src %>/assets/scss/docs.theme.scss'
@@ -97,7 +97,7 @@ module.exports = function(grunt) {
 				},
 				dist: {
 					options: {
-						style: 'expanded'
+						outputStyle: 'nested'
 					},
 					files: [ {
 						expand: true,
