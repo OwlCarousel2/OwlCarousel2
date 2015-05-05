@@ -46,13 +46,13 @@
 			}, this),
 			'prepared.owl.carousel': $.proxy(function(e) {
 				if (e.namespace) {
-					var hash = $(e.content).find('[data-hash]').andSelf('[data-hash]').attr('data-hash');
+					var hash = $(e.item).find('[data-hash]').andSelf('[data-hash]').attr('data-hash');
 
 					if (!hash) {
 						return;
 					}
 
-					this._hashes[hash] = e.content;
+					this._hashes[hash] = e.item;
 				}
 			}, this),
 			'changed.owl.carousel': $.proxy(function(e) {

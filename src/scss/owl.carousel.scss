@@ -11,6 +11,7 @@
 	
 	.owl-stage {
 		position: relative;
+		white-space: nowrap;
 		-ms-touch-action: pan-Y;
 	}
 
@@ -33,7 +34,7 @@
 	.owl-item {
 		position: relative;
 		min-height: 1px;
-		float: left;
+		display: inline-block;
 		-webkit-backface-visibility: hidden;
 		-webkit-tap-highlight-color: transparent;
 		-webkit-touch-callout: none;
@@ -95,10 +96,6 @@
 
 	&.owl-rtl {
 		direction: rtl;
-	}
-
-	&.owl-rtl .owl-item {
-		float: right;
 	}
 }
 

@@ -65,11 +65,11 @@
 					return;
 				}
 
-				var $element = $(e.content).find('.owl-video');
+				var $element = $(e.item).find('.owl-video');
 
 				if ($element.length) {
 					$element.css('display', 'none');
-					this.fetch($element, $(e.content));
+					this.fetch($element, $(e.item));
 				}
 			}, this)
 		};

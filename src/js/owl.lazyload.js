@@ -34,26 +34,22 @@
 		 */
 		this._handlers = {
 			'initialized.owl.carousel change.owl.carousel': $.proxy(function(e) {
-				if (!e.namespace) {
+				if (!e.namespace || !this._core.settings || this._core.settings.lazyLoad === false) {
 					return;
 				}
 
-				if (!this._core.settings || !this._core.settings.lazyLoad) {
-					return;
-				}
-
-				if ((e.property && e.property.name == 'position') || e.type == 'initialized') {
-					var settings = this._core.settings,
-						n = (settings.center && Math.ceil(settings.items / 2) || settings.items),
-						i = ((settings.center && n * -1) || 0),
-						position = ((e.property && e.property.value) || this._core.current()) + i,
+				if ((e.property && e.property.name === 'position') || e.type === 'initialized') {
+					var position = e.property && e.property.value || this._core.current(),
+						positions = this.positions(position),
 						clones = this._core.clones().length,
+						iterator = positions.length,
 						load = $.proxy(function(i, v) { this.load(v) }, this);
 
-					while (i++ < n) {
-						this.load(clones / 2 + this._core.relative(position));
-						clones && $.each(this._core.clones(this._core.relative(position)), load);
-						position++;
+					console.log(positions);
+
+					while (iterator--) {
+						this.load(clones / 2 + positions[iterator]);
+						clones && $.each(this._core.clones(positions[iterator]), load);
 					}
 				}
 			}, this)
@@ -64,15 +60,45 @@
 
 		// register event handler
 		this._core.$element.on(this._handlers);
-	}
+	};
 
 	/**
 	 * Default options.
 	 * @public
 	 */
 	Lazy.Defaults = {
-		lazyLoad: false
-	}
+		lazyLoad: false,
+		lazyPrefetch: 'page'
+	};
+
+	/**
+	 * Gets the positions to load for the given position.
+	 * @todo Page size doesn't work with auto width or merge and might be a missing feature of the core.
+	 * @param {Numer} current - The absolute current position of the carousel.
+	 * @returns {Array}
+	 */
+	Lazy.prototype.positions = function(current) {
+		var result = [],
+			settings = this._core.settings,
+			relative = this._core.relative(current),
+			backward = settings.loop || settings.center && relative > 0,
+			before = settings.center && (relative > 0 || settings.loop),
+			page = settings.items + (before && settings.items % 2 === 0 ? 1 : 0),
+			prefetch = settings.lazyPrefetch === 'page' ? page : settings.lazyPrefetch,
+			iterator = page,
+			offset = before ? -Math.ceil(settings.items / 2) : 0;
+
+		while (prefetch--) {
+			backward && result.unshift(this._core.relative(current - prefetch + offset - 1));
+			result.unshift(this._core.relative(current + page + prefetch + offset));
+		}
+
+		while (iterator--) {
+			result.unshift(this._core.relative(current + iterator + offset));
+		}
+
+		return result;
+	};
 
 	/**
 	 * Loads all resources of an item at the specified position.
@@ -97,22 +123,24 @@
 				$element.one('load.owl.lazy', $.proxy(function() {
 					$element.css('opacity', 1);
 					this._core.trigger('loaded', { element: $element, url: url }, 'lazy');
+					if (this._core.settings.autoWidth) {
+						this._core.invalidate('width');
+						this._core.update();
+					}
 				}, this)).attr('src', url);
 			} else {
-				image = new Image();
-				image.onload = $.proxy(function() {
+				$(new Image()).one('load.owl.lazy', $.proxy(function() {
 					$element.css({
 						'background-image': 'url(' + url + ')',
 						'opacity': '1'
 					});
 					this._core.trigger('loaded', { element: $element, url: url }, 'lazy');
-				}, this);
-				image.src = url;
+				}, this)).attr('src', url);
 			}
 		}, this));
 
 		this._loaded.push($item.get(0));
-	}
+	};
 
 	/**
 	 * Destroys the plugin.

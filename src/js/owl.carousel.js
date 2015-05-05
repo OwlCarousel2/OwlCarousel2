@@ -108,8 +108,15 @@
 
 		/**
 		 * Widths of all items.
+		 * @protected
 		 */
 		this._widths = [];
+
+		/**
+		 * Paging indexes.
+		 * @protected
+		 */
+		this._pages = [];
 
 		/**
 		 * Invalidated parts within the update process.
@@ -348,28 +355,17 @@
 				iterator = -1,
 				previous = 0,
 				current = 0,
-				coordinates = [];
+				coordinates = [],
+				padding = this.settings.stagePadding || 0,
+				margin = this.settings.margin || 0;
 
 			while (++iterator < size) {
-				previous = coordinates[iterator - 1] || 0;
-				current = this._widths[this.relative(iterator)] + this.settings.margin;
+				previous = coordinates[iterator - 1] || -padding * rtl;
+				current = this._widths[this.relative(iterator)] + margin;
 				coordinates.push(previous + current * rtl);
 			}
 
 			this._coordinates = coordinates;
-		}
-	}, {
-		filter: [ 'width', 'items', 'settings' ],
-		run: function() {
-			var padding = this.settings.stagePadding,
-				coordinates = this._coordinates,
-				css = {
-					'width': Math.ceil(Math.abs(coordinates[coordinates.length - 1])) + padding * 2,
-					'padding-left': padding || '',
-					'padding-right': padding || ''
-				};
-
-			this.$stage.css(css);
 		}
 	}, {
 		filter: [ 'width', 'items', 'settings' ],
@@ -386,6 +382,35 @@
 			} else if (grid) {
 				cache.css.width = cache.items.width;
 				items.css(cache.css);
+			}
+		}
+	}, {
+		filter: [ 'width', 'items', 'settings' ],
+		run: function() {
+			var maximum = this.maximum(true),
+				iterator = -1,
+				page = 0,
+				items = this._items.length,
+				settings = this.settings,
+				size = settings.center || settings.autoWidth
+					? 1 : settings.items;
+
+			this._pages = [];
+
+			while (++iterator < items) {
+				if (page >= size || page === 0) {
+					this._pages.push({
+						start: Math.min(maximum, iterator),
+						end: iterator + size - 1
+					});
+
+					if (Math.min(maximum, iterator) === maximum) {
+						break;
+					}
+					page = 0;
+				}
+
+				page += this._mergers[iterator];
 			}
 		}
 	}, {
@@ -444,19 +469,6 @@
 
 		this.$element.toggleClass(this.settings.rtlClass, this.settings.rtl);
 
-		if (this.settings.autoWidth && !this.is('pre-loading')) {
-			var imgs, nestedSelector, width;
-			imgs = this.$element.find('img');
-			nestedSelector = this.settings.nestedItemSelector ? '.' + this.settings.nestedItemSelector : undefined;
-			width = this.$element.children(nestedSelector).width();
-
-			if (imgs.length && width <= 0) {
-				this.preloadAutoWidthImages(imgs);
-			}
-		}
-
-		this.$element.addClass(this.options.loadingClass);
-
 		// create stage
 		this.$stage = $('<' + this.settings.stageElement + ' class="' + this.settings.stageClass + '"/>')
 			.wrap('<div class="' + this.settings.stageOuterClass + '"/>');
@@ -475,10 +487,6 @@
 			// invalidate width
 			this.invalidate('width');
 		}
-
-		this.$element
-			.removeClass(this.options.loadingClass)
-			.addClass(this.options.loadedClass);
 
 		// register event handlers
 		this.registerEventHandlers();
@@ -541,19 +549,18 @@
 
 	/**
 	 * Prepares an item before add.
-	 * @todo Rename event parameter `content` to `item`.
 	 * @protected
 	 * @returns {jQuery|HTMLElement} - The item container.
 	 */
-	Owl.prototype.prepare = function(item) {
-		var event = this.trigger('prepare', { content: item });
+	Owl.prototype.prepare = function(item, index) {
+		var event = this.trigger('prepare', { item: item, index: index });
 
 		if (!event.data) {
 			event.data = $('<' + this.settings.itemElement + '/>')
 				.addClass(this.options.itemClass).append(item)
 		}
 
-		this.trigger('prepared', { content: event.data });
+		this.trigger('prepared', { item: event.data, index: index });
 
 		return event.data;
 	};
@@ -599,6 +606,7 @@
 
 	/**
 	 * Refreshes the carousel primarily for adaptive purposes.
+	 * @todo Add parameter `part` for `invalidate`, so the additional call of it before will be no longer necessary.
 	 * @public
 	 */
 	Owl.prototype.refresh = function() {
@@ -905,35 +913,43 @@
 	/**
 	 * Sets the absolute position of the current item.
 	 * @public
-	 * @param {Number} [position] - The new absolute position or nothing to leave it unchanged.
-	 * @returns {Number} - The absolute position of the current item.
+	 * @param {Number|String} [position=item] - The new absolute position if it's a number. Use 'item' or 'page' to leave it unchanged.
+	 * @returns {Number} - The absolute position of the current item or page.
 	 */
 	Owl.prototype.current = function(position) {
-		if (position === undefined) {
-			return this._current;
-		}
+		var current = null,
+			event = null;
 
 		if (this._items.length === 0) {
 			return undefined;
 		}
 
-		position = this.normalize(position);
+		if ($.isNumeric(position)) {
+			position = this.normalize(position);
 
-		if (this._current !== position) {
-			var event = this.trigger('change', { property: { name: 'position', value: position } });
+			if (this._current !== position) {
+				event = this.trigger('change', { property: { name: 'position', value: position } });
 
-			if (event.data !== undefined) {
-				position = this.normalize(event.data);
+				if (event.data !== undefined) {
+					position = this.normalize(event.data);
+				}
+
+				this._current = current = position;
+
+				this.invalidate('position');
+
+				this.trigger('changed', { property: { name: 'position', value: position } });
 			}
-
-			this._current = position;
-
-			this.invalidate('position');
-
-			this.trigger('changed', { property: { name: 'position', value: this._current } });
+		} else if (position === undefined || position === 'item') {
+			current = this._current;
+		} else if (position === 'page') {
+			current = this.relative(this._current);
+			current = $.inArray($.grep(this._pages, function(page, index) {
+				return page.start <= current && page.end >= current;
+			}).pop(), this._pages);
 		}
 
-		return this._current;
+		return current;
 	};
 
 	/**
@@ -1061,6 +1077,22 @@
 	};
 
 	/**
+	 * Gets a page index at the specified position.
+	 * @public
+	 * @param {Number} [position] - The relative position of the item.
+	 * @return {jQuery|Array.<jQuery>} - The item at the given position or all items if no position was given.
+	 */
+	Owl.prototype.pages = function(position) {
+		var length = this._pages.length;
+
+		if (position === undefined) {
+			return this._pages.slice();
+		}
+
+		return this._pages[((position % length) + length) % length];
+	};
+
+	/**
 	 * Gets an item at the specified relative position.
 	 * @public
 	 * @param {Number} [position] - The relative position of the item.
@@ -1150,8 +1182,11 @@
 	 * @public
 	 * @param {Number} position - The position of the item.
 	 * @param {Number} [speed] - The time in milliseconds for the transition.
+	 * @param {Number|String} [offset=1] - The offset between items. Use 'page' to slide by visible items.
 	 */
-	Owl.prototype.to = function(position, speed) {
+	Owl.prototype.to = function(position, speed, offset) {
+		position = offset === 'page' ? this.pages(position).start : position * (offset || 1);
+
 		var current = this.current(),
 			revert = null,
 			distance = position - this.relative(current),
@@ -1192,20 +1227,22 @@
 	 * Slides to the next item.
 	 * @public
 	 * @param {Number} [speed] - The time in milliseconds for the transition.
+	 * @param {Number|String} [offset=1] - The offset between items. Use 'page' for the next non visible item.
 	 */
-	Owl.prototype.next = function(speed) {
-		speed = speed || false;
-		this.to(this.relative(this.current()) + 1, speed);
+	Owl.prototype.next = function(speed, offset) {
+		var current = offset === 'page' ? this.current(offset) : this.relative(this.current());
+		this.to(current + 1, speed, offset);
 	};
 
 	/**
 	 * Slides to the previous item.
 	 * @public
 	 * @param {Number} [speed] - The time in milliseconds for the transition.
+	 * @param {Number|String} [offset=1] - The offset between items. Use 'page' to slide until the current item is hidden.
 	 */
-	Owl.prototype.prev = function(speed) {
-		speed = speed || false;
-		this.to(this.relative(this.current()) - 1, speed);
+	Owl.prototype.prev = function(speed, offset) {
+		var current = offset === 'page' ? this.current(offset) : this.relative(this.current());
+		this.to(current - 1, speed, offset);
 	};
 
 	/**
@@ -1268,7 +1305,7 @@
 		content.filter(function() {
 			return this.nodeType === 1;
 		}).each($.proxy(function(index, item) {
-			item = this.prepare(item);
+			item = this.prepare(item, index);
 			this.$stage.append(item);
 			this._items.push(item);
 			this._mergers.push(item.find('[data-merge]').andSelf('[data-merge]').attr('data-merge') * 1 || 1);
@@ -1281,7 +1318,6 @@
 
 	/**
 	 * Adds an item.
-	 * @todo Use `item` instead of `content` for the event arguments.
 	 * @public
 	 * @param {HTMLElement|jQuery|String} content - The item content to add.
 	 * @param {Number} [position] - The relative position at which to insert the item otherwise the item will be added to the end.
@@ -1290,33 +1326,32 @@
 		var current = this.relative(this._current);
 
 		position = position === undefined ? this._items.length : this.normalize(position, true);
-		content = content instanceof jQuery ? content : $(content);
+		item = content instanceof jQuery ? content : $(content);
 
-		this.trigger('add', { content: content, position: position });
+		this.trigger('add', { item: item, position: position });
 
-		content = this.prepare(content);
+		item = this.prepare(item, position);
 
 		if (this._items.length === 0 || position === this._items.length) {
-			this._items.length === 0 && this.$stage.append(content);
-			this._items.length !== 0 && this._items[position - 1].after(content);
-			this._items.push(content);
-			this._mergers.push(content.find('[data-merge]').andSelf('[data-merge]').attr('data-merge') * 1 || 1);
+			this._items.length === 0 && this.$stage.append(item);
+			this._items.length !== 0 && this._items[position - 1].after(item);
+			this._items.push(item);
+			this._mergers.push(item.find('[data-merge]').andSelf('[data-merge]').attr('data-merge') * 1 || 1);
 		} else {
-			this._items[position].before(content);
-			this._items.splice(position, 0, content);
-			this._mergers.splice(position, 0, content.find('[data-merge]').andSelf('[data-merge]').attr('data-merge') * 1 || 1);
+			this._items[position].before(item);
+			this._items.splice(position, 0, item);
+			this._mergers.splice(position, 0, item.find('[data-merge]').andSelf('[data-merge]').attr('data-merge') * 1 || 1);
 		}
 
 		this._items[current] && this.reset(this._items[current].index());
 
 		this.invalidate('items');
 
-		this.trigger('added', { content: content, position: position });
+		this.trigger('added', { item: item, position: position });
 	};
 
 	/**
 	 * Removes an item by its position.
-	 * @todo Use `item` instead of `content` for the event arguments.
 	 * @public
 	 * @param {Number} position - The relative position of the item to remove.
 	 */
@@ -1327,7 +1362,7 @@
 			return;
 		}
 
-		this.trigger('remove', { content: this._items[position], position: position });
+		this.trigger('remove', { item: this._items[position], position: position });
 
 		this._items[position].remove();
 		this._items.splice(position, 1);
@@ -1335,25 +1370,7 @@
 
 		this.invalidate('items');
 
-		this.trigger('removed', { content: null, position: position });
-	};
-
-	/**
-	 * Preloads images with auto width.
-	 * @todo Replace by a more generic approach
-	 * @protected
-	 */
-	Owl.prototype.preloadAutoWidthImages = function(images) {
-		images.each($.proxy(function(i, element) {
-			this.enter('pre-loading');
-			element = $(element);
-			$(new Image()).one('load', $.proxy(function(e) {
-				element.attr('src', e.target.src);
-				element.css('opacity', 1);
-				this.leave('pre-loading');
-				!this.is('pre-loading') && !this.is('initializing') && this.refresh();
-			}, this)).attr('src', element.attr('src') || element.attr('data-src') || element.attr('data-src-retina'));
-		}, this));
+		this.trigger('removed', { item: null, position: position });
 	};
 
 	/**
@@ -1459,14 +1476,12 @@
 	 * @returns {Event} - The event arguments.
 	 */
 	Owl.prototype.trigger = function(name, data, namespace, state, enter) {
-		var status = {
-			item: { count: this._items.length, index: this.current() }
-		}, handler = $.camelCase(
+		var handler = $.camelCase(
 			$.grep([ 'on', name, namespace ], function(v) { return v })
 				.join('-').toLowerCase()
 		), event = $.Event(
 			[ name, 'owl', namespace || 'carousel' ].join('.').toLowerCase(),
-			$.extend({ relatedTarget: this }, status, data)
+			$.extend({ relatedTarget: this }, data)
 		);
 
 		if (!this._supress[name]) {
