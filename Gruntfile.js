@@ -278,7 +278,7 @@ module.exports = function(grunt) {
 	// tasks
 	grunt.registerTask('dist', [ 'clean:dist', 'sass:dist', 'concat:dist', 'cssmin:dist', 'copy:themes', 'copy:distImages', 'jscs:dist', 'uglify:dist', 'copy:readme' ]);
 
-	grunt.registerTask('docs', [ 'clean:docs', 'assemble', 'sass:docs', 'copy:docsAssets', 'copy:distToDocs' ]);
+	grunt.registerTask('docs', [ 'dist', 'clean:docs', 'assemble', 'sass:docs', 'copy:docsAssets', 'copy:distToDocs' ]);
 
 	grunt.registerTask('test', [ 'jshint:dist', 'qunit:dist' ]);
 
