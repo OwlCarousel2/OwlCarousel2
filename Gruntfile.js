@@ -261,7 +261,7 @@ module.exports = function(grunt) {
 			compress: {
 				zip: {
 					options: {
-						archive: 'download/<%= pkg.version %>/owl.carousel.zip'
+						archive: 'docs/download/owl.carousel.<%= pkg.version %>.zip'
 					},
 					files: [ {
 						expand: true,
