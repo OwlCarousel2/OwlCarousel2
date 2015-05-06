@@ -296,6 +296,6 @@ module.exports = function(grunt) {
 
 	grunt.registerTask('zip', [ 'compress' ]);
 
-	grunt.registerTask('deploy', [ 'docs', 'gh-pages' ]);3
+	grunt.registerTask('deploy', [ 'docs', 'gh-pages' ]);
 
 };
