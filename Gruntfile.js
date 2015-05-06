@@ -270,6 +270,14 @@ module.exports = function(grunt) {
 						dest: 'owl.carousel.<%= pkg.version %>'
 					} ]
 				}
+			},
+
+			// publish to github pages
+			'gh-pages': {
+				options: {
+					base: 'docs'
+				},
+				src: '**/*'
 			}
 		});
 
@@ -287,5 +295,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('serve', [ 'connect:docs', 'watch' ]);
 
 	grunt.registerTask('zip', [ 'compress' ]);
+
+	grunt.registerTask('deploy', [ 'docs', 'gh-pages' ]);3
 
 };
