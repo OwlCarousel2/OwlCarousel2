@@ -7,8 +7,6 @@
   -moz-transition: opacity 400ms ease;
   -ms-transition: opacity 400ms ease;
   -o-transition: opacity 400ms ease;
-  transition: opacity 400ms ease;
-}
+  transition: opacity 400ms ease; }
 .owl-carousel .owl-item img {
-  transform-style: preserve-3d;
-}
+  transform-style: preserve-3d; }

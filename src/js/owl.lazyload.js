@@ -1,5 +1,5 @@
 /**
- * LazyLoad Plugin
+ * Lazy Plugin
  * @version 2.0.0
  * @author Bartosz Wojciechowski
  * @license The MIT License (MIT)
@@ -7,104 +7,128 @@
 ;(function($, window, document, undefined) {
 
 	/**
-	 * Creates the lazy load plugin.
-	 * @class The Lazy Load Plugin
-	 * @param {Owl} scope - The Owl Carousel
+	 * Creates the lazy plugin.
+	 * @class The Lazy Plugin
+	 * @param {Owl} carousel - The Owl Carousel
 	 */
-	LazyLoad = function(scope) {
-		this.owl = scope;
-		this.owl.options = $.extend({}, LazyLoad.Defaults, this.owl.options);
+	var Lazy = function(carousel) {
 
-		this.handlers = {
-			'changed.owl.carousel': $.proxy(function(e) {
-				if (e.property.name == 'items' && e.property.value && !e.property.value.is(':empty')) {
-					this.check();
+		/**
+		 * Reference to the core.
+		 * @protected
+		 * @type {Owl}
+		 */
+		this._core = carousel;
+
+		/**
+		 * Already loaded items.
+		 * @protected
+		 * @type {Array.<jQuery>}
+		 */
+		this._loaded = [];
+
+		/**
+		 * Event handlers.
+		 * @protected
+		 * @type {Object}
+		 */
+		this._handlers = {
+			'initialized.owl.carousel change.owl.carousel': $.proxy(function(e) {
+				if (!e.namespace) {
+					return;
+				}
+
+				if (!this._core.settings || !this._core.settings.lazyLoad) {
+					return;
+				}
+
+				if ((e.property && e.property.name == 'position') || e.type == 'initialized') {
+					var settings = this._core.settings,
+						n = (settings.center && Math.ceil(settings.items / 2) || settings.items),
+						i = ((settings.center && n * -1) || 0),
+						position = ((e.property && e.property.value) || this._core.current()) + i,
+						clones = this._core.clones().length,
+						load = $.proxy(function(i, v) { this.load(v) }, this);
+
+					while (i++ < n) {
+						this.load(clones / 2 + this._core.relative(position));
+						clones && $.each(this._core.clones(this._core.relative(position)), load);
+						position++;
+					}
 				}
 			}, this)
 		};
 
-		this.owl.dom.$el.on(this.handlers);
-	};
+		// set the default options
+		this._core.options = $.extend({}, Lazy.Defaults, this._core.options);
+
+		// register event handler
+		this._core.$element.on(this._handlers);
+	}
 
 	/**
 	 * Default options.
 	 * @public
 	 */
-	LazyLoad.Defaults = {
+	Lazy.Defaults = {
 		lazyLoad: false
-	};
+	}
 
 	/**
-	 * Checks all items and if necessary, calls `preload`.
+	 * Loads all resources of an item at the specified position.
+	 * @param {Number} position - The absolute position of the item.
 	 * @protected
 	 */
-	LazyLoad.prototype.check = function() {
-		var attr = window.devicePixelRatio > 1 ? 'data-src-retina' : 'data-src',
-			src, img, i, $item;
+	Lazy.prototype.load = function(position) {
+		var $item = this._core.$stage.children().eq(position),
+			$elements = $item && $item.find('.owl-lazy');
 
-		for (i = 0; i < this.owl.num.items; i++) {
-			$item = this.owl.dom.$items.eq(i);
-
-			if ($item.data('owl-item').current === true && $item.data('owl-item').loaded === false) {
-				img = $item.find('.owl-lazy');
-				src = img.attr(attr);
-				src = src || img.attr('data-src');
-				if (src) {
-					img.css('opacity', '0');
-					this.preload(img, $item);
-				}
-			}
+		if (!$elements || $.inArray($item.get(0), this._loaded) > -1) {
+			return;
 		}
-	};
 
-	/**
-	 * Preloads the images of an item.
-	 * @protected
-	 * @param {jQuery} images - The images to load.
-	 * @param {jQuery} $item - The item for which the images are loaded.
-	 */
-	LazyLoad.prototype.preload = function(images, $item) {
-		var $el, img, srcType;
+		$elements.each($.proxy(function(index, element) {
+			var $element = $(element), image,
+				url = (window.devicePixelRatio > 1 && $element.attr('data-src-retina')) || $element.attr('data-src');
 
-		images.each($.proxy(function(i, el) {
+			this._core.trigger('load', { element: $element, url: url }, 'lazy');
 
-			this.owl.trigger('load', null, 'lazy');
-
-			$el = $(el);
-			img = new Image();
-			srcType = window.devicePixelRatio > 1 ? $el.attr('data-src-retina') : $el.attr('data-src');
-			srcType = srcType || $el.attr('data-src');
-
-			img.onload = $.proxy(function() {
-				$item.data('owl-item').loaded = true;
-				if ($el.is('img')) {
-					$el.attr('src', img.src);
-				} else {
-					$el.css('background-image', 'url(' + img.src + ')');
-				}
-
-				$el.css('opacity', 1);
-				this.owl.trigger('loaded', null, 'lazy');
-			}, this);
-			img.src = srcType;
+			if ($element.is('img')) {
+				$element.one('load.owl.lazy', $.proxy(function() {
+					$element.css('opacity', 1);
+					this._core.trigger('loaded', { element: $element, url: url }, 'lazy');
+				}, this)).attr('src', url);
+			} else {
+				image = new Image();
+				image.onload = $.proxy(function() {
+					$element.css({
+						'background-image': 'url(' + url + ')',
+						'opacity': '1'
+					});
+					this._core.trigger('loaded', { element: $element, url: url }, 'lazy');
+				}, this);
+				image.src = url;
+			}
 		}, this));
-	};
+
+		this._loaded.push($item.get(0));
+	}
 
 	/**
 	 * Destroys the plugin.
 	 * @public
 	 */
-	LazyLoad.prototype.destroy = function() {
+	Lazy.prototype.destroy = function() {
 		var handler, property;
 
 		for (handler in this.handlers) {
-			this.owl.dom.$el.off(handler, this.handlers[handler]);
+			this._core.$element.off(handler, this.handlers[handler]);
 		}
 		for (property in Object.getOwnPropertyNames(this)) {
 			typeof this[property] != 'function' && (this[property] = null);
 		}
 	};
 
-	$.fn.owlCarousel.Constructor.Plugins.lazyLoad = LazyLoad;
+	$.fn.owlCarousel.Constructor.Plugins.Lazy = Lazy;
 
 })(window.Zepto || window.jQuery, window, document);

@@ -11,116 +11,6 @@
  */
 ;(function($, window, document, undefined) {
 
-	var item, dom, width, num, pos, drag, speed, state, e;
-
-	/**
-	 * Template for the data of each item respectively its DOM element.
-	 * @private
-	 */
-	item = {
-		index: false,
-		indexAbs: false,
-		posLeft: false,
-		clone: false,
-		active: false,
-		loaded: false,
-		lazyLoad: false,
-		current: false,
-		width: false,
-		center: false,
-		page: false,
-		hasVideo: false,
-		playVideo: false
-	};
-
-	/**
-	 * Template for the references to DOM elements, those with `$` sign are `jQuery` objects.
-	 * @private
-	 */
-	dom = {
-		el: null, // main element
-		$el: null, // jQuery main element
-		stage: null, // stage
-		$stage: null, // jQuery stage
-		oStage: null, // outer stage
-		$oStage: null, // $ outer stage
-		$items: null, // all items, clones and originals included
-		$oItems: null, // original items
-		$cItems: null, // cloned items only
-		$content: null
-	};
-
-	/**
-	 * Template for the widths of some elements.
-	 * @private
-	 */
-	width = {
-		el: 0,
-		stage: 0,
-		item: 0,
-		prevWindow: 0,
-		cloneLast: 0
-	};
-
-	/**
-	 * Template for counting to some properties.
-	 * @private
-	 */
-	num = {
-		items: 0,
-		oItems: 0,
-		cItems: 0,
-		active: 0,
-		merged: []
-	};
-
-	/**
-	 * Template for status information about drag and touch events.
-	 * @private
-	 */
-	drag = {
-		start: 0,
-		startX: 0,
-		startY: 0,
-		current: 0,
-		currentX: 0,
-		currentY: 0,
-		offsetX: 0,
-		offsetY: 0,
-		distance: null,
-		startTime: 0,
-		endTime: 0,
-		updatedX: 0,
-		targetEl: null
-	};
-
-	/**
-	 * Template for some status informations.
-	 * @private
-	 */
-	state = {
-		isTouch: false,
-		isScrolling: false,
-		isSwiping: false,
-		direction: false,
-		inMotion: false
-	};
-
-	/**
-	 * Event functions references.
-	 * @private
-	 */
-	e = {
-		_onDragStart: null,
-		_onDragMove: null,
-		_onDragEnd: null,
-		_transitionEnd: null,
-		_resizer: null,
-		_responsiveCall: null,
-		_goToLoop: null,
-		_checkVisibile: null
-	};
-
 	/**
 	 * Creates a carousel.
 	 * @class The Owl Carousel.
@@ -130,72 +20,35 @@
 	 */
 	function Owl(element, options) {
 
-		// add basic Owl information to dom element
-		element.owlCarousel = {
-			'name': 'Owl Carousel',
-			'author': 'Bartosz Wojciechowski',
-			'version': '2.0.0-beta.2.1'
-		};
-
 		/**
 		 * Current settings for the carousel.
-		 * @protected
+		 * @public
 		 */
 		this.settings = null;
 
 		/**
-		 *
-		 * @protected
-		 * @todo Must be dosumented.
+		 * Current options set by the caller including defaults.
+		 * @public
 		 */
 		this.options = $.extend({}, Owl.Defaults, options);
 
 		/**
-		 * Template for the data of each item.
-		 * @protected
+		 * Plugin element.
+		 * @public
 		 */
-		this.itemData = $.extend({}, item);
+		this.$element = $(element);
 
 		/**
-		 * Contains references to DOM elements, those with `$` sign are `jQuery` objects.
+		 * Proxied event handlers.
 		 * @protected
 		 */
-		this.dom = $.extend({}, dom);
-
-		/**
-		 * Caches the widths of some elements.
-		 * @protected
-		 */
-		this.width = $.extend({}, width);
-
-		/**
-		 * Caches some count informations.
-		 * @protected
-		 */
-		this.num = $.extend({}, num);
-
-		/**
-		 * Caches informations about drag and touch events.
-		 */
-		this.drag = $.extend({}, drag);
-
-		/**
-		 * Caches some status informations.
-		 * @protected
-		 */
-		this.state = $.extend({}, state);
-
-		/**
-		 * @protected
-		 * @todo Must be documented
-		 */
-		this.e = $.extend({}, e);
+		this._handlers = {};
 
 		/**
 		 * References to the running plugins of this carousel.
 		 * @protected
 		 */
-		this.plugins = {};
+		this._plugins = {};
 
 		/**
 		 * Currently suppressed events to prevent them from beeing retriggered.
@@ -204,31 +57,120 @@
 		this._supress = {};
 
 		/**
-		 * The absolute current position.
+		 * Absolute current position.
 		 * @protected
 		 */
 		this._current = null;
 
 		/**
-		 * The animation speed in milliseconds.
+		 * Animation speed in milliseconds.
 		 * @protected
 		 */
 		this._speed = null;
 
 		/**
-		 * The coordinates of all items in pixel.
+		 * Coordinates of all items in pixel.
+		 * @todo The name of this member is missleading.
+		 * @protected
 		 */
-		this._coordinates = null;
+		this._coordinates = [];
 
-		this.dom.el = element;
-		this.dom.$el = $(element);
+		/**
+		 * Current breakpoint.
+		 * @todo Real media queries would be nice.
+		 * @protected
+		 */
+		this._breakpoint = null;
 
-		for (var plugin in Owl.Plugins) {
-			this.plugins[plugin[0].toLowerCase() + plugin.slice(1)]
-				= new Owl.Plugins[plugin](this);
-		}
+		/**
+		 * Current width of the plugin element.
+		 */
+		this._width = null;
 
-		this.init();
+		/**
+		 * All real items.
+		 * @protected
+		 */
+		this._items = [];
+
+		/**
+		 * All cloned items.
+		 * @protected
+		 */
+		this._clones = [];
+
+		/**
+		 * Merge values of all items.
+		 * @todo Maybe this could be part of a plugin.
+		 * @protected
+		 */
+		this._mergers = [];
+
+		/**
+		 * Widths of all items.
+		 */
+		this._widths = [];
+
+		/**
+		 * Invalidated parts within the update process.
+		 * @protected
+		 */
+		this._invalidated = {};
+
+		/**
+		 * Ordered list of workers for the update process.
+		 * @protected
+		 */
+		this._pipe = [];
+
+		/**
+		 * Current state information for the drag operation.
+		 * @todo #261
+		 * @protected
+		 */
+		this._drag = {
+			time: null,
+			target: null,
+			pointer: null,
+			stage: {
+				start: null,
+				current: null
+			},
+			direction: null
+		};
+
+		/**
+		 * Current state information and their tags.
+		 * @type {Object}
+		 * @protected
+		 */
+		this._states = {
+			current: {},
+			tags: {
+				'initializing': [ 'busy' ],
+				'animating': [ 'busy' ],
+				'dragging': [ 'interacting' ]
+			}
+		};
+
+		$.each([ 'onResize', 'onThrottledResize' ], $.proxy(function(i, handler) {
+			this._handlers[handler] = $.proxy(this[handler], this);
+		}, this));
+
+		$.each(Owl.Plugins, $.proxy(function(key, plugin) {
+			this._plugins[key.charAt(0).toLowerCase() + key.slice(1)]
+				= new plugin(this);
+		}, this));
+
+		$.each(Owl.Workers, $.proxy(function(priority, worker) {
+			this._pipe.push({
+				'filter': worker.filter,
+				'run': $.proxy(worker.run, this)
+			});
+		}, this));
+
+		this.setup();
+		this.initialize();
 	}
 
 	/**
@@ -239,6 +181,7 @@
 		items: 3,
 		loop: false,
 		center: false,
+		rewind: false,
 
 		mouseDrag: true,
 		touchDrag: true,
@@ -253,6 +196,7 @@
 		autoWidth: false,
 
 		startPosition: 0,
+		rtl: false,
 
 		smartSpeed: 250,
 		fluidSpeed: false,
@@ -261,7 +205,6 @@
 		responsive: {},
 		responsiveRefreshRate: 200,
 		responsiveBaseElement: window,
-		responsiveClass: false,
 
 		fallbackEasing: 'swing',
 
@@ -271,12 +214,39 @@
 		itemElement: 'div',
 		stageElement: 'div',
 
-		// Classes and Names
-		themeClass: 'owl-theme',
-		baseClass: 'owl-carousel',
+		refreshClass: 'owl-refresh',
+		loadedClass: 'owl-loaded',
+		loadingClass: 'owl-loading',
+		rtlClass: 'owl-rtl',
+		responsiveClass: 'owl-responsive',
+		dragClass: 'owl-drag',
 		itemClass: 'owl-item',
-		centerClass: 'center',
-		activeClass: 'active'
+		stageClass: 'owl-stage',
+		stageOuterClass: 'owl-stage-outer',
+		grabClass: 'owl-grab'
+	};
+
+	/**
+	 * Enumeration for width.
+	 * @public
+	 * @readonly
+	 * @enum {String}
+	 */
+	Owl.Width = {
+		Default: 'default',
+		Inner: 'inner',
+		Outer: 'outer'
+	};
+
+	/**
+	 * Enumeration for types.
+	 * @public
+	 * @readonly
+	 * @enum {String}
+	 */
+	Owl.Type = {
+		Event: 'event',
+		State: 'state'
 	};
 
 	/**
@@ -286,99 +256,275 @@
 	Owl.Plugins = {};
 
 	/**
+	 * List of workers involved in the update process.
+	 */
+	Owl.Workers = [ {
+		filter: [ 'width', 'settings' ],
+		run: function() {
+			this._width = this.$element.width();
+		}
+	}, {
+		filter: [ 'width', 'items', 'settings' ],
+		run: function(cache) {
+			cache.current = this._items && this._items[this.relative(this._current)];
+		}
+	}, {
+		filter: [ 'items', 'settings' ],
+		run: function() {
+			this.$stage.children('.cloned').remove();
+		}
+	}, {
+		filter: [ 'width', 'items', 'settings' ],
+		run: function(cache) {
+			var margin = this.settings.margin || '',
+				grid = !this.settings.autoWidth,
+				rtl = this.settings.rtl,
+				css = {
+					'width': 'auto',
+					'margin-left': rtl ? margin : '',
+					'margin-right': rtl ? '' : margin
+				};
+
+			!grid && this.$stage.children().css(css);
+
+			cache.css = css;
+		}
+	}, {
+		filter: [ 'width', 'items', 'settings' ],
+		run: function(cache) {
+			var width = (this.width() / this.settings.items).toFixed(3) - this.settings.margin,
+				merge = null,
+				iterator = this._items.length,
+				grid = !this.settings.autoWidth,
+				widths = [];
+
+			cache.items = {
+				merge: false,
+				width: width
+			};
+
+			while (iterator--) {
+				merge = this._mergers[iterator];
+				merge = this.settings.mergeFit && Math.min(merge, this.settings.items) || merge;
+
+				cache.items.merge = merge > 1 || cache.items.merge;
+
+				widths[iterator] = !grid ? this._items[iterator].width() : width * merge;
+			}
+
+			this._widths = widths;
+		}
+	}, {
+		filter: [ 'items', 'settings' ],
+		run: function() {
+			var clones = [],
+				items = this._items,
+				settings = this.settings,
+				view = Math.max(settings.items * 2, 4),
+				size = Math.ceil(items.length / 2) * 2,
+				repeat = settings.loop && items.length ? settings.rewind ? view : Math.max(view, size) : 0,
+				append = '',
+				prepend = '';
+
+			repeat /= 2;
+
+			while (repeat--) {
+				clones.push(this.normalize(clones.length / 2, true));
+				append = append + items[clones[clones.length - 1]][0].outerHTML;
+				clones.push(this.normalize(items.length - 1 - (clones.length - 1) / 2, true));
+				prepend = items[clones[clones.length - 1]][0].outerHTML + prepend;
+			}
+
+			this._clones = clones;
+
+			$(append).addClass('cloned').appendTo(this.$stage);
+			$(prepend).addClass('cloned').prependTo(this.$stage);
+		}
+	}, {
+		filter: [ 'width', 'items', 'settings' ],
+		run: function() {
+			var rtl = this.settings.rtl ? 1 : -1,
+				size = this._clones.length + this._items.length,
+				iterator = -1,
+				previous = 0,
+				current = 0,
+				coordinates = [];
+
+			while (++iterator < size) {
+				previous = coordinates[iterator - 1] || 0;
+				current = this._widths[this.relative(iterator)] + this.settings.margin;
+				coordinates.push(previous + current * rtl);
+			}
+
+			this._coordinates = coordinates;
+		}
+	}, {
+		filter: [ 'width', 'items', 'settings' ],
+		run: function() {
+			var padding = this.settings.stagePadding,
+				coordinates = this._coordinates,
+				css = {
+					'width': Math.ceil(Math.abs(coordinates[coordinates.length - 1])) + padding * 2,
+					'padding-left': padding || '',
+					'padding-right': padding || ''
+				};
+
+			this.$stage.css(css);
+		}
+	}, {
+		filter: [ 'width', 'items', 'settings' ],
+		run: function(cache) {
+			var iterator = this._coordinates.length,
+				grid = !this.settings.autoWidth,
+				items = this.$stage.children();
+
+			if (grid && cache.items.merge) {
+				while (iterator--) {
+					cache.css.width = this._widths[this.relative(iterator)];
+					items.eq(iterator).css(cache.css);
+				}
+			} else if (grid) {
+				cache.css.width = cache.items.width;
+				items.css(cache.css);
+			}
+		}
+	}, {
+		filter: [ 'items' ],
+		run: function() {
+			this._coordinates.length < 1 && this.$stage.removeAttr('style');
+		}
+	}, {
+		filter: [ 'width', 'items', 'settings' ],
+		run: function(cache) {
+			cache.current = cache.current ? this.$stage.children().index(cache.current) : 0;
+			cache.current = Math.max(this.minimum(), Math.min(this.maximum(), cache.current));
+			this.reset(cache.current);
+		}
+	}, {
+		filter: [ 'position' ],
+		run: function() {
+			this.animate(this.coordinates(this._current));
+		}
+	}, {
+		filter: [ 'width', 'position', 'items', 'settings' ],
+		run: function() {
+			var rtl = this.settings.rtl ? 1 : -1,
+				padding = this.settings.stagePadding * 2,
+				begin = this.coordinates(this.current()) + padding,
+				end = begin + this.width() * rtl,
+				inner, outer, matches = [], i, n;
+
+			for (i = 0, n = this._coordinates.length; i < n; i++) {
+				inner = this._coordinates[i - 1] || 0;
+				outer = Math.abs(this._coordinates[i]) + padding * rtl;
+
+				if ((this.op(inner, '<=', begin) && (this.op(inner, '>', end)))
+					|| (this.op(outer, '<', begin) && this.op(outer, '>', end))) {
+					matches.push(i);
+				}
+			}
+
+			this.$stage.children('.active').removeClass('active');
+			this.$stage.children(':eq(' + matches.join('), :eq(') + ')').addClass('active');
+
+			if (this.settings.center) {
+				this.$stage.children('.center').removeClass('center');
+				this.$stage.children().eq(this.current()).addClass('center');
+			}
+		}
+	} ];
+
+	/**
 	 * Initializes the carousel.
 	 * @protected
 	 */
-	Owl.prototype.init = function() {
-
-		// Update options.items on given size
-		this.setResponsiveOptions();
-
+	Owl.prototype.initialize = function() {
+		this.enter('initializing');
 		this.trigger('initialize');
 
-		// Add base class
-		if (!this.dom.$el.hasClass(this.settings.baseClass)) {
-			this.dom.$el.addClass(this.settings.baseClass);
-		}
+		this.$element.toggleClass(this.settings.rtlClass, this.settings.rtl);
 
-		// Add theme class
-		if (!this.dom.$el.hasClass(this.settings.themeClass)) {
-			this.dom.$el.addClass(this.settings.themeClass);
-		}
-
-		// Add theme class
-		if (this.settings.rtl) {
-			this.dom.$el.addClass('owl-rtl');
-		}
-
-		// Check support
-		this.browserSupport();
-
-		if (this.settings.autoWidth && this.state.imagesLoaded !== true) {
+		if (this.settings.autoWidth && !this.is('pre-loading')) {
 			var imgs, nestedSelector, width;
-			imgs = this.dom.$el.find('img');
+			imgs = this.$element.find('img');
 			nestedSelector = this.settings.nestedItemSelector ? '.' + this.settings.nestedItemSelector : undefined;
-			width = this.dom.$el.children(nestedSelector).width();
+			width = this.$element.children(nestedSelector).width();
 
 			if (imgs.length && width <= 0) {
 				this.preloadAutoWidthImages(imgs);
-				return false;
 			}
 		}
 
-		// Get and store window width
-		// iOS safari likes to trigger unnecessary resize event
-		this.width.prevWindow = this.viewport();
+		this.$element.addClass(this.options.loadingClass);
 
-		// create stage object
-		this.createStage();
+		// create stage
+		this.$stage = $('<' + this.settings.stageElement + ' class="' + this.settings.stageClass + '"/>')
+			.wrap('<div class="' + this.settings.stageOuterClass + '"/>');
 
-		// Append local content
-		this.fetchContent();
+		// append stage
+		this.$element.append(this.$stage.parent());
 
-		// attach generic events
-		this.eventsCall();
+		// append content
+		this.replace(this.$element.children().not(this.$stage.parent()));
 
-		// attach generic events
-		this.internalEvents();
+		// check visibility
+		if (this.$element.is(':visible')) {
+			// update view
+			this.refresh();
+		} else {
+			// invalidate width
+			this.invalidate('width');
+		}
 
-		this.dom.$el.addClass('owl-loading');
-		this.refresh(true);
-		this.dom.$el.removeClass('owl-loading').addClass('owl-loaded');
+		this.$element
+			.removeClass(this.options.loadingClass)
+			.addClass(this.options.loadedClass);
 
+		// register event handlers
+		this.registerEventHandlers();
+
+		this.leave('initializing');
 		this.trigger('initialized');
-
-		// attach custom control events
-		this.addTriggerableEvents();
 	};
 
 	/**
-	 * Sets responsive options.
-	 * @protected
+	 * Setups the current settings.
+	 * @todo Remove responsive classes. Why should adaptive designs be brought into IE8?
+	 * @todo Support for media queries by using `matchMedia` would be nice.
+	 * @public
 	 */
-	Owl.prototype.setResponsiveOptions = function() {
-		if (!this.options.responsive) {
-			this.settings = $.extend({}, this.options);
-		} else {
-			var viewport = this.viewport(),
-				overwrites = this.options.responsive,
-				match = -1;
+	Owl.prototype.setup = function() {
+		var viewport = this.viewport(),
+			overwrites = this.options.responsive,
+			match = -1,
+			settings = null;
 
+		if (!overwrites) {
+			settings = $.extend({}, this.options);
+		} else {
 			$.each(overwrites, function(breakpoint) {
 				if (breakpoint <= viewport && breakpoint > match) {
 					match = Number(breakpoint);
 				}
 			});
 
-			this.settings = $.extend({}, this.options, overwrites[match]);
-			delete this.settings.responsive;
+			settings = $.extend({}, this.options, overwrites[match]);
+			delete settings.responsive;
 
-			// Responsive Class
-			if (this.settings.responsiveClass) {
-				this.dom.$el.attr('class', function(i, c) {
-					return c.replace(/\b owl-responsive-\S+/g, '');
-				}).addClass('owl-responsive-' + match);
+			// responsive class
+			if (settings.responsiveClass) {
+				this.$element.attr('class',
+					this.$element.attr('class').replace(new RegExp('(' + this.options.responsiveClass + '-)\\S+\\s', 'g'), '$1' + match)
+				);
 			}
+		}
+
+		if (this.settings === null || this._breakpoint !== match) {
+			this.trigger('change', { property: { name: 'settings', value: settings } });
+			this._breakpoint = match;
+			this.settings = settings;
+			this.invalidate('settings');
+			this.trigger('changed', { property: { name: 'settings', value: this.settings } });
 		}
 	};
 
@@ -387,14 +533,6 @@
 	 * @protected
 	 */
 	Owl.prototype.optionsLogic = function() {
-		// Toggle Center class
-		this.dom.$el.toggleClass('owl-center', this.settings.center);
-
-		// if items number is less than in body
-		if (this.settings.loop && this.num.oItems < this.settings.items) {
-			this.settings.loop = false;
-		}
-
 		if (this.settings.autoWidth) {
 			this.settings.stagePadding = false;
 			this.settings.merge = false;
@@ -402,401 +540,61 @@
 	};
 
 	/**
-	 * Creates stage and outer-stage elements.
+	 * Prepares an item before add.
+	 * @todo Rename event parameter `content` to `item`.
 	 * @protected
+	 * @returns {jQuery|HTMLElement} - The item container.
 	 */
-	Owl.prototype.createStage = function() {
-		var oStage = document.createElement('div'),
-			stage = document.createElement(this.settings.stageElement);
+	Owl.prototype.prepare = function(item) {
+		var event = this.trigger('prepare', { content: item });
 
-		oStage.className = 'owl-stage-outer';
-		stage.className = 'owl-stage';
+		if (!event.data) {
+			event.data = $('<' + this.settings.itemElement + '/>')
+				.addClass(this.options.itemClass).append(item)
+		}
 
-		oStage.appendChild(stage);
-		this.dom.el.appendChild(oStage);
+		this.trigger('prepared', { content: event.data });
 
-		this.dom.oStage = oStage;
-		this.dom.$oStage = $(oStage);
-		this.dom.stage = stage;
-		this.dom.$stage = $(stage);
-
-		oStage = null;
-		stage = null;
+		return event.data;
 	};
 
 	/**
-	 * Creates an item container.
-	 * @protected
-	 * @returns {jQuery} - The item container.
+	 * Updates the view.
+	 * @public
 	 */
-	Owl.prototype.createItemContainer = function() {
-		var item = document.createElement(this.settings.itemElement);
-		item.className = this.settings.itemClass;
-		return $(item);
-	};
+	Owl.prototype.update = function() {
+		var i = 0,
+			n = this._pipe.length,
+			filter = $.proxy(function(p) { return this[p] }, this._invalidated),
+			cache = {};
 
-	/**
-	 * Fetches the content.
-	 * @protected
-	 */
-	Owl.prototype.fetchContent = function(extContent) {
-		if (extContent) {
-			this.dom.$content = (extContent instanceof jQuery) ? extContent : $(extContent);
-		} else if (this.settings.nestedItemSelector) {
-			this.dom.$content = this.dom.$el.find('.' + this.settings.nestedItemSelector).not('.owl-stage-outer');
-		} else {
-			this.dom.$content = this.dom.$el.children().not('.owl-stage-outer');
-		}
-		// content length
-		this.num.oItems = this.dom.$content.length;
-
-		// init Structure
-		if (this.num.oItems !== 0) {
-			this.initStructure();
-		}
-	};
-
-	/**
-	 * Initializes the content struture.
-	 * @protected
-	 */
-	Owl.prototype.initStructure = function() {
-		this.createNormalStructure();
-	};
-
-	/**
-	 * Creates small/mid weight content structure.
-	 * @protected
-	 * @todo This results in a poor performance,
-	 * but this is due to the approach of completely
-	 * rebuild the existing DOM tree from scratch,
-	 * rather to use them. The effort to implement
-	 * this with a good performance, while maintaining
-	 * the original approach is disproportionate.
-	 */
-	Owl.prototype.createNormalStructure = function() {
-		var i, $item;
-		for (i = 0; i < this.num.oItems; i++) {
-			$item = this.createItemContainer();
-			this.initializeItemContainer($item, this.dom.$content[i]);
-			this.dom.$stage.append($item);
-		}
-		this.dom.$content = null;
-	};
-
-	/**
-	 * Creates custom content structure.
-	 * @protected
-	 */
-	Owl.prototype.createCustomStructure = function(howManyItems) {
-		var i, $item;
-		for (i = 0; i < howManyItems; i++) {
-			$item = this.createItemContainer();
-			this.createItemContainerData($item);
-			this.dom.$stage.append($item);
-		}
-	};
-
-	/**
-	 * Initializes item container with provided content.
-	 * @protected
-	 * @param {jQuery} item - The item that has to be filled.
-	 * @param {HTMLElement|jQuery|string} content - The content that fills the item.
-	 */
-	Owl.prototype.initializeItemContainer = function(item, content) {
-		this.trigger('change', { property: { name: 'item', value: item } });
-
-		this.createItemContainerData(item);
-		item.append(content);
-
-		this.trigger('changed', { property: { name: 'item', value: item } });
-	};
-
-	/**
-	 * Creates item container data.
-	 * @protected
-	 * @param {jQuery} item - The item for which the data are to be set.
-	 * @param {jQuery} [source] - The item whose data are to be copied.
-	 */
-	Owl.prototype.createItemContainerData = function(item, source) {
-		var data = $.extend({}, this.itemData);
-
-		if (source) {
-			$.extend(data, source.data('owl-item'));
-		}
-
-		item.data('owl-item', data);
-	};
-
-	/**
-	 * Clones an item container.
-	 * @protected
-	 * @param {jQuery} item - The item to clone.
-	 * @returns {jQuery} - The cloned item.
-	 */
-	Owl.prototype.cloneItemContainer = function(item) {
-		var $clone = item.clone(true, true).addClass('cloned');
-		// somehow data references the same object
-		this.createItemContainerData($clone, $clone);
-		$clone.data('owl-item').clone = true;
-		return $clone;
-	};
-
-	/**
-	 * Updates original items index data.
-	 * @protected
-	 */
-	Owl.prototype.updateLocalContent = function() {
-
-		var k, item;
-
-		this.dom.$oItems = this.dom.$stage.find('.' + this.settings.itemClass).filter(function() {
-			return $(this).data('owl-item').clone === false;
-		});
-
-		this.num.oItems = this.dom.$oItems.length;
-		// update index on original items
-
-		for (k = 0; k < this.num.oItems; k++) {
-			item = this.dom.$oItems.eq(k);
-			item.data('owl-item').index = k;
-		}
-	};
-
-	/**
-	 * Creates clones for infinity loop.
-	 * @protected
-	 */
-	Owl.prototype.loopClone = function() {
-		if (!this.settings.loop || this.num.oItems < this.settings.items) {
-			return false;
-		}
-
-		var append, prepend, i,
-			items = this.settings.items,
-			last = this.num.oItems - 1;
-
-		// if neighbour margin then add one more duplicat
-		if (this.settings.stagePadding && this.settings.items === 1) {
-			items += 1;
-		}
-		this.num.cItems = items * 2;
-
-		for (i = 0; i < items; i++) {
-			append = this.cloneItemContainer(this.dom.$oItems.eq(i));
-			prepend = this.cloneItemContainer(this.dom.$oItems.eq(last - i));
-
-			this.dom.$stage.append(append);
-			this.dom.$stage.prepend(prepend);
-		}
-
-		this.dom.$cItems = this.dom.$stage.find('.' + this.settings.itemClass).filter(function() {
-			return $(this).data('owl-item').clone === true;
-		});
-	};
-
-	/**
-	 * Update cloned elements.
-	 * @protected
-	 */
-	Owl.prototype.reClone = function() {
-		// remove cloned items
-		if (this.dom.$cItems !== null) { // && (this.num.oItems !== 0 &&
-			// this.num.oItems <=
-			// this.settings.items)){
-			this.dom.$cItems.remove();
-			this.dom.$cItems = null;
-			this.num.cItems = 0;
-		}
-
-		if (!this.settings.loop) {
-			return;
-		}
-		// generete new elements
-		this.loopClone();
-	};
-
-	/**
-	 * Updates all items index data.
-	 * @protected
-	 */
-	Owl.prototype.calculate = function() {
-
-		var i, j, elMinusMargin, dist, allItems, iWidth,  mergeNumber,  posLeft = 0, fullWidth = 0;
-
-		// element width minus neighbour
-		this.width.el = this.dom.$el.width() - (this.settings.stagePadding * 2);
-
-		// to check
-		this.width.view = this.dom.$el.width();
-
-		// calculate width minus addition margins
-		elMinusMargin = this.width.el - (this.settings.margin * (this.settings.items === 1 ? 0 : this.settings.items - 1));
-
-		// calculate element width and item width
-		this.width.el = this.width.el + this.settings.margin;
-		this.width.item = ((elMinusMargin / this.settings.items) + this.settings.margin).toFixed(3);
-
-		this.dom.$items = this.dom.$stage.find('.owl-item');
-		this.num.items = this.dom.$items.length;
-
-		// change to autoWidths
-		if (this.settings.autoWidth) {
-			this.dom.$items.css('width', '');
-		}
-
-		// Set grid array
-		this._coordinates = [];
-		this.num.merged = [];
-
-		// item distances
-		if (this.settings.rtl) {
-			dist = this.settings.center ? -((this.width.el) / 2) : 0;
-		} else {
-			dist = this.settings.center ? (this.width.el) / 2 : 0;
-		}
-
-		this.width.mergeStage = 0;
-
-		// Calculate items positions
-		for (i = 0; i < this.num.items; i++) {
-
-			// check merged items
-
-			if (this.settings.merge) {
-				mergeNumber = this.dom.$items.eq(i).find('[data-merge]').attr('data-merge') || 1;
-				if (this.settings.mergeFit && mergeNumber > this.settings.items) {
-					mergeNumber = this.settings.items;
-				}
-				this.num.merged.push(parseInt(mergeNumber));
-				this.width.mergeStage += this.width.item * this.num.merged[i];
-			} else {
-				this.num.merged.push(1);
+		while (i < n) {
+			if (this._invalidated.all || $.grep(this._pipe[i].filter, filter).length > 0) {
+				this._pipe[i].run(cache);
 			}
-
-			iWidth = this.width.item * this.num.merged[i];
-
-			// autoWidth item size
-			if (this.settings.autoWidth) {
-				iWidth = this.dom.$items.eq(i).width() + this.settings.margin;
-				if (this.settings.rtl) {
-					this.dom.$items[i].style.marginLeft = this.settings.margin + 'px';
-				} else {
-					this.dom.$items[i].style.marginRight = this.settings.margin + 'px';
-				}
-
-			}
-			// push item position into array
-			this._coordinates.push(dist);
-
-			// update item data
-			this.dom.$items.eq(i).data('owl-item').posLeft = posLeft;
-			this.dom.$items.eq(i).data('owl-item').width = iWidth;
-
-			// dist starts from middle of stage if center
-			// posLeft always starts from 0
-			if (this.settings.rtl) {
-				dist += iWidth;
-				posLeft += iWidth;
-			} else {
-				dist -= iWidth;
-				posLeft -= iWidth;
-			}
-
-			fullWidth -= Math.abs(iWidth);
-
-			// update position if center
-			if (this.settings.center) {
-				this._coordinates[i] = !this.settings.rtl ? this._coordinates[i] - (iWidth / 2) : this._coordinates[i]
-					+ (iWidth / 2);
-			}
+			i++;
 		}
 
-		if (this.settings.autoWidth) {
-			this.width.stage = this.settings.center ? Math.abs(fullWidth) : Math.abs(dist);
-		} else {
-			this.width.stage = Math.abs(fullWidth);
-		}
+		this._invalidated = {};
 
-		// update indexAbs on all items
-		allItems = this.num.oItems + this.num.cItems;
-
-		for (j = 0; j < allItems; j++) {
-			this.dom.$items.eq(j).data('owl-item').indexAbs = j;
-		}
-
-		// Recalculate grid
-		this.setSizes();
+		!this.is('valid') && this.enter('valid');
 	};
 
 	/**
-	 * Set sizes on elements from `collectData`.
-	 * @protected
-	 * @todo CRAZY FIX!!! Doublecheck this!
+	 * Gets the width of the view.
+	 * @public
+	 * @param {Owl.Width} [dimension=Owl.Width.Default] - The dimension to return.
+	 * @returns {Number} - The width of the view in pixel.
 	 */
-	Owl.prototype.setSizes = function() {
-
-		// show neighbours
-		if (this.settings.stagePadding !== false) {
-			this.dom.oStage.style.paddingLeft = this.settings.stagePadding + 'px';
-			this.dom.oStage.style.paddingRight = this.settings.stagePadding + 'px';
+	Owl.prototype.width = function(dimension) {
+		dimension = dimension || Owl.Width.Default;
+		switch (dimension) {
+			case Owl.Width.Inner:
+			case Owl.Width.Outer:
+				return this._width;
+			default:
+				return this._width - this.settings.stagePadding * 2 + this.settings.margin;
 		}
-
-		// if(this.width.stagePrev > this.width.stage){
-		if (this.settings.rtl) {
-			window.setTimeout($.proxy(function() {
-				this.dom.stage.style.width = this.width.stage + 'px';
-			}, this), 0);
-		} else {
-			this.dom.stage.style.width = this.width.stage + 'px';
-		}
-
-		for (var i = 0; i < this.num.items; i++) {
-
-			// Set items width
-			if (!this.settings.autoWidth) {
-				this.dom.$items[i].style.width = this.width.item - (this.settings.margin) + 'px';
-			}
-			// add margin
-			if (this.settings.rtl) {
-				this.dom.$items[i].style.marginLeft = this.settings.margin + 'px';
-			} else {
-				this.dom.$items[i].style.marginRight = this.settings.margin + 'px';
-			}
-
-			if (this.num.merged[i] !== 1 && !this.settings.autoWidth) {
-				this.dom.$items[i].style.width = (this.width.item * this.num.merged[i]) - (this.settings.margin) + 'px';
-			}
-		}
-
-		// save prev stage size
-		this.width.stagePrev = this.width.stage;
-	};
-
-	/**
-	 * Updates all data by calling `refresh`.
-	 * @protected
-	 */
-	Owl.prototype.responsive = function() {
-
-		if (!this.num.oItems) {
-			return false;
-		}
-		// If El width hasnt change then stop responsive
-		var elChanged = this.isElWidthChanged();
-		if (!elChanged) {
-			return false;
-		}
-
-		if (this.trigger('resize').isDefaultPrevented()) {
-			return false;
-		}
-
-		this.state.responsive = true;
-		this.refresh();
-		this.state.responsive = false;
-
-		this.trigger('resized');
 	};
 
 	/**
@@ -804,507 +602,258 @@
 	 * @public
 	 */
 	Owl.prototype.refresh = function() {
-		var current = this.dom.$oItems && this.dom.$oItems.eq(this.normalize(this.current(), true));
-
+		this.enter('refreshing');
 		this.trigger('refresh');
 
-		// Update Options for given width
-		this.setResponsiveOptions();
+		this.setup();
 
-		// update info about local content
-		this.updateLocalContent();
-
-		// udpate options
 		this.optionsLogic();
 
-		// if no items then stop
-		if (this.num.oItems === 0) {
-			return false;
-		}
+		this.$element.addClass(this.options.refreshClass);
 
-		// Hide and Show methods helps here to set a proper widths.
-		// This prevents Scrollbar to be calculated in stage width
-		this.dom.$stage.addClass('owl-refresh');
+		this.update();
 
-		// Remove clones and generate new ones
-		this.reClone();
+		this.$element.removeClass(this.options.refreshClass);
 
-		// calculate
-		this.calculate();
-
-		// aaaand show.
-		this.dom.$stage.removeClass('owl-refresh');
-
-		if (!current) {
-			this.dom.oStage.scrollLeft = 0;
-			this.reset(this.dom.$oItems.eq(0).data('owl-item').indexAbs);
-		} else {
-			this.reset(current.data('owl-item').indexAbs); // fix that
-		}
-
-		this.state.orientation = window.orientation;
-
-		this.watchVisibility();
-
+		this.leave('refreshing');
 		this.trigger('refreshed');
-	};
-
-	/**
-	 * Updates information about current state of items (visibile, hidden, active, etc.).
-	 * @protected
-	 */
-	Owl.prototype.updateActiveItems = function() {
-		this.trigger('change', { property: { name: 'items', value: this.dom.$items } });
-
-		var i, j, item, ipos, iwidth, outsideView;
-
-		// clear states
-		for (i = 0; i < this.num.items; i++) {
-			this.dom.$items.eq(i).data('owl-item').active = false;
-			this.dom.$items.eq(i).data('owl-item').current = false;
-			this.dom.$items.eq(i).removeClass(this.settings.activeClass).removeClass(this.settings.centerClass);
-		}
-
-		this.num.active = 0;
-		padding = this.settings.stagePadding * 2;
-		stageX = this.coordinates(this.current()) + padding;
-		view = this.settings.rtl ? this.width.view : -this.width.view;
-
-		for (j = 0; j < this.num.items; j++) {
-
-			item = this.dom.$items.eq(j);
-			ipos = item.data('owl-item').posLeft;
-			iwidth = item.data('owl-item').width;
-			outsideView = this.settings.rtl ? ipos - iwidth - padding : ipos - iwidth + padding;
-
-			if ((this.op(ipos, '<=', stageX) && (this.op(ipos, '>', stageX + view)))
-				|| (this.op(outsideView, '<', stageX) && this.op(outsideView, '>', stageX + view))) {
-
-				this.num.active++;
-
-				item.data('owl-item').active = true;
-				item.data('owl-item').current = true;
-				item.addClass(this.settings.activeClass);
-
-				if (!this.settings.lazyLoad) {
-					item.data('owl-item').loaded = true;
-				}
-				if (this.settings.loop) {
-					this.updateClonedItemsState(item.data('owl-item').index);
-				}
-			}
-		}
-
-		if (this.settings.center) {
-			this.dom.$items.eq(this.current()).addClass(this.settings.centerClass).data('owl-item').center = true;
-		}
-		this.trigger('changed', { property: { name: 'items', value: this.dom.$items } });
-	};
-
-	/**
-	 * Sets current state on sibilings items for center.
-	 * @protected
-	 */
-	Owl.prototype.updateClonedItemsState = function(activeIndex) {
-
-		// find cloned center
-		var center, $el, i;
-		if (this.settings.center) {
-			center = this.dom.$items.eq(this.current()).data('owl-item').index;
-		}
-
-		for (i = 0; i < this.num.items; i++) {
-			$el = this.dom.$items.eq(i);
-			if ($el.data('owl-item').index === activeIndex) {
-				$el.data('owl-item').current = true;
-				if ($el.data('owl-item').index === center) {
-					$el.addClass(this.settings.centerClass);
-				}
-			}
-		}
-	};
-
-	/**
-	 * Save internal event references and add event based functions.
-	 * @protected
-	 */
-	Owl.prototype.eventsCall = function() {
-		// Save events references
-		this.e._onDragStart = $.proxy(function(e) {
-			this.onDragStart(e);
-		}, this);
-		this.e._onDragMove = $.proxy(function(e) {
-			this.onDragMove(e);
-		}, this);
-		this.e._onDragEnd = $.proxy(function(e) {
-			this.onDragEnd(e);
-		}, this);
-		this.e._transitionEnd = $.proxy(function(e) {
-			this.transitionEnd(e);
-		}, this);
-		this.e._resizer = $.proxy(function() {
-			this.responsiveTimer();
-		}, this);
-		this.e._responsiveCall = $.proxy(function() {
-			this.responsive();
-		}, this);
-		this.e._preventClick = $.proxy(function(e) {
-			this.preventClick(e);
-		}, this);
 	};
 
 	/**
 	 * Checks window `resize` event.
 	 * @protected
 	 */
-	Owl.prototype.responsiveTimer = function() {
-		if (this.viewport() === this.width.prevWindow) {
+	Owl.prototype.onThrottledResize = function() {
+		window.clearTimeout(this.resizeTimer);
+		this.resizeTimer = window.setTimeout(this._handlers.onResize, this.settings.responsiveRefreshRate);
+	};
+
+	/**
+	 * Checks window `resize` event.
+	 * @protected
+	 */
+	Owl.prototype.onResize = function() {
+		if (!this._items.length) {
 			return false;
 		}
-		window.clearTimeout(this.resizeTimer);
 
-		this.resizeTimer = window.setTimeout(this.e._responsiveCall, this.settings.responsiveRefreshRate);
-		this.width.prevWindow = this.viewport();
+		if (this._width === this.$element.width()) {
+			return false;
+		}
+
+		if (!this.$element.is(':visible')) {
+			return false;
+		}
+
+		this.enter('resizing');
+
+		if (this.trigger('resize').isDefaultPrevented()) {
+			this.leave('resizing');
+			return false;
+		}
+
+		this.invalidate('width');
+
+		this.refresh();
+
+		this.leave('resizing');
+		this.trigger('resized');
 	};
 
 	/**
-	 * Checks for touch/mouse drag options and add necessery event handlers.
+	 * Registers event handlers.
+	 * @todo Check `msPointerEnabled`
+	 * @todo #261
 	 * @protected
 	 */
-	Owl.prototype.internalEvents = function() {
-		var isTouch = isTouchSupport(),
-			isTouchIE = isTouchSupportIE();
-
-		if (isTouch && !isTouchIE) {
-			this.dragType = [ 'touchstart', 'touchmove', 'touchend', 'touchcancel' ];
-		} else if (isTouch && isTouchIE) {
-			this.dragType = [ 'MSPointerDown', 'MSPointerMove', 'MSPointerUp', 'MSPointerCancel' ];
-		} else {
-			this.dragType = [ 'mousedown', 'mousemove', 'mouseup' ];
+	Owl.prototype.registerEventHandlers = function() {
+		if ($.support.transition) {
+			this.$stage.on($.support.transition.end + '.owl.core', $.proxy(this.onTransitionEnd, this));
 		}
 
-		if ((isTouch || isTouchIE) && this.settings.touchDrag) {
-			// touch cancel event
-			this.on(document, this.dragType[3], this.e._onDragEnd);
-
-		} else {
-			// firefox startdrag fix - addeventlistener doesnt work here :/
-			this.dom.$stage.on('dragstart', function() {
-				return false;
-			});
-
-			if (this.settings.mouseDrag) {
-				// disable text select
-				this.dom.stage.onselectstart = function() {
-					return false;
-				};
-			} else {
-				// enable text select
-				this.dom.$el.addClass('owl-text-select-on');
-			}
-		}
-
-		// Catch transitionEnd event
-		if (this.transitionEndVendor) {
-			this.on(this.dom.stage, this.transitionEndVendor, this.e._transitionEnd, false);
-		}
-
-		// Responsive
 		if (this.settings.responsive !== false) {
-			this.on(window, 'resize', this.e._resizer, false);
+			this.on(window, 'resize', this._handlers.onThrottledResize);
 		}
 
-		this.dragEvents();
-	};
+		if (this.settings.mouseDrag) {
+			this.$element.addClass(this.options.dragClass);
+			this.$stage.on('mousedown.owl.core', $.proxy(this.onDragStart, this));
+			this.$stage.on('dragstart.owl.core selectstart.owl.core', function() { return false });
+		}
 
-	/**
-	 * Triggers event handlers for drag events.
-	 * @protected
-	 */
-	Owl.prototype.dragEvents = function() {
-
-		if (this.settings.touchDrag && (this.dragType[0] === 'touchstart' || this.dragType[0] === 'MSPointerDown')) {
-			this.on(this.dom.stage, this.dragType[0], this.e._onDragStart, false);
-		} else if (this.settings.mouseDrag && this.dragType[0] === 'mousedown') {
-			this.on(this.dom.stage, this.dragType[0], this.e._onDragStart, false);
-		} else {
-			this.off(this.dom.stage, this.dragType[0], this.e._onDragStart);
+		if (this.settings.touchDrag){
+			this.$stage.on('touchstart.owl.core', $.proxy(this.onDragStart, this));
+			this.$stage.on('touchcancel.owl.core', $.proxy(this.onDragEnd, this));
 		}
 	};
 
 	/**
-	 * Handles touchstart/mousedown event.
+	 * Handles `touchstart` and `mousedown` events.
+	 * @todo Horizontal swipe threshold as option
+	 * @todo #261
 	 * @protected
 	 * @param {Event} event - The event arguments.
 	 */
 	Owl.prototype.onDragStart = function(event) {
-		var ev, isTouchEvent, pageX, pageY, animatedPos;
+		var stage = null;
 
-		ev = event.originalEvent || event || window.event;
-
-		// prevent right click
-		if (ev.which === 3) {
-			return false;
+		if (event.which === 3) {
+			return;
 		}
 
-		if (this.dragType[0] === 'mousedown') {
-			this.dom.$stage.addClass('owl-grab');
+		if ($.support.transform) {
+			stage = this.$stage.css('transform').replace(/.*\(|\)| /g, '').split(',');
+			stage = {
+				x: stage[stage.length === 16 ? 12 : 4],
+				y: stage[stage.length === 16 ? 13 : 5]
+			};
+		} else {
+			stage = this.$stage.position();
+			stage = {
+				x: this.settings.rtl ?
+					stage.left + this.$stage.width() - this.width() + this.settings.margin :
+					stage.left,
+				y: stage.top
+			};
 		}
 
-		this.trigger('drag');
-		this.drag.startTime = new Date().getTime();
+		if (this.is('animating')) {
+			$.support.transform ? this.animate(stage.x) : this.$stage.stop()
+			this.invalidate('position');
+		}
+
+		this.$element.toggleClass(this.options.grabClass, event.type === 'mousedown');
+
 		this.speed(0);
-		this.state.isTouch = true;
-		this.state.isScrolling = false;
-		this.state.isSwiping = false;
-		this.drag.distance = 0;
 
-		// if is 'touchstart'
-		isTouchEvent = ev.type === 'touchstart';
-		pageX = isTouchEvent ? event.targetTouches[0].pageX : (ev.pageX || ev.clientX);
-		pageY = isTouchEvent ? event.targetTouches[0].pageY : (ev.pageY || ev.clientY);
+		this._drag.time = new Date().getTime();
+		this._drag.target = $(event.target);
+		this._drag.stage.start = stage;
+		this._drag.stage.current = stage;
+		this._drag.pointer = this.pointer(event);
 
-		// get stage position left
-		this.drag.offsetX = this.dom.$stage.position().left - this.settings.stagePadding;
-		this.drag.offsetY = this.dom.$stage.position().top;
+		$(document).on('mouseup.owl.core touchend.owl.core', $.proxy(this.onDragEnd, this));
 
-		if (this.settings.rtl) {
-			this.drag.offsetX = this.dom.$stage.position().left + this.width.stage - this.width.el
-				+ this.settings.margin;
-		}
+		$(document).one('mousemove.owl.core touchmove.owl.core', $.proxy(function(event) {
+			var delta = this.difference(this._drag.pointer, this.pointer(event));
 
-		// catch position // ie to fix
-		if (this.state.inMotion && this.support3d) {
-			animatedPos = this.getTransformProperty();
-			this.drag.offsetX = animatedPos;
-			this.animate(animatedPos);
-			this.state.inMotion = true;
-		} else if (this.state.inMotion && !this.support3d) {
-			this.state.inMotion = false;
-			return false;
-		}
+			$(document).on('mousemove.owl.core touchmove.owl.core', $.proxy(this.onDragMove, this));
 
-		this.drag.startX = pageX - this.drag.offsetX;
-		this.drag.startY = pageY - this.drag.offsetY;
+			if (Math.abs(delta.x) < Math.abs(delta.y) && this.is('valid')) {
+				return;
+			}
 
-		this.drag.start = pageX - this.drag.startX;
-		this.drag.targetEl = ev.target || ev.srcElement;
-		this.drag.updatedX = this.drag.start;
+			event.preventDefault();
 
-		// to do/check
-		// prevent links and images dragging;
-		if (this.drag.targetEl.tagName === "IMG" || this.drag.targetEl.tagName === "A") {
-			this.drag.targetEl.draggable = false;
-		}
-
-		this.on(document, this.dragType[1], this.e._onDragMove, false);
-		this.on(document, this.dragType[2], this.e._onDragEnd, false);
+			this.enter('dragging');
+			this.trigger('drag');
+		}, this));
 	};
 
 	/**
-	 * Handles the touchmove/mousemove events.
-	 * @todo Simplify
+	 * Handles the `touchmove` and `mousemove` events.
+	 * @todo #261
 	 * @protected
 	 * @param {Event} event - The event arguments.
 	 */
 	Owl.prototype.onDragMove = function(event) {
-		var ev, isTouchEvent, pageX, pageY, minValue, maxValue, pull;
+		var minimum = null,
+			maximum = null,
+			pull = null,
+			delta = this.difference(this._drag.pointer, this.pointer(event)),
+			stage = this.difference(this._drag.stage.start, delta);
 
-		if (!this.state.isTouch) {
+		if (!this.is('dragging')) {
 			return;
 		}
 
-		if (this.state.isScrolling) {
-			return;
-		}
+		event.preventDefault();
 
-		ev = event.originalEvent || event || window.event;
-
-		// if is 'touchstart'
-		isTouchEvent = ev.type == 'touchmove';
-		pageX = isTouchEvent ? ev.targetTouches[0].pageX : (ev.pageX || ev.clientX);
-		pageY = isTouchEvent ? ev.targetTouches[0].pageY : (ev.pageY || ev.clientY);
-
-		// Drag Direction
-		this.drag.currentX = pageX - this.drag.startX;
-		this.drag.currentY = pageY - this.drag.startY;
-		this.drag.distance = this.drag.currentX - this.drag.offsetX;
-
-		// Check move direction
-		if (this.drag.distance < 0) {
-			this.state.direction = this.settings.rtl ? 'right' : 'left';
-		} else if (this.drag.distance > 0) {
-			this.state.direction = this.settings.rtl ? 'left' : 'right';
-		}
-		// Loop
 		if (this.settings.loop) {
-			if (this.op(this.drag.currentX, '>', this.coordinates(this.minimum())) && this.state.direction === 'right') {
-				this.drag.currentX -= (this.settings.center && this.coordinates(0)) - this.coordinates(this.num.oItems);
-			} else if (this.op(this.drag.currentX, '<', this.coordinates(this.maximum())) && this.state.direction === 'left') {
-				this.drag.currentX += (this.settings.center && this.coordinates(0)) - this.coordinates(this.num.oItems);
-			}
+			minimum = this.coordinates(this.minimum());
+			maximum = this.coordinates(this.maximum() + 1) - minimum;
+			stage.x = (((stage.x - minimum) % maximum + maximum) % maximum) + minimum;
 		} else {
-			// pull
-			minValue = this.settings.rtl ? this.coordinates(this.maximum()) : this.coordinates(this.minimum());
-			maxValue = this.settings.rtl ? this.coordinates(this.minimum()) : this.coordinates(this.maximum());
-			pull = this.settings.pullDrag ? this.drag.distance / 5 : 0;
-			this.drag.currentX = Math.max(Math.min(this.drag.currentX, minValue + pull), maxValue + pull);
+			minimum = this.settings.rtl ? this.coordinates(this.maximum()) : this.coordinates(this.minimum());
+			maximum = this.settings.rtl ? this.coordinates(this.minimum()) : this.coordinates(this.maximum());
+			pull = this.settings.pullDrag ? -1 * delta.x / 5 : 0;
+			stage.x = Math.max(Math.min(stage.x, minimum + pull), maximum + pull);
 		}
 
-		// Lock browser if swiping horizontal
+		this._drag.stage.current = stage;
 
-		if ((this.drag.distance > 8 || this.drag.distance < -8)) {
-			if (ev.preventDefault !== undefined) {
-				ev.preventDefault();
-			} else {
-				ev.returnValue = false;
-			}
-			this.state.isSwiping = true;
-		}
-
-		this.drag.updatedX = this.drag.currentX;
-
-		// Lock Owl if scrolling
-		if ((this.drag.currentY > 16 || this.drag.currentY < -16) && this.state.isSwiping === false) {
-			this.state.isScrolling = true;
-			this.drag.updatedX = this.drag.start;
-		}
-
-		this.animate(this.drag.updatedX);
+		this.animate(stage.x);
 	};
 
 	/**
-	 * Handles the touchend/mouseup events.
+	 * Handles the `touchend` and `mouseup` events.
+	 * @todo #261
+	 * @todo Threshold for click event
 	 * @protected
+	 * @param {Event} event - The event arguments.
 	 */
-	Owl.prototype.onDragEnd = function() {
-		var compareTimes, distanceAbs, closest;
+	Owl.prototype.onDragEnd = function(event) {
+		var delta = this.difference(this._drag.pointer, this.pointer(event)),
+			stage = this._drag.stage.current,
+			direction = delta.x > 0 ^ this.settings.rtl ? 'left' : 'right';
 
-		if (!this.state.isTouch) {
+		$(document).off('.owl.core');
+
+		this.$element.removeClass(this.options.grabClass);
+
+		if (delta.x !== 0 && this.is('dragging') || !this.is('valid')) {
+			this.speed(this.settings.dragEndSpeed || this.settings.smartSpeed);
+			this.current(this.closest(stage.x, delta.x !== 0 ? direction : this._drag.direction));
+			this.invalidate('position');
+			this.update();
+
+			this._drag.direction = direction;
+
+			if (Math.abs(delta.x) > 3 || new Date().getTime() - this._drag.time > 300) {
+				this._drag.target.one('click.owl.core', function() { return false; });
+			}
+		}
+
+		if (!this.is('dragging')) {
 			return;
 		}
-		if (this.dragType[0] === 'mousedown') {
-			this.dom.$stage.removeClass('owl-grab');
-		}
 
+		this.leave('dragging');
 		this.trigger('dragged');
-
-		// prevent links and images dragging;
-		this.drag.targetEl.removeAttribute("draggable");
-
-		// remove drag event listeners
-
-		this.state.isTouch = false;
-		this.state.isScrolling = false;
-		this.state.isSwiping = false;
-
-		// to check
-		if (this.drag.distance === 0 && this.state.inMotion !== true) {
-			this.state.inMotion = false;
-			return false;
-		}
-
-		// prevent clicks while scrolling
-
-		this.drag.endTime = new Date().getTime();
-		compareTimes = this.drag.endTime - this.drag.startTime;
-		distanceAbs = Math.abs(this.drag.distance);
-
-		// to test
-		if (distanceAbs > 3 || compareTimes > 300) {
-			this.removeClick(this.drag.targetEl);
-		}
-
-		closest = this.closest(this.drag.updatedX);
-
-		this.speed(this.settings.dragEndSpeed || this.settings.smartSpeed);
-		this.current(closest);
-
-		// if pullDrag is off then fire transitionEnd event manually when stick
-		// to border
-		if (!this.settings.pullDrag && this.drag.updatedX === this.coordinates(closest)) {
-			this.transitionEnd();
-		}
-
-		this.drag.distance = 0;
-
-		this.off(document, this.dragType[1], this.e._onDragMove);
-		this.off(document, this.dragType[2], this.e._onDragEnd);
-	};
-
-	/**
-	 * Attaches `preventClick` to disable link while swipping.
-	 * @protected
-	 * @param {HTMLElement} [target] - The target of the `click` event.
-	 */
-	Owl.prototype.removeClick = function(target) {
-		this.drag.targetEl = target;
-		$(target).on('click.preventClick', this.e._preventClick);
-		// to make sure click is removed:
-		window.setTimeout(function() {
-			$(target).off('click.preventClick');
-		}, 300);
-	};
-
-	/**
-	 * Suppresses click event.
-	 * @protected
-	 * @param {Event} ev - The event arguments.
-	 */
-	Owl.prototype.preventClick = function(ev) {
-		if (ev.preventDefault) {
-			ev.preventDefault();
-		} else {
-			ev.returnValue = false;
-		}
-		if (ev.stopPropagation) {
-			ev.stopPropagation();
-		}
-		$(ev.target).off('click.preventClick');
-	};
-
-	/**
-	 * Catches stage position while animate (only CSS3).
-	 * @protected
-	 * @returns
-	 */
-	Owl.prototype.getTransformProperty = function() {
-		var transform, matrix3d;
-
-		transform = window.getComputedStyle(this.dom.stage, null).getPropertyValue(this.vendorName + 'transform');
-		// var transform = this.dom.$stage.css(this.vendorName + 'transform')
-		transform = transform.replace(/matrix(3d)?\(|\)/g, '').split(',');
-		matrix3d = transform.length === 16;
-
-		return matrix3d !== true ? transform[4] : transform[12];
 	};
 
 	/**
 	 * Gets absolute position of the closest item for a coordinate.
+	 * @todo Setting `freeDrag` makes `closest` not reusable. See #165.
 	 * @protected
 	 * @param {Number} coordinate - The coordinate in pixel.
+	 * @param {String} direction - The direction to check for the closest item. Ether `left` or `right`.
 	 * @return {Number} - The absolute position of the closest item.
 	 */
-	Owl.prototype.closest = function(coordinate) {
-		var position = 0, pull = 30;
+	Owl.prototype.closest = function(coordinate, direction) {
+		var position = -1,
+			pull = 30,
+			width = this.width(),
+			coordinates = this.coordinates();
 
 		if (!this.settings.freeDrag) {
 			// check closest item
-			$.each(this.coordinates(), $.proxy(function(index, value) {
+			$.each(coordinates, $.proxy(function(index, value) {
 				if (coordinate > value - pull && coordinate < value + pull) {
 					position = index;
 				} else if (this.op(coordinate, '<', value)
-					&& this.op(coordinate, '>', this.coordinates(index + 1) || value - this.width.el)) {
-					position = this.state.direction === 'left' ? index + 1 : index;
+					&& this.op(coordinate, '>', coordinates[index + 1] || value - width)) {
+					position = direction === 'left' ? index + 1 : index;
 				}
+				return position === -1;
 			}, this));
 		}
 
 		if (!this.settings.loop) {
 			// non loop boundries
-			if (this.op(coordinate, '>', this.coordinates(this.minimum()))) {
+			if (this.op(coordinate, '>', coordinates[this.minimum()])) {
 				position = coordinate = this.minimum();
-			} else if (this.op(coordinate, '<', this.coordinates(this.maximum()))) {
+			} else if (this.op(coordinate, '<', coordinates[this.maximum()])) {
 				position = coordinate = this.maximum();
 			}
 		}
@@ -1314,31 +863,43 @@
 
 	/**
 	 * Animates the stage.
+	 * @todo #270
 	 * @public
 	 * @param {Number} coordinate - The coordinate in pixels.
 	 */
 	Owl.prototype.animate = function(coordinate) {
-		this.trigger('translate');
-		this.state.inMotion = this.speed() > 0;
+		var animate = this.speed() > 0;
 
-		if (this.support3d) {
-			this.dom.$stage.css({
-				transform: 'translate3d(' + coordinate + 'px' + ',0px, 0px)',
+		this.is('animating') && this.onTransitionEnd();
+
+		if (animate) {
+			this.enter('animating');
+			this.trigger('translate');
+		}
+
+		if ($.support.transform3d && $.support.transition) {
+			this.$stage.css({
+				transform: 'translate3d(' + coordinate + 'px,0px,0px)',
 				transition: (this.speed() / 1000) + 's'
 			});
-		} else if (this.state.isTouch) {
-			this.dom.$stage.css({
+		} else if (animate) {
+			this.$stage.animate({
+				left: coordinate + 'px'
+			}, this.speed(), this.settings.fallbackEasing, $.proxy(this.onTransitionEnd, this));
+		} else {
+			this.$stage.css({
 				left: coordinate + 'px'
 			});
-		} else {
-			this.dom.$stage.animate({
-				left: coordinate
-			}, this.speed() / 1000, this.settings.fallbackEasing, $.proxy(function() {
-				if (this.state.inMotion) {
-					this.transitionEnd();
-				}
-			}, this));
 		}
+	};
+
+	/**
+	 * Checks whether the carousel is in a specific state or not.
+	 * @param {String} state - The state to check.
+	 * @returns {Boolean} - The flag which indicates if the carousel is busy.
+	 */
+	Owl.prototype.is = function(state) {
+		return this._states.current[state] && this._states.current[state] > 0;
 	};
 
 	/**
@@ -1352,15 +913,13 @@
 			return this._current;
 		}
 
-		if (this.num.oItems === 0) {
+		if (this._items.length === 0) {
 			return undefined;
 		}
 
 		position = this.normalize(position);
 
-		if (this._current === position) {
-			this.animate(this.coordinates(this._current));
-		} else {
+		if (this._current !== position) {
 			var event = this.trigger('change', { property: { name: 'position', value: position } });
 
 			if (event.data !== undefined) {
@@ -1369,9 +928,7 @@
 
 			this._current = position;
 
-			this.animate(this.coordinates(this._current));
-
-			this.updateActiveItems();
+			this.invalidate('position');
 
 			this.trigger('changed', { property: { name: 'position', value: this._current } });
 		}
@@ -1380,83 +937,166 @@
 	};
 
 	/**
+	 * Invalidates the given part of the update routine.
+	 * @param {String} [part] - The part to invalidate.
+	 * @returns {Array.<String>} - The invalidated parts.
+	 */
+	Owl.prototype.invalidate = function(part) {
+		if ($.type(part) === 'string') {
+			this._invalidated[part] = true;
+			this.is('valid') && this.leave('valid');
+		}
+		return $.map(this._invalidated, function(v, i) { return i });
+	};
+
+	/**
 	 * Resets the absolute position of the current item.
 	 * @public
 	 * @param {Number} position - The absolute position of the new item.
 	 */
 	Owl.prototype.reset = function(position) {
-		this.suppress([ 'change', 'changed' ]);
-		this.speed(0);
-		this.current(position);
-		this.release([ 'change', 'changed' ]);
+		position = this.normalize(position);
+
+		if (position === undefined) {
+			return;
+		}
+
+		this._speed = 0;
+		this._current = position;
+
+		this.suppress([ 'translate', 'translated' ]);
+
+		this.animate(this.coordinates(position));
+
+		this.release([ 'translate', 'translated' ]);
 	};
 
 	/**
-	 * Normalizes an absolute position for an item.
+	 * Normalizes an absolute or a relative position of an item.
 	 * @public
-	 * @param {Number} position - The absolute position to normalize.
-	 * @param {Boolean} [relative=false] - Whether to return a relative position or not.
-	 * @return {Number} - The normalized position.
+	 * @param {Number} position - The absolute or relative position to normalize.
+	 * @param {Boolean} [relative=false] - Whether the given position is relative or not.
+	 * @returns {Number} - The normalized position.
 	 */
 	Owl.prototype.normalize = function(position, relative) {
-		if (position === undefined || !this.dom.$items) {
-			return undefined;
+		var n = this._items.length,
+			m = relative ? 0 : this._clones.length;
+
+		if (!$.isNumeric(position) || n < 1) {
+			position = undefined;
+		} else if (position < 0 || position >= n + m) {
+			position = ((position - m / 2) % n + n) % n + m / 2;
 		}
 
-		if (this.settings.loop) {
-			var n = this.dom.$items.length;
-			position = ((position % n) + n) % n;
-		} else {
-			position = Math.max(this.minimum(), Math.min(this.maximum(), position));
-		}
-
-		return relative ? this.dom.$items.eq(position).data('owl-item').index : position;
+		return position;
 	};
 
 	/**
-	 * Gets the absolute maximum position for an item.
+	 * Converts an absolute position of an item into a relative one.
 	 * @public
+	 * @param {Number} position - The absolute position to convert.
+	 * @returns {Number} - The converted position.
+	 */
+	Owl.prototype.relative = function(position) {
+		position -= this._clones.length / 2;
+		return this.normalize(position, true);
+	};
+
+	/**
+	 * Gets the maximum position for the current item.
+	 * @public
+	 * @param {Boolean} [relative=false] - Whether to return an absolute position or a relative position.
 	 * @returns {Number}
 	 */
-	Owl.prototype.maximum = function() {
-		var maximum, width,
-			settings = this.settings;
+	Owl.prototype.maximum = function(relative) {
+		var settings = this.settings,
+			maximum = this._coordinates.length,
+			boundary = Math.abs(this._coordinates[maximum - 1]) - this._width,
+			i = -1, j;
 
-		if (!settings.loop && settings.center) {
-			maximum = this.num.oItems - 1;
-		} else if (!settings.loop && !settings.center) {
-			maximum = this.num.oItems - settings.items;
-		} else if (settings.loop || settings.center) {
-			maximum = this.num.oItems + settings.items;
+		if (settings.loop) {
+			maximum = this._clones.length / 2 + this._items.length - 1;
 		} else if (settings.autoWidth || settings.merge) {
-			revert = settings.rtl ? 1 : -1;
-			width = this.dom.$stage.width() - this.$el.width();
-			$.each(this.coordinates(), function(index, coordinate) {
-				if (coordinate * revert >= width) {
-					return false;
-				}
-				maximum = index + 1;
-			});
+			// binary search
+			while (maximum - i > 1) {
+				Math.abs(this._coordinates[j = maximum + i >> 1]) < boundary
+					? i = j : maximum = j;
+			}
+		} else if (settings.center) {
+			maximum = this._items.length - 1;
 		} else {
-			throw 'Can not detect maximum absolute position.'
+			maximum = this._items.length - settings.items;
 		}
 
-		return maximum;
+		if (relative) {
+			maximum -= this._clones.length / 2;
+		}
+
+		return Math.max(maximum, 0);
 	};
 
 	/**
-	 * Gets the absolute minimum position for an item.
+	 * Gets the minimum position for the current item.
 	 * @public
+	 * @param {Boolean} [relative=false] - Whether to return an absolute position or a relative position.
 	 * @returns {Number}
 	 */
-	Owl.prototype.minimum = function() {
-		return this.dom.$oItems.eq(0).data('owl-item').indexAbs;
+	Owl.prototype.minimum = function(relative) {
+		return relative ? 0 : this._clones.length / 2;
+	};
+
+	/**
+	 * Gets an item at the specified relative position.
+	 * @public
+	 * @param {Number} [position] - The relative position of the item.
+	 * @return {jQuery|Array.<jQuery>} - The item at the given position or all items if no position was given.
+	 */
+	Owl.prototype.items = function(position) {
+		if (position === undefined) {
+			return this._items.slice();
+		}
+
+		position = this.normalize(position, true);
+		return this._items[position];
+	};
+
+	/**
+	 * Gets an item at the specified relative position.
+	 * @public
+	 * @param {Number} [position] - The relative position of the item.
+	 * @return {jQuery|Array.<jQuery>} - The item at the given position or all items if no position was given.
+	 */
+	Owl.prototype.mergers = function(position) {
+		if (position === undefined) {
+			return this._mergers.slice();
+		}
+
+		position = this.normalize(position, true);
+		return this._mergers[position];
+	};
+
+	/**
+	 * Gets the absolute positions of clones for an item.
+	 * @public
+	 * @param {Number} [position] - The relative position of the item.
+	 * @returns {Array.<Number>} - The absolute positions of clones for the item or all if no position was given.
+	 */
+	Owl.prototype.clones = function(position) {
+		var odd = this._clones.length / 2,
+			even = odd + this._items.length,
+			map = function(index) { return index % 2 === 0 ? even + index / 2 : odd - (index + 1) / 2 };
+
+		if (position === undefined) {
+			return $.map(this._clones, function(v, i) { return map(i) });
+		}
+
+		return $.map(this._clones, function(v, i) { return v === position ? map(i) : null });
 	};
 
 	/**
 	 * Sets the current animation speed.
 	 * @public
-	 * @param {Number} [speed] - The animation speed in millisecondsor nothing to leave it unchanged.
+	 * @param {Number} [speed] - The animation speed in milliseconds or nothing to leave it unchanged.
 	 * @returns {Number} - The current animation speed in milliseconds.
 	 */
 	Owl.prototype.speed = function(speed) {
@@ -1468,13 +1108,29 @@
 	};
 
 	/**
-	 * Gets the coordinate for an item.
+	 * Gets the coordinate of an item.
+	 * @todo The name of this method is missleanding.
 	 * @public
-	 * @param {Number} [position] - The absolute position of the item.
+	 * @param {Number} position - The absolute position of the item within `minimum()` and `maximum()`.
 	 * @returns {Number|Array.<Number>} - The coordinate of the item in pixel or all coordinates.
 	 */
 	Owl.prototype.coordinates = function(position) {
-		return position !== undefined ? this._coordinates[position] : this._coordinates;
+		var coordinate = null;
+
+		if (position === undefined) {
+			return $.map(this._coordinates, $.proxy(function(coordinate, index) {
+				return this.coordinates(index);
+			}, this));
+		}
+
+		if (this.settings.center) {
+			coordinate = this._coordinates[position];
+			coordinate += (this.width() - coordinate + (this._coordinates[position - 1] || 0)) / 2 * (this.settings.rtl ? -1 : 1);
+		} else {
+			coordinate = this._coordinates[position - 1] || 0;
+		}
+
+		return coordinate;
 	};
 
 	/**
@@ -1496,28 +1152,39 @@
 	 * @param {Number} [speed] - The time in milliseconds for the transition.
 	 */
 	Owl.prototype.to = function(position, speed) {
-		if (this.settings.loop) {
-			var distance = position - this.normalize(this.current(), true),
-				revert = this.current(),
-				before = this.current(),
-				after = this.current() + distance,
-				direction = before - after < 0 ? true : false;
+		var current = this.current(),
+			revert = null,
+			distance = position - this.relative(current),
+			direction = (distance > 0) - (distance < 0),
+			items = this._items.length,
+			minimum = this.minimum(),
+			maximum = this.maximum();
 
-			if (after < this.settings.items && direction === false) {
-				revert = this.num.items - (this.settings.items - before) - this.settings.items;
-				this.reset(revert);
-			} else if (after >= this.num.items - this.settings.items && direction === true) {
-				revert = before - this.num.oItems;
-				this.reset(revert);
+		if (this.settings.loop) {
+			if (!this.settings.rewind && Math.abs(distance) > items / 2) {
+				distance += direction * -1 * items;
 			}
-			window.clearTimeout(this.e._goToLoop);
-			this.e._goToLoop = window.setTimeout($.proxy(function() {
-				this.speed(this.duration(this.current(), revert + distance, speed));
-				this.current(revert + distance);
-			}, this), 30);
+
+			position = current + distance;
+			revert = ((position - minimum) % items + items) % items + minimum;
+
+			if (revert !== position && revert - distance <= maximum && revert - distance > 0) {
+				current = revert - distance;
+				position = revert;
+				this.reset(current);
+			}
+		} else if (this.settings.rewind) {
+			maximum += 1;
+			position = (position % maximum + maximum) % maximum;
 		} else {
-			this.speed(this.duration(this.current(), position, speed));
-			this.current(position);
+			position = Math.max(minimum, Math.min(maximum, position));
+		}
+
+		this.speed(this.duration(current, position, speed));
+		this.current(position);
+
+		if (this.$element.is(':visible')) {
+			this.update();
 		}
 	};
 
@@ -1528,7 +1195,7 @@
 	 */
 	Owl.prototype.next = function(speed) {
 		speed = speed || false;
-		this.to(this.normalize(this.current(), true) + 1, speed);
+		this.to(this.relative(this.current()) + 1, speed);
 	};
 
 	/**
@@ -1538,7 +1205,7 @@
 	 */
 	Owl.prototype.prev = function(speed) {
 		speed = speed || false;
-		this.to(this.normalize(this.current(), true) - 1, speed);
+		this.to(this.relative(this.current()) - 1, speed);
 	};
 
 	/**
@@ -1546,33 +1213,20 @@
 	 * @protected
 	 * @param {Event} event - The event arguments.
 	 */
-	Owl.prototype.transitionEnd = function(event) {
+	Owl.prototype.onTransitionEnd = function(event) {
 
 		// if css2 animation then event object is undefined
 		if (event !== undefined) {
 			event.stopPropagation();
 
 			// Catch only owl-stage transitionEnd event
-			var eventTarget = event.target || event.srcElement || event.originalTarget;
-			if (eventTarget !== this.dom.stage) {
+			if ((event.target || event.srcElement || event.originalTarget) !== this.$stage.get(0)) {
 				return false;
 			}
 		}
 
-		this.state.inMotion = false;
+		this.leave('animating');
 		this.trigger('translated');
-	};
-
-	/**
-	 * Checks if element width has changed
-	 * @protected
-	 * @returns {Booelan}
-	 */
-	Owl.prototype.isElWidthChanged = function() {
-		var newElWidth = this.dom.$el.width() - this.settings.stagePadding, // to
-		// check
-		prevElWidth = this.width.el + this.settings.margin;
-		return newElWidth !== prevElWidth;
 	};
 
 	/**
@@ -1599,131 +1253,107 @@
 	 * @public
 	 * @param {HTMLElement|jQuery|String} content - The new content.
 	 */
-	Owl.prototype.insertContent = function(content) {
-		this.dom.$stage.empty();
-		this.fetchContent(content);
-		this.refresh();
+	Owl.prototype.replace = function(content) {
+		this.$stage.empty();
+		this._items = [];
+
+		if (content) {
+			content = (content instanceof jQuery) ? content : $(content);
+		}
+
+		if (this.settings.nestedItemSelector) {
+			content = content.find('.' + this.settings.nestedItemSelector);
+		}
+
+		content.filter(function() {
+			return this.nodeType === 1;
+		}).each($.proxy(function(index, item) {
+			item = this.prepare(item);
+			this.$stage.append(item);
+			this._items.push(item);
+			this._mergers.push(item.find('[data-merge]').andSelf('[data-merge]').attr('data-merge') * 1 || 1);
+		}, this));
+
+		this.reset($.isNumeric(this.settings.startPosition) ? this.settings.startPosition : 0);
+
+		this.invalidate('items');
 	};
 
 	/**
 	 * Adds an item.
+	 * @todo Use `item` instead of `content` for the event arguments.
 	 * @public
 	 * @param {HTMLElement|jQuery|String} content - The item content to add.
-	 * @param {Number} [position=0] - The position at which to insert the item.
+	 * @param {Number} [position] - The relative position at which to insert the item otherwise the item will be added to the end.
 	 */
-	Owl.prototype.addItem = function(content, position) {
-		var $item = this.createItemContainer();
+	Owl.prototype.add = function(content, position) {
+		var current = this.relative(this._current);
 
-		position = position || 0;
-		// wrap content
-		this.initializeItemContainer($item, content);
-		// if carousel is empty then append item
-		if (this.dom.$oItems.length === 0) {
-			this.dom.$stage.append($item);
+		position = position === undefined ? this._items.length : this.normalize(position, true);
+		content = content instanceof jQuery ? content : $(content);
+
+		this.trigger('add', { content: content, position: position });
+
+		content = this.prepare(content);
+
+		if (this._items.length === 0 || position === this._items.length) {
+			this._items.length === 0 && this.$stage.append(content);
+			this._items.length !== 0 && this._items[position - 1].after(content);
+			this._items.push(content);
+			this._mergers.push(content.find('[data-merge]').andSelf('[data-merge]').attr('data-merge') * 1 || 1);
 		} else {
-			// append item
-			if (pos !== -1) {
-				this.dom.$oItems.eq(position).before($item);
-			} else {
-				this.dom.$oItems.eq(position).after($item);
-			}
+			this._items[position].before(content);
+			this._items.splice(position, 0, content);
+			this._mergers.splice(position, 0, content.find('[data-merge]').andSelf('[data-merge]').attr('data-merge') * 1 || 1);
 		}
-		// update and calculate carousel
-		this.refresh();
+
+		this._items[current] && this.reset(this._items[current].index());
+
+		this.invalidate('items');
+
+		this.trigger('added', { content: content, position: position });
 	};
 
 	/**
-	 * Removes an item.
+	 * Removes an item by its position.
+	 * @todo Use `item` instead of `content` for the event arguments.
 	 * @public
-	 * @param {Number} pos - The position of the item.
+	 * @param {Number} position - The relative position of the item to remove.
 	 */
-	Owl.prototype.removeItem = function(pos) {
-		this.dom.$oItems.eq(pos).remove();
-		this.refresh();
-	};
+	Owl.prototype.remove = function(position) {
+		position = this.normalize(position, true);
 
-	/**
-	 * Adds triggerable events.
-	 * @protected
-	 */
-	Owl.prototype.addTriggerableEvents = function() {
-		var handler = $.proxy(function(callback, event) {
-			return $.proxy(function(e) {
-				if (e.relatedTarget !== this) {
-					this.suppress([ event ]);
-					callback.apply(this, [].slice.call(arguments, 1));
-					this.release([ event ]);
-				}
-			}, this);
-		}, this);
-
-		$.each({
-			'next': this.next,
-			'prev': this.prev,
-			'to': this.to,
-			'destroy': this.destroy,
-			'refresh': this.refresh,
-			'replace': this.insertContent,
-			'add': this.addItem,
-			'remove': this.removeItem
-		}, $.proxy(function(event, callback) {
-			this.dom.$el.on(event + '.owl.carousel', handler(callback, event + '.owl.carousel'));
-		}, this));
-
-	};
-
-	/**
-	 * Watches the visibility of the carousel element.
-	 * @protected
-	 */
-	Owl.prototype.watchVisibility = function() {
-
-		// test on zepto
-		if (!isElVisible(this.dom.el)) {
-			this.dom.$el.addClass('owl-hidden');
-			window.clearInterval(this.e._checkVisibile);
-			this.e._checkVisibile = window.setInterval($.proxy(checkVisible, this), 500);
+		if (position === undefined) {
+			return;
 		}
 
-		function isElVisible(el) {
-			return el.offsetWidth > 0 && el.offsetHeight > 0;
-		}
+		this.trigger('remove', { content: this._items[position], position: position });
 
-		function checkVisible() {
-			if (isElVisible(this.dom.el)) {
-				this.dom.$el.removeClass('owl-hidden');
-				this.refresh();
-				window.clearInterval(this.e._checkVisibile);
-			}
-		}
+		this._items[position].remove();
+		this._items.splice(position, 1);
+		this._mergers.splice(position, 1);
+
+		this.invalidate('items');
+
+		this.trigger('removed', { content: null, position: position });
 	};
 
 	/**
 	 * Preloads images with auto width.
+	 * @todo Replace by a more generic approach
 	 * @protected
-	 * @todo Still to test
 	 */
-	Owl.prototype.preloadAutoWidthImages = function(imgs) {
-		var loaded, that, $el, img;
-
-		loaded = 0;
-		that = this;
-		imgs.each(function(i, el) {
-			$el = $(el);
-			img = new Image();
-
-			img.onload = function() {
-				loaded++;
-				$el.attr('src', img.src);
-				$el.css('opacity', 1);
-				if (loaded >= imgs.length) {
-					that.state.imagesLoaded = true;
-					that.init();
-				}
-			};
-
-			img.src = $el.attr('src') || $el.attr('data-src') || $el.attr('data-src-retina');
-		});
+	Owl.prototype.preloadAutoWidthImages = function(images) {
+		images.each($.proxy(function(i, element) {
+			this.enter('pre-loading');
+			element = $(element);
+			$(new Image()).one('load', $.proxy(function(e) {
+				element.attr('src', e.target.src);
+				element.css('opacity', 1);
+				this.leave('pre-loading');
+				!this.is('pre-loading') && !this.is('initializing') && this.refresh();
+			}, this)).attr('src', element.attr('src') || element.attr('data-src') || element.attr('data-src-retina'));
+		}, this));
 	};
 
 	/**
@@ -1732,50 +1362,34 @@
 	 */
 	Owl.prototype.destroy = function() {
 
-		if (this.dom.$el.hasClass(this.settings.themeClass)) {
-			this.dom.$el.removeClass(this.settings.themeClass);
-		}
+		this.$element.off('.owl.core');
+		this.$stage.off('.owl.core');
+		$(document).off('.owl.core');
 
 		if (this.settings.responsive !== false) {
-			this.off(window, 'resize', this.e._resizer);
+			window.clearTimeout(this.resizeTimer);
+			this.off(window, 'resize', this._handlers.onThrottledResize);
 		}
 
-		if (this.transitionEndVendor) {
-			this.off(this.dom.stage, this.transitionEndVendor, this.e._transitionEnd);
+		for (var i in this._plugins) {
+			this._plugins[i].destroy();
 		}
 
-		for ( var i in this.plugins) {
-			this.plugins[i].destroy();
-		}
+		this.$stage.children('.cloned').remove();
 
-		if (this.settings.mouseDrag || this.settings.touchDrag) {
-			this.off(this.dom.stage, this.dragType[0], this.e._onDragStart);
-			if (this.settings.mouseDrag) {
-				this.off(document, this.dragType[3], this.e._onDragStart);
-			}
-			if (this.settings.mouseDrag) {
-				this.dom.$stage.off('dragstart', function() {
-					return false;
-				});
-				this.dom.stage.onselectstart = function() {
-				};
-			}
-		}
+		this.$stage.unwrap();
+		this.$stage.children().contents().unwrap();
+		this.$stage.children().unwrap();
 
-		// Remove event handlers in the ".owl.carousel" namespace
-		this.dom.$el.off('.owl');
-
-		if (this.dom.$cItems !== null) {
-			this.dom.$cItems.remove();
-		}
-		this.e = null;
-		this.dom.$el.data('owlCarousel', null);
-		delete this.dom.el.owlCarousel;
-
-		this.dom.$stage.unwrap();
-		this.dom.$items.unwrap();
-		this.dom.$items.contents().unwrap();
-		this.dom = null;
+		this.$element
+			.removeClass(this.options.refreshClass)
+			.removeClass(this.options.loadingClass)
+			.removeClass(this.options.loadedClass)
+			.removeClass(this.options.rtlClass)
+			.removeClass(this.options.dragClass)
+			.removeClass(this.options.grabClass)
+			.attr('class', this.$element.attr('class').replace(new RegExp(this.options.responsiveClass + '-\\S+\\s', 'g'), ''))
+			.removeData('owl.carousel');
 	};
 
 	/**
@@ -1788,16 +1402,16 @@
 	Owl.prototype.op = function(a, o, b) {
 		var rtl = this.settings.rtl;
 		switch (o) {
-		case '<':
-			return rtl ? a > b : a < b;
-		case '>':
-			return rtl ? a < b : a > b;
-		case '>=':
-			return rtl ? a <= b : a >= b;
-		case '<=':
-			return rtl ? a >= b : a <= b;
-		default:
-			break;
+			case '<':
+				return rtl ? a > b : a < b;
+			case '>':
+				return rtl ? a < b : a > b;
+			case '>=':
+				return rtl ? a <= b : a >= b;
+			case '<=':
+				return rtl ? a >= b : a <= b;
+			default:
+				break;
 		}
 	};
 
@@ -1834,16 +1448,19 @@
 	};
 
 	/**
-	 * Triggers an public event.
+	 * Triggers a public event.
+	 * @todo Remove `status`, `relatedTarget` should be used instead.
 	 * @protected
 	 * @param {String} name - The event name.
 	 * @param {*} [data=null] - The event data.
-	 * @param {String} [namespace=.owl.carousel] - The event namespace.
+	 * @param {String} [namespace=carousel] - The event namespace.
+	 * @param {String} [state] - The state which is associated with the event.
+	 * @param {Boolean} [enter=false] - Indicates if the call enters the specified state or not.
 	 * @returns {Event} - The event arguments.
 	 */
-	Owl.prototype.trigger = function(name, data, namespace) {
+	Owl.prototype.trigger = function(name, data, namespace, state, enter) {
 		var status = {
-			item: { count: this.num.oItems, index: this.current() }
+			item: { count: this._items.length, index: this.current() }
 		}, handler = $.camelCase(
 			$.grep([ 'on', name, namespace ], function(v) { return v })
 				.join('-').toLowerCase()
@@ -1852,21 +1469,80 @@
 			$.extend({ relatedTarget: this }, status, data)
 		);
 
-		if (!this._supress[event.type]) {
-			$.each(this.plugins, function(name, plugin) {
+		if (!this._supress[name]) {
+			$.each(this._plugins, function(name, plugin) {
 				if (plugin.onTrigger) {
 					plugin.onTrigger(event);
 				}
 			});
 
-			this.dom.$el.trigger(event);
+			this.register({ type: Owl.Type.Event, name: name });
+			this.$element.trigger(event);
 
-			if (typeof this.settings[handler] === 'function') {
-				this.settings[handler].apply(this, event);
+			if (this.settings && typeof this.settings[handler] === 'function') {
+				this.settings[handler].call(this, event);
 			}
 		}
 
 		return event;
+	};
+
+	/**
+	 * Enters a state.
+	 * @param name - The state name.
+	 */
+	Owl.prototype.enter = function(name) {
+		$.each([ name ].concat(this._states.tags[name] || []), $.proxy(function(i, name) {
+			if (this._states.current[name] === undefined) {
+				this._states.current[name] = 0;
+			}
+
+			this._states.current[name]++;
+		}, this));
+	};
+
+	/**
+	 * Leaves a state.
+	 * @param name - The state name.
+	 */
+	Owl.prototype.leave = function(name) {
+		$.each([ name ].concat(this._states.tags[name] || []), $.proxy(function(i, name) {
+			this._states.current[name]--;
+		}, this));
+	};
+
+	/**
+	 * Registers an event or state.
+	 * @public
+	 * @param {Object} object - The event or state to register.
+	 */
+	Owl.prototype.register = function(object) {
+		if (object.type === Owl.Type.Event) {
+			if (!$.event.special[object.name]) {
+				$.event.special[object.name] = {};
+			}
+
+			if (!$.event.special[object.name].owl) {
+				var _default = $.event.special[object.name]._default;
+				$.event.special[object.name]._default = function(e) {
+					if (_default && _default.apply && (!e.namespace || e.namespace.indexOf('owl') === -1)) {
+						return _default.apply(this, arguments);
+					}
+					return e.namespace && e.namespace.indexOf('owl') > -1;
+				};
+				$.event.special[object.name].owl = true;
+			}
+		} else if (object.type === Owl.Type.State) {
+			if (!this._states.tags[object.name]) {
+				this._states.tags[object.name] = object.tags;
+			} else {
+				this._states.tags[object.name] = this._states.tags[object.name].concat(object.tags);
+			}
+
+			this._states.tags[object.name] = $.grep(this._states.tags[object.name], $.proxy(function(tag, i) {
+				return $.inArray(tag, this._states.tags[object.name]) === i;
+			}, this));
+		}
 	};
 
 	/**
@@ -1878,7 +1554,7 @@
 		$.each(events, $.proxy(function(index, event) {
 			this._supress[event] = true;
 		}, this));
-	}
+	};
 
 	/**
 	 * Releases suppressed events.
@@ -1889,102 +1565,82 @@
 		$.each(events, $.proxy(function(index, event) {
 			delete this._supress[event];
 		}, this));
-	}
-
-	/**
-	 * Checks the availability of some browser features.
-	 * @protected
-	 */
-	Owl.prototype.browserSupport = function() {
-		this.support3d = isPerspective();
-
-		if (this.support3d) {
-			this.transformVendor = isTransform();
-
-			// take transitionend event name by detecting transition
-			var endVendors = [ 'transitionend', 'webkitTransitionEnd', 'transitionend', 'oTransitionEnd' ];
-			this.transitionEndVendor = endVendors[isTransition()];
-
-			// take vendor name from transform name
-			this.vendorName = this.transformVendor.replace(/Transform/i, '');
-			this.vendorName = this.vendorName !== '' ? '-' + this.vendorName.toLowerCase() + '-' : '';
-		}
-
-		this.state.orientation = window.orientation;
 	};
 
 	/**
-	 * Checks for CSS support.
-	 * @private
-	 * @param {Array} array - The CSS properties to check for.
-	 * @returns {Array} - Contains the supported CSS property name and its index or `false`.
+	 * Gets unified pointer coordinates from event.
+	 * @todo #261
+	 * @protected
+	 * @param {Event} - The `mousedown` or `touchstart` event.
+	 * @returns {Object} - Contains `x` and `y` coordinates of current pointer position.
 	 */
-	function isStyleSupported(array) {
-		var p, s, fake = document.createElement('div'), list = array;
-		for (p in list) {
-			s = list[p];
-			if (typeof fake.style[s] !== 'undefined') {
-				fake = null;
-				return [ s, p ];
-			}
+	Owl.prototype.pointer = function(event) {
+		var result = { x: null, y: null };
+
+		event = event.originalEvent || event || window.event;
+
+		event = event.touches && event.touches.length ?
+			event.touches[0] : event.changedTouches && event.changedTouches.length ?
+				event.changedTouches[0] : event;
+
+		if (event.pageX) {
+			result.x = event.pageX;
+			result.y = event.pageY;
+		} else {
+			result.x = event.clientX;
+			result.y = event.clientY;
 		}
-		return [ false ];
-	}
+
+		return result;
+	};
 
 	/**
-	 * Checks for CSS transition support.
-	 * @private
-	 * @todo Realy bad design
-	 * @returns {Number}
+	 * Gets the difference of two vectors.
+	 * @todo #261
+	 * @protected
+	 * @param {Object} - The first vector.
+	 * @param {Object} - The second vector.
+	 * @returns {Object} - The difference.
 	 */
-	function isTransition() {
-		return isStyleSupported([ 'transition', 'WebkitTransition', 'MozTransition', 'OTransition' ])[1];
-	}
-
-	/**
-	 * Checks for CSS transform support.
-	 * @private
-	 * @returns {String} The supported property name or false.
-	 */
-	function isTransform() {
-		return isStyleSupported([ 'transform', 'WebkitTransform', 'MozTransform', 'OTransform', 'msTransform' ])[0];
-	}
-
-	/**
-	 * Checks for CSS perspective support.
-	 * @private
-	 * @returns {String} The supported property name or false.
-	 */
-	function isPerspective() {
-		return isStyleSupported([ 'perspective', 'webkitPerspective', 'MozPerspective', 'OPerspective', 'MsPerspective' ])[0];
-	}
-
-	/**
-	 * Checks wether touch is supported or not.
-	 * @private
-	 * @returns {Boolean}
-	 */
-	function isTouchSupport() {
-		return 'ontouchstart' in window || !!(navigator.msMaxTouchPoints);
-	}
-
-	/**
-	 * Checks wether touch is supported or not for IE.
-	 * @private
-	 * @returns {Boolean}
-	 */
-	function isTouchSupportIE() {
-		return window.navigator.msPointerEnabled;
-	}
+	Owl.prototype.difference = function(first, second) {
+		return {
+			x: first.x - second.x,
+			y: first.y - second.y
+		};
+	};
 
 	/**
 	 * The jQuery Plugin for the Owl Carousel
+	 * @todo Navigation plugin `next` and `prev`
 	 * @public
 	 */
-	$.fn.owlCarousel = function(options) {
+	$.fn.owlCarousel = function(option) {
+		var args = Array.prototype.slice.call(arguments, 1);
+
 		return this.each(function() {
-			if (!$(this).data('owlCarousel')) {
-				$(this).data('owlCarousel', new Owl(this, options));
+			var $this = $(this),
+				data = $this.data('owl.carousel');
+
+			if (!data) {
+				data = new Owl(this, typeof option == 'object' && option);
+				$this.data('owl.carousel', data);
+
+				$.each([
+					'next', 'prev', 'to', 'destroy', 'refresh', 'replace', 'add', 'remove'
+				], function(i, event) {
+					data.register({ type: Owl.Type.Event, name: event });
+					data.$element.on(event + '.owl.carousel.core', $.proxy(function(e) {
+						if (e.namespace && e.relatedTarget !== this) {
+							this.suppress([ event ]);
+							data[event].apply(this, [].slice.call(arguments, 1));
+							this.release([ event ]);
+						}
+					}, data));
+				});
+			}
+
+			if (typeof option == 'string' && option.charAt(0) !== '_') {
+				data[option].apply(data, args);
 			}
 		});
 	};

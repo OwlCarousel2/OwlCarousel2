@@ -15,7 +15,7 @@
     "name":     "loop",
     "type":     "Boolean",
     "Default":  "false",
-    "desc":     "Inifnity loop. Duplicate last and first items to get loop illusion."
+    "desc":     "Infinity loop. Duplicate last and first items to get loop illusion."
   },
   {
     "name":     "center",
@@ -90,10 +90,10 @@
     "desc":     "Show next/prev buttons."
   },
   {
-    "name":     "navRewind",
+    "name":     "rewind",
     "type":     "Boolean",
     "Default":  "true",
-    "desc":     "Go to first/last."
+    "desc":     "Go backwards when the boundary has reached."
   },
   {
     "name":     "navText",
@@ -216,12 +216,6 @@
     "desc":     "Set on any DOM element. If you care about non responsive browser (like ie8) then use it on main wrapper. This will prevent from crazy resizing."
   },
   {
-    "name":     "responsiveClass",
-    "type":     "Boolean",
-    "Default":  "false",
-    "desc":     "Optional helper class. Add 'owl-reponsive-' + 'breakpoint' class to main element. Can be used to stylize content on given breakpoint."
-  },
-  {
     "name":     "video",
     "type":     "Boolean",
     "Default":  "false",
@@ -241,15 +235,15 @@
   },
   {
     "name":     "animateOut",
-    "type":     "String/Bolean",
+    "type":     "String/Boolean",
     "Default":  "false",
-    "desc":     "CSS3 animation out."
+    "desc":     "Class for CSS3 animation out."
   },
   {
-    "name":     "animateIn",
-    "type":     "String/Bolean",
+    "name":     "animateInClass",
+    "type":     "String/Boolean",
     "Default":  "false",
-    "desc":     "CSS3 animation in."
+    "desc":     "Class for CSS3 animation in."
   },
   {
     "name":     "fallbackEasing",
@@ -283,13 +277,13 @@
   },
   {
     "name":     "navContainer",
-    "type":     "String/Class/ID/Bolean",
+    "type":     "String/Class/ID/Boolean",
     "Default":  "false",
     "desc":     "Set your own container for nav."
   },
   {
     "name":     "dotsContainer",
-    "type":     "String/Class/ID/Bolean",
+    "type":     "String/Class/ID/Boolean",
     "Default":  "false",
     "desc":     "Set your own container for nav."
   }

@@ -9,40 +9,79 @@
 	/**
 	 * Creates the video plugin.
 	 * @class The Video Plugin
-	 * @param {Owl} scope - The Owl Carousel
+	 * @param {Owl} carousel - The Owl Carousel
 	 */
-	Video = function(scope) {
-		this.owl = scope;
-		this.owl.options = $.extend({}, Video.Defaults, this.owl.options);
+	var Video = function(carousel) {
+		/**
+		 * Reference to the core.
+		 * @protected
+		 * @type {Owl}
+		 */
+		this._core = carousel;
 
-		this.handlers = {
+		/**
+		 * Cache all video URLs.
+		 * @protected
+		 * @type {Object}
+		 */
+		this._videos = {};
+
+		/**
+		 * Current playing item.
+		 * @protected
+		 * @type {jQuery}
+		 */
+		this._playing = null;
+
+		/**
+		 * All event handlers.
+		 * @todo The cloned content removale is too late
+		 * @protected
+		 * @type {Object}
+		 */
+		this._handlers = {
+			'initialized.owl.carousel': $.proxy(function(e) {
+				if (e.namespace) {
+					this._core.register({ type: 'state', name: 'playing', tags: [ 'interacting' ] });
+				}
+			}, this),
 			'resize.owl.carousel': $.proxy(function(e) {
-				if (this.owl.settings.video && !this.isInFullScreen()) {
+				if (e.namespace && this._core.settings.video && this.isInFullScreen()) {
 					e.preventDefault();
 				}
 			}, this),
-			'refresh.owl.carousel changed.owl.carousel': $.proxy(function(e) {
-				if (this.owl.state.videoPlay) {
-					this.stopVideo();
+			'refreshed.owl.carousel': $.proxy(function(e) {
+				if (e.namespace && this._core.is('resizing')) {
+					this._core.$stage.find('.cloned .owl-video-frame').remove();
 				}
-			}, this),
-			'refresh.owl.carousel refreshed.owl.carousel': $.proxy(function(e) {
-				if (!this.owl.settings.video) {
-					return false;
-				}
-				this.refreshing = e.type == 'refresh';
 			}, this),
 			'changed.owl.carousel': $.proxy(function(e) {
-				if (this.refreshing && e.property.name == 'items' && e.property.value && !e.property.value.is(':empty')) {
-					this.checkVideoLinks();
+				if (e.namespace && e.property.name === 'position' && this._playing) {
+					this.stop();
+				}
+			}, this),
+			'prepared.owl.carousel': $.proxy(function(e) {
+				if (!e.namespace) {
+					return;
+				}
+
+				var $element = $(e.content).find('.owl-video');
+
+				if ($element.length) {
+					$element.css('display', 'none');
+					this.fetch($element, $(e.content));
 				}
 			}, this)
 		};
 
-		this.owl.dom.$el.on(this.handlers);
+		// set default options
+		this._core.options = $.extend({}, Video.Defaults, this._core.options);
 
-		this.owl.dom.$el.on('click.owl.video', '.owl-video-play-icon', $.proxy(function(e) {
-			this.playVideo(e);
+		// register event handlers
+		this._core.$element.on(this._handlers);
+
+		this._core.$element.on('click.owl.video', '.owl-video-play-icon', $.proxy(function(e) {
+			this.play(e);
 		}, this));
 	};
 
@@ -57,137 +96,100 @@
 	};
 
 	/**
-	 * Checks if for any videos links exists.
-	 * @protected
-	 */
-	Video.prototype.checkVideoLinks = function() {
-		var videoEl, item, i;
-
-		for (i = 0; i < this.owl.num.items; i++) {
-
-			item = this.owl.dom.$items.eq(i);
-			if (item.data('owl-item').hasVideo) {
-				continue;
-			}
-
-			videoEl = item.find('.owl-video');
-			if (videoEl.length) {
-				this.owl.state.hasVideos = true;
-				this.owl.dom.$items.eq(i).data('owl-item').hasVideo = true;
-				videoEl.css('display', 'none');
-				this.getVideoInfo(videoEl, item);
-			}
-		}
-	};
-
-	/**
 	 * Gets the video ID and the type (YouTube/Vimeo only).
 	 * @protected
-	 * @param {jQuery} videoEl - The element containing the video data.
+	 * @param {jQuery} target - The target containing the video data.
 	 * @param {jQuery} item - The item containing the video.
 	 */
-	Video.prototype.getVideoInfo = function(videoEl, item) {
+	Video.prototype.fetch = function(target, item) {
+		var type = target.attr('data-vimeo-id') ? 'vimeo' : 'youtube',
+			id = target.attr('data-vimeo-id') || target.attr('data-youtube-id'),
+			width = target.attr('data-width') || this._core.settings.videoWidth,
+			height = target.attr('data-height') || this._core.settings.videoHeight,
+			url = target.attr('href');
 
-		var info, type, id, dimensions,
-			vimeoId = videoEl.data('vimeo-id'),
-			youTubeId = videoEl.data('youtube-id'),
-			width = videoEl.data('width') || this.owl.settings.videoWidth,
-			height = videoEl.data('height') || this.owl.settings.videoHeight,
-			url = videoEl.attr('href');
-
-		if (vimeoId) {
-			type = 'vimeo';
-			id = vimeoId;
-		} else if (youTubeId) {
-			type = 'youtube';
-			id = youTubeId;
-		} else if (url) {
+		if (url) {
 			id = url.match(/(http:|https:|)\/\/(player.|www.)?(vimeo\.com|youtu(be\.com|\.be|be\.googleapis\.com))\/(video\/|embed\/|watch\?v=|v\/)?([A-Za-z0-9._%-]*)(\&\S+)?/);
 
 			if (id[3].indexOf('youtu') > -1) {
 				type = 'youtube';
 			} else if (id[3].indexOf('vimeo') > -1) {
 				type = 'vimeo';
+			} else {
+				throw new Error('Video URL not supported.');
 			}
 			id = id[6];
 		} else {
-			throw new Error('Missing video link.');
+			throw new Error('Missing video URL.');
 		}
 
-		item.data('owl-item').videoType = type;
-		item.data('owl-item').videoId = id;
-		item.data('owl-item').videoWidth = width;
-		item.data('owl-item').videoHeight = height;
-
-		info = {
+		this._videos[url] = {
 			type: type,
-			id: id
+			id: id,
+			width: width,
+			height: height
 		};
 
-		// Check dimensions
-		dimensions = width && height ? 'style="width:' + width + 'px;height:' + height + 'px;"' : '';
+		item.attr('data-video', url);
 
-		// wrap video content into owl-video-wrapper div
-		videoEl.wrap('<div class="owl-video-wrapper"' + dimensions + '></div>');
-
-		this.createVideoTn(videoEl, info);
+		this.thumbnail(target, this._videos[url]);
 	};
 
 	/**
 	 * Creates video thumbnail.
 	 * @protected
-	 * @param {jQuery} videoEl - The element containing the video data.
+	 * @param {jQuery} target - The target containing the video data.
 	 * @param {Object} info - The video info object.
-	 * @see `getVideoInfo`
+	 * @see `fetch`
 	 */
-	Video.prototype.createVideoTn = function(videoEl, info) {
-
-		var tnLink, icon, path,
-			customTn = videoEl.find('img'),
+	Video.prototype.thumbnail = function(target, video) {
+		var tnLink,
+			icon,
+			path,
+			dimensions = video.width && video.height ? 'style="width:' + video.width + 'px;height:' + video.height + 'px;"' : '',
+			customTn = target.find('img'),
 			srcType = 'src',
 			lazyClass = '',
-			that = this.owl;
+			settings = this._core.settings,
+			create = function(path) {
+				icon = '<div class="owl-video-play-icon"></div>';
 
-		if (this.owl.settings.lazyLoad) {
+				if (settings.lazyLoad) {
+					tnLink = '<div class="owl-video-tn ' + lazyClass + '" ' + srcType + '="' + path + '"></div>';
+				} else {
+					tnLink = '<div class="owl-video-tn" style="opacity:1;background-image:url(' + path + ')"></div>';
+				}
+				target.after(tnLink);
+				target.after(icon);
+			};
+
+		// wrap video content into owl-video-wrapper div
+		target.wrap('<div class="owl-video-wrapper"' + dimensions + '></div>');
+
+		if (this._core.settings.lazyLoad) {
 			srcType = 'data-src';
 			lazyClass = 'owl-lazy';
 		}
 
-		// Custom thumbnail
-
+		// custom thumbnail
 		if (customTn.length) {
-			addThumbnail(customTn.attr(srcType));
+			create(customTn.attr(srcType));
 			customTn.remove();
 			return false;
 		}
 
-		function addThumbnail(tnPath) {
-			icon = '<div class="owl-video-play-icon"></div>';
-
-			if (that.settings.lazyLoad) {
-				tnLink = '<div class="owl-video-tn ' + lazyClass + '" ' + srcType + '="' + tnPath + '"></div>';
-			} else {
-				tnLink = '<div class="owl-video-tn" style="opacity:1;background-image:url(' + tnPath + ')"></div>';
-			}
-			videoEl.after(tnLink);
-			videoEl.after(icon);
-		}
-
-		if (info.type === 'youtube') {
-			path = "http://img.youtube.com/vi/" + info.id + "/hqdefault.jpg";
-			addThumbnail(path);
-		} else if (info.type === 'vimeo') {
+		if (video.type === 'youtube') {
+			path = "http://img.youtube.com/vi/" + video.id + "/hqdefault.jpg";
+			create(path);
+		} else if (video.type === 'vimeo') {
 			$.ajax({
 				type: 'GET',
-				url: 'http://vimeo.com/api/v2/video/' + info.id + '.json',
+				url: 'http://vimeo.com/api/v2/video/' + video.id + '.json',
 				jsonp: 'callback',
 				dataType: 'jsonp',
 				success: function(data) {
 					path = data[0].thumbnail_large;
-					addThumbnail(path);
-					if (that.settings.loop) {
-						that.updateActiveItems();
-					}
+					create(path);
 				}
 			});
 		}
@@ -197,87 +199,64 @@
 	 * Stops the current video.
 	 * @public
 	 */
-	Video.prototype.stopVideo = function() {
-		this.owl.trigger('stop', null, 'video');
-		var item = this.owl.dom.$items.eq(this.owl.state.videoPlayIndex);
-		item.find('.owl-video-frame').remove();
-		item.removeClass('owl-video-playing');
-		this.owl.state.videoPlay = false;
+	Video.prototype.stop = function() {
+		this._core.trigger('stop', null, 'video');
+		this._playing.find('.owl-video-frame').remove();
+		this._playing.removeClass('owl-video-playing');
+		this._playing = null;
+		this._core.leave('playing');
+		this._core.trigger('stopped', null, 'video');
 	};
 
 	/**
 	 * Starts the current video.
 	 * @public
-	 * @param {Event} ev - The event arguments.
+	 * @param {Event} event - The event arguments.
 	 */
-	Video.prototype.playVideo = function(ev) {
-		this.owl.trigger('play', null, 'video');
+	Video.prototype.play = function(event) {
+		var target = $(event.target),
+			item = target.closest('.' + this._core.settings.itemClass),
+			video = this._videos[item.attr('data-video')],
+			width = video.width || '100%',
+			height = video.height || this._core.$stage.height(),
+			html;
 
-		if (this.owl.state.videoPlay) {
-			this.stopVideo();
-		}
-		var videoLink, videoWrap, videoType,
-			target = $(ev.target || ev.srcElement),
-			item = target.closest('.' + this.owl.settings.itemClass);
-
-		videoType = item.data('owl-item').videoType, id = item.data('owl-item').videoId, width = item
-			.data('owl-item').videoWidth
-			|| Math.floor(item.data('owl-item').width - this.owl.settings.margin), height = item.data('owl-item').videoHeight
-			|| this.owl.dom.$stage.height();
-
-		if (videoType === 'youtube') {
-			videoLink = "<iframe width=\"" + width + "\" height=\"" + height + "\" src=\"http://www.youtube.com/embed/"
-				+ id + "?autoplay=1&v=" + id + "\" frameborder=\"0\" allowfullscreen></iframe>";
-		} else if (videoType === 'vimeo') {
-			videoLink = '<iframe src="http://player.vimeo.com/video/' + id + '?autoplay=1" width="' + width
-				+ '" height="' + height
-				+ '" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+		if (this._playing) {
+			return;
 		}
 
-		item.addClass('owl-video-playing');
-		this.owl.state.videoPlay = true;
-		this.owl.state.videoPlayIndex = item.data('owl-item').indexAbs;
+		this._core.enter('playing');
+		this._core.trigger('play', null, 'video');
 
-		videoWrap = $('<div style="height:' + height + 'px; width:' + width + 'px" class="owl-video-frame">'
-			+ videoLink + '</div>');
-		target.after(videoWrap);
+		item = this._core.items(this._core.relative(item.index()));
+
+		this._core.reset(item.index());
+
+		if (video.type === 'youtube') {
+			html = '<iframe width="' + width + '" height="' + height + '" src="http://www.youtube.com/embed/' +
+				video.id + '?autoplay=1&v=' + video.id + '" frameborder="0" allowfullscreen></iframe>';
+		} else if (video.type === 'vimeo') {
+			html = '<iframe src="http://player.vimeo.com/video/' + video.id +
+				'?autoplay=1" width="' + width + '" height="' + height +
+				'" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+		}
+
+		$('<div class="owl-video-frame">' + html + '</div>').insertAfter(item.find('.owl-video'));
+
+		this._playing = item.addClass('owl-video-playing');
 	};
 
 	/**
 	 * Checks whether an video is currently in full screen mode or not.
+	 * @todo Bad style because looks like a readonly method but changes members.
 	 * @protected
 	 * @returns {Boolean}
 	 */
 	Video.prototype.isInFullScreen = function() {
+		var element = document.fullscreenElement || document.mozFullScreenElement ||
+				document.webkitFullscreenElement;
 
-		// if Vimeo Fullscreen mode
-		var fullscreenElement = document.fullscreenElement || document.mozFullScreenElement
-			|| document.webkitFullscreenElement;
-		if (fullscreenElement) {
-			if ($(fullscreenElement.parentNode).hasClass('owl-video-frame')) {
-				this.owl.speed(0);
-				this.owl.state.isFullScreen = true;
-			}
-		}
-
-		if (fullscreenElement && this.owl.state.isFullScreen && this.owl.state.videoPlay) {
-			return false;
-		}
-
-		// Comming back from fullscreen
-		if (this.owl.state.isFullScreen) {
-			this.owl.state.isFullScreen = false;
-			return false;
-		}
-
-		// check full screen mode and window orientation
-		if (this.owl.state.videoPlay) {
-			if (this.owl.state.orientation !== window.orientation) {
-				this.owl.state.orientation = window.orientation;
-				return false;
-			}
-		}
-		return true;
+		return element && $(element).parent().hasClass('owl-video-frame');
 	};
 
 	/**
@@ -286,16 +265,16 @@
 	Video.prototype.destroy = function() {
 		var handler, property;
 
-		this.owl.dom.$el.off('click.owl.video');
+		this._core.$element.off('click.owl.video');
 
-		for (handler in this.handlers) {
-			this.owl.dom.$el.off(handler, this.handlers[handler]);
+		for (handler in this._handlers) {
+			this._core.$element.off(handler, this._handlers[handler]);
 		}
 		for (property in Object.getOwnPropertyNames(this)) {
 			typeof this[property] != 'function' && (this[property] = null);
 		}
 	};
 
-	$.fn.owlCarousel.Constructor.Plugins.video = Video;
+	$.fn.owlCarousel.Constructor.Plugins.Video = Video;
 
 })(window.Zepto || window.jQuery, window, document);

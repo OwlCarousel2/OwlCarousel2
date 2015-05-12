@@ -1,5 +1,7 @@
+*.iml
 .sass-cache
 .bowerrc
+.idea
 /bower_components
 /docs
 /node_modules
@@ -7,6 +9,7 @@
 *.zip
 /download
 /jscs.report.txt
+/dist
 
 .DS_Store
 */.DS_Store
@@ -15,3 +18,4 @@
 .Trashes
 ehthumbs.db
 Thumbs.db
+.grunt

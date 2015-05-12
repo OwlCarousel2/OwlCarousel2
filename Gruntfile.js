@@ -1,4 +1,4 @@
-/*
+/**
  * Owl Carousel
  *
  * Bartosz Wojciechowski
@@ -31,21 +31,21 @@ module.exports = function(grunt) {
 					assets: '<%= app.docs.dest %>/assets',
 					postprocess: require('pretty'),
 
-					// Metadata
+					// metadata
 					pkg: '<%= pkg %>',
 					app: '<%= app %>',
 					data: [ '<%= app.docs.src %>/data/*.{json,yml}' ],
 
-					// Templates
+					// templates
 					partials: '<%= app.docs.templates %>/partials/*.hbs',
 					layoutdir: '<%= app.docs.layouts %>/',
 
-					// Extensions
+					// extensions
 					helpers: '<%= app.docs.src %>/helpers/*.js'
 				},
 				index: {
 					options: {
-						layout: 'home.hbs',
+						layout: 'home.hbs'
 					},
 					files: [ {
 						expand: true,
@@ -88,8 +88,8 @@ module.exports = function(grunt) {
 			sass: {
 				docs: {
 					options: {
-						style: 'compressed',
-						loadPath: [ '<%= app.docs.src %>/assets/scss/', 'bower_components/foundation/scss' ]
+						outputStyle: 'compressed',
+						includePaths: [ '<%= app.docs.src %>/assets/scss/', 'bower_components/foundation/scss' ]
 					},
 					files: {
 						'<%= app.docs.dest %>/assets/css/docs.theme.min.css': '<%= app.docs.src %>/assets/scss/docs.theme.scss'
@@ -97,7 +97,7 @@ module.exports = function(grunt) {
 				},
 				dist: {
 					options: {
-						style: 'expanded'
+						outputStyle: 'nested'
 					},
 					files: [ {
 						expand: true,
@@ -137,6 +137,10 @@ module.exports = function(grunt) {
 				dist: {
 					src: [ '<%= app.src.scripts %>', 'Gruntfile.js' ]
 				}
+			},
+
+			qunit: {
+				dist: [ 'test/*.html' ]
 			},
 
 			jscs: {
@@ -197,13 +201,13 @@ module.exports = function(grunt) {
 				},
 				readme: {
 					files: [ {
-						'dist/LICENSE-MIT': 'LICENSE-MIT',
+						'dist/LICENSE': 'LICENSE',
 						'dist/README.md': 'README.md'
 					} ]
 				}
 			},
 
-			// Connect
+			// connect
 			connect: {
 				options: {
 					port: 9000,
@@ -218,7 +222,7 @@ module.exports = function(grunt) {
 				}
 			},
 
-			// Watch
+			// watch
 			watch: {
 				options: {
 					livereload: true
@@ -233,7 +237,7 @@ module.exports = function(grunt) {
 				},
 				sassDist: {
 					files: [ 'src/**/*.scss' ],
-					tasks: [ 'sass:dist', 'concat:dist', 'cssmin:dist', 'copy:themes' ]
+					tasks: [ 'sass:dist', 'concat:dist', 'cssmin:dist', 'copy:themes','copy:distToDocs' ]
 				},
 				jsDocs: {
 					files: [ '<%= app.docs.src %>/assets/**/*.js' ],
@@ -241,11 +245,15 @@ module.exports = function(grunt) {
 				},
 				js: {
 					files: [ 'src/**/*.js' ],
-					tasks: [ 'jscs:dist', 'uglify:dist', 'concat:dist', 'copy:distToDocs', 'copy:srcToDocs'  ]
+					tasks: [ 'jscs:dist', 'jshint:dist', 'qunit:dist', 'uglify:dist', 'concat:dist', 'copy:distToDocs', 'copy:srcToDocs' ]
 				},
 				helpers: {
 					files: [ '<%= app.src %>/helpers/*.js' ],
 					tasks: [ 'assemble' ]
+				},
+				test: {
+					files: [ 'test/*.html', 'test/unit/*.js' ],
+					tasks: [ 'qunit:dist' ]
 				}
 			},
 
@@ -253,7 +261,7 @@ module.exports = function(grunt) {
 			compress: {
 				zip: {
 					options: {
-						archive: 'download/<%= pkg.version %>/owl.carousel.zip'
+						archive: 'docs/download/owl.carousel.<%= pkg.version %>.zip'
 					},
 					files: [ {
 						expand: true,
@@ -262,21 +270,32 @@ module.exports = function(grunt) {
 						dest: 'owl.carousel.<%= pkg.version %>'
 					} ]
 				}
+			},
+
+			// publish to github pages
+			'gh-pages': {
+				options: {
+					base: 'docs'
+				},
+				src: '**/*'
 			}
 		});
 
 	grunt.loadNpmTasks('assemble');
 
-	// Tasks
-	grunt.registerTask('dist', [ 'clean:dist', 'sass:dist', 'concat:dist', 'cssmin:dist', 'copy:themes',
-			'copy:distImages', 'jscs:dist', 'jshint:dist', 'uglify:dist', 'copy:readme' ]);
+	// tasks
+	grunt.registerTask('dist', [ 'clean:dist', 'sass:dist', 'concat:dist', 'cssmin:dist', 'copy:themes', 'copy:distImages', 'jscs:dist', 'uglify:dist', 'copy:readme' ]);
 
-	grunt.registerTask('docs', [ 'clean:docs', 'assemble', 'sass:docs', 'copy:docsAssets', 'copy:distToDocs' ]);
+	grunt.registerTask('docs', [ 'dist', 'clean:docs', 'assemble', 'sass:docs', 'copy:docsAssets', 'copy:distToDocs', 'zip' ]);
 
-	grunt.registerTask('default', [ 'dist', 'docs' ]);
+	grunt.registerTask('test', [ 'jshint:dist', 'qunit:dist' ]);
+
+	grunt.registerTask('default', [ 'dist', 'docs', 'test' ]);
 
 	grunt.registerTask('serve', [ 'connect:docs', 'watch' ]);
 
 	grunt.registerTask('zip', [ 'compress' ]);
+
+	grunt.registerTask('deploy', [ 'docs', 'gh-pages' ]);
 
 };
