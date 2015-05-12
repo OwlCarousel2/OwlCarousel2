@@ -69,6 +69,12 @@
 		this._speed = null;
 
 		/**
+		 * The scaling of the Owl instance
+		 * @protected
+		 */
+		this._scale = 1;
+
+		/**
 		 * Coordinates of all items in pixel.
 		 * @todo The name of this member is missleading.
 		 * @protected
@@ -780,6 +786,8 @@
 			stage.x = Math.max(Math.min(stage.x, minimum + pull), maximum + pull);
 		}
 
+		stage.x /= this._scale;
+
 		this._drag.stage.current = stage;
 
 		this.animate(stage.x);
@@ -1105,6 +1113,20 @@
 		}
 
 		return this._speed;
+	};
+
+	/**
+	 * Sets the current scale.
+	 * @public
+	 * @param {Number} [scale] - The scaling done with transform outside the Owl instance
+	 * @returns {Number} - The scaling of the Owl outside the Owl instance
+	 */
+	Owl.prototype.scale = function( scale ) {
+		if (scale !== undefined) {
+			this._scale = scale;
+		}
+
+		return this._scale;
 	};
 
 	/**
