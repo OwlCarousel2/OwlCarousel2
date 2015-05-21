@@ -55,3 +55,11 @@ $(document).ready(function(){
 });
 ```
 > See [demos](http://owlcarousel.owlgraphic.com/demos/demos.html) for customisation and options usage.
+
+### Using an earlier version?
+
+If you are using Owl Carousel v1.0, you can find the documentation [here](http://owlgraphic.com/owlcarousel/)
+
+This is the Github repository: [OwlFonk/OwlCarousel](https://github.com/OwlFonk/OwlCarousel)
+
+And this is the zipped plugin: [Owl Carousel v1.0](http://owlgraphic.com/owlcarousel/owl.carousel.zip)
