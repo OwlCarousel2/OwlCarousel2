@@ -739,10 +739,6 @@
 
 			$(document).on('mousemove.owl.core touchmove.owl.core', $.proxy(this.onDragMove, this));
 
-			if (Math.abs(delta.x) < Math.abs(delta.y) && this.is('valid')) {
-				return;
-			}
-
 			event.preventDefault();
 
 			this.enter('dragging');
