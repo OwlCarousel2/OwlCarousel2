@@ -113,12 +113,15 @@
 
 			if (id[3].indexOf('youtu') > -1) {
 				type = 'youtube';
+				id = id[6];
 			} else if (id[3].indexOf('vimeo') > -1) {
 				type = 'vimeo';
+				urlParts = url.split('/');
+                                id = parseInt( urlParts.pop(), 10);
 			} else {
 				throw new Error('Video URL not supported.');
 			}
-			id = id[6];
+			
 		} else {
 			throw new Error('Missing video URL.');
 		}
