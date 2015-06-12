@@ -7,7 +7,7 @@
 ;(function($, window, document, undefined) {
 
 	/**
-	 * Creates the video plugin.
+	 * Creates the fetch plugin.
 	 * @class The Video Plugin
 	 * @param {Owl} carousel - The Owl Carousel
 	 */
@@ -102,19 +102,22 @@
 	 * @param {jQuery} item - The item containing the video.
 	 */
 	Video.prototype.fetch = function(target, item) {
+
 		var type = target.attr('data-vimeo-id') ? 'vimeo' : 'youtube',
-			id = target.attr('data-vimeo-id') || target.attr('data-youtube-id'),
+			id = target.attr('data-vimeo-id') || target.attr('data-youtube-id') || target.attr('data-vzaar-id'),
 			width = target.attr('data-width') || this._core.settings.videoWidth,
 			height = target.attr('data-height') || this._core.settings.videoHeight,
 			url = target.attr('href');
 
 		if (url) {
-			id = url.match(/(http:|https:|)\/\/(player.|www.)?(vimeo\.com|youtu(be\.com|\.be|be\.googleapis\.com))\/(video\/|embed\/|watch\?v=|v\/)?([A-Za-z0-9._%-]*)(\&\S+)?/);
+			id = url.match(/(http:|https:|)\/\/(player.|www.|app.)?(vimeo\.com|youtu(be\.com|\.be|be\.googleapis\.com)|vzaar\.com)\/(video\/|videos\/|embed\/|watch\?v=|v\/)?([A-Za-z0-9._%-]*)(\&\S+)?/);
 
 			if (id[3].indexOf('youtu') > -1) {
 				type = 'youtube';
 			} else if (id[3].indexOf('vimeo') > -1) {
 				type = 'vimeo';
+			} else if (id[3].indexOf('vzaar') > -1) {
+				type = 'vzaar';
 			} else {
 				throw new Error('Video URL not supported.');
 			}
@@ -192,6 +195,17 @@
 					create(path);
 				}
 			});
+		} else if (video.type === 'vzaar') {
+			$.ajax({
+				type: 'GET',
+				url: 'http://vzaar.com/api/videos/' + video.id + '.json',
+				jsonp: 'callback',
+				dataType: 'jsonp',
+				success: function(data) {
+					path = data.framegrab_url;
+					create(path);
+				}
+			});
 		}
 	};
 
@@ -239,6 +253,9 @@
 			html = '<iframe src="http://player.vimeo.com/video/' + video.id +
 				'?autoplay=1" width="' + width + '" height="' + height +
 				'" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+		} else if (video.type === 'vzaar') {
+			html = '<iframe class="vzaar-video-player" frameborder="0" height="' + height + '" width="' + width + '"' +
+				 'allowfullscreen mozallowfullscreen webkitAllowFullScreen src="//view.vzaar.com/' + video.id + '/player?autoplay=true"></iframe>';
 		}
 
 		$('<div class="owl-video-frame">' + html + '</div>').insertAfter(item.find('.owl-video'));
