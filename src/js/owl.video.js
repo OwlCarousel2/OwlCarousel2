@@ -7,7 +7,7 @@
 ;(function($, window, document, undefined) {
 
 	/**
-	 * Creates the fetch plugin.
+	 * Creates the video plugin.
 	 * @class The Video Plugin
 	 * @param {Owl} carousel - The Owl Carousel
 	 */
@@ -254,8 +254,9 @@
 				'?autoplay=1" width="' + width + '" height="' + height +
 				'" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
 		} else if (video.type === 'vzaar') {
-			html = '<iframe class="vzaar-video-player" frameborder="0" height="' + height + '" width="' + width + '"' +
-				 'allowfullscreen mozallowfullscreen webkitAllowFullScreen src="//view.vzaar.com/' + video.id + '/player?autoplay=true"></iframe>';
+			html = '<iframe class="vzaar-video-player" frameborder="0"' + 'height="' + height + '"' +
+				'width="' + width + '" allowfullscreen mozallowfullscreen webkitAllowFullScreen ' +
+				'src="//view.vzaar.com/' + video.id + '/player?autoplay=true"></iframe>';
 		}
 
 		$('<div class="owl-video-frame">' + html + '</div>').insertAfter(item.find('.owl-video'));
