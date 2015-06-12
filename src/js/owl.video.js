@@ -254,8 +254,8 @@
 				'?autoplay=1" width="' + width + '" height="' + height +
 				'" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
 		} else if (video.type === 'vzaar') {
-			html = '<iframe class="vzaar-video-player" frameborder="0"' + 'height="' + height + '"' +
-				'width="' + width + '" allowfullscreen mozallowfullscreen webkitAllowFullScreen ' +
+			html = '<iframe frameborder="0"' + 'height="' + height + '"' + 'width="' + width +
+				'" allowfullscreen mozallowfullscreen webkitAllowFullScreen ' +
 				'src="//view.vzaar.com/' + video.id + '/player?autoplay=true"></iframe>';
 		}
 
