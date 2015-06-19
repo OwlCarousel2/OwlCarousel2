@@ -7,13 +7,13 @@ Big announcement comming about maintainance of this project.  Stay tuned!
 
 ## Owl Carousel 2 Beta
 
-Touch enabled [jQuery](http://jquery.com/) plugin that lets you createbeautiful responsive carousel slider. **To get started, check out http://owlcarousel.owlgraphic.com.**
+Touch enabled [jQuery](http://jquery.com/) plugin that lets you create a beautiful, responsive carousel slider. **To get started, check out http://owlcarousel.owlgraphic.com.**
 
-Please consider that the project is still in beta. The current status of the milestones can be found [here](https://github.com/OwlFonk/OwlCarousel2/milestones). If you want to use the [latest development](https://github.com/OwlFonk/OwlCarousel2/archive/develop.zip) see [building](#building).
+Please consider that the project is still in beta. The current status of the milestones can be found [here](https://github.com/OwlFonk/OwlCarousel2/milestones). If you want to use the [latest development](http://smashingboxes.github.io/download/owl.carousel.2.0.0-beta.3.zip) see [building](#building).
 
 ## Quick start
 
-Download the [latest release](http://owlcarousel.owlgraphic.com/download/owl.carousel.zip) and put the required stylesheet at the [top](https://developer.yahoo.com/performance/rules.html#css_top) of your markup:
+Download the [latest release](http://smashingboxes.github.io/download/owl.carousel.2.0.0-beta.3.zip) and put the required stylesheet at the [top](https://developer.yahoo.com/performance/rules.html#css_top) of your markup:
 
 ```html
 <link rel="stylesheet" href="owlcarousel/owl.carousel.min.css" />
@@ -65,13 +65,13 @@ To define which plugins are build into the distribution just edit `/_config.json
 
 ## Contributing
 
-The [issue tracker](https://github.com/OwlFonk/OwlCarousel2/issues) is the preferred channel for bug reports, features requests and submitting pull requests.
+The [issue tracker](https://github.com/OwlFonk/OwlCarousel2/issues) is the preferred channel for bug reports, feature requests, and submitting pull requests.
 
 **Please do not use the issue tracker for personal support requests. Stack Overflow ([`owl-carousel`](http://stackoverflow.com/questions/tagged/owl-carousel)) is a better place to get help.**
 
 ### Bug reports
 
-A bug is a **demonstrable problem** that is caused by the code in the repository. Good bug reports are extremely helpful, so thanks!
+A bug is a **demonstrable, reproducible problem** that is caused by the code in the repository. Good bug reports are extremely helpful, so thanks!
 
 Guidelines for bug reports:
 

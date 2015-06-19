@@ -1,6 +1,6 @@
 /**
  * Owl carousel
- * @version 2.0.0
+ * @version 2.0.0-beta.3
  * @author Bartosz Wojciechowski
  * @license The MIT License (MIT)
  * @todo Lazy Load Icon
@@ -1655,7 +1655,7 @@
 
 /**
  * AutoRefresh Plugin
- * @version 2.0.0
+ * @version 2.0.0-beta.3
  * @author Artus Kolanowski
  * @license The MIT License (MIT)
  */
@@ -1766,7 +1766,7 @@
 
 /**
  * Lazy Plugin
- * @version 2.0.0
+ * @version 2.0.0-beta.3
  * @author Bartosz Wojciechowski
  * @license The MIT License (MIT)
  */
@@ -1901,7 +1901,7 @@
 
 /**
  * AutoHeight Plugin
- * @version 2.0.0
+ * @version 2.0.0-beta.3
  * @author Bartosz Wojciechowski
  * @license The MIT License (MIT)
  */
@@ -1998,7 +1998,7 @@
 
 /**
  * Video Plugin
- * @version 2.0.0
+ * @version 2.0.0-beta.3
  * @author Bartosz Wojciechowski
  * @license The MIT License (MIT)
  */
@@ -2279,7 +2279,7 @@
 
 /**
  * Animate Plugin
- * @version 2.0.0
+ * @version 2.0.0-beta.3
  * @author Bartosz Wojciechowski
  * @license The MIT License (MIT)
  */
@@ -2400,7 +2400,7 @@
 
 /**
  * Autoplay Plugin
- * @version 2.0.0
+ * @version 2.0.0-beta.3
  * @author Bartosz Wojciechowski
  * @author Artus Kolanowski
  * @license The MIT License (MIT)
@@ -2562,7 +2562,7 @@
 
 /**
  * Navigation Plugin
- * @version 2.0.0
+ * @version 2.0.0-beta.3
  * @author Artus Kolanowski
  * @license The MIT License (MIT)
  */
@@ -2944,7 +2944,7 @@
 
 /**
  * Hash Plugin
- * @version 2.0.0
+ * @version 2.0.0-beta.3
  * @author Artus Kolanowski
  * @license The MIT License (MIT)
  */
@@ -3067,7 +3067,7 @@
 /**
  * Support Plugin
  *
- * @version 2.0.0
+ * @version 2.0.0-beta.3
  * @author Vivid Planet Software GmbH
  * @author Artus Kolanowski
  * @license The MIT License (MIT)
