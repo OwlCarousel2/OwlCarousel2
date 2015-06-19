@@ -42,6 +42,12 @@
     "desc":     "Stage pull to edge."
   },
   {
+    "name":     "pull",
+    "type":     "Number",
+    "Default":  "30",
+    "desc":     "Pull offset."
+  },
+  {
     "name":     "freeDrag",
     "type":     "Boolean",
     "Default":  "false",
