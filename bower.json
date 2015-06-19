@@ -5,6 +5,7 @@
     "dist/owl.carousel.js",
     "dist/assets/owl.carousel.css"
   ],
+  "ignore": [],
   "dependencies": {
     "jquery": ">= 1.8.3"
   },
