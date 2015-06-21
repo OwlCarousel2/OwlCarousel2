@@ -103,7 +103,16 @@
 	 */
 	Video.prototype.fetch = function(target, item) {
 
-		var type = target.attr('data-vimeo-id') ? 'vimeo' : target.attr('data-vzaar-id') ? 'vzaar' : 'youtube',
+		//var type = target.attr('data-vimeo-id') ? 'vimeo' : target.attr('data-vzaar-id') ? 'vzaar' : 'youtube',
+			var type = (function() {
+				if (target.attr('data-vimeo-id')) {
+					return 'vimeo';
+				} else if (target.attr('data-vzaar-id')) {
+					return 'vzaar'
+				} else {
+					return 'youtube';
+				}
+			})(),
 			id = target.attr('data-vimeo-id') || target.attr('data-youtube-id') || target.attr('data-vzaar-id'),
 			width = target.attr('data-width') || this._core.settings.videoWidth,
 			height = target.attr('data-height') || this._core.settings.videoHeight,
