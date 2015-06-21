@@ -219,7 +219,7 @@
     "name":     "video",
     "type":     "Boolean",
     "Default":  "false",
-    "desc":     "Enable fetching YouTube/Vimeo videos."
+    "desc":     "Enable fetching YouTube/Vimeo/Vzaar videos."
   },
   {
     "name":     "videoHeight",

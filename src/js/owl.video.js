@@ -96,26 +96,25 @@
 	};
 
 	/**
-	 * Gets the video ID and the type (YouTube/Vimeo only).
+	 * Gets the video ID and the type (YouTube/Vimeo/vzaar only).
 	 * @protected
 	 * @param {jQuery} target - The target containing the video data.
 	 * @param {jQuery} item - The item containing the video.
 	 */
 	Video.prototype.fetch = function(target, item) {
-
 			var type = (function() {
-				if (target.attr('data-vimeo-id')) {
-					return 'vimeo';
-				} else if (target.attr('data-vzaar-id')) {
-					return 'vzaar'
-				} else {
-					return 'youtube';
-				}
-			})(),
-			id = target.attr('data-vimeo-id') || target.attr('data-youtube-id') || target.attr('data-vzaar-id'),
-			width = target.attr('data-width') || this._core.settings.videoWidth,
-			height = target.attr('data-height') || this._core.settings.videoHeight,
-			url = target.attr('href');
+					if (target.attr('data-vimeo-id')) {
+						return 'vimeo';
+					} else if (target.attr('data-vzaar-id')) {
+						return 'vzaar'
+					} else {
+						return 'youtube';
+					}
+				})(),
+				id = target.attr('data-vimeo-id') || target.attr('data-youtube-id') || target.attr('data-vzaar-id'),
+				width = target.attr('data-width') || this._core.settings.videoWidth,
+				height = target.attr('data-height') || this._core.settings.videoHeight,
+				url = target.attr('href');
 
 		if (url) {
 			id = url.match(/(http:|https:|)\/\/(player.|www.|app.)?(vimeo\.com|youtu(be\.com|\.be|be\.googleapis\.com)|vzaar\.com)\/(video\/|videos\/|embed\/|watch\?v=|v\/)?([A-Za-z0-9._%-]*)(\&\S+)?/);
