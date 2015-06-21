@@ -74,7 +74,7 @@
 			'prepared.owl.carousel': $.proxy(function(e) {
 				if (e.namespace && this._core.settings.dotsData) {
 					this._templates.push('<div class="' + this._core.settings.dotClass + '">' +
-						$(e.content).find('[data-dot]').andSelf('[data-dot]').attr('data-dot') + '</div>');
+						$(e.content).find('[data-dot]').addBack('[data-dot]').attr('data-dot') + '</div>');
 				}
 			}, this),
 			'added.owl.carousel': $.proxy(function(e) {
