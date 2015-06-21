@@ -103,7 +103,6 @@
 	 */
 	Video.prototype.fetch = function(target, item) {
 
-		//var type = target.attr('data-vimeo-id') ? 'vimeo' : target.attr('data-vzaar-id') ? 'vzaar' : 'youtube',
 			var type = (function() {
 				if (target.attr('data-vimeo-id')) {
 					return 'vimeo';
