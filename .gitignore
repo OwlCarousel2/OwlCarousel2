@@ -9,7 +9,6 @@
 *.zip
 /download
 /jscs.report.txt
-/dist
 
 .DS_Store
 */.DS_Store
