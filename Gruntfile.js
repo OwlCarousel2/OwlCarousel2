@@ -154,7 +154,25 @@ module.exports = function(grunt) {
 				}
 			},
 
+			usebanner: {
+				dist: {
+					options: {
+						banner: '<%= banner %>',
+						linebreak: false
+					},
+					files: {
+						src: [
+							'dist/<%= pkg.name %>.js',
+							'dist/assets/*.css'
+						]
+					}
+				}
+			},
+
 			uglify: {
+				options: {
+					banner: '<%= banner %>'
+				},
 				dist: {
 					files: {
 						'dist/<%= pkg.name %>.min.js': '<%= app.src.scripts %>'
@@ -237,7 +255,7 @@ module.exports = function(grunt) {
 				},
 				sassDist: {
 					files: [ 'src/**/*.scss' ],
-					tasks: [ 'sass:dist', 'concat:dist', 'cssmin:dist', 'copy:themes','copy:distToDocs' ]
+					tasks: [ 'sass:dist', 'concat:dist', 'cssmin:dist', 'copy:themes','usebanner:dist', 'copy:distToDocs' ]
 				},
 				jsDocs: {
 					files: [ '<%= app.docs.src %>/assets/**/*.js' ],
@@ -245,7 +263,7 @@ module.exports = function(grunt) {
 				},
 				js: {
 					files: [ 'src/**/*.js' ],
-					tasks: [ 'jscs:dist', 'jshint:dist', 'qunit:dist', 'uglify:dist', 'concat:dist', 'copy:distToDocs', 'copy:srcToDocs' ]
+					tasks: [ 'jscs:dist', 'jshint:dist', 'qunit:dist', 'uglify:dist', 'concat:dist', 'usebanner:dist', 'copy:distToDocs', 'copy:srcToDocs' ]
 				},
 				helpers: {
 					files: [ '<%= app.src %>/helpers/*.js' ],
@@ -284,7 +302,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('assemble');
 
 	// tasks
-	grunt.registerTask('dist', [ 'clean:dist', 'sass:dist', 'concat:dist', 'cssmin:dist', 'copy:themes', 'copy:distImages', 'jscs:dist', 'uglify:dist', 'copy:readme' ]);
+	grunt.registerTask('dist', [ 'clean:dist', 'sass:dist', 'concat:dist', 'cssmin:dist', 'copy:themes', 'copy:distImages', 'jscs:dist', 'usebanner:dist', 'uglify:dist', 'copy:readme' ]);
 
 	grunt.registerTask('docs', [ 'dist', 'clean:docs', 'assemble', 'sass:docs', 'copy:docsAssets', 'copy:distToDocs', 'zip' ]);
 
