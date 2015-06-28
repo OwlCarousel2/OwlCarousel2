@@ -8,9 +8,5 @@
   "ignore": [],
   "dependencies": {
     "jquery": ">= 1.8.3"
-  },
-  "devDependencies": {
-    "foundation": "~5.5.2",
-    "qunit": "1.14.0"
   }
 }
