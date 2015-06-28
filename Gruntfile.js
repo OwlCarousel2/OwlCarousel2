@@ -248,7 +248,7 @@ module.exports = function(grunt) {
 					tasks: [ 'jscs:dist', 'jshint:dist', 'qunit:dist', 'uglify:dist', 'concat:dist', 'copy:distToDocs', 'copy:srcToDocs' ]
 				},
 				helpers: {
-					files: [ '<%= app.src %>/helpers/*.js' ],
+					files: [ '<%= app.docs.src %>/helpers/*.js' ],
 					tasks: [ 'assemble' ]
 				},
 				test: {
