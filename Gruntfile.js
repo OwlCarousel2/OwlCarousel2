@@ -8,16 +8,12 @@
  */
 module.exports = function(grunt) {
 
-	if (!grunt.file.isDir('bower_components')) {
-		grunt.fail.fatal('>> Please run "bower install" before continuing.');
-	}
 	require('load-grunt-tasks')(grunt);
 
 	grunt
 		.initConfig({
 			pkg: grunt.file.readJSON('package.json'),
 			app: grunt.file.readJSON('_config.json'),
-			vendor: 'bower_components',
 			banner: '/**\n' + ' * Owl Carousel v<%= pkg.version %>\n'
 				+ ' * Copyright 2013-<%= grunt.template.today("yyyy") %> <%= pkg.author.name %>\n'
 				+ ' * Licensed under <%= pkg.license.type %> (<%= pkg.license.url %>)\n' + ' */\n',
@@ -89,7 +85,7 @@ module.exports = function(grunt) {
 				docs: {
 					options: {
 						outputStyle: 'compressed',
-						includePaths: [ '<%= app.docs.src %>/assets/scss/', 'bower_components/foundation/scss' ]
+						includePaths: [ '<%= app.docs.src %>/assets/scss/', 'node_modules/foundation-sites/scss' ]
 					},
 					files: {
 						'<%= app.docs.dest %>/assets/css/docs.theme.min.css': '<%= app.docs.src %>/assets/scss/docs.theme.scss'
