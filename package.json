@@ -32,6 +32,7 @@
     "grunt-gh-pages": "^0.10.0",
     "grunt-jscs": "~1.8.0",
     "grunt-sass": "^1.0.0",
+    "grunt-banner": "^0.4.0",
     "load-grunt-tasks": "^3.2.0",
     "pretty": "^1.0.0"
   },
