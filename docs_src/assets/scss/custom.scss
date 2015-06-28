@@ -7,7 +7,7 @@ $medium-down: "#{$screen} and (max-width:#{lower-bound($medium-range)})" !defaul
 
 /* Custom mixins */ 
 
-@mixin transition($p:all, $t:300ms) {
+@mixin owl-transition($p:all, $t:300ms) {
 	-webkit-transition: $p $t ease-in-out;
 	-moz-transition: $p $t ease-in-out;
 	-ms-transition: $p $t ease-in-out;
