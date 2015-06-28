@@ -97,9 +97,7 @@ module.exports = function(grunt) {
 				},
 				dist: {
 					options: {
-						outputStyle: 'nested',
-						expand: true,
-						flatten: true
+						outputStyle: 'nested'
 					},
 					files: {
 						'dist/assets/<%= pkg.name %>.css': 'src/scss/<%= pkg.name %>.scss',
