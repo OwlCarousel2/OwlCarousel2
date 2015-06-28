@@ -234,15 +234,15 @@ module.exports = function(grunt) {
 				options: {
 					livereload: true
 				},
-				templates: {
+				templatesDocs: {
 					files: [ '<%= app.docs.templates %>/**/*.hbs' ],
 					tasks: [ 'assemble' ]
 				},
-				sass: {
+				sassDocs: {
 					files: [ '<%= app.docs.src %>/assets/**/*.scss' ],
 					tasks: [ 'sass:docs' ]
 				},
-				sassDist: {
+				sass: {
 					files: [ 'src/**/*.scss' ],
 					tasks: [ 'sass:dist', 'cssmin:dist', 'usebanner:dist', 'copy:distToDocs' ]
 				},
@@ -255,7 +255,7 @@ module.exports = function(grunt) {
 
 					tasks: [ 'jscs:dist', 'jshint:dist', 'qunit:dist', 'concat:dist', 'uglify:dist', 'usebanner:dist', 'copy:distToDocs', 'copy:srcToDocs' ]
 				},
-				helpers: {
+				helpersDocs: {
 					files: [ '<%= app.docs.src %>/helpers/*.js' ],
 					tasks: [ 'assemble' ]
 				},
