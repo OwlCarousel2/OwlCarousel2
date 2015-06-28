@@ -80,8 +80,8 @@ module.exports = function(grunt) {
 
 			// clean
 			clean: {
-				docs: [ '<%= app.docs.dest %>/**/*.*' ],
-				dist: [ 'dist/**/*.*' ]
+				docs: [ '<%= app.docs.dest %>' ],
+				dist: [ 'dist' ]
 			},
 
 			// sass
