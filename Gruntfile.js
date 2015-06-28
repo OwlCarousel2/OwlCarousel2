@@ -99,22 +99,17 @@ module.exports = function(grunt) {
 					options: {
 						outputStyle: 'nested'
 					},
-					files: [ {
-						expand: true,
-						flatten: true,
-						cwd: 'src/scss/',
-						src: '*scss',
-						dest: 'src/css/',
-						ext: '.css',
-						extDot: 'last'
-					} ]
+					files: {
+						'dist/assets/<%= pkg.name %>.css': 'src/scss/<%= pkg.name %>.scss',
+						'dist/assets/owl.theme.default.css': 'src/scss/owl.theme.default.scss',
+						'dist/assets/owl.theme.green.css': 'src/scss/owl.theme.green.scss'
+					}
 				}
 			},
 
 			concat: {
 				dist: {
 					files: {
-						'dist/assets/owl.carousel.css': [ 'src/css/*.css', '!src/css/owl.theme*.css' ],
 						'dist/<%= pkg.name %>.js': '<%= app.src.scripts %>'
 					}
 				}
@@ -123,9 +118,9 @@ module.exports = function(grunt) {
 			cssmin: {
 				dist: {
 					files: {
-						'dist/assets/<%= pkg.name %>.min.css': [ 'src/css/*.css', '!src/css/owl.theme*.css' ],
-						'dist/assets/owl.theme.default.min.css': 'src/css/owl.theme.default.css',
-						'dist/assets/owl.theme.green.min.css': 'src/css/owl.theme.green.css'
+						'dist/assets/<%= pkg.name %>.min.css': 'dist/assets/<%= pkg.name %>.css',
+						'dist/assets/owl.theme.default.min.css': 'dist/assets/owl.theme.default.css',
+						'dist/assets/owl.theme.green.min.css': 'dist/assets/owl.theme.green.css'
 					}
 				}
 			},
@@ -157,20 +152,13 @@ module.exports = function(grunt) {
 			uglify: {
 				dist: {
 					files: {
-						'dist/<%= pkg.name %>.min.js': '<%= app.src.scripts %>'
+						'dist/<%= pkg.name %>.min.js': 'dist/<%= pkg.name %>.js'
 					}
 				}
 			},
 
 			// copy
 			copy: {
-				themes: {
-					expand: true,
-					flatten: true,
-					cwd: 'src/css/',
-					src: [ 'owl.theme.*' ],
-					dest: 'dist/assets'
-				},
 				distImages: {
 					expand: true,
 					flatten: true,
@@ -199,6 +187,7 @@ module.exports = function(grunt) {
 					src: [ 'css/*.css', 'vendors/*.js', 'vendors/*.map', 'img/*.*', 'js/*.*' ],
 					dest: '<%= app.docs.dest %>/assets/'
 				},
+
 				readme: {
 					files: [ {
 						'dist/LICENSE': 'LICENSE',
@@ -237,7 +226,7 @@ module.exports = function(grunt) {
 				},
 				sassDist: {
 					files: [ 'src/**/*.scss' ],
-					tasks: [ 'sass:dist', 'concat:dist', 'cssmin:dist', 'copy:themes','copy:distToDocs' ]
+					tasks: [ 'sass:dist', 'cssmin:dist', 'copy:distToDocs' ]
 				},
 				jsDocs: {
 					files: [ '<%= app.docs.src %>/assets/**/*.js' ],
@@ -245,7 +234,7 @@ module.exports = function(grunt) {
 				},
 				js: {
 					files: [ 'src/**/*.js' ],
-					tasks: [ 'jscs:dist', 'jshint:dist', 'qunit:dist', 'uglify:dist', 'concat:dist', 'copy:distToDocs', 'copy:srcToDocs' ]
+					tasks: [ 'jscs:dist', 'jshint:dist', 'qunit:dist', 'concat:dist', 'uglify:dist', 'copy:distToDocs', 'copy:srcToDocs' ]
 				},
 				helpers: {
 					files: [ '<%= app.docs.src %>/helpers/*.js' ],
@@ -284,7 +273,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('assemble');
 
 	// tasks
-	grunt.registerTask('dist', [ 'clean:dist', 'sass:dist', 'concat:dist', 'cssmin:dist', 'copy:themes', 'copy:distImages', 'jscs:dist', 'uglify:dist', 'copy:readme' ]);
+	grunt.registerTask('dist', [ 'clean:dist', 'sass:dist', 'concat:dist', 'cssmin:dist', 'copy:distImages', 'jscs:dist', 'uglify:dist', 'copy:readme' ]);
 
 	grunt.registerTask('docs', [ 'dist', 'clean:docs', 'assemble', 'sass:docs', 'copy:docsAssets', 'copy:distToDocs', 'zip' ]);
 
