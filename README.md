@@ -9,11 +9,11 @@ Big announcement comming about maintainance of this project.  Stay tuned!
 
 Touch enabled [jQuery](http://jquery.com/) plugin that lets you create a beautiful, responsive carousel slider. **To get started, check out http://owlcarousel.owlgraphic.com.**
 
-Please consider that the project is still in beta. The current status of the milestones can be found [here](https://github.com/OwlFonk/OwlCarousel2/milestones). If you want to use the [latest development](http://smashingboxes.github.io/download/owl.carousel.2.0.0-beta.3.zip) see [building](#building).
+Please consider that the project is still in beta. The current status of the milestones can be found [here](https://github.com/OwlFonk/OwlCarousel2/milestones). If you want to use the [latest development](http://smashingboxes.github.io/OwlCarousel2/download/owl.carousel.2.0.0-beta.3.zip) see [building](#building).
 
 ## Quick start
 
-Download the [latest release](http://smashingboxes.github.io/download/owl.carousel.2.0.0-beta.3.zip) and put the required stylesheet at the [top](https://developer.yahoo.com/performance/rules.html#css_top) of your markup:
+Download the [latest release](http://smashingboxes.github.io/OwlCarousel2/download/owl.carousel.2.0.0-beta.3.zip) and put the required stylesheet at the [top](https://developer.yahoo.com/performance/rules.html#css_top) of your markup:
 
 ```html
 <link rel="stylesheet" href="owlcarousel/owl.carousel.min.css" />
