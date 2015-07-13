@@ -189,12 +189,12 @@
 		}
 
 		if (video.type === 'youtube') {
-			path = "http://img.youtube.com/vi/" + video.id + "/hqdefault.jpg";
+			path = "//img.youtube.com/vi/" + video.id + "/hqdefault.jpg";
 			create(path);
 		} else if (video.type === 'vimeo') {
 			$.ajax({
 				type: 'GET',
-				url: 'http://vimeo.com/api/v2/video/' + video.id + '.json',
+				url: '//vimeo.com/api/v2/video/' + video.id + '.json',
 				jsonp: 'callback',
 				dataType: 'jsonp',
 				success: function(data) {
@@ -205,7 +205,7 @@
 		} else if (video.type === 'vzaar') {
 			$.ajax({
 				type: 'GET',
-				url: 'http://vzaar.com/api/videos/' + video.id + '.json',
+				url: '//vzaar.com/api/videos/' + video.id + '.json',
 				jsonp: 'callback',
 				dataType: 'jsonp',
 				success: function(data) {
@@ -254,10 +254,10 @@
 		this._core.reset(item.index());
 
 		if (video.type === 'youtube') {
-			html = '<iframe width="' + width + '" height="' + height + '" src="http://www.youtube.com/embed/' +
+			html = '<iframe width="' + width + '" height="' + height + '" src="//www.youtube.com/embed/' +
 				video.id + '?autoplay=1&v=' + video.id + '" frameborder="0" allowfullscreen></iframe>';
 		} else if (video.type === 'vimeo') {
-			html = '<iframe src="http://player.vimeo.com/video/' + video.id +
+			html = '<iframe src="//player.vimeo.com/video/' + video.id +
 				'?autoplay=1" width="' + width + '" height="' + height +
 				'" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
 		} else if (video.type === 'vzaar') {
