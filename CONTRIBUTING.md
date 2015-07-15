@@ -38,7 +38,7 @@ Feature requests are welcome. But take a moment to find out whether your idea fi
 
 Good pull requests are a fantastic help. They should remain focused in scope and avoid containing unrelated commits.
 
-**Please ask first** before embarking on any significant pull request (e.g. implementing features, refactoring code, porting to a different language), otherwise you risk spending a lot of time working on something that the project's developers might not want to merge into the project.
+**Going forward, we will only be accepting pull requests that are linked to an issue that is marked "[approved for development](https://github.com/smashingboxes/OwlCarousel2/labels/approved%20for%20development)."** If there is something you'd like to implement that isn't already approved (like a new feature, documentation updates, or some sort of refactoring), create an issue on the issue tracker! Only submitting pull requests for issues that have been approved helps us, the maintainers, get new code into the project quickly and helps prevent you from spending a lot of time on something that might never get merged into the project.
 
 Adhering to the following process is the best way to get your work included in the project:
 
