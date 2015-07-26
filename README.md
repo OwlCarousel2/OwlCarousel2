@@ -1,15 +1,11 @@
 [![Stories in Ready](https://badge.waffle.io/smashingboxes/OwlCarousel2.png?label=ready&title=Ready)](http://waffle.io/smashingboxes/OwlCarousel2)
 [![Build Status](https://travis-ci.org/smashingboxes/OwlCarousel2.svg)](https://travis-ci.org/smashingboxes/OwlCarousel2)
 
-## Announcement.
-
-Big announcement comming about maintainance of this project.  Stay tuned!
-
 ## Owl Carousel 2 Beta
 
-Touch enabled [jQuery](http://jquery.com/) plugin that lets you create a beautiful, responsive carousel slider. **To get started, check out http://owlcarousel.owlgraphic.com.**
+Touch enabled [jQuery](http://jquery.com/) plugin that lets you create a beautiful, responsive carousel slider. **To get started, check out http://smashingboxes.github.io/OwlCarousel2/.**
 
-Please consider that the project is still in beta. The current status of the milestones can be found [here](https://github.com/OwlFonk/OwlCarousel2/milestones). If you want to use the [latest development](https://github.com/smashingboxes/OwlCarousel2/archive/develop.zip) see [building](#building).
+Please consider that the project is still in beta. The current status of the milestones can be found [here](https://github.com/smashingboxes/OwlCarousel2/milestones). If you want to use the [latest development](https://github.com/smashingboxes/OwlCarousel2/archive/develop.zip) see [building](#building).
 
 ## Quick start
 
@@ -50,7 +46,7 @@ $(document).ready(function(){
 
 ## Documentation
 
-The documentation, included in this repo in the root directory, is built with [Assemble](http://assemble.io/) and publicly available at http://owlcarousel.owlgraphic.com. The documentation may also be run locally.
+The documentation, included in this repo in the root directory, is built with [Assemble](http://assemble.io/) and publicly available at http://smashingboxes.github.io/OwlCarousel2/. The documentation may also be run locally.
 
 ## Building
 
