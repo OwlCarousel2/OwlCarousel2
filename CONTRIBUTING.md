@@ -49,7 +49,7 @@ Adhering to the following process is the best way to get your work included in t
     ```bash
     git clone https://github.com/<your-username>/OwlCarousel2.git
     cd OwlCarousel2
-    git remote add upstream https://github.com/OwlFonk/OwlCarousel2.git
+    git remote add upstream https://github.com/smashingboxes/OwlCarousel2.git
     ```
 
   2. If you cloned a while ago, get the latest changes from upstream:
