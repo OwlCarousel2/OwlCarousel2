@@ -1125,7 +1125,7 @@
 
 		if (this.settings.center) {
 			coordinate = this._coordinates[position];
-			coordinate += (this.width() - coordinate + (this._coordinates[position - 1] || 0)) / 2 * (this.settings.rtl ? -1 : 1);
+			coordinate += (this.width() * (this.settings.rtl ? -1 : 1) - coordinate + (this._coordinates[position - 1] || 0)) / 2;
 		} else {
 			coordinate = this._coordinates[position - 1] || 0;
 		}
