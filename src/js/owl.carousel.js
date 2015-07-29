@@ -1594,6 +1594,12 @@
 		return result;
 	};
 
+	/**
+	 * Determines if the input is a Number or something that can be coerced to a Number
+	 * @protected
+	 * @param {Number|String|Object|Array|Boolean|RegExp|Function|Symbol} - The input to be tested
+	 * @returns {Boolean} - An indication if the input is a Number or can be coerced to a Number
+	 */
 	Owl.prototype.isNumeric = function(number) {
 		return !isNaN(parseFloat(number));
 	};
