@@ -185,8 +185,12 @@
 				? $(e.target).index() : $(e.target).parent().index();
 
 			e.preventDefault();
+			if (index === this.core._current) {
+        return;
+      } else {
+        this.to(index, settings.dotsSpeed);
+      }
 
-			this.to(index, settings.dotsSpeed);
 		}, this));
 
 		// override public methods of the carousel
