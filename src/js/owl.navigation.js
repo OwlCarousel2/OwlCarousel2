@@ -186,10 +186,10 @@
 
 			e.preventDefault();
 			if (index === this.core._current) {
-        return;
-      } else {
-        this.to(index, settings.dotsSpeed);
-      }
+				return;
+			} else {
+				this.to(index, settings.dotsSpeed);
+			}
 
 		}, this));
 
