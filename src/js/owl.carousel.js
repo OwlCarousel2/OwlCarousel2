@@ -1115,7 +1115,9 @@
 	 * @returns {Number|Array.<Number>} - The coordinate of the item in pixel or all coordinates.
 	 */
 	Owl.prototype.coordinates = function(position) {
-		var coordinate = null;
+		var multiplier = 1,
+			newPosition = position - 1,
+			coordinates;
 
 		if (position === undefined) {
 			return $.map(this._coordinates, $.proxy(function(coordinate, index) {
@@ -1124,10 +1126,15 @@
 		}
 
 		if (this.settings.center) {
+			if (this.settings.rtl) {
+				multiplier = -1;
+				newPosition = position + 1;
+			}
+
 			coordinate = this._coordinates[position];
-			coordinate += (this.width() - coordinate + (this._coordinates[position - 1] || 0)) / 2 * (this.settings.rtl ? -1 : 1);
+			coordinate += (this.width() - coordinate + (this._coordinates[newPosition] || 0)) / 2 * multiplier;
 		} else {
-			coordinate = this._coordinates[position - 1] || 0;
+			coordinate = this._coordinates[newPosition] || 0;
 		}
 
 		return coordinate;
