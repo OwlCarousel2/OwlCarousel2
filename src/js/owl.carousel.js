@@ -1117,7 +1117,7 @@
 	Owl.prototype.coordinates = function(position) {
 		var multiplier = 1,
 			newPosition = position - 1,
-			coordinates;
+			coordinate;
 
 		if (position === undefined) {
 			return $.map(this._coordinates, $.proxy(function(coordinate, index) {
