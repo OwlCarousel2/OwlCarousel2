@@ -187,6 +187,7 @@
 		touchDrag: true,
 		pullDrag: true,
 		freeDrag: false,
+		dragByPage: false,
 
 		margin: 0,
 		stagePadding: 0,
@@ -795,7 +796,9 @@
 	Owl.prototype.onDragEnd = function(event) {
 		var delta = this.difference(this._drag.pointer, this.pointer(event)),
 			stage = this._drag.stage.current,
-			direction = delta.x > 0 ^ this.settings.rtl ? 'left' : 'right';
+			direction = delta.x > 0 ^ this.settings.rtl ? 'left' : 'right',
+			items = this.settings.items,
+			closest;
 
 		$(document).off('.owl.core');
 
@@ -803,7 +806,16 @@
 
 		if (delta.x !== 0 && this.is('dragging') || !this.is('valid')) {
 			this.speed(this.settings.dragEndSpeed || this.settings.smartSpeed);
-			this.current(this.closest(stage.x, delta.x !== 0 ? direction : this._drag.direction));
+			closest = this.closest(stage.x, delta.x !== 0 ? direction : this._drag.direction);
+			if (this.settings.dragByPage && !this.settings.freeDrag && this.current() !== closest) {
+				if (direction === 'left') {
+					closest = this.current() + items;
+				} else if (direction === 'right') {
+					closest = this.current() - items;
+				}
+			}
+			this.current(closest);
+
 			this.invalidate('position');
 			this.update();
 
