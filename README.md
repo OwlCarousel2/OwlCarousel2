@@ -14,6 +14,8 @@ Download the [latest release](http://smashingboxes.github.io/OwlCarousel2/downlo
 ```html
 <link rel="stylesheet" href="owlcarousel/owl.carousel.min.css" />
 ```
+**NOTE:** If you want to use the default navigation styles, you will also need to include `owl.theme.default.css`.
+
 
 Put the script at the [bottom](https://developer.yahoo.com/performance/rules.html#js_bottom) of your markup right after jQuery:
 
@@ -25,7 +27,7 @@ Put the script at the [bottom](https://developer.yahoo.com/performance/rules.htm
 Wrap your items (`div`, `a`, `img`, `span`, `li` etc.) with a container element (`div`, `ul` etc.). Only the class `owl-carousel` is mandatory to apply proper styles:
 
 ```html
-<div class="owl-carousel">
+<div class="owl-carousel owl-theme">
   <div> Your Content </div>
   <div> Your Content </div>
   <div> Your Content </div>
@@ -35,6 +37,8 @@ Wrap your items (`div`, `a`, `img`, `span`, `li` etc.) with a container element 
   <div> Your Content </div>
 </div>
 ```
+**NOTE:** The `owl-theme` class is optional, but without it, you will need to style navigation features on your own.
+
 
 Call the [plugin](http://learn.jquery.com/plugins/) function and your carousel is ready.
 
