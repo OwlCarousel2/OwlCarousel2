@@ -613,6 +613,8 @@
 
 		this.update();
 
+		this.onResize();
+
 		this.$element.removeClass(this.options.refreshClass);
 
 		this.leave('refreshing');
