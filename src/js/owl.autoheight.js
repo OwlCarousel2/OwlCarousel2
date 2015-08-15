@@ -65,7 +65,7 @@
 	AutoHeight.prototype.update = function() {
 		var start = this._core._current,
 			end = start + this._core.settings.items,
-			visible = this._core.$stage.children().toArray().slice(start, end);
+			visible = this._core.$stage.children().toArray().slice(start, end),
 			heights = [],
 			maxheight = 0;
 
