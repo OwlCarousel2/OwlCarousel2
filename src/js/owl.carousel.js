@@ -1149,6 +1149,7 @@
 	 * @returns {Number} - The time in milliseconds for the translation.
 	 */
 	Owl.prototype.duration = function(from, to, factor) {
+		if(factor === 0){ return 0; }
 		return Math.min(Math.max(Math.abs(to - from), 1), 6) * Math.abs((factor || this.settings.smartSpeed));
 	};
 
