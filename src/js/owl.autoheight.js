@@ -1,6 +1,6 @@
 /**
  * AutoHeight Plugin
- * @version 2.0.0
+ * @version 2.0.0-beta.3
  * @author Bartosz Wojciechowski
  * @license The MIT License (MIT)
  */
@@ -65,7 +65,7 @@
 	AutoHeight.prototype.update = function() {
 		var start = this._core._current,
 			end = start + this._core.settings.items,
-			visible = this._core.$stage.children().toArray().slice(start, end);
+			visible = this._core.$stage.children().toArray().slice(start, end),
 			heights = [],
 			maxheight = 0;
 

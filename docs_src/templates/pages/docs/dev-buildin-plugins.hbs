@@ -11,7 +11,7 @@ tags:
 
 {{#markdown }}
 ## Build-in Plugins
-> Owl Carousel supports plugin modular structure. This means that you can remove plugins that you won’t use or create new ones that fit your needs 
+> Owl Carousel supports plugin modular structure. This means that you can remove plugins that you won’t use or create new ones that fit your needs
 
 
 
@@ -43,11 +43,11 @@ Big thanks to [Artus Kolanowski](https://github.com/witrin) for helping me with 
 
 
 
-{{!-- 
+{{!--
 
 ## owl.lazyload.js
 
-LazyLoad require `class="owl-lazy"` and link to image inside data: data-src="url_to_img" or/and data-src-retina="url_to_highres_img". 
+LazyLoad require `class="owl-lazy"` and link to image inside data: data-src="url_to_img" or/and data-src-retina="url_to_highres_img".
 There is also option to load images into background but this needs to be tested. [See demo](/demos/demo.html)
 
 Usage:
@@ -68,9 +68,9 @@ HTML Markup:
 
 ## owl.video.js
 
-Currently support YouTube and Vimeo videos only.
+Currently support YouTube, Vimeo, and vzaar videos only.
 
-To add video into carousel just put `<a class="owl-video" href="_straight URL from youtube or vimeo"></a>`.
+To add video into carousel just put `<a class="owl-video" href="_straight URL from YouTube, Vimeo, or vzaar"></a>`.
 A tag is not mandatory, can be any other tag but `"owl-video"` and href with url link is required.
 
 Thumbnails are automaticaly fetched from servers. [See demo](/demos/demo.html)
@@ -101,13 +101,13 @@ Adjusts stage height to highest element on viewport. No special HTML markup requ
 ```
 $('.owl-carousel').owlCarousel({
 	autoHeight:true,
-	autoHeightClass: 'owl-height' //default 
+	autoHeightClass: 'owl-height' //default
 });
 ```
 
 ## owl.animate.js
 
-Owl Carousel CSS has build-in only fade out tranisiton. To get more fancy looking animations you have to create them yourself in CSS or use fantastic Animate.css library created by Daniel Eden http://daneden.github.io/animate.css/ 
+Owl Carousel CSS has build-in only fade out tranisiton. To get more fancy looking animations you have to create them yourself in CSS or use fantastic Animate.css library created by Daniel Eden http://daneden.github.io/animate.css/
 Animate functions works only with one item and only in browsers that support perspective property.
 
 To get fade out effect just set `animateOut: 'fadeOut'`

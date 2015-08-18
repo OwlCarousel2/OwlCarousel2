@@ -1,4 +1,4 @@
-@mixin transition($prop, $time, $easing){
+@mixin owl-transition($prop, $time, $easing){
 	-webkit-transition: $prop $time $easing;
 	-moz-transition: $prop $time $easing;
 	-ms-transition: $prop $time $easing;
@@ -6,13 +6,13 @@
 	transition: $prop $time $easing;
 }
 
-@mixin rounded($value){
+@mixin owl-rounded($value){
 	-webkit-border-radius: $value;
 	-moz-border-radius: $value;
 	border-radius: $value;
 }
 
-@mixin transform($prop){
+@mixin owl-transform($prop){
 	-webkit-transition: $prop;
 	-moz-transition: $prop;
 	-ms-transition: $prop;

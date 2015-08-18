@@ -219,7 +219,7 @@
     "name":     "video",
     "type":     "Boolean",
     "Default":  "false",
-    "desc":     "Enable fetching YouTube/Vimeo videos."
+    "desc":     "Enable fetching YouTube/Vimeo/Vzaar videos."
   },
   {
     "name":     "videoHeight",
@@ -235,13 +235,13 @@
   },
   {
     "name":     "animateOut",
-    "type":     "String/Bolean",
+    "type":     "String/Boolean",
     "Default":  "false",
     "desc":     "Class for CSS3 animation out."
   },
   {
     "name":     "animateInClass",
-    "type":     "String/Bolean",
+    "type":     "String/Boolean",
     "Default":  "false",
     "desc":     "Class for CSS3 animation in."
   },
@@ -277,13 +277,13 @@
   },
   {
     "name":     "navContainer",
-    "type":     "String/Class/ID/Bolean",
+    "type":     "String/Class/ID/Boolean",
     "Default":  "false",
     "desc":     "Set your own container for nav."
   },
   {
     "name":     "dotsContainer",
-    "type":     "String/Class/ID/Bolean",
+    "type":     "String/Class/ID/Boolean",
     "Default":  "false",
     "desc":     "Set your own container for nav."
   }
