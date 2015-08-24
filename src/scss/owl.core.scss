@@ -1,4 +1,4 @@
-/* 
+/*
  *  Owl Carousel - Core
  */
 .owl-carousel {
@@ -8,7 +8,7 @@
 	/* position relative and z-index fix webkit rendering fonts issue */
 	position: relative;
 	z-index: 1;
-	
+
 	.owl-stage {
 		position: relative;
 		-ms-touch-action: pan-Y;
@@ -29,7 +29,7 @@
 		/* fix for flashing background */
 		-webkit-transform: translate3d(0px, 0px, 0px);
 	}
-	
+
 	.owl-item {
 		position: relative;
 		min-height: 1px;
@@ -43,7 +43,7 @@
 		width: 100%;
 		-webkit-transform-style: preserve-3d;
 	}
-	
+
 	.owl-nav.disabled,
 	.owl-dots.disabled {
 		display: none;
@@ -77,7 +77,7 @@
 	&.owl-refresh .owl-item {
 		display: none;
 	}
-	
+
 	&.owl-drag .owl-item {
 		-webkit-user-select: none;
 		-moz-user-select: none;
@@ -87,9 +87,6 @@
 
 	&.owl-grab {
 		cursor: move;
-		cursor: -webkit-grab;
-		cursor: -o-grab;
-		cursor: -ms-grab;
 		cursor: grab;
 	}
 

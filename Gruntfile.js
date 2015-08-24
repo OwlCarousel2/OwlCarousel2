@@ -103,6 +103,19 @@ module.exports = function(grunt) {
 				}
 			},
 
+			autoprefixer: {
+				options: {
+					browsers: [ 'last 2 versions', 'ie 7', 'ie 8', 'ie 9', 'ie 10', 'ie 11' ]
+				},
+				dist: {
+					files: {
+						'dist/assets/<%= pkg.name %>.css': 'dist/assets/<%= pkg.name %>.css',
+						'dist/assets/owl.theme.default.css': 'dist/assets/owl.theme.default.css',
+						'dist/assets/owl.theme.green.css': 'dist/assets/owl.theme.green.css'
+					}
+				}
+			},
+
 			concat: {
 				dist: {
 					files: {
@@ -296,7 +309,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('assemble');
 
 	// tasks
-	grunt.registerTask('dist', [ 'clean:dist', 'sass:dist', 'concat:dist', 'cssmin:dist', 'copy:distImages', 'jscs:dist', 'usebanner:dist', 'uglify:dist', 'copy:readme' ]);
+	grunt.registerTask('dist', [ 'clean:dist', 'sass:dist', 'autoprefixer', 'concat:dist', 'cssmin:dist', 'copy:distImages', 'jscs:dist', 'usebanner:dist', 'uglify:dist', 'copy:readme' ]);
 
 	grunt.registerTask('docs', [ 'dist', 'clean:docs', 'assemble', 'sass:docs', 'copy:docsAssets', 'copy:distToDocs', 'zip' ]);
 
