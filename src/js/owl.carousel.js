@@ -261,7 +261,7 @@
 	Owl.Workers = [ {
 		filter: [ 'width', 'settings' ],
 		run: function() {
-			this._width = this.$element[0].getBoundingClientRect().width;
+			this._width = this.$element[0].getBoundingClientRect().width || this.$element.width();
 		}
 	}, {
 		filter: [ 'width', 'items', 'settings' ],
