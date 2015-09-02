@@ -39,11 +39,10 @@
 		 */
 		this._handlers = {
 			'changed.owl.carousel': $.proxy(function(e) {
-				if (e.namespace && e.property.name === 'settings') {
+				if (e.namespace && (e.property.name === 'settings' || e.property.name === 'position')) {
+					this.stop();
 					if (this._core.settings.autoplay) {
 						this.play();
-					} else {
-						this.stop();
 					}
 				}
 			}, this),
