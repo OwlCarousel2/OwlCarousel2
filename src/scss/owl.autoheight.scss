@@ -1,9 +1,7 @@
-/* 
+/*
  * 	Owl Carousel - Auto Height Plugin
  */
 
-@import 'mixins';
-
 .owl-height {
-	@include owl-transition(height, 500ms, ease-in-out)
+	transition: height 500ms ease-in-out;
 }
