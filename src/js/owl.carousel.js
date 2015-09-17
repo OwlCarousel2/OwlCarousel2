@@ -9,7 +9,17 @@
  * @todo Test Zepto
  * @todo stagePadding calculate wrong active classes
  */
-;(function($, window, document, undefined) {
+!(function(root, factory) {
+	if (typeof define === 'function' && define.amd) {
+		define(['jquery'], function($) {
+			return factory(root, $);
+		});
+	} else if (typeof exports === 'object') {
+		factory(root, require('jquery'));
+	} else {
+		factory(root, root.jQuery || root.Zepto);
+	}
+})(typeof window !== 'undefined' ? window : this, function(window, $) {
 
 	/**
 	 * Creates a carousel.
@@ -1265,7 +1275,7 @@
 		this._items = [];
 
 		if (content) {
-			content = (content instanceof jQuery) ? content : $(content);
+			content = (content instanceof $) ? content : $(content);
 		}
 
 		if (this.settings.nestedItemSelector) {
@@ -1297,7 +1307,7 @@
 		var current = this.relative(this._current);
 
 		position = position === undefined ? this._items.length : this.normalize(position, true);
-		content = content instanceof jQuery ? content : $(content);
+		content = content instanceof $ ? content : $(content);
 
 		this.trigger('add', { content: content, position: position });
 
@@ -1668,4 +1678,4 @@
 	 */
 	$.fn.owlCarousel.Constructor = Owl;
 
-})(window.Zepto || window.jQuery, window, document);
+});
