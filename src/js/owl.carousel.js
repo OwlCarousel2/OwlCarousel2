@@ -497,12 +497,16 @@
 		var viewport = this.viewport(),
 			overwrites = this.options.responsive,
 			match = -1,
-			settings = null;
+			settings = null,
+			breakpointClasses = [];
 
 		if (!overwrites) {
 			settings = $.extend({}, this.options);
 		} else {
 			$.each(overwrites, function(breakpoint) {
+				if (settings.responsiveClass) {
+					breakpointClasses.push(settings.responsiveClass + '-' + breakpoint);
+				}
 				if (breakpoint <= viewport && breakpoint > match) {
 					match = Number(breakpoint);
 				}
@@ -513,9 +517,8 @@
 
 			// responsive class
 			if (settings.responsiveClass) {
-				this.$element.attr('class',
-					this.$element.attr('class').replace(new RegExp('(' + this.options.responsiveClass + '-)\\S+\\s', 'g'), '$1' + match)
-				);
+				this.$element.removeClass(breakpointClasses.join(' '));
+				this.$element.addClass(this.options.responsiveClass + '-' + match);
 			}
 		}
 
