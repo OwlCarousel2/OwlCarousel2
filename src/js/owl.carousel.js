@@ -218,7 +218,7 @@
 		loadedClass: 'owl-loaded',
 		loadingClass: 'owl-loading',
 		rtlClass: 'owl-rtl',
-		responsiveClass: 'owl-responsive',
+		responsiveClass: false,
 		dragClass: 'owl-drag',
 		itemClass: 'owl-item',
 		stageClass: 'owl-stage',
@@ -498,15 +498,14 @@
 			overwrites = this.options.responsive,
 			match = -1,
 			settings = null,
+			breakpoints = [],
 			breakpointClasses = [];
 
 		if (!overwrites) {
 			settings = $.extend({}, this.options);
 		} else {
 			$.each(overwrites, function(breakpoint) {
-				if (settings.responsiveClass) {
-					breakpointClasses.push(settings.responsiveClass + '-' + breakpoint);
-				}
+				breakpoints.push(breakpoint);
 				if (breakpoint <= viewport && breakpoint > match) {
 					match = Number(breakpoint);
 				}
@@ -516,9 +515,14 @@
 			delete settings.responsive;
 
 			// responsive class
-			if (settings.responsiveClass) {
+			if (typeof settings.responsiveClass === 'string' && breakpoints.length) {
+
+				$.each(breakpoints, function(i, breakpoint) {
+					breakpointClasses.push(settings.responsiveClass + '-' + breakpoint);
+				});
+
 				this.$element.removeClass(breakpointClasses.join(' '));
-				this.$element.addClass(this.options.responsiveClass + '-' + match);
+				this.$element.addClass(settings.responsiveClass + '-' + match);
 			}
 		}
 
