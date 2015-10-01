@@ -1136,7 +1136,9 @@
 		} else {
 			coordinate = this._coordinates[newPosition] || 0;
 		}
-
+		
+		coordinate = Math.ceil(coordinate);
+		
 		return coordinate;
 	};
 
