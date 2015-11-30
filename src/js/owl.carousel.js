@@ -843,7 +843,14 @@
 					position = index;
 				} else if (this.op(coordinate, '<', value)
 					&& this.op(coordinate, '>', coordinates[index + 1] || value - width)) {
-					position = direction === 'left' ? index + 1 : index;
+					var offset = 1;
+					if (this.settings.slideBy == 'page') {
+						offset = this.settings.items;
+					} else if (this.settings.slideBy > 1) {
+						offset = this.settings.slideBy;
+					}
+					position = this.relative(this.current());
+					direction === 'left' ? position += offset : position -= offset;
 				}
 				return position === -1;
 			}, this));
