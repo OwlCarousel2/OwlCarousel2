@@ -21,10 +21,10 @@
 		this._core = carousel;
 
 		/**
-		 * The autoplay interval.
-		 * @type {Number}
+		 * The autoplay timeout.
+		 * @type {Timeout}
 		 */
-		this._interval = null;
+		this._timeout = null;
 
 		/**
 		 * Indicates whenever the autoplay is paused.
@@ -45,6 +45,11 @@
 					} else {
 						this.stop();
 					}
+				} else if (e.namespace && e.property.name === 'position') {
+					//console.log('play?', e);
+					if (this._core.settings.autoplay) {
+						this._setAutoPlayInterval();
+					} 						
 				}
 			}, this),
 			'initialized.owl.carousel': $.proxy(function(e) {
@@ -107,12 +112,29 @@
 
 		this._core.enter('rotating');
 
-		this._interval = window.setInterval($.proxy(function() {
+		this._setAutoPlayInterval();
+	};
+
+	/**
+	 * Gets a new timeout
+	 * @private
+	 * @param {Number} [timeout] - The interval before the next animation starts.
+	 * @param {Number} [speed] - The animation speed for the animations.
+	 * @return {Timeout}
+	 */
+	Autoplay.prototype._getNextTimeout = function(timeout, speed) {
+		console.log('_getNextTimeout', Date.now());
+		if ( this._timeout ) window.clearTimeout(this._timeout);
+		return window.setTimeout($.proxy(function() {
 			if (this._paused || this._core.is('busy') || this._core.is('interacting') || document.hidden) {
 				return;
 			}
 			this._core.next(speed || this._core.settings.autoplaySpeed);
 		}, this), timeout || this._core.settings.autoplayTimeout);
+	};
+
+	Autoplay.prototype._setAutoPlayInterval = function() {
+		this._timeout = this._getNextTimeout();
 	};
 
 	/**
@@ -124,7 +146,7 @@
 			return;
 		}
 
-		window.clearInterval(this._interval);
+		window.clearTimeout(this._timeout);
 		this._core.leave('rotating');
 	};
 
