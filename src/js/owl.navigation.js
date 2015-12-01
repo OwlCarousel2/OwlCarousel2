@@ -370,7 +370,6 @@
 
 		if (!standard && this._pages.length) {
 			length = this._pages.length;
-			console.log(this._pages, standard, this._core.settings.slideBy)
 			$.proxy(this._overrides.to, this._core)(this._pages[((position % length) + length) % length].start, speed);
 		} else {
 			$.proxy(this._overrides.to, this._core)(position, speed);
