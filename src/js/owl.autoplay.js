@@ -123,7 +123,6 @@
 	 * @return {Timeout}
 	 */
 	Autoplay.prototype._getNextTimeout = function(timeout, speed) {
-		console.log('_getNextTimeout', Date.now());
 		if ( this._timeout ) window.clearTimeout(this._timeout);
 		return window.setTimeout($.proxy(function() {
 			if (this._paused || this._core.is('busy') || this._core.is('interacting') || document.hidden) {
