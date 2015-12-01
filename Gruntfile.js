@@ -144,6 +144,9 @@ module.exports = function(grunt) {
 			},
 
 			qunit: {
+				options: {
+					timeout: 10000
+				},
 				dist: [ 'test/index.html' ]
 			},
 

@@ -49,7 +49,7 @@
 					//console.log('play?', e);
 					if (this._core.settings.autoplay) {
 						this._setAutoPlayInterval();
-					} 						
+					}
 				}
 			}, this),
 			'initialized.owl.carousel': $.proxy(function(e) {
@@ -123,7 +123,9 @@
 	 * @return {Timeout}
 	 */
 	Autoplay.prototype._getNextTimeout = function(timeout, speed) {
-		if ( this._timeout ) window.clearTimeout(this._timeout);
+		if ( this._timeout ) {
+			window.clearTimeout(this._timeout);
+		}
 		return window.setTimeout($.proxy(function() {
 			if (this._paused || this._core.is('busy') || this._core.is('interacting') || document.hidden) {
 				return;
@@ -132,6 +134,10 @@
 		}, this), timeout || this._core.settings.autoplayTimeout);
 	};
 
+	/**
+	 * Sets autoplay in motion.
+	 * @private
+	 */
 	Autoplay.prototype._setAutoPlayInterval = function() {
 		this._timeout = this._getNextTimeout();
 	};
