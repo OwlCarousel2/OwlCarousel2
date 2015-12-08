@@ -256,7 +256,7 @@
 			html;
 
 		if (this._playing) {
-			return;
+			this.stop();
 		}
 
 		this._core.enter('playing');
