@@ -122,6 +122,11 @@
 		autoplaySpeed: false
 	};
 
+	/**
+	 * Transition to the next slide and set a timeout for the next transition.
+	 * @private
+	 * @param {Number} [speed] - The animation speed for the animations.
+	 */
 	Autoplay.prototype._next = function(speed) {
 		this._call = window.setTimeout(
 			$.proxy(this._next, this, speed),
@@ -135,8 +140,7 @@
 	}
 
 	/**
-	 * Read the current timer value. Should only be used when the timer is
-	 * paused.
+	 * Reads the current timer value when the timer is playing.
 	 * @public
 	 */
 	Autoplay.prototype.read = function() {
@@ -158,20 +162,24 @@
 
 		timeout = timeout || this._core.settings.autoplayTimeout;
 
+		// Calculate the elapsed time since the last transition. If the carousel
+		// wasn't playing this calculation will yield zero.
 		elapsed = Math.min(this._time % (this._timeout || timeout), timeout);
 
 		if (this._paused) {
+			// Start the clock.
 			this._time = this.read();
 			this._paused = false;
 		} else {
+			// Clear the active timeout to allow replacement.
 			window.clearTimeout(this._call);
 		}
 
+		// Adjust the origin of the timer to match the new timeout value.
 		this._time += this.read() % timeout - elapsed;
 
-		this._call = window.setTimeout($.proxy(this._next, this, speed), timeout - elapsed);
-
 		this._timeout = timeout;
+		this._call = window.setTimeout($.proxy(this._next, this, speed), timeout - elapsed);
 	};
 
 	/**
@@ -180,6 +188,7 @@
 	 */
 	Autoplay.prototype.stop = function() {
 		if (this._core.is('rotating')) {
+			// Reset the clock.
 			this._time = 0;
 			this._paused = true;
 
@@ -194,6 +203,7 @@
 	 */
 	Autoplay.prototype.pause = function() {
 		if (this._core.is('rotating') && !this._paused) {
+			// Pause the clock.
 			this._time = this.read();
 			this._paused = true;
 
