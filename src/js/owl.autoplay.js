@@ -62,9 +62,10 @@
 					} else {
 						this.stop();
 					}
-				} else if (e.namespace && e.property.name === 'position') {
-					this.stop();
-					this.play();
+				} else if (e.namespace && e.property.name === 'position' && this._paused) {
+					// Reset the timer. This code is triggered when the position
+					// of the carousel was changed through user interaction.
+					this._time = 0;
 				}
 			}, this),
 			'initialized.owl.carousel': $.proxy(function(e) {
