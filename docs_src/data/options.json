@@ -267,7 +267,7 @@
     "name":     "nestedItemSelector",
     "type":     "String/Class",
     "Default":  "false",
-    "desc":     "Use it if owl items are deep nasted inside some generated content. E.g 'youritem'. Dont use dot before class name."
+    "desc":     "Use it if owl items are deep nested inside some generated content. E.g 'youritem'. Dont use dot before class name."
   },
   {
     "name":     "itemElement",
