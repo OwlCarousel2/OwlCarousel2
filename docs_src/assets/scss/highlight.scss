@@ -11,11 +11,12 @@ pre {
 }
 
 .hljs {
-  display: block; padding: 0.5em;
+  display: block; 
   color: #333;
   background: #f8f8f8;
   padding: 2rem;
-  line-height: 1.4
+  line-height: 1.4;
+  overflow-x: scroll;
 }
 
 .hljs-comment,
