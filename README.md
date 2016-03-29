@@ -1,15 +1,14 @@
-[![Stories in Ready](https://badge.waffle.io/smashingboxes/OwlCarousel2.png?label=ready&title=Ready)](http://waffle.io/smashingboxes/OwlCarousel2)
-[![Build Status](https://travis-ci.org/smashingboxes/OwlCarousel2.svg)](https://travis-ci.org/smashingboxes/OwlCarousel2)
+# THIS PROJECT IS NO LONGER MAINTAINED
 
 ## Owl Carousel 2 Beta
 
-Touch enabled [jQuery](http://jquery.com/) plugin that lets you create a beautiful, responsive carousel slider. **To get started, check out http://smashingboxes.github.io/OwlCarousel2/.**
+Touch enabled [jQuery](http://jquery.com/) plugin that lets you create a beautiful, responsive carousel slider. **To get started, check out http://owlcarousel2.github.io/OwlCarousel2/.**
 
-Please consider that the project is still in beta. The current status of the milestones can be found [here](https://github.com/smashingboxes/OwlCarousel2/milestones). If you want to use the [latest development](https://github.com/smashingboxes/OwlCarousel2/archive/develop.zip) see [building](#building).
+Please consider that the project is still in beta. The current status of the milestones can be found [here](https://github.com/owlcarousel2/OwlCarousel2/milestones). If you want to use the [latest development](https://github.com/owlcarousel2/OwlCarousel2/archive/develop.zip) see [building](#building).
 
 ## Quick start
 
-Download the [latest release](http://smashingboxes.github.io/OwlCarousel2/download/owl.carousel.2.0.0-beta.3.zip) and put the required stylesheet at the [top](https://developer.yahoo.com/performance/rules.html#css_top) of your markup:
+Download the [latest release](http://owlcarousel2.github.io/OwlCarousel2/download/owl.carousel.2.0.0-beta.3.zip) and put the required stylesheet at the [top](https://developer.yahoo.com/performance/rules.html#css_top) of your markup:
 
 ```html
 <link rel="stylesheet" href="owlcarousel/owl.carousel.min.css" />
@@ -50,7 +49,7 @@ $(document).ready(function(){
 
 ## Documentation
 
-The documentation, included in this repo in the root directory, is built with [Assemble](http://assemble.io/) and publicly available at http://smashingboxes.github.io/OwlCarousel2/. The documentation may also be run locally.
+The documentation, included in this repo in the root directory, is built with [Assemble](http://assemble.io/) and publicly available at http://owlcarousel2.github.io/OwlCarousel2/. The documentation may also be run locally.
 
 ## Building
 
