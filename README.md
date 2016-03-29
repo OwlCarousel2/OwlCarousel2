@@ -1,15 +1,10 @@
-[![Stories in Ready](https://badge.waffle.io/smashingboxes/OwlCarousel2.png?label=ready&title=Ready)](http://waffle.io/smashingboxes/OwlCarousel2)
-[![Build Status](https://travis-ci.org/smashingboxes/OwlCarousel2.svg)](https://travis-ci.org/smashingboxes/OwlCarousel2)
-
-## Announcement.
-
-Big announcement comming about maintainance of this project.  Stay tuned!
+# THIS PROJECT IS NO LONGER MAINTAINED
 
 ## Owl Carousel 2 Beta
 
 Touch enabled [jQuery](http://jquery.com/) plugin that lets you createbeautiful responsive carousel slider. **To get started, check out http://owlcarousel.owlgraphic.com.**
 
-Please consider that the project is still in beta. The current status of the milestones can be found [here](https://github.com/OwlFonk/OwlCarousel2/milestones). If you want to use the [latest development](https://github.com/OwlFonk/OwlCarousel2/archive/develop.zip) see [building](#building).
+Please consider that the project is still in beta. The current status of the milestones can be found [here](https://github.com/owlcarousel2/OwlCarousel2/milestones). If you want to use the [latest development](https://github.com/owlcarousel2/OwlCarousel2/archive/develop.zip) see [building](#building).
 
 ## Quick start
 
@@ -65,7 +60,7 @@ To define which plugins are build into the distribution just edit `/_config.json
 
 ## Contributing
 
-The [issue tracker](https://github.com/OwlFonk/OwlCarousel2/issues) is the preferred channel for bug reports, features requests and submitting pull requests.
+The [issue tracker](https://github.com/owlcarousel2/OwlCarousel2/issues) is the preferred channel for bug reports, features requests and submitting pull requests.
 
 **Please do not use the issue tracker for personal support requests. Stack Overflow ([`owl-carousel`](http://stackoverflow.com/questions/tagged/owl-carousel)) is a better place to get help.**
 
