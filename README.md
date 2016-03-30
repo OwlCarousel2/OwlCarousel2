@@ -1,4 +1,5 @@
-# THIS PROJECT IS NO LONGER MAINTAINED
+# LOOKING FOR NEW OWNER
+Maintenance of OwlCarousel2 is more than I can handle. Looking for a new owner for OwlCarousel2. If you're interested, please contact me at owlcarousel2@gmail.com.
 
 ## Owl Carousel 2 Beta
 
