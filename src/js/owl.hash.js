@@ -79,15 +79,17 @@
 
 		// register event listener for hash navigation
 		$(window).on('hashchange.owl.navigation', $.proxy(function(e) {
-			var hash = window.location.hash.substring(1),
-				items = this._core.$stage.children(),
-				position = this._hashes[hash] && items.index(this._hashes[hash]);
+			if (this._core.settings.URLhashListener) {
+                var hash = window.location.hash.substring(1),
+    				items = this._core.$stage.children(),
+    				position = this._hashes[hash] && items.index(this._hashes[hash]);
 
-			if (position === undefined || position === this._core.current()) {
-				return;
-			}
+    			if (position === undefined || position === this._core.current()) {
+    				return;
+    			}
 
-			this._core.to(this._core.relative(position), false, true);
+    			this._core.to(this._core.relative(position), false, true);
+            }
 		}, this));
 	};
 
