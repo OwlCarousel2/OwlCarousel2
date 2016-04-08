@@ -1,5 +1,6 @@
-# LOOKING FOR NEW OWNER
-Maintenance of OwlCarousel2 is more than I can handle. Looking for a new owner for OwlCarousel2. If you're interested, please contact me at owlcarousel2@gmail.com.
+# OwlCarousel2 is currently being transferred to a new owner
+
+Stay tuned while the new owner sorts through some stuff. (Oh, hi, I'm [David](https://github.com/daviddeutsch)!)
 
 ## Owl Carousel 2 Beta
 
