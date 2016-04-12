@@ -27,6 +27,13 @@
 		this._videos = {};
 
 		/**
+		* Cache all video parameters.
+		* @protected
+		* @type {Object}
+		*/
+		this._urlParameters = {};
+
+		/**
 		 * Current playing item.
 		 * @protected
 		 * @type {jQuery}
@@ -114,7 +121,8 @@
 				id = target.attr('data-vimeo-id') || target.attr('data-youtube-id') || target.attr('data-vzaar-id'),
 				width = target.attr('data-width') || this._core.settings.videoWidth,
 				height = target.attr('data-height') || this._core.settings.videoHeight,
-				url = target.attr('href');
+				url = target.attr('href'),
+				params = null;
 
 		if (url) {
 
@@ -141,6 +149,8 @@
 			} else {
 				throw new Error('Video URL not supported.');
 			}
+			var splittedUrl = url.split(/\?/);
+			params = splittedUrl[1] ? splittedUrl[1] : null;
 			id = id[6];
 		} else {
 			throw new Error('Missing video URL.');
@@ -152,6 +162,8 @@
 			width: width,
 			height: height
 		};
+
+		this._urlParameters[url] = params;
 
 		item.attr('data-video', url);
 
@@ -251,6 +263,7 @@
 		var target = $(event.target),
 			item = target.closest('.' + this._core.settings.itemClass),
 			video = this._videos[item.attr('data-video')],
+			urlParams = this._urlParameters[item.attr('data-video')],
 			width = video.width || '100%',
 			height = video.height || this._core.$stage.height(),
 			html;
@@ -267,12 +280,23 @@
 		this._core.reset(item.index());
 
 		if (video.type === 'youtube') {
-			html = '<iframe width="' + width + '" height="' + height + '" src="//www.youtube.com/embed/' +
-				video.id + '?autoplay=1&v=' + video.id + '" frameborder="0" allowfullscreen></iframe>';
+			if(urlParams){
+				html = '<iframe width="' + width + '" height="' + height + '" src="http://www.youtube.com/embed/' + 
+					video.id + '?autoplay=1&' + urlParams + '&v=' + video.id + '" frameborder="0" allowfullscreen></iframe>';
+			}else{
+				html = '<iframe width="' + width + '" height="' + height + '" src="http://www.youtube.com/embed/' + 
+					video.id + '?autoplay=1&v=' + video.id + '" frameborder="0" allowfullscreen></iframe>';
+			}
 		} else if (video.type === 'vimeo') {
-			html = '<iframe src="//player.vimeo.com/video/' + video.id +
-				'?autoplay=1" width="' + width + '" height="' + height +
-				'" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+			if(urlParams){
+				html = '<iframe src="//player.vimeo.com/video/' + video.id +
+					'?autoplay=1&' + urlParams + '" width="' + width + '" height="' + height +
+					'" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+			}else{
+				html = '<iframe src="//player.vimeo.com/video/' + video.id +
+					'?autoplay=1" width="' + width + '" height="' + height +
+					'" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+			}
 		} else if (video.type === 'vzaar') {
 			html = '<iframe frameborder="0"' + 'height="' + height + '"' + 'width="' + width +
 				'" allowfullscreen mozallowfullscreen webkitAllowFullScreen ' +
