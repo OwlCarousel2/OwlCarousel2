@@ -1,21 +1,21 @@
 {
   "name": "owl.carousel",
   "description": "Touch enabled jQuery plugin that lets you create beautiful responsive carousel slider.",
-  "version": "2.0.0-beta.3",
-  "homepage": "https://github.com/smashingboxes/OwlCarousel2",
+  "version": "2.0.1",
+  "homepage": "https://github.com/OwlCarousel2/OwlCarousel2",
   "main": "./dist/owl.carousel.js",
   "author": {
-    "name": "Smashing Boxes",
-    "email": "opensource@smashingboxes.com",
-    "url": "http://owlcarousel.owlgraphic.com"
+    "name": "David Deutsch",
+    "email": "deutsch@medienpark.net",
+    "url": "http://owlcarousel2.github.io/OwlCarousel2"
   },
   "license": {
     "type": "MIT",
-    "url": "https://github.com/smashingboxes/OwlCarousel2/blob/master/LICENSE"
+    "url": "https://github.com/OwlCarousel2/OwlCarousel2/blob/master/LICENSE"
   },
   "bugs": {
-    "url": "http://github.com/smashingboxes/OwlCarousel2/issues",
-    "email": "opensource@smashingboxes.com"
+    "url": "https://github.com/OwlCarousel2/OwlCarousel2/issues",
+    "email": "deutsch@medienpark.net"
   },
   "dependencies": {
     "jquery": ">=1.8.3"

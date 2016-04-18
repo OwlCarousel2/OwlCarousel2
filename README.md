@@ -10,7 +10,7 @@ Please consider that the project is still in beta. The current status of the mil
 
 ## Quick start
 
-Download the [latest release](http://owlcarousel2.github.io/OwlCarousel2/download/owl.carousel.2.0.0-beta.3.zip) and put the required stylesheet at the [top](https://developer.yahoo.com/performance/rules.html#css_top) of your markup:
+Download the [latest release](http://owlcarousel2.github.io/OwlCarousel2/download/owl.carousel.2.0.1.zip) and put the required stylesheet at the [top](https://developer.yahoo.com/performance/rules.html#css_top) of your markup:
 
 ```html
 <link rel="stylesheet" href="owlcarousel/owl.carousel.min.css" />

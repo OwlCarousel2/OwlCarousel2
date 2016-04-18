@@ -1,7 +1,7 @@
 /**
  * Support Plugin
  *
- * @version 2.0.0-beta.3
+ * @version 2.0.1
  * @author Vivid Planet Software GmbH
  * @author Artus Kolanowski
  * @license The MIT License (MIT)

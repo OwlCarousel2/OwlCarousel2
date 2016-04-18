@@ -1,6 +1,6 @@
 /**
  * Owl carousel
- * @version 2.0.0-beta.3
+ * @version 2.0.1
  * @author Bartosz Wojciechowski
  * @license The MIT License (MIT)
  * @todo Lazy Load Icon
@@ -1141,9 +1141,9 @@
 		} else {
 			coordinate = this._coordinates[newPosition] || 0;
 		}
-		
+
 		coordinate = Math.ceil(coordinate);
-		
+
 		return coordinate;
 	};
 
@@ -1156,7 +1156,10 @@
 	 * @returns {Number} - The time in milliseconds for the translation.
 	 */
 	Owl.prototype.duration = function(from, to, factor) {
-		if(factor === 0){ return 0; }
+		if (factor === 0) {
+			return 0;
+		}
+
 		return Math.min(Math.max(Math.abs(to - from), 1), 6) * Math.abs((factor || this.settings.smartSpeed));
 	};
 
