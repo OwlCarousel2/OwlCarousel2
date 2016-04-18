@@ -1,8 +1,9 @@
 /**
  * Autoplay Plugin
- * @version 2.0.1
+ * @version 2.1.0
  * @author Bartosz Wojciechowski
  * @author Artus Kolanowski
+ * @author David Deutsch
  * @license The MIT License (MIT)
  */
 ;(function($, window, document, undefined) {
