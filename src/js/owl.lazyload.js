@@ -33,7 +33,7 @@
 		 * @type {Object}
 		 */
 		this._handlers = {
-			'initialized.owl.carousel change.owl.carousel': $.proxy(function(e) {
+			'initialized.owl.carousel change.owl.carousel resized.owl.carousel': $.proxy(function(e) {
 				if (!e.namespace) {
 					return;
 				}
@@ -64,7 +64,7 @@
 
 		// register event handler
 		this._core.$element.on(this._handlers);
-	}
+	};
 
 	/**
 	 * Default options.
@@ -72,7 +72,7 @@
 	 */
 	Lazy.Defaults = {
 		lazyLoad: false
-	}
+	};
 
 	/**
 	 * Loads all resources of an item at the specified position.
@@ -112,7 +112,7 @@
 		}, this));
 
 		this._loaded.push($item.get(0));
-	}
+	};
 
 	/**
 	 * Destroys the plugin.
