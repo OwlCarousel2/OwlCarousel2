@@ -8,16 +8,12 @@
  */
 module.exports = function(grunt) {
 
-	if (!grunt.file.isDir('bower_components')) {
-		grunt.fail.fatal('>> Please run "bower install" before continuing.');
-	}
 	require('load-grunt-tasks')(grunt);
 
 	grunt
 		.initConfig({
 			pkg: grunt.file.readJSON('package.json'),
 			app: grunt.file.readJSON('_config.json'),
-			vendor: 'bower_components',
 			banner: '/**\n' + ' * Owl Carousel v<%= pkg.version %>\n'
 				+ ' * Copyright 2013-<%= grunt.template.today("yyyy") %> <%= pkg.author.name %>\n'
 				+ ' * Licensed under <%= pkg.license.type %> (<%= pkg.license.url %>)\n' + ' */\n',
@@ -80,8 +76,8 @@ module.exports = function(grunt) {
 
 			// clean
 			clean: {
-				docs: [ '<%= app.docs.dest %>/**/*.*' ],
-				dist: [ 'dist/**/*.*' ]
+				docs: [ '<%= app.docs.dest %>' ],
+				dist: [ 'dist' ]
 			},
 
 			// sass
@@ -89,7 +85,7 @@ module.exports = function(grunt) {
 				docs: {
 					options: {
 						outputStyle: 'compressed',
-						includePaths: [ '<%= app.docs.src %>/assets/scss/', 'bower_components/foundation/scss' ]
+						includePaths: [ '<%= app.docs.src %>/assets/scss/', 'node_modules/foundation-sites/scss' ]
 					},
 					files: {
 						'<%= app.docs.dest %>/assets/css/docs.theme.min.css': '<%= app.docs.src %>/assets/scss/docs.theme.scss'
@@ -99,22 +95,30 @@ module.exports = function(grunt) {
 					options: {
 						outputStyle: 'nested'
 					},
-					files: [ {
-						expand: true,
-						flatten: true,
-						cwd: 'src/scss/',
-						src: '*scss',
-						dest: 'src/css/',
-						ext: '.css',
-						extDot: 'last'
-					} ]
+					files: {
+						'dist/assets/<%= pkg.name %>.css': 'src/scss/<%= pkg.name %>.scss',
+						'dist/assets/owl.theme.default.css': 'src/scss/owl.theme.default.scss',
+						'dist/assets/owl.theme.green.css': 'src/scss/owl.theme.green.scss'
+					}
+				}
+			},
+
+			autoprefixer: {
+				options: {
+					browsers: [ 'last 2 versions', 'ie 7', 'ie 8', 'ie 9', 'ie 10', 'ie 11' ]
+				},
+				dist: {
+					files: {
+						'dist/assets/<%= pkg.name %>.css': 'dist/assets/<%= pkg.name %>.css',
+						'dist/assets/owl.theme.default.css': 'dist/assets/owl.theme.default.css',
+						'dist/assets/owl.theme.green.css': 'dist/assets/owl.theme.green.css'
+					}
 				}
 			},
 
 			concat: {
 				dist: {
 					files: {
-						'dist/assets/owl.carousel.css': [ 'src/css/*.css', '!src/css/owl.theme*.css' ],
 						'dist/<%= pkg.name %>.js': '<%= app.src.scripts %>'
 					}
 				}
@@ -123,9 +127,9 @@ module.exports = function(grunt) {
 			cssmin: {
 				dist: {
 					files: {
-						'dist/assets/<%= pkg.name %>.min.css': [ 'src/css/*.css', '!src/css/owl.theme*.css' ],
-						'dist/assets/owl.theme.default.min.css': 'src/css/owl.theme.default.css',
-						'dist/assets/owl.theme.green.min.css': 'src/css/owl.theme.green.css'
+						'dist/assets/<%= pkg.name %>.min.css': 'dist/assets/<%= pkg.name %>.css',
+						'dist/assets/owl.theme.default.min.css': 'dist/assets/owl.theme.default.css',
+						'dist/assets/owl.theme.green.min.css': 'dist/assets/owl.theme.green.css'
 					}
 				}
 			},
@@ -140,7 +144,19 @@ module.exports = function(grunt) {
 			},
 
 			qunit: {
-				dist: [ 'test/*.html' ]
+				options: {
+					timeout: 10000
+				},
+				dist: [ 'test/index.html' ]
+			},
+
+			blanket_qunit: {
+				dist: {
+					options: {
+						urls: [ 'test/index.html?coverage&gruntReport' ],
+						threshold: 0
+					}
+				}
 			},
 
 			jscs: {
@@ -154,23 +170,34 @@ module.exports = function(grunt) {
 				}
 			},
 
+			usebanner: {
+				dist: {
+					options: {
+						banner: '<%= banner %>',
+						linebreak: false
+					},
+					files: {
+						src: [
+							'dist/<%= pkg.name %>.js',
+							'dist/assets/*.css'
+						]
+					}
+				}
+			},
+
 			uglify: {
+				options: {
+					banner: '<%= banner %>'
+				},
 				dist: {
 					files: {
-						'dist/<%= pkg.name %>.min.js': '<%= app.src.scripts %>'
+						'dist/<%= pkg.name %>.min.js': 'dist/<%= pkg.name %>.js'
 					}
 				}
 			},
 
 			// copy
 			copy: {
-				themes: {
-					expand: true,
-					flatten: true,
-					cwd: 'src/css/',
-					src: [ 'owl.theme.*' ],
-					dest: 'dist/assets'
-				},
 				distImages: {
 					expand: true,
 					flatten: true,
@@ -199,6 +226,7 @@ module.exports = function(grunt) {
 					src: [ 'css/*.css', 'vendors/*.js', 'vendors/*.map', 'img/*.*', 'js/*.*' ],
 					dest: '<%= app.docs.dest %>/assets/'
 				},
+
 				readme: {
 					files: [ {
 						'dist/LICENSE': 'LICENSE',
@@ -227,17 +255,17 @@ module.exports = function(grunt) {
 				options: {
 					livereload: true
 				},
-				templates: {
+				templatesDocs: {
 					files: [ '<%= app.docs.templates %>/**/*.hbs' ],
 					tasks: [ 'assemble' ]
 				},
-				sass: {
+				sassDocs: {
 					files: [ '<%= app.docs.src %>/assets/**/*.scss' ],
 					tasks: [ 'sass:docs' ]
 				},
-				sassDist: {
+				sass: {
 					files: [ 'src/**/*.scss' ],
-					tasks: [ 'sass:dist', 'concat:dist', 'cssmin:dist', 'copy:themes','copy:distToDocs' ]
+					tasks: [ 'sass:dist', 'cssmin:dist', 'usebanner:dist', 'copy:distToDocs' ]
 				},
 				jsDocs: {
 					files: [ '<%= app.docs.src %>/assets/**/*.js' ],
@@ -245,10 +273,10 @@ module.exports = function(grunt) {
 				},
 				js: {
 					files: [ 'src/**/*.js' ],
-					tasks: [ 'jscs:dist', 'jshint:dist', 'qunit:dist', 'uglify:dist', 'concat:dist', 'copy:distToDocs', 'copy:srcToDocs' ]
+					tasks: [ 'jscs:dist', 'jshint:dist', 'qunit:dist', 'concat:dist', 'uglify:dist', 'usebanner:dist', 'copy:distToDocs', 'copy:srcToDocs' ]
 				},
-				helpers: {
-					files: [ '<%= app.src %>/helpers/*.js' ],
+				helpersDocs: {
+					files: [ '<%= app.docs.src %>/helpers/*.js' ],
 					tasks: [ 'assemble' ]
 				},
 				test: {
@@ -284,11 +312,11 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('assemble');
 
 	// tasks
-	grunt.registerTask('dist', [ 'clean:dist', 'sass:dist', 'concat:dist', 'cssmin:dist', 'copy:themes', 'copy:distImages', 'jscs:dist', 'uglify:dist', 'copy:readme' ]);
+	grunt.registerTask('dist', [ 'clean:dist', 'sass:dist', 'autoprefixer', 'concat:dist', 'cssmin:dist', 'copy:distImages', 'jscs:dist', 'usebanner:dist', 'uglify:dist', 'copy:readme' ]);
 
 	grunt.registerTask('docs', [ 'dist', 'clean:docs', 'assemble', 'sass:docs', 'copy:docsAssets', 'copy:distToDocs', 'zip' ]);
 
-	grunt.registerTask('test', [ 'jshint:dist', 'qunit:dist' ]);
+	grunt.registerTask('test', [ 'jshint:dist', 'qunit:dist', 'blanket_qunit:dist' ]);
 
 	grunt.registerTask('default', [ 'dist', 'docs', 'test' ]);
 

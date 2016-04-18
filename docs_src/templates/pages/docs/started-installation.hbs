@@ -22,7 +22,7 @@ First, include two CSS files into your HTML head:
 > `owl.carousel.css` file is required and its good when inculded in head before *.js
 
 
-Second `owl.theme.default.css` file is optional and feel free to edit it. 
+Second `owl.theme.default.css` file is optional and feel free to edit it. However, it is required if you'd like the default nav controls like dots or next buttons.
 Inside the source package you can also find [SCSS](http://sass-lang.com/) files for easy generation of your own themes.
 
 
@@ -38,7 +38,7 @@ Yep, include jQuery and `owl.carousel.min.js` into the footer.
 ### Set HTML
 
 You don't need any special markup. All you need is to wrap your divs(owl works with any type element a/img/span..) inside the container element `<div class="owl-carousel">`.
-Class "owl-carousel" is mandatory to apply proper styles that come from owl.carousel.css file.
+Class "owl-carousel" is mandatory to apply proper styles that come from owl.carousel.css file. If you want the default nav controls like dots or buttons, you must also include the "owl-theme" class on that same div.
 
 ```
 <!-- Set up your HTML -->
@@ -62,10 +62,10 @@ $(document).ready(function(){
   $(".owl-carousel").owlCarousel();
 });
 ```
-> See [demos](/demos/demos.html) for customisation and options usage.
+> See [demos](/OwlCarousel2/demos/demos.html) for customisation and options usage.
 
 ### Next Step
 
-* [FAQ](started-faq.html)
+####[FAQ](started-faq.html)
 
-{{/markdown }} 
+{{/markdown }}

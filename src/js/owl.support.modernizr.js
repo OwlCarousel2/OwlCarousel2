@@ -1,7 +1,7 @@
 /**
  * Modernizr Support Plugin
  *
- * @version 2.0.0-beta.3
+ * @version 2.0.1
  * @author Vivid Planet Software GmbH
  * @author Artus Kolanowski
  * @license The MIT License (MIT)
@@ -41,6 +41,14 @@
 		/* jshint -W053 */
 		$.support.transition = new String(Modernizr.prefixed('transition'))
 		$.support.transition.end = events.transition.end[ $.support.transition ];
+		// fix transitionend support detection, which does not work properly for older Android versions,
+        	// as it does not give the prefixed event name. here we use Modernizr to ensure the correct event.
+        	// see:
+        	// https://github.com/Modernizr/Modernizr/issues/897
+        	// https://github.com/niksy/modernizr-detects/commit/05d148fc4f3813b1412c836325a9ca78c7a63f4d
+        	if (/Android 4\.[123]/.test(navigator.userAgent)) {
+                	$.support.transition.end = 'webkitTransitionEnd';
+        	}
 	}
 
 	if (Modernizr.cssanimations) {

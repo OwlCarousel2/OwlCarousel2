@@ -101,6 +101,12 @@
     "Default":  "['next','prev']",
     "desc":     "HTML allowed."
   },
+    {
+    "name":     "navElement",
+    "type":     "String",
+    "Default":  "div",
+    "desc":     "DOM element type for a single directional navigation link."
+  },
   {
     "name":     "slideBy",
     "type":     "Number/String",
@@ -219,7 +225,7 @@
     "name":     "video",
     "type":     "Boolean",
     "Default":  "false",
-    "desc":     "Enable fetching YouTube/Vimeo videos."
+    "desc":     "Enable fetching YouTube/Vimeo/Vzaar videos."
   },
   {
     "name":     "videoHeight",
@@ -261,7 +267,7 @@
     "name":     "nestedItemSelector",
     "type":     "String/Class",
     "Default":  "false",
-    "desc":     "Use it if owl items are deep nasted inside some generated content. E.g 'youritem'. Dont use dot before class name."
+    "desc":     "Use it if owl items are deep nested inside some generated content. E.g 'youritem'. Dont use dot before class name."
   },
   {
     "name":     "itemElement",
