@@ -4,13 +4,13 @@ Stay tuned while the new owner sorts through some stuff. (Oh, hi, I'm [David](ht
 
 ## Owl Carousel 2 Beta
 
-Touch enabled [jQuery](http://jquery.com/) plugin that lets you create a beautiful, responsive carousel slider. **To get started, check out http://owlcarousel2.github.io/OwlCarousel2/.**
+Touch enabled [jQuery](https://jquery.com/) plugin that lets you create a beautiful, responsive carousel slider. **To get started, check out https://owlcarousel2.github.io/OwlCarousel2/.**
 
 Please consider that the project is still in beta. The current status of the milestones can be found [here](https://github.com/owlcarousel2/OwlCarousel2/milestones). If you want to use the [latest development](https://github.com/owlcarousel2/OwlCarousel2/archive/develop.zip) see [building](#building).
 
 ## Quick start
 
-Download the [latest release](http://owlcarousel2.github.io/OwlCarousel2/download/owl.carousel.2.1.0.zip) and put the required stylesheet at the [top](https://developer.yahoo.com/performance/rules.html#css_top) of your markup:
+Download the [latest release](https://owlcarousel2.github.io/OwlCarousel2/download/owl.carousel.2.1.0.zip) and put the required stylesheet at the [top](https://developer.yahoo.com/performance/rules.html#css_top) of your markup:
 
 ```html
 <link rel="stylesheet" href="owlcarousel/owl.carousel.min.css" />
@@ -41,7 +41,7 @@ Wrap your items (`div`, `a`, `img`, `span`, `li` etc.) with a container element 
 **NOTE:** The `owl-theme` class is optional, but without it, you will need to style navigation features on your own.
 
 
-Call the [plugin](http://learn.jquery.com/plugins/) function and your carousel is ready.
+Call the [plugin](https://learn.jquery.com/plugins/) function and your carousel is ready.
 
 ```javascript
 $(document).ready(function(){
@@ -51,7 +51,7 @@ $(document).ready(function(){
 
 ## Documentation
 
-The documentation, included in this repo in the root directory, is built with [Assemble](http://assemble.io/) and publicly available at http://owlcarousel2.github.io/OwlCarousel2/. The documentation may also be run locally.
+The documentation, included in this repo in the root directory, is built with [Assemble](http://assemble.io/) and publicly available at https://owlcarousel2.github.io/OwlCarousel2/. The documentation may also be run locally.
 
 ## Building
 
