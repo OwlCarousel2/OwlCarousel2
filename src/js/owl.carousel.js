@@ -601,7 +601,7 @@
 	 * Refreshes the carousel primarily for adaptive purposes.
 	 * @public
 	 */
-	Owl.prototype.refresh = function() {
+	Owl.prototype.refresh = function(resizing) {
 		this.enter('refreshing');
 		this.trigger('refresh');
 
@@ -613,7 +613,9 @@
 
 		this.update();
 
-		this.onResize();
+		if (!resizing) {
+			this.onResize();
+		}
 
 		this.$element.removeClass(this.options.refreshClass);
 
@@ -656,7 +658,8 @@
 
 		this.invalidate('width');
 
-		this.refresh();
+		var resizing = true;
+		this.refresh(resizing);
 
 		this.leave('resizing');
 		this.trigger('resized');
