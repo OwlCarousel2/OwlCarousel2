@@ -602,6 +602,8 @@
 	 * @public
 	 */
 	Owl.prototype.refresh = function(resizing) {
+		resizing = resizing || false;
+
 		this.enter('refreshing');
 		this.trigger('refresh');
 
