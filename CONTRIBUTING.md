@@ -1,6 +1,6 @@
 ## Contributing
 
-The [issue tracker](https://github.com/OwlFonk/OwlCarousel2/issues) is the preferred channel for bug reports, feature requests, and submitting pull requests.
+The [issue tracker](https://github.com/OwlCarousel2/OwlCarousel2/issues) is the preferred channel for bug reports, feature requests, and submitting pull requests.
 
 **Please do not use the issue tracker for personal support requests. Stack Overflow ([`owl-carousel`](https://stackoverflow.com/questions/tagged/owl-carousel)) is a better place to get help.**
 
