@@ -639,6 +639,8 @@
 	 * @protected
 	 */
 	Owl.prototype.onResize = function() {
+		var resizing = true;
+
 		if (!this._items.length) {
 			return false;
 		}
@@ -660,7 +662,6 @@
 
 		this.invalidate('width');
 
-		var resizing = true;
 		this.refresh(resizing);
 
 		this.leave('resizing');
