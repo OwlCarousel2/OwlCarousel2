@@ -1,8 +1,8 @@
 ## Contributing
 
-The [issue tracker](https://github.com/OwlFonk/OwlCarousel2/issues) is the preferred channel for bug reports, feature requests, and submitting pull requests.
+The [issue tracker](https://github.com/OwlCarousel2/OwlCarousel2/issues) is the preferred channel for bug reports, feature requests, and submitting pull requests.
 
-**Please do not use the issue tracker for personal support requests. Stack Overflow ([`owl-carousel`](http://stackoverflow.com/questions/tagged/owl-carousel)) is a better place to get help.**
+**Please do not use the issue tracker for personal support requests. Stack Overflow ([`owl-carousel`](https://stackoverflow.com/questions/tagged/owl-carousel)) is a better place to get help.**
 
 ### Bug reports
 
@@ -14,7 +14,7 @@ Guidelines for bug reports:
 
   2. Check if the issue has been fixed — try to reproduce it using the latest `develop` branch in the repository.
 
-  3. Isolate the problem — ideally create a reduced test case and a live example. This [CodePen](http://codepen.io/anon/pen/rVENKy), [JSFiddle](http://jsfiddle.net/og7ee99s/) and [JS Bin](http://jsbin.com/sevukihupi/1/edit?html,js,output) are helpful templates you can fork or clone.
+  3. Isolate the problem — ideally create a reduced test case and a live example. This [CodePen](https://codepen.io/anon/pen/rVENKy), [JSFiddle](https://jsfiddle.net/og7ee99s/) and [JS Bin](https://jsbin.com/sevukihupi/1/edit?html,js,output) are helpful templates you can fork or clone.
 
 Example:
 
@@ -44,7 +44,7 @@ Good pull requests are a fantastic help. They should remain focused in scope and
 
 Adhering to the following process is the best way to get your work included in the project:
 
-  1. [Fork](http://help.github.com/fork-a-repo/) the project, clone your fork, and configure the remotes:
+  1. [Fork](https://help.github.com/fork-a-repo/) the project, clone your fork, and configure the remotes:
 
     ```bash
     git clone https://github.com/<your-username>/OwlCarousel2.git
