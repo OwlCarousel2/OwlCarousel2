@@ -17,7 +17,7 @@
     "url": "https://github.com/OwlCarousel2/OwlCarousel2/issues",
     "email": "deutsch@medienpark.net"
   },
-  "dependencies": {
+  "peerDependencies": {
     "jquery": ">=1.8.3"
   },
   "devDependencies": {
