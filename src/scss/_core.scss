@@ -11,7 +11,7 @@
 
 	.owl-stage {
 		position: relative;
-		-ms-touch-action: pan-Y;
+		touch-action: pan-Y;
 	}
 
 	.owl-stage:after {
@@ -54,10 +54,6 @@
 	.owl-dot {
 		cursor: pointer;
 		cursor: hand;
-		-webkit-user-select: none;
-		-khtml-user-select: none;
-		-moz-user-select: none;
-		-ms-user-select: none;
 		user-select: none;
 	}
 
@@ -79,9 +75,6 @@
 	}
 
 	&.owl-drag .owl-item {
-		-webkit-user-select: none;
-		-moz-user-select: none;
-		-ms-user-select: none;
 		user-select: none;
 	}
 
