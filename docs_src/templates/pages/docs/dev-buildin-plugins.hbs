@@ -1,5 +1,5 @@
 ---
-title: Build-in Plugins
+title: Built-in Plugins
 subTitle: Development
 nav: docs
 description: Owl Carousel Documentation
@@ -10,8 +10,8 @@ tags:
 ---
 
 {{#markdown }}
-## Build-in Plugins
-> Owl Carousel supports plugin modular structure. This means that you can remove plugins that you won’t use or create new ones that fit your needs 
+## Built-in Plugins
+> Owl Carousel supports plugin modular structure. This means that you can remove plugins that you won’t use or create new ones that fit your needs
 
 
 
@@ -33,7 +33,7 @@ src/
     └── owl.video.js
 ```
 
-> [See demos of build-in plugins](/demos/demos.html#using-build-in-plugins)
+> [See demos of built-in plugins](/demos/demos.html#using-built-in-plugins)
 
 ------
 
@@ -43,11 +43,11 @@ Big thanks to [Artus Kolanowski](https://github.com/witrin) for helping me with 
 
 
 
-{{!-- 
+{{!--
 
 ## owl.lazyload.js
 
-LazyLoad require `class="owl-lazy"` and link to image inside data: data-src="url_to_img" or/and data-src-retina="url_to_highres_img". 
+LazyLoad require `class="owl-lazy"` and link to image inside data: data-src="url_to_img" or/and data-src-retina="url_to_highres_img".
 There is also option to load images into background but this needs to be tested. [See demo](/demos/demo.html)
 
 Usage:
@@ -60,17 +60,17 @@ $('.owl-carousel').owlCarousel({
 HTML Markup:
 ```
 <div class="owl-carousel">
-	<img class="owl-lazy" data-src="http://placehold.it/350x250&text=3" alt="">
-	<img class="owl-lazy" data-src-retina="http://placehold.it/350x250&text=1-retina" data-src="http://placehold.it/350x250&text=1" alt="">
-	<div class="owl-lazy" data-src-retina="http://placehold.it/350x250&text=1-retina" data-src="http://placehold.it/350x250&text=1"></div>
+	<img class="owl-lazy" data-src="https://placehold.it/350x250&text=3" alt="">
+	<img class="owl-lazy" data-src-retina="https://placehold.it/350x250&text=1-retina" data-src="https://placehold.it/350x250&text=1" alt="">
+	<div class="owl-lazy" data-src-retina="https://placehold.it/350x250&text=1-retina" data-src="https://placehold.it/350x250&text=1"></div>
 </div>
 ```
 
 ## owl.video.js
 
-Currently support YouTube and Vimeo videos only.
+Currently support YouTube, Vimeo, and vzaar videos only.
 
-To add video into carousel just put `<a class="owl-video" href="_straight URL from youtube or vimeo"></a>`.
+To add video into carousel just put `<a class="owl-video" href="_straight URL from YouTube, Vimeo, or vzaar"></a>`.
 A tag is not mandatory, can be any other tag but `"owl-video"` and href with url link is required.
 
 Thumbnails are automaticaly fetched from servers. [See demo](/demos/demo.html)
@@ -86,10 +86,10 @@ $('.owl-carousel').owlCarousel({
 #### HTML Markup:
 ```
 <div class="owl-carousel">
-	<div class="article-video"><a class="owl-video" href="http://vimeo.com/23924346"></a></div>
+	<div class="article-video"><a class="owl-video" href="https://vimeo.com/23924346"></a></div>
 	<div class="article-video"><a class="owl-video" href="https://www.youtube.com/watch?v=JpxsRwnRwCQ"></a></div>
-	<div class="article-video"><a class="owl-video" href="http://www.youtube.com/watch?v=FBu_jxT1PkA"></a></div>
-	<div class="article-video"><a class="owl-video" href="http://www.youtube.com/watch?v=oy18DJwy5lI"></a></div>
+	<div class="article-video"><a class="owl-video" href="https://www.youtube.com/watch?v=FBu_jxT1PkA"></a></div>
+	<div class="article-video"><a class="owl-video" href="https://www.youtube.com/watch?v=oy18DJwy5lI"></a></div>
 </div>
 ```
 
@@ -101,13 +101,13 @@ Adjusts stage height to highest element on viewport. No special HTML markup requ
 ```
 $('.owl-carousel').owlCarousel({
 	autoHeight:true,
-	autoHeightClass: 'owl-height' //default 
+	autoHeightClass: 'owl-height' //default
 });
 ```
 
 ## owl.animate.js
 
-Owl Carousel CSS has build-in only fade out tranisiton. To get more fancy looking animations you have to create them yourself in CSS or use fantastic Animate.css library created by Daniel Eden http://daneden.github.io/animate.css/ 
+Owl Carousel CSS has built-in only fade out tranisiton. To get more fancy looking animations you have to create them yourself in CSS or use fantastic Animate.css library created by Daniel Eden https://daneden.github.io/animate.css/
 Animate functions works only with one item and only in browsers that support perspective property.
 
 To get fade out effect just set `animateOut: 'fadeOut'`

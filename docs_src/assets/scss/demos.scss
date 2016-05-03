@@ -40,6 +40,6 @@
 		margin-bottom: 0.3rem;
 	}
 	span.label{
-		@include transition();
+		@include owl-transition();
 	}
 }

@@ -1,7 +1,8 @@
 /**
  * Navigation Plugin
- * @version 2.0.0
+ * @version 2.1.0
  * @author Artus Kolanowski
+ * @author David Deutsch
  * @license The MIT License (MIT)
  */
 ;(function($, window, document, undefined) {
@@ -74,7 +75,7 @@
 			'prepared.owl.carousel': $.proxy(function(e) {
 				if (e.namespace && this._core.settings.dotsData) {
 					this._templates.push('<div class="' + this._core.settings.dotClass + '">' +
-						$(e.content).find('[data-dot]').andSelf('[data-dot]').attr('data-dot') + '</div>');
+						$(e.content).find('[data-dot]').addBack('[data-dot]').attr('data-dot') + '</div>');
 				}
 			}, this),
 			'added.owl.carousel': $.proxy(function(e) {
@@ -368,7 +369,7 @@
 	Navigation.prototype.to = function(position, speed, standard) {
 		var length;
 
-		if (!standard) {
+		if (!standard && this._pages.length) {
 			length = this._pages.length;
 			$.proxy(this._overrides.to, this._core)(this._pages[((position % length) + length) % length].start, speed);
 		} else {

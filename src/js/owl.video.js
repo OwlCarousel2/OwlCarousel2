@@ -1,7 +1,8 @@
 /**
  * Video Plugin
- * @version 2.0.0
+ * @version 2.1.0
  * @author Bartosz Wojciechowski
+ * @author David Deutsch
  * @license The MIT License (MIT)
  */
 ;(function($, window, document, undefined) {
@@ -96,25 +97,48 @@
 	};
 
 	/**
-	 * Gets the video ID and the type (YouTube/Vimeo only).
+	 * Gets the video ID and the type (YouTube/Vimeo/vzaar only).
 	 * @protected
 	 * @param {jQuery} target - The target containing the video data.
 	 * @param {jQuery} item - The item containing the video.
 	 */
 	Video.prototype.fetch = function(target, item) {
-		var type = target.attr('data-vimeo-id') ? 'vimeo' : 'youtube',
-			id = target.attr('data-vimeo-id') || target.attr('data-youtube-id'),
-			width = target.attr('data-width') || this._core.settings.videoWidth,
-			height = target.attr('data-height') || this._core.settings.videoHeight,
-			url = target.attr('href');
+			var type = (function() {
+					if (target.attr('data-vimeo-id')) {
+						return 'vimeo';
+					} else if (target.attr('data-vzaar-id')) {
+						return 'vzaar'
+					} else {
+						return 'youtube';
+					}
+				})(),
+				id = target.attr('data-vimeo-id') || target.attr('data-youtube-id') || target.attr('data-vzaar-id'),
+				width = target.attr('data-width') || this._core.settings.videoWidth,
+				height = target.attr('data-height') || this._core.settings.videoHeight,
+				url = target.attr('href');
 
 		if (url) {
-			id = url.match(/(http:|https:|)\/\/(player.|www.)?(vimeo\.com|youtu(be\.com|\.be|be\.googleapis\.com))\/(video\/|embed\/|watch\?v=|v\/)?([A-Za-z0-9._%-]*)(\&\S+)?/);
+
+			/*
+					Parses the id's out of the following urls (and probably more):
+					https://www.youtube.com/watch?v=:id
+					https://youtu.be/:id
+					https://vimeo.com/:id
+					https://vimeo.com/channels/:channel/:id
+					https://vimeo.com/groups/:group/videos/:id
+					https://app.vzaar.com/videos/:id
+
+					Visual example: https://regexper.com/#(http%3A%7Chttps%3A%7C)%5C%2F%5C%2F(player.%7Cwww.%7Capp.)%3F(vimeo%5C.com%7Cyoutu(be%5C.com%7C%5C.be%7Cbe%5C.googleapis%5C.com)%7Cvzaar%5C.com)%5C%2F(video%5C%2F%7Cvideos%5C%2F%7Cembed%5C%2F%7Cchannels%5C%2F.%2B%5C%2F%7Cgroups%5C%2F.%2B%5C%2F%7Cwatch%5C%3Fv%3D%7Cv%5C%2F)%3F(%5BA-Za-z0-9._%25-%5D*)(%5C%26%5CS%2B)%3F
+			*/
+
+			id = url.match(/(http:|https:|)\/\/(player.|www.|app.)?(vimeo\.com|youtu(be\.com|\.be|be\.googleapis\.com)|vzaar\.com)\/(video\/|videos\/|embed\/|channels\/.+\/|groups\/.+\/|watch\?v=|v\/)?([A-Za-z0-9._%-]*)(\&\S+)?/);
 
 			if (id[3].indexOf('youtu') > -1) {
 				type = 'youtube';
 			} else if (id[3].indexOf('vimeo') > -1) {
 				type = 'vimeo';
+			} else if (id[3].indexOf('vzaar') > -1) {
+				type = 'vzaar';
 			} else {
 				throw new Error('Video URL not supported.');
 			}
@@ -179,16 +203,27 @@
 		}
 
 		if (video.type === 'youtube') {
-			path = "http://img.youtube.com/vi/" + video.id + "/hqdefault.jpg";
+			path = "//img.youtube.com/vi/" + video.id + "/hqdefault.jpg";
 			create(path);
 		} else if (video.type === 'vimeo') {
 			$.ajax({
 				type: 'GET',
-				url: 'http://vimeo.com/api/v2/video/' + video.id + '.json',
+				url: '//vimeo.com/api/v2/video/' + video.id + '.json',
 				jsonp: 'callback',
 				dataType: 'jsonp',
 				success: function(data) {
 					path = data[0].thumbnail_large;
+					create(path);
+				}
+			});
+		} else if (video.type === 'vzaar') {
+			$.ajax({
+				type: 'GET',
+				url: '//vzaar.com/api/videos/' + video.id + '.json',
+				jsonp: 'callback',
+				dataType: 'jsonp',
+				success: function(data) {
+					path = data.framegrab_url;
 					create(path);
 				}
 			});
@@ -233,12 +268,16 @@
 		this._core.reset(item.index());
 
 		if (video.type === 'youtube') {
-			html = '<iframe width="' + width + '" height="' + height + '" src="http://www.youtube.com/embed/' +
+			html = '<iframe width="' + width + '" height="' + height + '" src="//www.youtube.com/embed/' +
 				video.id + '?autoplay=1&v=' + video.id + '" frameborder="0" allowfullscreen></iframe>';
 		} else if (video.type === 'vimeo') {
-			html = '<iframe src="http://player.vimeo.com/video/' + video.id +
+			html = '<iframe src="//player.vimeo.com/video/' + video.id +
 				'?autoplay=1" width="' + width + '" height="' + height +
 				'" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+		} else if (video.type === 'vzaar') {
+			html = '<iframe frameborder="0"' + 'height="' + height + '"' + 'width="' + width +
+				'" allowfullscreen mozallowfullscreen webkitAllowFullScreen ' +
+				'src="//view.vzaar.com/' + video.id + '/player?autoplay=true"></iframe>';
 		}
 
 		$('<div class="owl-video-frame">' + html + '</div>').insertAfter(item.find('.owl-video'));
