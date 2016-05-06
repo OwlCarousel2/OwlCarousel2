@@ -91,7 +91,7 @@
      * Destroys the plugin.
      * @protected
      */
-    Sync.prototype.destroy = function() {
+    Linked.prototype.destroy = function() {
         var handler, property;
 
         for (handler in this._handlers) {
