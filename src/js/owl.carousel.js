@@ -683,8 +683,8 @@
 		}
 
 		if (this.settings.touchDrag){
-			this.$stage.on('touchstart.owl.core', $.proxy(this.onDragStart, this));
-			this.$stage.on('touchcancel.owl.core', $.proxy(this.onDragEnd, this));
+			this.$stage.on('touchstart.owl.core.noPreventDefault', $.proxy(this.onDragStart, this));
+			this.$stage.on('touchcancel.owl.core.noPreventDefault', $.proxy(this.onDragEnd, this));
 		}
 	};
 
@@ -733,7 +733,7 @@
 		this._drag.stage.current = stage;
 		this._drag.pointer = this.pointer(event);
 
-		$(document).on('mouseup.owl.core touchend.owl.core', $.proxy(this.onDragEnd, this));
+		$(document).on('mouseup.owl.core touchend.owl.core.noPreventDefault', $.proxy(this.onDragEnd, this));
 
 		$(document).one('mousemove.owl.core touchmove.owl.core', $.proxy(function(event) {
 			var delta = this.difference(this._drag.pointer, this.pointer(event));

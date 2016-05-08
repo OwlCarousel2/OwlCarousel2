@@ -20,7 +20,8 @@
 			"src/js/owl.autoplay.js",
 			"src/js/owl.navigation.js",
 			"src/js/owl.hash.js",
-			"src/js/owl.support.js"
+			"src/js/owl.support.js",
+			"src/js/owl.support.jquery.js"
 		]
 	},
 

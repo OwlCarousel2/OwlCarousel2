@@ -78,12 +78,12 @@
 					this.play();
 				}
 			}, this),
-			'touchstart.owl.core': $.proxy(function() {
+			'touchstart.owl.core.noPreventDefault': $.proxy(function() {
 				if (this._core.settings.autoplayHoverPause && this._core.is('rotating')) {
 					this.pause();
 				}
 			}, this),
-			'touchend.owl.core': $.proxy(function() {
+			'touchend.owl.core.noPreventDefault': $.proxy(function() {
 				if (this._core.settings.autoplayHoverPause) {
 					this.play();
 				}
