@@ -54,6 +54,5 @@
     "owlcarousel",
     "jQuery",
     "plugin"
-  ],
-  "private": true
+  ]
 }
