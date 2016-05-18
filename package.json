@@ -18,7 +18,7 @@
     "email": "deutsch@medienpark.net"
   },
   "dependencies": {
-    "jquery": ">=1.8.3"
+    "jquery": "2.2.0"
   },
   "devDependencies": {
     "assemble": "~0.4.37",
