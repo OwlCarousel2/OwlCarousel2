@@ -7,7 +7,6 @@
  * @todo Lazy Load Icon
  * @todo prevent animationend bubling
  * @todo itemsScaleUp
- * @todo Test Zepto
  * @todo stagePadding calculate wrong active classes
  */
 ;(function($, window, document, undefined) {
@@ -1680,4 +1679,4 @@
 	 */
 	$.fn.owlCarousel.Constructor = Owl;
 
-})(window.Zepto || window.jQuery, window, document);
+})(window.jQuery, window, document);

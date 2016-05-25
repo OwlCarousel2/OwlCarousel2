@@ -31,4 +31,4 @@
 		}
 	}
 
-})(window.Zepto || window.jQuery, window, document);
+})(window.jQuery, window, document);
