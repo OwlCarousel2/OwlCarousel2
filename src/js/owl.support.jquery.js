@@ -6,29 +6,42 @@
  * @license The MIT License (MIT)
  */
 ;(function($, window, document, undefined) {
-	var eventListenerTypes = [
-		'mousewheel',
-		'touchcancel',
-		'touchdrag',
-		'touchend',
-		'touchstart'
-	],
-	i = 0;
+	var supportsEventListenerOptions = false,
+		eventListenerTypes = [
+			'mousewheel',
+			'touchcancel',
+			'touchdrag',
+			'touchend',
+			'touchstart'
+		],
+		i = 0;
 
-	for (i = 0; i < eventListenerTypes.length; i++) {
-		createSpecialEvent(eventListenerTypes[i]);
+	try {
+		// Check to see if the browser can create new Events this way.
+		testEvents = new Event('test');
+
+		// Check to see if the browser supports Event Listener options.
+		opts = Object.defineProperty({}, 'capture', {
+			get: function() {
+				supportsEventListenerOptions = true;
+			}
+		});
+
+		window.addEventListener('test', null, opts);
+	} catch (e) {}
+
+	if (supportsEventListenerOptions) {
+		for (i = 0; i < eventListenerTypes.length; i++) {
+			createSpecialEvent(eventListenerTypes[i]);
+		}
 	}
 
 	function createSpecialEvent(eventListenerType) {
 		$.event.special[eventListenerType] = {
 			setup: function(_, ns, handle) {
-				try {
-					if (ns.includes('noPreventDefault')) {
-						this.addEventListener(eventListenerType, handle, { passive: true });
-					} else {
-						return false;
-					}
-				} catch(e) {
+				if (ns.indexOf('noPreventDefault') > -1) {
+					this.addEventListener(eventListenerType, handle, { passive: true });
+				} else {
 					return false;
 				}
 			}
