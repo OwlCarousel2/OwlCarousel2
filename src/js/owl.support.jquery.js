@@ -21,10 +21,14 @@
 
 	function createSpecialEvent(eventListenerType) {
 		$.event.special[eventListenerType] = {
-			setup: function(data, namespaces, eventHandle) {
-				if (namespaces.includes('noPreventDefault')) {
-					this.addEventListener(eventListenerType, eventHandle, { passive: true });
-				} else {
+			setup: function(_, ns, handle) {
+				try {
+					if (ns.includes('noPreventDefault')) {
+						this.addEventListener(eventListenerType, handle, { passive: true });
+					} else {
+						return false;
+					}
+				} catch(e) {
 					return false;
 				}
 			}
