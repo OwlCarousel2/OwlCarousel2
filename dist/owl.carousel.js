@@ -1,5 +1,5 @@
 /**
- * Owl Carousel v2.2.0
+ * Owl Carousel v2.2.2
  * Copyright 2013-2016 David Deutsch
  * Licensed under MIT (https://github.com/OwlCarousel2/OwlCarousel2/blob/master/LICENSE)
  */
@@ -3287,10 +3287,14 @@
 
 	function createSpecialEvent(eventListenerType) {
 		$.event.special[eventListenerType] = {
-			setup: function(data, namespaces, eventHandle) {
-				if (namespaces.includes('noPreventDefault')) {
-					this.addEventListener(eventListenerType, eventHandle, { passive: true });
-				} else {
+			setup: function(_, ns, handle) {
+				try {
+					if (ns.includes('noPreventDefault')) {
+						this.addEventListener(eventListenerType, handle, { passive: true });
+					} else {
+						return false;
+					}
+				} catch(e) {
 					return false;
 				}
 			}
