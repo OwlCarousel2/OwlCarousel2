@@ -510,6 +510,9 @@
 			});
 
 			settings = $.extend({}, this.options, overwrites[match]);
+			if (typeof settings.stagePadding === 'function') {
+				settings.stagePadding = settings.stagePadding();
+			}
 			delete settings.responsive;
 
 			// responsive class
