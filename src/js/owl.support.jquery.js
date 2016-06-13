@@ -14,7 +14,9 @@
 			'touchend',
 			'touchstart'
 		],
-		i = 0;
+		i = 0,
+		opts = null,
+		testEvents = null;
 
 	try {
 		// Check to see if the browser can create new Events this way.
