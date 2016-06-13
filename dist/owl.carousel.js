@@ -1,5 +1,5 @@
 /**
- * Owl Carousel v2.2.4
+ * Owl Carousel v2.2.5
  * Copyright 2013-2016 David Deutsch
  * Licensed under MIT (https://github.com/OwlCarousel2/OwlCarousel2/blob/master/LICENSE)
  */
@@ -3280,7 +3280,9 @@
 			'touchend',
 			'touchstart'
 		],
-		i = 0;
+		i = 0,
+		opts = null,
+		testEvents = null;
 
 	try {
 		// Check to see if the browser can create new Events this way.
