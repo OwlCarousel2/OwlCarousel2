@@ -48,7 +48,8 @@
      * @public
      */
     Linked.Defaults = {
-        linked: false
+        linked: false,
+        linkSpeed: 300
     };
 
     /**
@@ -66,7 +67,8 @@
      */
     Linked.prototype.toSlide = function(index, speed, propagate) {
         var id = this._core.$element.attr('id'),
-            linked = this._core.settings.linked.split(',');
+            linked = typeof this._core.settings.linked === 'string' ? this._core.settings.linked.split(',') : this._core.settings.linked,
+            speed = this._core.options.linkSpeed;
 
         if ( typeof propagate == 'undefined' ) {
             propagate = true;
@@ -76,10 +78,10 @@
 
         if ( propagate ) {
             $.each(linked, function(i, el){
-                $(el).trigger('linked.to.owl.carousel', [index, 300, true, false]);
+                $(el).trigger('linked.to.owl.carousel', [index, speed, true, false]);
             });
         } else {
-            this._core.$element.trigger('to.owl.carousel', [index, 300, true]);
+            this._core.$element.trigger('to.owl.carousel', [index, speed, true]);
 
             if ( this._core.settings.current ) {
                 this._core._plugins.current.switchTo(index);
