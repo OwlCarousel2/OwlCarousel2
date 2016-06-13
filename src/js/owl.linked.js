@@ -29,7 +29,7 @@
                     this.update(e);
                 }
             }, this),
-            'linked.to.owl.carousel': $.proxy(function(e, index, speed, standard, propagate) {
+            'link.to.owl.carousel': $.proxy(function(e, index, speed, standard, propagate) {
                 if (e.namespace && this._core.settings.linked) {
                     this.toSlide(index, speed, propagate);
                 }
@@ -70,16 +70,15 @@
             linked = typeof this._core.settings.linked === 'string' ? this._core.settings.linked.split(',') : this._core.settings.linked,
             speed = this._core.options.linkSpeed;
 
-        if ( typeof propagate == 'undefined' ) {
-            propagate = true;
-        }
+        propagate = typeof propagate == 'undefined' ? true : propagate;
 
         index = index || 0;
 
         if ( propagate ) {
             $.each(linked, function(i, el){
-                $(el).trigger('linked.to.owl.carousel', [index, speed, true, false]);
+                $(el).trigger('link.to.owl.carousel', [index, speed, true, false]); // don't propagate
             });
+			$(linked[0]).trigger('linked.owl.carousel', index);
         } else {
             this._core.$element.trigger('to.owl.carousel', [index, speed, true]);
 
