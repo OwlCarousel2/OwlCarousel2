@@ -510,6 +510,9 @@
 			});
 
 			settings = $.extend({}, this.options, overwrites[match]);
+			if (typeof settings.stagePadding === 'function') {
+				settings.stagePadding = settings.stagePadding();
+			}
 			delete settings.responsive;
 
 			// responsive class
@@ -1008,6 +1011,7 @@
 
 	/**
 	 * Gets the maximum position for the current item.
+     * @todo: find a prettier workaround #1419
 	 * @public
 	 * @param {Boolean} [relative=false] - Whether to return an absolute position or a relative position.
 	 * @returns {Number}
@@ -1016,16 +1020,28 @@
 		var settings = this.settings,
 			maximum = this._coordinates.length,
 			boundary = Math.abs(this._coordinates[maximum - 1]) - this._width,
-			i = -1, j;
+			i = -1, j,
+            revert = settings.rtl ? 1 : -1,
+            width = this.$stage.width() - this.$element.width(),
+            coordinate;
 
 		if (settings.loop) {
 			maximum = this._clones.length / 2 + this._items.length - 1;
 		} else if (settings.autoWidth || settings.merge) {
-			// binary search
-			while (maximum - i > 1) {
-				Math.abs(this._coordinates[j = maximum + i >> 1]) < boundary
-					? i = j : maximum = j;
-			}
+            if (!settings.loop) {
+                while (coordinate = this.coordinates(i)) {
+                    if (coordinate * revert >= width) {
+                        break;
+                    }
+                    maximum = ++i;
+                }
+            } else {
+                //binary search
+                while (maximum - i > 1) {
+                    Math.abs(this._coordinates[j = maximum + i >> 1]) < boundary
+                        ? i = j : maximum = j;
+                }
+            }
 		} else if (settings.center) {
 			maximum = this._items.length - 1;
 		} else {
