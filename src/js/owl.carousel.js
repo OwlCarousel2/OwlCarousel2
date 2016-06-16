@@ -1011,6 +1011,7 @@
 
 	/**
 	 * Gets the maximum position for the current item.
+     * @TODO: Work on the binary search (remove workaround for issue #1419)
 	 * @public
 	 * @param {Boolean} [relative=false] - Whether to return an absolute position or a relative position.
 	 * @returns {Number}
