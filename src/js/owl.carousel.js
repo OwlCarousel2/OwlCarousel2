@@ -1011,7 +1011,6 @@
 
 	/**
 	 * Gets the maximum position for the current item.
-     * @todo: find a prettier workaround #1419
 	 * @public
 	 * @param {Boolean} [relative=false] - Whether to return an absolute position or a relative position.
 	 * @returns {Number}
@@ -1019,29 +1018,23 @@
 	Owl.prototype.maximum = function(relative) {
 		var settings = this.settings,
 			maximum = this._coordinates.length,
-			boundary = Math.abs(this._coordinates[maximum - 1]) - this._width,
-			i = -1, j,
-            revert = settings.rtl ? 1 : -1,
-            width = this.$stage.width() - this.$element.width(),
-            coordinate;
+			iterator,
+			reciprocalItemsWidth,
+			elementWidth;
 
 		if (settings.loop) {
 			maximum = this._clones.length / 2 + this._items.length - 1;
 		} else if (settings.autoWidth || settings.merge) {
-            if (!settings.loop) {
-                while (coordinate = this.coordinates(i)) {
-                    if (coordinate * revert >= width) {
-                        break;
-                    }
-                    maximum = ++i;
-                }
-            } else {
-                //binary search
-                while (maximum - i > 1) {
-                    Math.abs(this._coordinates[j = maximum + i >> 1]) < boundary
-                        ? i = j : maximum = j;
-                }
-            }
+			iterator = this._items.length;
+			reciprocalItemsWidth = this._items[--iterator].width();
+			elementWidth = this.$element.width();
+			while (iterator--) {
+				reciprocalItemsWidth += this._items[iterator].width() + this.settings.margin;
+				if (reciprocalItemsWidth > elementWidth) {
+					break;
+				}
+			}
+			maximum = iterator + 1;
 		} else if (settings.center) {
 			maximum = this._items.length - 1;
 		} else {
