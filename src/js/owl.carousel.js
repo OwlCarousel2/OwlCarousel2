@@ -321,7 +321,7 @@
 			var clones = [],
 				items = this._items,
 				settings = this.settings,
-				view = Math.max(settings.items * 2, 4),
+				view = Math.max(settings.items * 2, 2),
 				size = Math.ceil(items.length / 2) * 2,
 				repeat = settings.loop && items.length ? settings.rewind ? view : Math.max(view, size) : 0,
 				append = '',
