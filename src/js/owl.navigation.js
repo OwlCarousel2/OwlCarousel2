@@ -285,8 +285,8 @@
 				this._controls.$absolute.children().slice(difference).remove();
 			}
 
-			this._controls.$absolute.find('.active').removeClass('active');
-			this._controls.$absolute.children().eq($.inArray(this.current(), this._pages)).addClass('active');
+			this._controls.$absolute.find('.' + settings.activeClass).removeClass(settings.activeClass);
+			this._controls.$absolute.children().eq($.inArray(this.current(), this._pages)).addClass(settings.activeClass);
 		}
 	};
 
