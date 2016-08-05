@@ -11,6 +11,7 @@
 		"dist":		"dist",
 
 		"scripts": [
+			"src/js/owl.header.js",
 			"src/js/owl.carousel.js",
 			"src/js/owl.autorefresh.js",
 			"src/js/owl.lazyload.js",

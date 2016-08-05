@@ -316,4 +316,4 @@
 
 	$.fn.owlCarousel.Constructor.Plugins.Video = Video;
 
-})(window.Zepto || window.jQuery, window, document);
+})(owlCarousel.$, window, document);

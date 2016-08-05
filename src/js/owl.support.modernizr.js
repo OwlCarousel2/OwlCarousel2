@@ -63,4 +63,4 @@
 		$.support.transform = new String(Modernizr.prefixed('transform'));
 		$.support.transform3d = Modernizr.csstransforms3d;
 	}
-})(window.Zepto || window.jQuery, window.Modernizr, window, document);
+})(owlCarousel.$, window.Modernizr, window, document);

@@ -10,20 +10,55 @@ Please consider that the project is still in beta. The current status of the mil
 
 ## Quick start
 
-Download the [latest release](https://owlcarousel2.github.io/OwlCarousel2/download/owl.carousel.2.1.0.zip) and put the required stylesheet at the [top](https://developer.yahoo.com/performance/rules.html#css_top) of your markup:
+### Install
+
+This package can be installed with:
+
+- [npm](https://www.npmjs.com/package/owl.carousel): `npm install --save owl.carousel`
+- [bower](http://bower.io/search/?q=owl.carousel): `bower install --save owl.carousel`
+
+Or download the [latest release](https://github.com/OwlCarousel2/OwlCarousel2/releases).
+
+### Load
+
+#### Webpack
+
+Load the required stylesheet and JS:
+
+```js
+import 'owl.carousel/dist/assets/owl.carousel.css';
+import $ from 'jquery';
+import 'imports?jQuery=jquery!owl.carousel';
+```
+
+#### Static HTML
+
+Put the required stylesheet at the [top](https://developer.yahoo.com/performance/rules.html#css_top) of your markup:
 
 ```html
-<link rel="stylesheet" href="owlcarousel/owl.carousel.min.css" />
+<link rel="stylesheet" href="/node_modules/owl.carousel/dist/assets/owl.carousel.min.css" />
 ```
+
+```html
+<link rel="stylesheet" href="/bower_components/owl.carousel/dist/assets/owl.carousel.min.css" />
+```
+
 **NOTE:** If you want to use the default navigation styles, you will also need to include `owl.theme.default.css`.
 
 
 Put the script at the [bottom](https://developer.yahoo.com/performance/rules.html#js_bottom) of your markup right after jQuery:
 
 ```html
-<script src="jquery.min.js"></script>
-<script src="owlcarousel/owl.carousel.min.js"></script>
+<script src="/node_modules/jquery/dist/jquery.js"></script>
+<script src="/node_modules/owl.carousel/dist/owl.carousel.min.js"></script>
 ```
+
+```html
+<script src="/bower_components/jquery/dist/jquery.js"></script>
+<script src="/bower_components/owl.carousel/dist/owl.carousel.min.js"></script>
+```
+
+### Usage
 
 Wrap your items (`div`, `a`, `img`, `span`, `li` etc.) with a container element (`div`, `ul` etc.). Only the class `owl-carousel` is mandatory to apply proper styles:
 

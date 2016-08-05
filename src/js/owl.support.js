@@ -80,4 +80,4 @@
 		$.support.transform3d = tests.csstransforms3d();
 	}
 
-})(window.Zepto || window.jQuery, window, document);
+})(owlCarousel.$, window, document);

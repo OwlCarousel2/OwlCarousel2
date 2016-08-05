@@ -3,6 +3,13 @@
  * Copyright 2013-2016 David Deutsch
  * Licensed under MIT (https://github.com/OwlCarousel2/OwlCarousel2/blob/master/LICENSE)
  */
+// Namespace
+var owlCarousel = owlCarousel || {};
+if (typeof jQuery != 'undefined') {
+	owlCarousel.$ = jQuery;
+} else if (typeof Zepto != 'undefined') {
+	owlCarousel.$ = Zepto;
+}
 /**
  * Owl carousel
  * @version 2.1.0
@@ -1685,7 +1692,7 @@
 	 */
 	$.fn.owlCarousel.Constructor = Owl;
 
-})(window.Zepto || window.jQuery, window, document);
+})(owlCarousel.$, window, document);
 
 /**
  * AutoRefresh Plugin
@@ -1797,7 +1804,7 @@
 
 	$.fn.owlCarousel.Constructor.Plugins.AutoRefresh = AutoRefresh;
 
-})(window.Zepto || window.jQuery, window, document);
+})(owlCarousel.$, window, document);
 
 /**
  * Lazy Plugin
@@ -1933,7 +1940,7 @@
 
 	$.fn.owlCarousel.Constructor.Plugins.Lazy = Lazy;
 
-})(window.Zepto || window.jQuery, window, document);
+})(owlCarousel.$, window, document);
 
 /**
  * AutoHeight Plugin
@@ -2031,7 +2038,7 @@
 
 	$.fn.owlCarousel.Constructor.Plugins.AutoHeight = AutoHeight;
 
-})(window.Zepto || window.jQuery, window, document);
+})(owlCarousel.$, window, document);
 
 /**
  * Video Plugin
@@ -2351,7 +2358,7 @@
 
 	$.fn.owlCarousel.Constructor.Plugins.Video = Video;
 
-})(window.Zepto || window.jQuery, window, document);
+})(owlCarousel.$, window, document);
 
 /**
  * Animate Plugin
@@ -2473,7 +2480,7 @@
 
 	$.fn.owlCarousel.Constructor.Plugins.Animate = Animate;
 
-})(window.Zepto || window.jQuery, window, document);
+})(owlCarousel.$, window, document);
 
 /**
  * Autoplay Plugin
@@ -2673,7 +2680,7 @@
 
 	$.fn.owlCarousel.Constructor.Plugins.autoplay = Autoplay;
 
-})(window.Zepto || window.jQuery, window, document);
+})(owlCarousel.$, window, document);
 
 /**
  * Navigation Plugin
@@ -3056,7 +3063,7 @@
 
 	$.fn.owlCarousel.Constructor.Plugins.Navigation = Navigation;
 
-})(window.Zepto || window.jQuery, window, document);
+})(owlCarousel.$, window, document);
 
 /**
  * Hash Plugin
@@ -3179,7 +3186,7 @@
 
 	$.fn.owlCarousel.Constructor.Plugins.Hash = Hash;
 
-})(window.Zepto || window.jQuery, window, document);
+})(owlCarousel.$, window, document);
 
 /**
  * Support Plugin
@@ -3263,4 +3270,4 @@
 		$.support.transform3d = tests.csstransforms3d();
 	}
 
-})(window.Zepto || window.jQuery, window, document);
+})(owlCarousel.$, window, document);
