@@ -1,17 +1,17 @@
 /**
  * @description Plugin for navigating between slides by selecting them, with a click or something else.
- * @version 1.0.0
+ * @version 1.1.0
  * @author Luiz Filipe Machado Barni @odahcam
  * @license The MIT License (MIT)
  */
 ;
-(function ($, window, document, undefined) {
+(function($, window, document, undefined) {
     /**
      * Creates the MouseNav plugin.
-     * @class The MouseNav Plugin
-     * @param {Owl} carousel - The Owl Carousel
+     * @class MouseNav the Plugin
+     * @param {Owl} carousel the Owl Carousel
      */
-    var MouseNav = function (carousel) {
+    var MouseNav = function(carousel) {
         /**
          * Reference to the core.
          * @protected
@@ -24,27 +24,7 @@
 
         // starts the plugin only if mouseNav == true
         if (this._core.options.mouseNav) {
-
-            var navTriggers = this._core.options.mouseNavTrigger.replace(/\s|$/g, '.owl.item ').replace(/\s$/g, '');
-
-            /**
-             * All event handlers.
-             * @protected
-             * @type {Object}
-             */
-            this._handlers = {};
-
-            // register custom navigation triggers
-            this._handlers[navTriggers] = $.proxy(function (e) {
-                var clickIndex = $(e.target).closest('.owl-item').index();
-                var relativeIndex = this._core.relative(clickIndex);
-
-                this.toSlide(relativeIndex, this._core.options.navSpeed);
-
-            }, this);
-
-            // register event handlers
-            this._core.$element.on(this._handlers, '.owl-item');
+            this.init();
         }
     };
 
@@ -62,7 +42,7 @@
      * @param {int} index
      * @param {int} speed
      */
-    MouseNav.prototype.toSlide = function (index, speed) {
+    MouseNav.prototype.toSlide = function(index, speed) {
 
         index = index || 0;
 
@@ -77,20 +57,68 @@
     };
 
     /**
+     * Unset and sets the mouse navigation handlers
+     * @param {void}
+     */
+    MouseNav.prototype.resetNavHandlers = function() {
+        this.unsetNavHandlers();
+        this._core.$element.on(this._handlers_sub, '.owl-item');
+    };
+
+    /**
+     * Unset the mouse navigation handlers
+     * @param {void}
+     */
+    MouseNav.prototype.unsetNavHandlers = function() {
+        for (var handler in this._handlers) {
+            this._core.$element.off(handler, this._handlers[handler]);
+        }
+    };
+
+    /**
      * Destroys the plugin.
      * @protected
      */
-    MouseNav.prototype.destroy = function () {
+    MouseNav.prototype.destroy = function() {
         var handler, property;
 
-        for (handler in this._handlers) {
-            this.$element.off(handler, this._handlers[handler]);
-        }
+        this.unsetNavHandlers();
+
         for (property in Object.getOwnPropertyNames(this)) {
             typeof this[property] !== 'function' && (this[property] = null);
         }
     };
 
-    $.fn.owlCarousel.Constructor.Plugins.mouseNav = MouseNav;
+    MouseNav.prototype.init = function() {
+        var navTriggers = this._core.options.mouseNavTrigger.replace(/\s|$/g, '.owl.item ').replace(/\s$/g, '');
+
+        /**
+         * All event handlers.
+         * @protected
+         * @type {Object}
+         */
+
+        this._handlers = {
+            "refreshed.owl.carousel": $.proxy(function(e) {
+                this.resetNavHandlers();
+            }, this)
+        };
+
+        this._handlers_sub = {};
+
+        // register custom navigation triggers
+        this._handlers_sub[navTriggers] = $.proxy(function(e) {
+            var clickIndex = $(e.target).closest('.owl-item').index();
+            var relativeIndex = this._core.relative(clickIndex);
+
+            this.toSlide(relativeIndex, this._core.options.navSpeed);
+        }, this);
+
+        // register event handlers
+        this._core.$element.on(this._handlers);
+        this._core.$element.on(this._handlers_sub, '.owl-item');
+    };
+
+    $.fn.owlCarousel.Constructor.Plugins.MouseNav = MouseNav;
 
 })(window.Zepto || window.jQuery, window, document);
