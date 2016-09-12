@@ -1,6 +1,6 @@
 /**
  * @description Plugin for navigating between slides by selecting them, with a click or something else.
- * @version 1.1.0
+ * @version 2.0.0
  * @author Luiz Filipe Machado Barni @odahcam
  * @license The MIT License (MIT)
  */
