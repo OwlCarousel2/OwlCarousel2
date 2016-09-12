@@ -87,7 +87,8 @@
 
 	&.owl-grab {
 		cursor: move;
-		cursor: grab;
+		cursor: e-resize;
+		cursor: grabbing;
 	}
 
 	&.owl-rtl {
