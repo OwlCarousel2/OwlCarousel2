@@ -7,11 +7,11 @@
 ;
 (function($, window, document, undefined) {
     /**
-     * Creates the MouseNav plugin.
-     * @class MouseNav the Plugin
+     * Creates the navByClick plugin.
+     * @class navByClick the Plugin
      * @param {Owl} carousel the Owl Carousel
      */
-    var MouseNav = function(carousel) {
+    var navByClick = function(carousel) {
         /**
          * Reference to the core.
          * @protected
@@ -20,10 +20,10 @@
         this._core = carousel;
 
         // set default options
-        this._core.options = $.extend({}, MouseNav.Defaults, this._core.options);
+        this._core.options = $.extend({}, navByClick.Defaults, this._core.options);
 
-        // starts the plugin only if mouseNav == true
-        if (this._core.options.mouseNav) {
+        // starts the plugin only if navByClick == true
+        if (this._core.options.navByClick) {
             this.init();
         }
     };
@@ -32,9 +32,9 @@
      * Default options.
      * @public
      */
-    MouseNav.Defaults = {
-        mouseNav: false,
-        mouseNavTrigger: 'click'
+    navByClick.Defaults = {
+        navByClick: false,
+        navByClickTrigger: 'click'
     };
 
     /**
@@ -42,7 +42,7 @@
      * @param {int} index
      * @param {int} speed
      */
-    MouseNav.prototype.toSlide = function(index, speed) {
+    navByClick.prototype.toSlide = function(index, speed) {
 
         index = index || 0;
 
@@ -52,7 +52,7 @@
             this._core._plugins.current.switchTo(index);
         }
 
-        this._core.$element.trigger('mouseNaved.owl.carousel', index);
+        this._core.$element.trigger('navByClicked.owl.carousel', index);
 
     };
 
@@ -60,7 +60,7 @@
      * Unset and sets the mouse navigation handlers
      * @param {void}
      */
-    MouseNav.prototype.resetNavHandlers = function() {
+    navByClick.prototype.resetNavHandlers = function() {
         this.unsetNavHandlers();
         this._core.$element.on(this._handlers_sub, '.owl-item');
     };
@@ -69,7 +69,7 @@
      * Unset the mouse navigation handlers
      * @param {void}
      */
-    MouseNav.prototype.unsetNavHandlers = function() {
+    navByClick.prototype.unsetNavHandlers = function() {
         for (var handler in this._handlers) {
             this._core.$element.off(handler, this._handlers[handler]);
         }
@@ -79,7 +79,7 @@
      * Destroys the plugin.
      * @protected
      */
-    MouseNav.prototype.destroy = function() {
+    navByClick.prototype.destroy = function() {
         var handler, property;
 
         this.unsetNavHandlers();
@@ -89,8 +89,8 @@
         }
     };
 
-    MouseNav.prototype.init = function() {
-        var navTriggers = this._core.options.mouseNavTrigger.replace(/\s|$/g, '.owl.item ').replace(/\s$/g, '');
+    navByClick.prototype.init = function() {
+        var navTriggers = this._core.options.navByClickTrigger.replace(/\s|$/g, '.owl.item ').replace(/\s$/g, '');
 
         /**
          * All event handlers.
@@ -119,6 +119,6 @@
         this._core.$element.on(this._handlers_sub, '.owl-item');
     };
 
-    $.fn.owlCarousel.Constructor.Plugins.MouseNav = MouseNav;
+    $.fn.owlCarousel.Constructor.Plugins.navByClick = navByClick;
 
 })(window.Zepto || window.jQuery, window, document);
