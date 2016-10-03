@@ -267,7 +267,7 @@
 
 		if (settings.nav) {
 			var maxIndex = this._core.maximum(true);
-			disabled = maxIndex == 0;
+			disabled = maxIndex === 0;
 			this._controls.$previous.toggleClass('disabled', !loop && index <= this._core.minimum(true));
 			this._controls.$next.toggleClass('disabled', !loop && index >= maxIndex);
 		}
