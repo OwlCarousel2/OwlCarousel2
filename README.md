@@ -1,6 +1,6 @@
-# OwlCarousel2 is currently being transferred to a new owner
+# OwlCarousel2 is was recently transferred to a new owner. 
 
-Stay tuned while the new owner sorts through some stuff. (Oh, hi, I'm [David](https://github.com/daviddeutsch)!)
+Pleaese start by reading this issue [Priorities Goring Forward](https://github.com/OwlCarousel2/OwlCarousel2/issues/1538)
 
 ## Owl Carousel 2 Beta
 
