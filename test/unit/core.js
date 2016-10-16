@@ -1,12 +1,12 @@
 QUnit.module('Core tests');
 
 QUnit.test('replace with loop', function() {
-	expect(1);
+	assert.expect(1);
 	before_and_after_replace({ loop: true });
 });
 
 QUnit.test('replace without loop', function() {
-	expect(1);
+	assert.expect(1);
 	before_and_after_replace({ loop: false });
 });
 
@@ -26,13 +26,13 @@ function before_and_after_replace(options) {
 }
 
 QUnit.test('remove with loop', function() {
-	expect(3);
+	assert.expect(3);
 	
 	before_and_after_remove({ loop: true });
 });
 
 QUnit.test('remove without loop', function() {
-	expect(3);
+	assert.expect(3);
 	
 	before_and_after_remove({ loop: false });
 });
@@ -69,13 +69,13 @@ function before_and_after_remove(options) {
 }
 
 QUnit.test('remove and add with loop', function() {
-	expect(1);
+	assert.expect(1);
 	
 	before_and_after_remove_add({ loop: true });
 });
 
 QUnit.test('remove and add without loop', function() {
-	expect(1);
+	assert.expect(1);
 	
 	before_and_after_remove_add({ loop: false });
 });
@@ -100,7 +100,7 @@ function before_and_after_remove_add(options) {
 }
 
 QUnit.test('invalidate', function() {
-	expect(6);
+	assert.expect(6);
 	
 	var carousel = $('#simple').owlCarousel().data('owl.carousel');
 	
@@ -126,7 +126,7 @@ QUnit.test('invalidate', function() {
 });
 
 QUnit.test('destroy', function() {
-	expect(1);
+	assert.expect(1);
 	
 	var simple = $('#simple'),
 		expected = simple.get(0).outerHTML.replace(/\s{2,}/g, '');
@@ -136,5 +136,5 @@ QUnit.test('destroy', function() {
 	equal(simple.get(0).outerHTML.replace(/\s{2,}/g, ''), expected, 'Outer HTML before create and after destroy is equal.');
 });
 
-start();
+QUnit.start()
 
