@@ -1,13 +1,12 @@
 language: node_js
 node_js:
-  - '0.32'
+  - '0.4.6'
 
 before_install:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
 
 before_script:
-  - nvm install node
   - npm install -g bower grunt-cli
   - bower install
   - npm run update-webdriver
