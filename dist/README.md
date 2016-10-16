@@ -1,13 +1,14 @@
-# OwlCarousel2 is currently being transferred to a new owner
+# OwlCarousel2 is was recently transferred to a new owner.
 
-Stay tuned while the new owner sorts through some stuff. (Oh, hi, I'm [David](https://github.com/daviddeutsch)!)
+Please read [Priorities Going Forward](https://github.com/OwlCarousel2/OwlCarousel2/issues/1538)
+This outlines our basic roadmap for moving forward with the project, and discusses the short-term
 
 ## Owl Carousel 2 Beta
 
 Touch enabled [jQuery](https://jquery.com/) plugin that lets you create a beautiful, responsive carousel slider. **To get started, check out https://owlcarousel2.github.io/OwlCarousel2/.**
 
 Please consider that the project is still in beta. The current status of the milestones can be found [here](https://github.com/owlcarousel2/OwlCarousel2/milestones). If you want to use the [latest development](https://github.com/owlcarousel2/OwlCarousel2/archive/develop.zip) see [building](#building).
-
+Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quia molestiae aliquam in eveniet veniam, cum ullam ipsum corrupti minima explicabo vero deserunt temporibus dicta quidem velit quas voluptatem, tenetur aspernatur.
 ## Quick start
 
 ### Install

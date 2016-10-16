@@ -1,12 +1,12 @@
-module('Core tests');
+QUnit.module('Core tests');
 
-test('replace with loop', function() {
-	expect(1);
+QUnit.test('replace with loop', function() {
+	assert.expect(1);
 	before_and_after_replace({ loop: true });
 });
 
-test('replace without loop', function() {
-	expect(1);
+QUnit.test('replace without loop', function() {
+	assert.expect(1);
 	before_and_after_replace({ loop: false });
 });
 
@@ -25,14 +25,14 @@ function before_and_after_replace(options) {
 	equal(simple.html(), expected, 'Inner HTML before and after replace equals.');
 }
 
-test('remove with loop', function() {
-	expect(3);
+QUnit.test('remove with loop', function() {
+	assert.expect(3);
 	
 	before_and_after_remove({ loop: true });
 });
 
-test('remove without loop', function() {
-	expect(3);
+QUnit.test('remove without loop', function() {
+	assert.expect(3);
 	
 	before_and_after_remove({ loop: false });
 });
@@ -68,14 +68,14 @@ function before_and_after_remove(options) {
 	equal(simple.html(), all.html(), 'Inner HTML before and after remove all equals.');
 }
 
-test('remove and add with loop', function() {
-	expect(1);
+QUnit.test('remove and add with loop', function() {
+	assert.expect(1);
 	
 	before_and_after_remove_add({ loop: true });
 });
 
-test('remove and add without loop', function() {
-	expect(1);
+QUnit.test('remove and add without loop', function() {
+	assert.expect(1);
 	
 	before_and_after_remove_add({ loop: false });
 });
@@ -99,8 +99,8 @@ function before_and_after_remove_add(options) {
 	equal(simple.html(), simpleClone.html(), 'Inner HTML before and after `remove()` and `add()` equals.');
 }
 
-test('invalidate', function() {
-	expect(6);
+QUnit.test('invalidate', function() {
+	assert.expect(6);
 	
 	var carousel = $('#simple').owlCarousel().data('owl.carousel');
 	
@@ -125,8 +125,8 @@ test('invalidate', function() {
 	deepEqual(carousel.invalidate('first'), [ 'first' ], 'Invalidating one part returns it directly.');
 });
 
-test('destroy', function() {
-	expect(1);
+QUnit.test('destroy', function() {
+	assert.expect(1);
 	
 	var simple = $('#simple'),
 		expected = simple.get(0).outerHTML.replace(/\s{2,}/g, '');
@@ -136,5 +136,5 @@ test('destroy', function() {
 	equal(simple.get(0).outerHTML.replace(/\s{2,}/g, ''), expected, 'Outer HTML before create and after destroy is equal.');
 });
 
-start();
+QUnit.start()
 
