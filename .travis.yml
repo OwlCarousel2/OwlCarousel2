@@ -9,7 +9,6 @@ before_install:
 before_script:
   - npm install -g bower grunt-cli
   - bower install
-  - npm run update-webdriver
 
 script:
   - grunt test
