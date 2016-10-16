@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  - '0.12'
+  - '4.5.5'
 
 before_install:
   - export DISPLAY=:99.0
@@ -8,7 +8,6 @@ before_install:
 
 before_script:
   - npm install -g bower grunt-cli
-  - npm install -g protractor
   - bower install
   - npm run update-webdriver
 
