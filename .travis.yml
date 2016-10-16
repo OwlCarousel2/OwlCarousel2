@@ -7,7 +7,7 @@ before_install:
   - sh -e /etc/init.d/xvfb start
 
 before_script:
-  - npm install -g bower grunt-cli
+  - npm install -g bower grunt-cli assemble
   - bower install
 
 script:
