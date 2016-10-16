@@ -316,7 +316,7 @@ module.exports = function(grunt) {
 
 	grunt.registerTask('docs', [ 'dist', 'clean:docs', 'assemble', 'sass:docs', 'copy:docsAssets', 'copy:distToDocs', 'zip' ]);
 
-	grunt.registerTask('test', [ 'jshint:dist', 'qunit:dist', 'blanket_qunit:dist' ]);
+	grunt.registerTask('test', [ 'jshint:dist', 'qunit:dist' ]);
 
 	grunt.registerTask('default', [ 'dist', 'docs', 'test' ]);
 
