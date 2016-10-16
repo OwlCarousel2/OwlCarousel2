@@ -1,4 +1,4 @@
-module('Core tests');
+QUnit.module('Core tests');
 
 test('replace with loop', function() {
 	expect(1);
