@@ -8,6 +8,7 @@ before_install:
 
 before_script:
   - npm install -g bower grunt-cli
+  - npm install -g protractor
   - bower install
   - npm run update-webdriver
 
