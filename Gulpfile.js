@@ -8,10 +8,14 @@ var gulp = require('gulp'),
     autoprefixer = require('autoprefixer'),
     cssnano = require('gulp-cssnano'),
     app = require('assemble')(),
-    extname = require('gulp-extname')
+    extname = require('gulp-extname'),
+    rename = require('gulp-rename'),
+    header = require('gulp-header'),
+    today = new Date()
     ;
 
-var cfg = {
+var pkg = require('./package.json'),
+    cfg = {
         docs: {
             "src":       "docs_src",
             "dest":      "docs",
@@ -34,24 +38,36 @@ var cfg = {
                 "src/js/owl.support.js"
             ]
         },
-
         title:    "Owl Carousel",
         download: "https://github.com/OwlCarousel2/OwlCarousel2/archive/master.zip",
-        donate:   "https://www.paypal.com"
-    },
-    pkg = require('./package.json');
+        donate:   "https://www.paypal.com",
+        header: '/**\n' + ' * Owl Carousel v' + pkg.version + '\n'
+        + ' * Copyright 2013-' + today.getFullYear() + ' ' + pkg.author.name + '\n'
+        + ' * Licensed under ' + pkg.license.type + ' (' + pkg.license.url + ')\n' + ' */\n'
+    };
+
 
 function cssPipe(source, target, path) {
+    console.log(source);
     return gulp.src(source)
-        .pipe(sourcemaps.init())
+        //.pipe(sourcemaps.init())
+
         .pipe(sass())
-        .pipe(postcss([ autoprefixer({ browsers: [
-            'last 2 versions',
-            'ie 7', 'ie 8', 'ie 9', 'ie 10', 'ie 11'
-        ] }) ]))
+        .pipe(postcss([
+            autoprefixer({ browsers: [
+                'last 2 versions',
+                'ie 7', 'ie 8', 'ie 9', 'ie 10', 'ie 11'
+            ] })
+        ]))
         .pipe(concat(target))
+        .pipe(header(cfg.header))
+        .pipe(gulp.dest(path))
         .pipe(cssnano())
-        .pipe(sourcemaps.write('.'))
+        .pipe(rename({
+            suffix: '.min'
+        }))
+        //.pipe(sourcemaps.write('.'))
+        .pipe(header(cfg.header))
         .pipe(gulp.dest(path));
 }
 
@@ -91,9 +107,16 @@ gulp.task(
 
 gulp.task(
     'css',
+    ['css:owl', 'css:theme-default', 'css:theme-green']
+);
+
+gulp.task(
+    'css:owl',
     function() {
         return cssPipe(
-            'src/scss/owl.carousel.scss',
+            [
+                'src/scss/owl.carousel.scss'
+            ],
             'owl.carousel.css',
             'dist/assets/'
         );
@@ -101,8 +124,43 @@ gulp.task(
 );
 
 gulp.task(
+    'css:theme-default',
+    function() {
+        return cssPipe(
+            [
+                'src/scss/owl.theme.default.scss'
+            ],
+            'owl.theme.default.css',
+            'dist/assets/'
+        );
+    }
+);
+
+gulp.task(
+    'css:theme-green',
+    function() {
+        return cssPipe(
+            [
+                'src/scss/owl.theme.green.scss'
+            ],
+            'owl.theme.green.css',
+            'dist/assets/'
+        );
+    }
+);
+
+
+gulp.task(
     'build-dist',
     ['css'],
+    function() {
+
+    }
+);
+
+gulp.task(
+    'default',
+    ['dist', 'docs', 'test'],
     function() {
 
     }
