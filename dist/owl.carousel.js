@@ -57,7 +57,7 @@
 		this._plugins = {};
 
 		/**
-		 * Currently suppressed events to prevent them from beeing retriggered.
+		 * Currently suppressed events to prevent them from being retriggered.
 		 * @protected
 		 */
 		this._supress = {};
@@ -76,7 +76,7 @@
 
 		/**
 		 * Coordinates of all items in pixel.
-		 * @todo The name of this member is missleading.
+		 * @todo The name of this member is misleading.
 		 * @protected
 		 */
 		this._coordinates = [];
@@ -494,7 +494,7 @@
 	};
 
 	/**
-	 * Setups the current settings.
+	 * Setup the current settings.
 	 * @todo Remove responsive classes. Why should adaptive designs be brought into IE8?
 	 * @todo Support for media queries by using `matchMedia` would be nice.
 	 * @public
@@ -1127,7 +1127,7 @@
 
 	/**
 	 * Gets the coordinate of an item.
-	 * @todo The name of this method is missleanding.
+	 * @todo The name of this method is misleading.
 	 * @public
 	 * @param {Number} position - The absolute position of the item within `minimum()` and `maximum()`.
 	 * @returns {Number|Array.<Number>} - The coordinate of the item in pixel or all coordinates.
@@ -1452,7 +1452,7 @@
 	 * @param {HTMLElement} element - The event source.
 	 * @param {String} event - The event name.
 	 * @param {Function} listener - The event handler to attach.
-	 * @param {Boolean} capture - Wether the event should be handled at the capturing phase or not.
+	 * @param {Boolean} capture - Whether the event should be handled at the capturing phase or not.
 	 */
 	Owl.prototype.on = function(element, event, listener, capture) {
 		if (element.addEventListener) {
