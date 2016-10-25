@@ -75,7 +75,7 @@
 	}
 
 	&.owl-refresh .owl-item {
-		display: none;
+		visibility: hidden;
 	}
 
 	&.owl-drag .owl-item {
