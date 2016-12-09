@@ -298,7 +298,15 @@
 	}, {
 		filter: [ 'width', 'items', 'settings' ],
 		run: function(cache) {
-			var width = (this.width() / this.settings.items).toFixed(3) - this.settings.margin,
+			//Manual width
+			var preferWidth = 0;
+			if (!isNaN(this.settings.width)) {
+				preferWidth = this.settings.width
+			} else {
+				preferWidth = (this.width() / this.settings.items).toFixed(3) - this.settings.margin
+			}
+
+			var width = preferWidth,
 				merge = null,
 				iterator = this._items.length,
 				grid = !this.settings.autoWidth,
