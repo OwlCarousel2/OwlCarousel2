@@ -213,7 +213,12 @@
 
 		nestedItemSelector: false,
 		itemElement: 'div',
+		itemsSelector: '',
 		stageElement: 'div',
+
+		caption: true,
+		caption_container: 'owl-caption',
+		caption_src: 'data-caption',
 
 		refreshClass: 'owl-refresh',
 		loadedClass: 'owl-loaded',
@@ -468,7 +473,7 @@
 		this.$element.append(this.$stage.parent());
 
 		// append content
-		this.replace(this.$element.children().not(this.$stage.parent()));
+		this.replace(this.$element.children(this.settings.itemsSelector).not(this.$stage.parent()));
 
 		// check visibility
 		if (this.$element.is(':visible')) {
@@ -478,6 +483,14 @@
 			// invalidate width
 			this.invalidate('width');
 		}
+
+		//Save parent instance.
+		var that = this;
+		this.$element.find('.' + this.settings.itemClass).each(function(){
+			var caption = $(this).find('img').attr(that.settings.caption_src);
+			var caption_tag =  '<div class="' + that.settings.caption_container + '">' + caption + '</div>';
+			if(caption) $(this).append(caption_tag);
+		});
 
 		this.$element
 			.removeClass(this.options.loadingClass)
