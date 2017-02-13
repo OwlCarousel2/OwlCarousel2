@@ -2951,13 +2951,14 @@
 			index = this._core.relative(this._core.current()),
 			loop = settings.loop || settings.rewind;
 
-		this._controls.$relative.toggleClass('disabled', !settings.nav || disabled);
-
 		if (settings.nav) {
+			var maxIndex = this._core.maximum(true);
+			disabled = maxIndex === 0;
 			this._controls.$previous.toggleClass('disabled', !loop && index <= this._core.minimum(true));
-			this._controls.$next.toggleClass('disabled', !loop && index >= this._core.maximum(true));
+			this._controls.$next.toggleClass('disabled', !loop && index >= maxIndex);
 		}
 
+		this._controls.$relative.toggleClass('disabled', !settings.nav || disabled);
 		this._controls.$absolute.toggleClass('disabled', !settings.dots || disabled);
 
 		if (settings.dots) {
