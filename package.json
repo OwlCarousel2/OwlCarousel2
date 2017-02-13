@@ -9,10 +9,7 @@
     "email": "deutsch@medienpark.net",
     "url": "https://owlcarousel2.github.io/OwlCarousel2"
   },
-  "license": {
-    "type": "MIT",
-    "url": "https://github.com/OwlCarousel2/OwlCarousel2/blob/master/LICENSE"
-  },
+  "license": "SEE LICENSE IN https://github.com/OwlCarousel2/OwlCarousel2/blob/master/LICENSE",
   "bugs": {
     "url": "https://github.com/OwlCarousel2/OwlCarousel2/issues",
     "email": "deutsch@medienpark.net"
