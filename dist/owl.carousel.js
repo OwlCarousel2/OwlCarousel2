@@ -1,9 +1,4 @@
 /**
- * Owl Carousel v2.2.0
- * Copyright 2013-2016 David Deutsch
- * Licensed under MIT (https://github.com/OwlCarousel2/OwlCarousel2/blob/master/LICENSE)
- */
-/**
  * Owl carousel
  * @version 2.1.6
  * @author Bartosz Wojciechowski
@@ -218,7 +213,12 @@
 
 		nestedItemSelector: false,
 		itemElement: 'div',
+		itemsSelector: '',
 		stageElement: 'div',
+
+		caption: true,
+		caption_container: 'owl-caption',
+		caption_src: 'data-caption',
 
 		refreshClass: 'owl-refresh',
 		loadedClass: 'owl-loaded',
@@ -473,7 +473,7 @@
 		this.$element.append(this.$stage.parent());
 
 		// append content
-		this.replace(this.$element.children().not(this.$stage.parent()));
+		this.replace(this.$element.children(this.settings.itemsSelector).not(this.$stage.parent()));
 
 		// check visibility
 		if (this.$element.is(':visible')) {
@@ -483,6 +483,14 @@
 			// invalidate width
 			this.invalidate('width');
 		}
+
+		//Save parent instance.
+		var that = this;
+		this.$element.find('.' + this.settings.itemClass).each(function(){
+			var caption = $(this).find('img').attr(that.settings.caption_src);
+			var caption_tag =  '<div class="' + that.settings.caption_container + '">' + caption + '</div>';
+			if(caption) $(this).append(caption_tag);
+		});
 
 		this.$element
 			.removeClass(this.options.loadingClass)
@@ -2313,7 +2321,7 @@
 
 		if (video.type === 'youtube') {
 			html = '<iframe width="' + width + '" height="' + height + '" src="//www.youtube.com/embed/' +
-				video.id + '?autoplay=1&v=' + video.id + '" frameborder="0" allowfullscreen></iframe>';
+				video.id + '?autoplay=1&rel=0&v=' + video.id + '" frameborder="0" allowfullscreen></iframe>';
 		} else if (video.type === 'vimeo') {
 			html = '<iframe src="//player.vimeo.com/video/' + video.id +
 				'?autoplay=1" width="' + width + '" height="' + height +
