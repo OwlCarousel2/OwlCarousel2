@@ -14,7 +14,9 @@ Guidelines for bug reports:
 
   2. Check if the issue has been fixed — try to reproduce it using the latest `develop` branch in the repository.
 
-  3. Isolate the problem — ideally create a reduced test case and a live example. This [CodePen](https://codepen.io/anon/pen/rVENKy), [JSFiddle](https://jsfiddle.net/og7ee99s/) and [JS Bin](https://jsbin.com/sevukihupi/1/edit?html,js,output) are helpful templates you can fork or clone.
+  3. Isolate the problem - you NEED to provide a live example — ideally also create a reduced test case. This [CodePen](https://codepen.io/anon/pen/rVENKy), [JSFiddle](https://jsfiddle.net/og7ee99s/) and [JS Bin](https://jsbin.com/sevukihupi/1/edit?html,js,output) are helpful templates you can fork or clone.
+  
+  <b>Important</b>: If you don't provide a live example, your issue will be closed right away.
 
 Example:
 
