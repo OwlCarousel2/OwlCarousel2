@@ -1185,6 +1185,7 @@
 			distance = position - this.relative(current),
 			direction = (distance > 0) - (distance < 0),
 			items = this._items.length,
+			visibleItems = this.settings.items,
 			minimum = this.minimum(),
 			maximum = this.maximum();
 
@@ -1202,8 +1203,14 @@
 				this.reset(current);
 			}
 		} else if (this.settings.rewind) {
-			maximum += 1;
-			position = (position % maximum + maximum) % maximum;
+			if(position >= items) {
+				position = 0;
+				//position = (position % maximum + maximum) % maximum;
+			} else if(position <= -visibleItems) {
+				position = maximum;
+			} else {
+				position = Math.max(minimum, Math.min(maximum, position));
+			}
 		} else {
 			position = Math.max(minimum, Math.min(maximum, position));
 		}
@@ -1299,7 +1306,7 @@
 			item = this.prepare(item);
 			this.$stage.append(item);
 			this._items.push(item);
-			this._mergers.push(item.find('[data-merge]').addBack('[data-merge]').attr('data-merge') * 1 || 1);
+			this._mergers.push(item.find('[data-merge]').andSelf('[data-merge]').attr('data-merge') * 1 || 1);
 		}, this));
 
 		this.reset(this.isNumeric(this.settings.startPosition) ? this.settings.startPosition : 0);
@@ -1328,11 +1335,11 @@
 			this._items.length === 0 && this.$stage.append(content);
 			this._items.length !== 0 && this._items[position - 1].after(content);
 			this._items.push(content);
-			this._mergers.push(content.find('[data-merge]').addBack('[data-merge]').attr('data-merge') * 1 || 1);
+			this._mergers.push(content.find('[data-merge]').andSelf('[data-merge]').attr('data-merge') * 1 || 1);
 		} else {
 			this._items[position].before(content);
 			this._items.splice(position, 0, content);
-			this._mergers.splice(position, 0, content.find('[data-merge]').addBack('[data-merge]').attr('data-merge') * 1 || 1);
+			this._mergers.splice(position, 0, content.find('[data-merge]').andSelf('[data-merge]').attr('data-merge') * 1 || 1);
 		}
 
 		this._items[current] && this.reset(this._items[current].index());
