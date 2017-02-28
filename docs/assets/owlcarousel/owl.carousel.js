@@ -2603,9 +2603,9 @@
 	Autoplay.prototype.play = function(timeout, speed) {
 		this._paused = false;
 
-		if (this._core.is('rotating')) {
-			return;
-		}
+		// if (this._core.is('rotating')) {
+		// 	return;
+		// }
 
 		this._core.enter('rotating');
 
