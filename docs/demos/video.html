@@ -113,6 +113,11 @@
           <pre><code>video:true</code></pre>
           <p>To add video into carousel just put <code>&lt;a class=&quot;owl-video&quot; href=&quot;_straight URL from YouTube, Vimeo, or vzaar&quot;&gt;&lt;/a&gt;</code>.</p>
           <p>A tag is not mandatory, it can be any other tag but &quot;owl-video&quot; and href with url link is required.</p>
+          <p>You may also need to set the height of .item-video if has a height of zero</p>
+            
+           <pre><code>.owl-carousel .item-video {
+	height: 800px
+}</code></pre>
           <p>Additional video options:</p>
           <pre><code>videoWidth: false, // Default false; Type: Boolean/Number
 videoHeight: false, // Default false; Type: Boolean/Number</code></pre>
