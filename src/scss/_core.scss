@@ -12,6 +12,7 @@
 	.owl-stage {
 		position: relative;
 		-ms-touch-action: pan-Y;
+		-moz-backface-visibility: hidden; /* fix firefox animation glitch */
 	}
 
 	.owl-stage:after {
