@@ -1,9 +1,10 @@
 {
   "name": "owl.carousel",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "main": [
     "dist/owl.carousel.js",
-    "dist/assets/owl.carousel.css"
+    "dist/assets/owl.carousel.css",
+    "dist/assets/owl.theme.default.css"
   ],
   "ignore": [],
   "dependencies": {
