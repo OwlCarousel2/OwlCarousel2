@@ -1,5 +1,5 @@
 /**
- * Owl Carousel v2.2.0
+ * Owl Carousel v2.2.1
  * Copyright 2013-2017 David Deutsch
  * Licensed under  ()
  */
