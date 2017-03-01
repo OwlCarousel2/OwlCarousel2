@@ -15,7 +15,9 @@
   z-index: 1; }
   .owl-carousel .owl-stage {
     position: relative;
-    -ms-touch-action: pan-Y; }
+    -ms-touch-action: pan-Y;
+    -moz-backface-visibility: hidden;
+    /* fix firefox animation glitch */ }
   .owl-carousel .owl-stage:after {
     content: ".";
     display: block;
