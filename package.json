@@ -4,6 +4,7 @@
   "version": "2.2.1",
   "homepage": "https://github.com/OwlCarousel2/OwlCarousel2",
   "main": "./dist/owl.carousel.js",
+  "style": "./dist/assets/owl.carousel.css",
   "author": {
     "name": "David Deutsch",
     "email": "deutsch@medienpark.net",
