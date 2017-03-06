@@ -2,29 +2,29 @@
  * 	Green theme - Owl Carousel CSS File
  */
 
-$color-base:			#4DC7A0 !default;
-$color-white:			#FFF !default;
-$color-gray:			#D6D6D6 !default;
+$owl-color-base:			#4DC7A0 !default;
+$owl-color-white:			#FFF !default;
+$owl-color-gray:			#D6D6D6 !default;
 
 //nav
 
-$nav-color: 			$color-white !default;
-$nav-color-hover:		$color-white !default;
-$nav-font-size: 		14px !default;
-$nav-rounded: 			3px !default;
-$nav-margin: 			5px !default;
-$nav-padding: 			4px 7px !default;
-$nav-background: 		$color-gray !default;
-$nav-background-hover:	$color-base !default;
-$nav-disabled-opacity: 	0.5 !default;
+$owl-nav-color: 			$owl-color-white !default;
+$owl-nav-color-hover:		$owl-color-white !default;
+$owl-nav-font-size: 		14px !default;
+$owl-nav-rounded: 			3px !default;
+$owl-nav-margin: 			5px !default;
+$owl-nav-padding: 			4px 7px !default;
+$owl-nav-background: 		$owl-color-gray !default;
+$owl-nav-background-hover:	$owl-color-base !default;
+$owl-nav-disabled-opacity: 	0.5 !default;
 
 //dots
 
-$dot-width:				10px !default;
-$dot-height:			10px !default;
-$dot-rounded:			30px !default;
-$dot-margin: 			5px 7px !default;
-$dot-background:		$color-gray !default;
-$dot-background-active:	$color-base !default;
+$owl-dot-width:				10px !default;
+$owl-dot-height:			10px !default;
+$owl-dot-rounded:			30px !default;
+$owl-dot-margin: 			5px 7px !default;
+$owl-dot-background:		$owl-color-gray !default;
+$owl-dot-background-active:	$owl-color-base !default;
 
 @import 'theme';
