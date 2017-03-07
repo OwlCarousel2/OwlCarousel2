@@ -207,7 +207,11 @@
 			this.$element.off(handler, this._handlers[handler]);
 		}
 		for (control in this._controls) {
-			this._controls[control].remove();
+			if(control === '$relative' && settings.navContainer){
+				this._controls[control].html('');
+			}else{
+				this._controls[control].remove();
+			}
 		}
 		for (override in this.overides) {
 			this._core[override] = this._overrides[override];
