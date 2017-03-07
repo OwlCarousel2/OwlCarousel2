@@ -118,6 +118,7 @@
 		this._paused = false;
 
 		if (this._core.is('rotating')) {
+			this._setAutoPlayInterval();
 			return;
 		}
 
