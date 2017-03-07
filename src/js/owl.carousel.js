@@ -1408,7 +1408,7 @@
 		this.$stage.unwrap();
 		this.$stage.children().contents().unwrap();
 		this.$stage.children().unwrap();
-
+		this.$stage.remove();
 		this.$element
 			.removeClass(this.options.refreshClass)
 			.removeClass(this.options.loadingClass)
