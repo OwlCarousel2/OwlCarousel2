@@ -52,7 +52,7 @@
 		this._plugins = {};
 
 		/**
-		 * Currently suppressed events to prevent them from beeing retriggered.
+		 * Currently suppressed events to prevent them from being retriggered.
 		 * @protected
 		 */
 		this._supress = {};
