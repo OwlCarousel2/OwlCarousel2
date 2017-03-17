@@ -187,6 +187,7 @@
 		mouseDrag: true,
 		touchDrag: true,
 		pullDrag: true,
+		pull: 30,
 		freeDrag: false,
 
 		margin: 0,
@@ -836,7 +837,7 @@
 	 */
 	Owl.prototype.closest = function(coordinate, direction) {
 		var position = -1,
-			pull = 30,
+			pull = this.settings.pull,
 			width = this.width(),
 			coordinates = this.coordinates();
 
@@ -851,7 +852,7 @@
 				} else if (direction === 'right' && coordinate > value - width - pull && coordinate < value - width + pull) {
 					position = index + 1;
 				} else if (this.op(coordinate, '<', value)
-					&& this.op(coordinate, '>', coordinates[index + 1] || value - width)) {
+					&& this.op(coordinate, '>', coordinates[index + 1] + pull || value - width)) {
 					position = direction === 'left' ? index + 1 : index;
 				}
 				return position === -1;
