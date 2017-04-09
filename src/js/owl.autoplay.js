@@ -1,8 +1,9 @@
 /**
  * Autoplay Plugin
- * @version 2.0.0-beta.3
+ * @version 2.1.0
  * @author Bartosz Wojciechowski
  * @author Artus Kolanowski
+ * @author David Deutsch
  * @license The MIT License (MIT)
  */
 ;(function($, window, document, undefined) {
@@ -21,10 +22,10 @@
 		this._core = carousel;
 
 		/**
-		 * The autoplay interval.
-		 * @type {Number}
+		 * The autoplay timeout.
+		 * @type {Timeout}
 		 */
-		this._interval = null;
+		this._timeout = null;
 
 		/**
 		 * Indicates whenever the autoplay is paused.
@@ -44,6 +45,11 @@
 						this.play();
 					} else {
 						this.stop();
+					}
+				} else if (e.namespace && e.property.name === 'position') {
+					//console.log('play?', e);
+					if (this._core.settings.autoplay) {
+						this._setAutoPlayInterval();
 					}
 				}
 			}, this),
@@ -69,6 +75,16 @@
 			}, this),
 			'mouseleave.owl.autoplay': $.proxy(function() {
 				if (this._core.settings.autoplayHoverPause && this._core.is('rotating')) {
+					this.play();
+				}
+			}, this),
+			'touchstart.owl.core': $.proxy(function() {
+				if (this._core.settings.autoplayHoverPause && this._core.is('rotating')) {
+					this.pause();
+				}
+			}, this),
+			'touchend.owl.core': $.proxy(function() {
+				if (this._core.settings.autoplayHoverPause) {
 					this.play();
 				}
 			}, this)
@@ -107,12 +123,34 @@
 
 		this._core.enter('rotating');
 
-		this._interval = window.setInterval($.proxy(function() {
+		this._setAutoPlayInterval();
+	};
+
+	/**
+	 * Gets a new timeout
+	 * @private
+	 * @param {Number} [timeout] - The interval before the next animation starts.
+	 * @param {Number} [speed] - The animation speed for the animations.
+	 * @return {Timeout}
+	 */
+	Autoplay.prototype._getNextTimeout = function(timeout, speed) {
+		if ( this._timeout ) {
+			window.clearTimeout(this._timeout);
+		}
+		return window.setTimeout($.proxy(function() {
 			if (this._paused || this._core.is('busy') || this._core.is('interacting') || document.hidden) {
 				return;
 			}
 			this._core.next(speed || this._core.settings.autoplaySpeed);
 		}, this), timeout || this._core.settings.autoplayTimeout);
+	};
+
+	/**
+	 * Sets autoplay in motion.
+	 * @private
+	 */
+	Autoplay.prototype._setAutoPlayInterval = function() {
+		this._timeout = this._getNextTimeout();
 	};
 
 	/**
@@ -124,7 +162,7 @@
 			return;
 		}
 
-		window.clearInterval(this._interval);
+		window.clearTimeout(this._timeout);
 		this._core.leave('rotating');
 	};
 

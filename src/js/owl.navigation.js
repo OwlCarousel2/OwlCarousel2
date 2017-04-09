@@ -1,7 +1,8 @@
 /**
  * Navigation Plugin
- * @version 2.0.0-beta.3
+ * @version 2.1.0
  * @author Artus Kolanowski
+ * @author David Deutsch
  * @license The MIT License (MIT)
  */
 ;(function($, window, document, undefined) {
@@ -206,7 +207,11 @@
 			this.$element.off(handler, this._handlers[handler]);
 		}
 		for (control in this._controls) {
-			this._controls[control].remove();
+			if(control === '$relative' && settings.navContainer){
+				this._controls[control].html('');
+			}else{
+				this._controls[control].remove();
+			}
 		}
 		for (override in this.overides) {
 			this._core[override] = this._overrides[override];
@@ -368,7 +373,7 @@
 	Navigation.prototype.to = function(position, speed, standard) {
 		var length;
 
-		if (!standard) {
+		if (!standard && this._pages.length) {
 			length = this._pages.length;
 			$.proxy(this._overrides.to, this._core)(this._pages[((position % length) + length) % length].start, speed);
 		} else {

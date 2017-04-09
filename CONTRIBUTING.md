@@ -1,8 +1,8 @@
 ## Contributing
 
-The [issue tracker](https://github.com/OwlFonk/OwlCarousel2/issues) is the preferred channel for bug reports, feature requests, and submitting pull requests.
+The [issue tracker](https://github.com/OwlCarousel2/OwlCarousel2/issues) is the preferred channel for bug reports, feature requests, and submitting pull requests.
 
-**Please do not use the issue tracker for personal support requests. Stack Overflow ([`owl-carousel`](http://stackoverflow.com/questions/tagged/owl-carousel)) is a better place to get help.**
+**Please do not use the issue tracker for personal support requests. Stack Overflow ([`owl-carousel`](https://stackoverflow.com/questions/tagged/owl-carousel)) is a better place to get help.**
 
 ### Bug reports
 
@@ -14,7 +14,9 @@ Guidelines for bug reports:
 
   2. Check if the issue has been fixed — try to reproduce it using the latest `develop` branch in the repository.
 
-  3. Isolate the problem — ideally create a reduced test case and a live example. This [JSFiddle](http://jsfiddle.net/eqbL6vLb/) and this [JS Bin](http://jsbin.com/xuxozu/1) are helpful templates you can fork or clone.
+  3. Isolate the problem - you NEED to provide a live example — ideally also create a reduced test case. This [CodePen](https://codepen.io/anon/pen/rVENKy), [JSFiddle](https://jsfiddle.net/og7ee99s/) and [JS Bin](https://jsbin.com/sevukihupi/1/edit?html,js,output) are helpful templates you can fork or clone.
+  
+  <b>Important</b>: If you don't provide a live example, your issue will be closed right away.
 
 Example:
 
@@ -34,22 +36,22 @@ Example:
 
 Feature requests are welcome, but please take a moment to find out whether your idea fits with the scope and aims of the project. It's up to you to make a strong case to convince the project's developers of the merits of this feature.
 
-To get approval for your feature request, please create an issue on the issue tracker with as much detail and context as possible. We'll take a look at it and then [hopefully] apply the "[approved for development](https://github.com/smashingboxes/OwlCarousel2/labels/approved%20for%20development)" tag so someone can get to work on it!
+To get approval for your feature request, please create an issue on the issue tracker with as much detail and context as possible. We'll take a look at it and then [hopefully] apply the "[approved for development](https://github.com/OwlCarousel2/OwlCarousel2/labels/approved%20for%20development)" tag so someone can get to work on it!
 
 ### Pull requests
 
 Good pull requests are a fantastic help. They should remain focused in scope and avoid containing unrelated commits.
 
-**Going forward, we will only be accepting pull requests that are linked to an issue that is marked "[approved for development](https://github.com/smashingboxes/OwlCarousel2/labels/approved%20for%20development)."** If there is something you'd like to implement that isn't already approved (like a new feature, documentation updates, or some sort of refactoring), create an issue on the issue tracker! Only submitting pull requests for issues that have been approved helps us, the maintainers, get new code into the project quickly and helps prevent you from spending a lot of time on something that might never get merged into the project. See [Feature Requests](https://github.com/smashingboxes/OwlCarousel2/blob/develop/CONTRIBUTING.md#feature-requests) for more info.
+**Going forward, we will only be accepting pull requests that are linked to an issue that is marked "[approved for development](https://github.com/OwlCarousel2/OwlCarousel2/labels/approved%20for%20development)."** If there is something you'd like to implement that isn't already approved (like a new feature, documentation updates, or some sort of refactoring), create an issue on the issue tracker! Only submitting pull requests for issues that have been approved helps us, the maintainers, get new code into the project quickly and helps prevent you from spending a lot of time on something that might never get merged into the project. See [Feature Requests](https://github.com/OwlCarousel2/OwlCarousel2/blob/develop/CONTRIBUTING.md#feature-requests) for more info.
 
 Adhering to the following process is the best way to get your work included in the project:
 
-  1. [Fork](http://help.github.com/fork-a-repo/) the project, clone your fork, and configure the remotes:
+  1. [Fork](https://help.github.com/fork-a-repo/) the project, clone your fork, and configure the remotes:
 
     ```bash
     git clone https://github.com/<your-username>/OwlCarousel2.git
     cd OwlCarousel2
-    git remote add upstream https://github.com/smashingboxes/OwlCarousel2.git
+    git remote add upstream https://github.com/OwlCarousel2/OwlCarousel2.git
     ```
 
   2. If you cloned a while ago, get the latest changes from upstream:
