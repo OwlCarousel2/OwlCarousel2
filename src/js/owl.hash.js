@@ -80,9 +80,14 @@
 
 		// register event listener for hash navigation
 		$(window).on('hashchange.owl.navigation', $.proxy(function(e) {
-			var hash = window.location.hash.substring(1),
+			var hashes = window.location.hash.substring(1).split(','),
 				items = this._core.$stage.children(),
+				hash,
+				position;
+			for(var i in hashes){
+				hash = hashes[i];
 				position = this._hashes[hash] && items.index(this._hashes[hash]);
+			}
 
 			if (position === undefined || position === this._core.current()) {
 				return;
