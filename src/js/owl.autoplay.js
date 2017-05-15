@@ -4,6 +4,7 @@
  * @author Bartosz Wojciechowski
  * @author Artus Kolanowski
  * @author David Deutsch
+ * @author Tom De Caluwé
  * @license The MIT License (MIT)
  */
 ;(function($, window, document, undefined) {
@@ -22,16 +23,31 @@
 		this._core = carousel;
 
 		/**
-		 * The autoplay timeout.
-		 * @type {Timeout}
+		 * The autoplay timeout id.
+		 * @type {Number}
 		 */
-		this._timeout = null;
+		this._call = null;
+
+		/**
+		 * Depending on the state of the plugin, this variable contains either
+		 * the start time of the timer or the current timer value if it's
+		 * paused. Since we start in a paused state we initialize the timer
+		 * value.
+		 * @type {Number}
+		 */
+		this._time = 0;
+
+		/**
+		 * Stores the timeout currently used.
+		 * @type {Number}
+		 */
+		this._timeout = 0;
 
 		/**
 		 * Indicates whenever the autoplay is paused.
 		 * @type {Boolean}
 		 */
-		this._paused = false;
+		this._paused = true;
 
 		/**
 		 * All event handlers.
@@ -47,10 +63,8 @@
 						this.stop();
 					}
 				} else if (e.namespace && e.property.name === 'position') {
-					//console.log('play?', e);
-					if (this._core.settings.autoplay) {
-						this._setAutoPlayInterval();
-					}
+					this.stop();
+					this.play();
 				}
 			}, this),
 			'initialized.owl.carousel': $.proxy(function(e) {
@@ -108,6 +122,27 @@
 		autoplaySpeed: false
 	};
 
+	Autoplay.prototype._next = function(speed) {
+		this._call = window.setTimeout(
+			$.proxy(this._next, this, speed),
+			this._timeout * (Math.round(this.read() / this._timeout) + 1) - this.read()
+		);
+
+		if (this._core.is('busy') || this._core.is('interacting') || document.hidden) {
+			return;
+		}
+		this._core.next(speed || this._core.settings.autoplaySpeed);
+	}
+
+	/**
+	 * Read the current timer value. Should only be used when the timer is
+	 * paused.
+	 * @public
+	 */
+	Autoplay.prototype.read = function() {
+		return new Date().getTime() - this._time;
+	};
+
 	/**
 	 * Starts the autoplay.
 	 * @public
@@ -115,42 +150,24 @@
 	 * @param {Number} [speed] - The animation speed for the animations.
 	 */
 	Autoplay.prototype.play = function(timeout, speed) {
-		this._paused = false;
-
-		if (this._core.is('rotating')) {
-			return;
+		if (!this._core.is('rotating')) {
+			this._core.enter('rotating');
 		}
+		if (this._paused) {
+			timeout = timeout || this._core.settings.autoplayTimeout;
 
-		this._core.enter('rotating');
+			this._time += Math.min(this._time % (this._timeout || timeout), timeout) - this._time % timeout;
 
-		this._setAutoPlayInterval();
-	};
+			this._time = this.read();
+			this._paused = false;
 
-	/**
-	 * Gets a new timeout
-	 * @private
-	 * @param {Number} [timeout] - The interval before the next animation starts.
-	 * @param {Number} [speed] - The animation speed for the animations.
-	 * @return {Timeout}
-	 */
-	Autoplay.prototype._getNextTimeout = function(timeout, speed) {
-		if ( this._timeout ) {
-			window.clearTimeout(this._timeout);
+			this._call = window.setTimeout(
+				$.proxy(this._next, this, speed),
+				timeout * (Math.floor(this.read() / timeout) + 1) - this.read()
+			);
+
+			this._timeout = timeout;
 		}
-		return window.setTimeout($.proxy(function() {
-			if (this._paused || this._core.is('busy') || this._core.is('interacting') || document.hidden) {
-				return;
-			}
-			this._core.next(speed || this._core.settings.autoplaySpeed);
-		}, this), timeout || this._core.settings.autoplayTimeout);
-	};
-
-	/**
-	 * Sets autoplay in motion.
-	 * @private
-	 */
-	Autoplay.prototype._setAutoPlayInterval = function() {
-		this._timeout = this._getNextTimeout();
 	};
 
 	/**
@@ -158,24 +175,26 @@
 	 * @public
 	 */
 	Autoplay.prototype.stop = function() {
-		if (!this._core.is('rotating')) {
-			return;
-		}
+		if (this._core.is('rotating')) {
+			this._time = 0;
+			this._paused = true;
 
-		window.clearTimeout(this._timeout);
-		this._core.leave('rotating');
+			window.clearTimeout(this._call);
+			this._core.leave('rotating');
+		}
 	};
 
 	/**
-	 * Stops the autoplay.
+	 * Pauses the autoplay.
 	 * @public
 	 */
 	Autoplay.prototype.pause = function() {
-		if (!this._core.is('rotating')) {
-			return;
-		}
+		if (this._core.is('rotating') && !this._paused) {
+			this._time = this.read();
+			this._paused = true;
 
-		this._paused = true;
+			window.clearTimeout(this._call);
+		}
 	};
 
 	/**
