@@ -150,24 +150,28 @@
 	 * @param {Number} [speed] - The animation speed for the animations.
 	 */
 	Autoplay.prototype.play = function(timeout, speed) {
+		var elapsed;
+
 		if (!this._core.is('rotating')) {
 			this._core.enter('rotating');
 		}
+
+		timeout = timeout || this._core.settings.autoplayTimeout;
+
+		elapsed = Math.min(this._time % (this._timeout || timeout), timeout);
+
 		if (this._paused) {
-			var elapsed;
-
-			timeout = timeout || this._core.settings.autoplayTimeout;
-
-			elapsed = Math.min(this._time % (this._timeout || timeout), timeout);
-			this._time += elapsed - this._time % timeout;
-
 			this._time = this.read();
 			this._paused = false;
-
-			this._call = window.setTimeout($.proxy(this._next, this, speed), timeout - elapsed);
-
-			this._timeout = timeout;
+		} else {
+			window.clearTimeout(this._call);
 		}
+
+		this._time += this.read() % timeout - elapsed;
+
+		this._call = window.setTimeout($.proxy(this._next, this, speed), timeout - elapsed);
+
+		this._timeout = timeout;
 	};
 
 	/**
