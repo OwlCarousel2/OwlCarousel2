@@ -154,17 +154,17 @@
 			this._core.enter('rotating');
 		}
 		if (this._paused) {
+			var elapsed;
+
 			timeout = timeout || this._core.settings.autoplayTimeout;
 
-			this._time += Math.min(this._time % (this._timeout || timeout), timeout) - this._time % timeout;
+			elapsed = Math.min(this._time % (this._timeout || timeout), timeout);
+			this._time += elapsed - this._time % timeout;
 
 			this._time = this.read();
 			this._paused = false;
 
-			this._call = window.setTimeout(
-				$.proxy(this._next, this, speed),
-				timeout * (Math.floor(this.read() / timeout) + 1) - this.read()
-			);
+			this._call = window.setTimeout($.proxy(this._next, this, speed), timeout - elapsed);
 
 			this._timeout = timeout;
 		}
