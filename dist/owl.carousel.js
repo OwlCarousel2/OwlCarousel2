@@ -57,7 +57,7 @@
 		this._plugins = {};
 
 		/**
-		 * Currently suppressed events to prevent them from beeing retriggered.
+		 * Currently suppressed events to prevent them from being retriggered.
 		 * @protected
 		 */
 		this._supress = {};
@@ -1413,7 +1413,7 @@
 		this.$stage.unwrap();
 		this.$stage.children().contents().unwrap();
 		this.$stage.children().unwrap();
-
+		this.$stage.remove();
 		this.$element
 			.removeClass(this.options.refreshClass)
 			.removeClass(this.options.loadingClass)
@@ -2624,7 +2624,7 @@
 			window.clearTimeout(this._timeout);
 		}
 		return window.setTimeout($.proxy(function() {
-			if (this._paused || this._core.is('busy') || this._core.is('interacting') || document.hidden) {
+			if ( this._paused || this._core.is('interacting') ) {
 				return;
 			}
 			this._core.next(speed || this._core.settings.autoplaySpeed);
@@ -2893,7 +2893,11 @@
 			this.$element.off(handler, this._handlers[handler]);
 		}
 		for (control in this._controls) {
-			this._controls[control].remove();
+			if (control === '$relative' && settings.navContainer) {
+				this._controls[control].html('');
+			} else {
+				this._controls[control].remove();
+			}
 		}
 		for (override in this.overides) {
 			this._core[override] = this._overrides[override];
