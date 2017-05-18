@@ -331,10 +331,6 @@
 		var position, length,
 			settings = this._core.settings;
 
-		if (settings.rtl) {
-			successor = !successor;
-		}
-
 		if (settings.slideBy == 'page') {
 			position = $.inArray(this.current(), this._pages);
 			length = this._pages.length;
