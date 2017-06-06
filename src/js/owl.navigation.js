@@ -207,9 +207,9 @@
 			this.$element.off(handler, this._handlers[handler]);
 		}
 		for (control in this._controls) {
-			if(control === '$relative' && settings.navContainer){
+			if (control === '$relative' && settings.navContainer) {
 				this._controls[control].html('');
-			}else{
+			} else {
 				this._controls[control].remove();
 			}
 		}
