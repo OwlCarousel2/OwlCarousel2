@@ -1185,6 +1185,7 @@
 			distance = position - this.relative(current),
 			direction = (distance > 0) - (distance < 0),
 			items = this._items.length,
+			visibleItems = this.settings.items,
 			minimum = this.minimum(),
 			maximum = this.maximum();
 
@@ -1202,8 +1203,14 @@
 				this.reset(current);
 			}
 		} else if (this.settings.rewind) {
-			maximum += 1;
-			position = (position % maximum + maximum) % maximum;
+			if(position >= items) {
+				position = 0;
+				//position = (position % maximum + maximum) % maximum;
+			} else if(position <= -visibleItems) {
+				position = maximum;
+			} else {
+				position = Math.max(minimum, Math.min(maximum, position));
+			}
 		} else {
 			position = Math.max(minimum, Math.min(maximum, position));
 		}
