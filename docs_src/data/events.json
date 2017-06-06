@@ -93,7 +93,7 @@
         "name": "to.owl.carousel",
         "type": "triggerable",
         "param": "[position, speed]",
-        "desc": "Goes to postion."
+        "desc": "Goes to position."
       },
       {
         "name": "destroy.owl.carousel",
