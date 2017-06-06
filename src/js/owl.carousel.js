@@ -330,12 +330,13 @@
 
 			repeat /= 2;
 
-			while (repeat--) {
+			while (repeat > 0) {
 				// Switch to only using appended clones
 				clones.push(this.normalize(clones.length / 2, true));
 				append = append + items[clones[clones.length - 1]][0].outerHTML;
 				clones.push(this.normalize(items.length - 1 - (clones.length - 1) / 2, true));
 				prepend = items[clones[clones.length - 1]][0].outerHTML + prepend;
+				repeat -= 1;
 			}
 
 			this._clones = clones;
