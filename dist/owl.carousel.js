@@ -57,7 +57,7 @@
 		this._plugins = {};
 
 		/**
-		 * Currently suppressed events to prevent them from beeing retriggered.
+		 * Currently suppressed events to prevent them from being retriggered.
 		 * @protected
 		 */
 		this._supress = {};
@@ -335,12 +335,13 @@
 
 			repeat /= 2;
 
-			while (repeat--) {
+			while (repeat > 0) {
 				// Switch to only using appended clones
 				clones.push(this.normalize(clones.length / 2, true));
 				append = append + items[clones[clones.length - 1]][0].outerHTML;
 				clones.push(this.normalize(items.length - 1 - (clones.length - 1) / 2, true));
 				prepend = items[clones[clones.length - 1]][0].outerHTML + prepend;
+				repeat -= 1;
 			}
 
 			this._clones = clones;
@@ -435,8 +436,8 @@
 			this.$stage.children('.active').removeClass('active');
 			this.$stage.children(':eq(' + matches.join('), :eq(') + ')').addClass('active');
 
+			this.$stage.children('.center').removeClass('center');
 			if (this.settings.center) {
-				this.$stage.children('.center').removeClass('center');
 				this.$stage.children().eq(this.current()).addClass('center');
 			}
 		}
@@ -746,8 +747,6 @@
 		$(document).one('mousemove.owl.core touchmove.owl.core', $.proxy(function(event) {
 			var delta = this.difference(this._drag.pointer, this.pointer(event));
 
-			$(document).on('mousemove.owl.core touchmove.owl.core', $.proxy(this.onDragMove, this));
-
 			if (Math.abs(delta.x) < Math.abs(delta.y) && this.is('valid')) {
 				return;
 			}
@@ -756,6 +755,10 @@
 
 			this.enter('dragging');
 			this.trigger('drag');
+			
+			this.onDragMove(event);
+
+			$(document).on('mousemove.owl.core touchmove.owl.core', $.proxy(this.onDragMove, this));
 		}, this));
 	};
 
@@ -1413,7 +1416,7 @@
 		this.$stage.unwrap();
 		this.$stage.children().contents().unwrap();
 		this.$stage.children().unwrap();
-
+		this.$stage.remove();
 		this.$element
 			.removeClass(this.options.refreshClass)
 			.removeClass(this.options.loadingClass)
@@ -2893,7 +2896,11 @@
 			this.$element.off(handler, this._handlers[handler]);
 		}
 		for (control in this._controls) {
-			this._controls[control].remove();
+			if (control === '$relative' && settings.navContainer) {
+				this._controls[control].html('');
+			} else {
+				this._controls[control].remove();
+			}
 		}
 		for (override in this.overides) {
 			this._core[override] = this._overrides[override];
