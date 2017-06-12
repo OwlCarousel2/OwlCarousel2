@@ -750,7 +750,6 @@
 
 			this.enter('dragging');
 			this.trigger('drag');
-			
 			this.onDragMove(event);
 
 			$(document).on('mousemove.owl.core touchmove.owl.core', $.proxy(this.onDragMove, this));
