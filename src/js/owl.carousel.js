@@ -1029,12 +1029,14 @@
 			maximum = this._clones.length / 2 + this._items.length - 1;
 		} else if (settings.autoWidth || settings.merge) {
 			iterator = this._items.length;
-			reciprocalItemsWidth = this._items[--iterator].width();
-			elementWidth = this.$element.width();
-			while (iterator--) {
-				reciprocalItemsWidth += this._items[iterator].width() + this.settings.margin;
-				if (reciprocalItemsWidth > elementWidth) {
-					break;
+			if (iterator) {
+				reciprocalItemsWidth = this._items[--iterator].width();
+				elementWidth = this.$element.width();
+				while (iterator--) {
+					reciprocalItemsWidth += this._items[iterator].width() + this.settings.margin;
+					if (reciprocalItemsWidth > elementWidth) {
+						break;
+					}
 				}
 			}
 			maximum = iterator + 1;
