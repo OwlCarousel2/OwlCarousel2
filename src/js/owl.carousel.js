@@ -742,8 +742,6 @@
 		$(document).one('mousemove.owl.core touchmove.owl.core', $.proxy(function(event) {
 			var delta = this.difference(this._drag.pointer, this.pointer(event));
 
-			$(document).on('mousemove.owl.core touchmove.owl.core', $.proxy(this.onDragMove, this));
-
 			if (Math.abs(delta.x) < Math.abs(delta.y) && this.is('valid')) {
 				return;
 			}
@@ -752,6 +750,9 @@
 
 			this.enter('dragging');
 			this.trigger('drag');
+			this.onDragMove(event);
+
+			$(document).on('mousemove.owl.core touchmove.owl.core', $.proxy(this.onDragMove, this));
 		}, this));
 	};
 
