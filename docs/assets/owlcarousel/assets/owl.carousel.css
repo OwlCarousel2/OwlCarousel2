@@ -1,5 +1,5 @@
 /**
- * Owl Carousel v2.2.1
+ * Owl Carousel v2.3.0
  * Copyright 2013-2017 David Deutsch
  * Licensed under  ()
  */
@@ -16,6 +16,7 @@
   .owl-carousel .owl-stage {
     position: relative;
     -ms-touch-action: pan-Y;
+    touch-action: manipulation;
     -moz-backface-visibility: hidden;
     /* fix firefox animation glitch */ }
   .owl-carousel .owl-stage:after {
@@ -61,6 +62,14 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none; }
+  .owl-carousel .owl-nav button.owl-prev,
+  .owl-carousel .owl-nav button.owl-next,
+  .owl-carousel button.owl-dot {
+    background: none;
+    color: inherit;
+    border: none;
+    padding: 0 !important;
+    font: inherit; }
   .owl-carousel.owl-loaded {
     display: block; }
   .owl-carousel.owl-loading {
@@ -71,6 +80,8 @@
   .owl-carousel.owl-refresh .owl-item {
     visibility: hidden; }
   .owl-carousel.owl-drag .owl-item {
+    -ms-touch-action: none;
+        touch-action: none;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -91,8 +102,10 @@
  *  Owl Carousel - Animate Plugin
  */
 .owl-carousel .animated {
-  animation-duration: 1000ms;
-  animation-fill-mode: both; }
+  -webkit-animation-duration: 1000ms;
+          animation-duration: 1000ms;
+  -webkit-animation-fill-mode: both;
+          animation-fill-mode: both; }
 
 .owl-carousel .owl-animated-in {
   z-index: 0; }
@@ -101,7 +114,14 @@
   z-index: 1; }
 
 .owl-carousel .fadeOut {
-  animation-name: fadeOut; }
+  -webkit-animation-name: fadeOut;
+          animation-name: fadeOut; }
+
+@-webkit-keyframes fadeOut {
+  0% {
+    opacity: 1; }
+  100% {
+    opacity: 0; } }
 
 @keyframes fadeOut {
   0% {
@@ -123,7 +143,8 @@
   transition: opacity 400ms ease; }
 
 .owl-carousel .owl-item img.owl-lazy {
-  transform-style: preserve-3d; }
+  -webkit-transform-style: preserve-3d;
+          transform-style: preserve-3d; }
 
 /*
  * 	Owl Carousel - Video Plugin
@@ -145,11 +166,13 @@
   cursor: pointer;
   z-index: 1;
   -webkit-backface-visibility: hidden;
+  transition: -webkit-transform 100ms ease;
   transition: transform 100ms ease; }
 
 .owl-carousel .owl-video-play-icon:hover {
-  -ms-transform: scale(1.3, 1.3);
-      transform: scale(1.3, 1.3); }
+  -webkit-transform: scale(1.3, 1.3);
+      -ms-transform: scale(1.3, 1.3);
+          transform: scale(1.3, 1.3); }
 
 .owl-carousel .owl-video-playing .owl-video-tn,
 .owl-carousel .owl-video-playing .owl-video-play-icon {

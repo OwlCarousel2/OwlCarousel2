@@ -1,6 +1,6 @@
 # OwlCarousel 2 Roadmap
 
-You can discuss the roadmap here: #1756
+You can discuss the roadmap here: [#1756](https://github.com/OwlCarousel2/OwlCarousel2/issues/1756).
 
 ## 2.2 - current version
 
@@ -16,18 +16,18 @@ You can discuss the roadmap here: #1756
     - [x] [#1978](https://github.com/OwlCarousel2/OwlCarousel2/pull/1978) - Fix empty child auto width
     - [x] [#1942](https://github.com/OwlCarousel2/OwlCarousel2/pull/1942) - Improving autoplay behavior
     - [x] [#1915](https://github.com/OwlCarousel2/OwlCarousel2/pull/1915) - Fixing: [#1750](https://github.com/OwlCarousel2/OwlCarousel2/issues/1750) Passive event listeners, chrome and touch events
- - [ ] [#1602](https://github.com/OwlCarousel2/OwlCarousel2/issues/1602) - CSS transitions fail except for default
- - [ ] update progress in [#1538](https://github.com/OwlCarousel2/OwlCarousel2/issues/1538)
- - [ ] [#1704](https://github.com/OwlCarousel2/OwlCarousel2/issues/1704) - viewport width detection
+ - [x] [#1704](https://github.com/OwlCarousel2/OwlCarousel2/issues/1704) - viewport width detection
  - [ ] [#1717](https://github.com/OwlCarousel2/OwlCarousel2/issues/1717) - keyboard control
- - [ ] move repo to company account (https://github.com/medienpark)
+ - [ ] update progress in [#1538](https://github.com/OwlCarousel2/OwlCarousel2/issues/1538)
 
 ## 2.4 - finish up build pipeline, docs
 
+ - [ ] move repo to company account (https://github.com/medienpark)
  - [ ] [#1330](https://github.com/OwlCarousel2/OwlCarousel2/issues/1330) - finish moving to gulp
  - [ ] ditto for moving to assemble for docs
  - [ ] [#1666](https://github.com/OwlCarousel2/OwlCarousel2/issues/1666) - RTL center mode
  - [ ] [#1613](https://github.com/OwlCarousel2/OwlCarousel2/issues/1613) - generic plugin integration
+ - [ ] [#1602](https://github.com/OwlCarousel2/OwlCarousel2/issues/1602) - CSS transitions fail except for default
 
 ## 2.5 - cloning & worker cleanup
 

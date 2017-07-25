@@ -72,6 +72,16 @@
 		user-select: none;
 	}
 
+	.owl-nav button.owl-prev,
+	.owl-nav button.owl-next,
+	button.owl-dot {
+		background: none;
+		color: inherit;
+		border: none;
+		padding:0!important;
+		font: inherit;
+	}
+
 	&.owl-loaded {
 		display: block;
 	}

@@ -1,6 +1,6 @@
 {
   "name": "owl.carousel",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "main": [
     "dist/owl.carousel.js",
     "dist/assets/owl.carousel.css",

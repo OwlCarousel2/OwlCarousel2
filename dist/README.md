@@ -1,8 +1,8 @@
-# OwlCarousel2 is currently being transferred to a new owner
+### OwlCarousel2 was recently transferred to a new owner
 
-Stay tuned while the new owner sorts through some stuff. (Oh, hi, I'm [David](https://github.com/daviddeutsch)!)
+Please make sure to check out our [Roadmap Discussion](https://github.com/OwlCarousel2/OwlCarousel2/issues/1756).
 
-## Owl Carousel 2
+# Owl Carousel 2
 
 Touch enabled [jQuery](https://jquery.com/) plugin that lets you create a beautiful, responsive carousel slider. **To get started, check out https://owlcarousel2.github.io/OwlCarousel2/.**
 

@@ -9,7 +9,7 @@
     <meta name="description" content="Owl Carousel Documentation">
     <meta name="author" content="David Deutsch">
     <title>
-      Plugin API | Owl Carousel | 2.2.1
+      Plugin API | Owl Carousel | 2.3.0
     </title>
 
     <!-- Stylesheets -->
@@ -60,7 +60,7 @@
                 <a href="/OwlCarousel2/docs/started-welcome.html">Docs</a> 
               </li>
               <li>
-                <a href="https://github.com/OwlCarousel2/OwlCarousel2/archive/2.2.1.zip">Download</a> 
+                <a href="https://github.com/OwlCarousel2/OwlCarousel2/archive/2.3.0.zip">Download</a> 
                 <span class="download"></span> 
               </li>
             </ul>
@@ -120,7 +120,7 @@
 ;(function ( $, window, document, undefined ) {
     PluginName = function(scope){
         this.owl = scope;
-        this.owl._options = $.extend(PluginName.Defaults, this.owl.options);
+        this.owl._options = $.extend({}, PluginName.Defaults, this.owl.options);
         //link callback events with owl carousel here
     }
     PluginName.Defaults = {
