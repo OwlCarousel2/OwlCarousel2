@@ -8,6 +8,13 @@ You can discuss the roadmap here: #1756
 
  - [ ] clean up contributor guides
  - [ ] work through, accept or schedule PRs from current stack
+    - [x] Various spelling and code style fixes: #1785, #1858, #1856, #1814, #1876, #1838, #1424
+    - [x] [#1883](https://github.com/OwlCarousel2/OwlCarousel2/pull/1883) Fix infinite loop
+    - [x] [#1900](https://github.com/OwlCarousel2/OwlCarousel2/pull/1900) Add repository info to package.json
+    - [x] [#1770](https://github.com/OwlCarousel2/OwlCarousel2/pull/1770) Allow package file to expose CSS
+    - [x] [#1077](https://github.com/OwlCarousel2/OwlCarousel2/pull/1077) .center class hangs around when responsive options
+    - [x] [#1978](https://github.com/OwlCarousel2/OwlCarousel2/pull/1978) - Fix empty child auto width
+    - [x] [#1942](https://github.com/OwlCarousel2/OwlCarousel2/pull/1942) - Improving autoplay behavior
  - [ ] [#1602](https://github.com/OwlCarousel2/OwlCarousel2/issues/1602) - CSS transitions fail except for default
  - [ ] update progress in [#1538](https://github.com/OwlCarousel2/OwlCarousel2/issues/1538)
  - [ ] [#1704](https://github.com/OwlCarousel2/OwlCarousel2/issues/1704) - viewport width detection
@@ -37,13 +44,11 @@ You can discuss the roadmap here: #1756
  - [ ] [#1518](https://github.com/OwlCarousel2/OwlCarousel2/issues/1518) - slide change event issues (not cancelling events etc.)
  - [ ] [#1563](https://github.com/OwlCarousel2/OwlCarousel2/issues/1563) - slide offset on last if loop = false
  - [ ] [#1633](https://github.com/OwlCarousel2/OwlCarousel2/issues/1633) & [#1627](https://github.com/OwlCarousel2/OwlCarousel2/issues/1627) - (merged items) swipe/autoplay (mostly testing whether the worker/clone fixes in 2.5 solved this)
- - [ ] [#1723](https://github.com/OwlCarousel2/OwlCarousel2/issues/1723) & [#1655](https://github.com/OwlCarousel2/OwlCarousel2/issues/1655) - Autoplay bugs
 
 ## 2.7 - bugfixes & final, "LTS" 2.x release
 
  - [ ] [#1647](https://github.com/OwlCarousel2/OwlCarousel2/issues/1647) - 1px from prev. slide on current
  - [ ] [#1523](https://github.com/OwlCarousel2/OwlCarousel2/issues/1523) - autoplay vs. video autoplay issue
- - [ ] [#1471](https://github.com/OwlCarousel2/OwlCarousel2/issues/1471) - pause autoplay on hover
  - [ ] [#1343](https://github.com/OwlCarousel2/OwlCarousel2/issues/1343) - timeout per slide
 
 ## 3.0 - Typescript, additional plugins, breaking changes
