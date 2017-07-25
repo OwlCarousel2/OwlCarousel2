@@ -220,7 +220,8 @@
 	 * @protected
 	 */
 	Navigation.prototype.destroy = function() {
-		var handler, control, property, override;
+		var handler, control, property, override, settings;
+		settings = this._core.settings;
 
 		for (handler in this._handlers) {
 			this.$element.off(handler, this._handlers[handler]);
