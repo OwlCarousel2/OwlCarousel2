@@ -707,7 +707,7 @@
 		}
 
 		if ($.support.transform) {
-			stage = this.$stage.css('transform').replace(/.*\(|\)| /g, '').split(',');
+			stage = this.$stage.css($.support.transform + "").replace(/.*\(|\)| /g, '').split(',');
 			stage = {
 				x: stage[stage.length === 16 ? 12 : 4],
 				y: stage[stage.length === 16 ? 13 : 5]
@@ -888,10 +888,10 @@
 		}
 
 		if ($.support.transform3d && $.support.transition) {
-			this.$stage.css({
-				transform: 'translate3d(' + coordinate + 'px,0px,0px)',
-				transition: (this.speed() / 1000) + 's'
-			});
+			var css = {};
+			css[$.support.transform + ""] = 'translate3d(' + coordinate + 'px,0px,0px)';
+			css[$.support.transition + ""] = (this.speed() / 1000) + 's';
+			this.$stage.css(css);
 		} else if (animate) {
 			this.$stage.animate({
 				left: coordinate + 'px'
