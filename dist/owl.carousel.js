@@ -971,10 +971,13 @@
 	 */
 	Owl.prototype.reset = function(position) {
 		position = this.normalize(position);
-
+		
 		if (position === undefined) {
 			return;
 		}
+
+		// If position = "end" we use the last item of the array
+		if (position === "end") position = this._items.length - 1;
 
 		this._speed = 0;
 		this._current = position;
@@ -1309,8 +1312,8 @@
 			this._items.push(item);
 			this._mergers.push(item.find('[data-merge]').addBack('[data-merge]').attr('data-merge') * 1 || 1);
 		}, this));
-
-		this.reset(this.isNumeric(this.settings.startPosition) ? this.settings.startPosition : 0);
+		
+		this.reset(this.isNumeric(this.settings.startPosition) || this.settings.startPosition === "end" ? this.settings.startPosition : 0);
 
 		this.invalidate('items');
 	};
