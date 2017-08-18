@@ -333,16 +333,12 @@
 			while (repeat > 0) {
 				// Switch to only using appended clones
 				clones.push(this.normalize(clones.length / 2, true));
-				append = append + items[clones[clones.length - 1]][0].outerHTML;
-				clones.push(this.normalize(items.length - 1 - (clones.length - 1) / 2, true));
-				prepend = items[clones[clones.length - 1]][0].outerHTML + prepend;
+				$(items[clones[clones.length - 1]][0]).clone(true).addClass('cloned').appendTo(this.$stage);
+                clones.push(this.normalize(items.length - 1 - (clones.length - 1) / 2, true));
+				$(items[clones[clones.length - 1]][0]).clone(true).addClass('cloned').prependTo(this.$stage);
 				repeat -= 1;
 			}
-
 			this._clones = clones;
-
-			$(append).addClass('cloned').appendTo(this.$stage);
-			$(prepend).addClass('cloned').prependTo(this.$stage);
 		}
 	}, {
 		filter: [ 'width', 'items', 'settings' ],
