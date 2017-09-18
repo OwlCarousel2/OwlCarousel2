@@ -2910,7 +2910,7 @@
 		this._controls.$absolute = (settings.dotsContainer ? $(settings.dotsContainer)
 			: $('<div>').addClass(settings.dotsClass).appendTo(this.$element)).addClass('disabled');
 
-		this._controls.$absolute.on('click', 'button', $.proxy(function(e) {
+		this._controls.$absolute.on('click', '.' + settings.dotClass, $.proxy(function(e) {
 			var index = $(e.target).parent().is(this._controls.$absolute)
 				? $(e.target).index() : $(e.target).parent().index();
 
@@ -2943,7 +2943,8 @@
 	 * @protected
 	 */
 	Navigation.prototype.destroy = function() {
-		var handler, control, property, override;
+		var handler, control, property, override, settings;
+		settings = this._core.settings;
 
 		for (handler in this._handlers) {
 			this.$element.off(handler, this._handlers[handler]);
