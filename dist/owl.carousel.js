@@ -1155,7 +1155,8 @@
 			}
 
 			coordinate = this._coordinates[position];
-			coordinate += (this.width() - coordinate + (this._coordinates[newPosition] || 0)) / 2 * multiplier;
+			var delta = (this.settings.rtl) ? (this._coordinates[0]+this._coordinates[this._coordinates.length-1]) : 0;
+			coordinate += (this.width() - coordinate + (this._coordinates[newPosition] || delta)) / 2 * multiplier;
 		} else {
 			coordinate = this._coordinates[newPosition] || 0;
 		}
