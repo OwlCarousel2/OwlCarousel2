@@ -183,6 +183,7 @@
 		loop: false,
 		center: false,
 		rewind: false,
+    slideTransition: '',
 
 		mouseDrag: true,
 		touchDrag: true,
@@ -890,7 +891,7 @@
 		if ($.support.transform3d && $.support.transition) {
 			this.$stage.css({
 				transform: 'translate3d(' + coordinate + 'px,0px,0px)',
-				transition: (this.speed() / 1000) + 's'
+				transition: (this.speed() / 1000) + 's ' + this.settings.slideTransition
 			});
 		} else if (animate) {
 			this.$stage.animate({
