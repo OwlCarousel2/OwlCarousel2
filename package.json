@@ -16,6 +16,7 @@
     "url": "http://github.com/OwlFonk/OwlCarousel2/issues",
     "email": "owl@owlgraphic.com"
   },
+  "main": "src/js/owl.carousel.js",
   "devDependencies": {
     "assemble": "~0.4.37",
     "grunt": "~0.4.5",
@@ -33,10 +34,6 @@
     "grunt-contrib-qunit": ">=0.2.1",
     "load-grunt-tasks": "^0.4.0",
     "pretty": "^0.1.2"
-   
-  },
-  "engines": {
-    "node": "~0.10.28"
   },
   "keywords": [
     "responsive",
