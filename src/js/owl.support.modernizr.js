@@ -6,7 +6,7 @@
  * @author Artus Kolanowski
  * @license The MIT License (MIT)
  */
-;(function($, Modernizr, window, document, undefined) {
+function owlCarouselModernizr($, Modernizr, window, document, undefined) {
 
 	var events = {
 		transition: {
@@ -54,4 +54,6 @@
 		$.support.transform = new String(Modernizr.prefixed('transform'));
 		$.support.transform3d = Modernizr.csstransforms3d;
 	}
-})(window.Zepto || window.jQuery, window.Modernizr, window, document);
+}
+
+module.exports = owlCarouselModernizr;
