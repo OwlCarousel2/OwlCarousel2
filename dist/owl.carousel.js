@@ -1864,6 +1864,11 @@
 						clones = this._core.clones().length,
 						load = $.proxy(function(i, v) { this.load(v) }, this);
 
+					if (!settings.center && settings.stagePadding) {
+						position--;
+						n += 2;
+					}
+
 					while (i++ < n) {
 						this.load(clones / 2 + this._core.relative(position));
 						clones && $.each(this._core.clones(this._core.relative(position)), load);
