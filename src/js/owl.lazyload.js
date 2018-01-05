@@ -43,7 +43,7 @@
 					return;
 				}
 
-				if ((e.property && e.property.name == 'position') || e.type == 'initialized') {
+				if ((e.property && e.property.name == 'position') || e.type == 'initialized' || e.type == 'resized') {
 					var settings = this._core.settings,
 						n = (settings.center && Math.ceil(settings.items / 2) || settings.items),
 						i = ((settings.center && n * -1) || 0),
