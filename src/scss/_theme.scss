@@ -50,7 +50,7 @@
 				display: block;
 				-webkit-backface-visibility: visible;
 				transition: opacity 200ms ease;
-				border-radius: 30px;
+				border-radius: $dot-rounded;
 			}
 
 			&.active,
