@@ -291,6 +291,12 @@
     "name":     "dotsContainer",
     "type":     "String/Class/ID/Boolean",
     "Default":  "false",
-    "desc":     "Set your own container for nav."
+    "desc":     "Set your own container for nav. If **dotSelector** is also set, the carousel will be listening to clicks on this container's descendants that satisfy the dotSelector selector. Otherwise, clicks on this container's children will be listened."
+  },
+  {
+    "name":     "dotSelector",
+    "type":     "String/Class/ID/attribute/Boolean",
+    "Default":  "false",
+    "desc":     "A selector for a dot navigation item in your custom nav container. Only takes effect if **dotsContainer** is set."
   }
 ]

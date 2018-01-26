@@ -146,7 +146,8 @@
 		dotsEach: false,
 		dotsData: false,
 		dotsSpeed: false,
-		dotsContainer: false
+		dotsContainer: false,
+		dotSelector: false
 	};
 
 	/**
@@ -155,7 +156,9 @@
 	 */
 	Navigation.prototype.initialize = function() {
 		var override,
-			settings = this._core.settings;
+			settings = this._core.settings,
+			dotSelector,
+			matchingDotElements;
 
 		// create DOM structure for relative navigation
 		this._controls.$relative = (settings.navContainer ? $(settings.navContainer)
@@ -187,9 +190,24 @@
 		this._controls.$absolute = (settings.dotsContainer ? $(settings.dotsContainer)
 			: $('<div>').addClass(settings.dotsClass).appendTo(this.$element)).addClass('disabled');
 
-		this._controls.$absolute.on('click', 'button', $.proxy(function(e) {
-			var index = $(e.target).parent().is(this._controls.$absolute)
-				? $(e.target).index() : $(e.target).parent().index();
+		// We should detect clicks on one of the following (in that order):
+		// - If both `dotsContainer` and `dotSelector` are set, then listen
+		// for clicks on elements that match `dotSelector` and are inside of
+		// `dotsContainer`.
+		// - Otherwise, detect clicks on direct children of either
+		// `dotsContainer` of the nave the plugin constructs itself (if
+		// `dotsContainer` is not set)
+		dotSelector = settings.dotsContainer && settings.dotSelector &&
+			this._controls.$absolute.find(settings.dotSelector).length ?
+			settings.dotSelector : '> *';
+
+		this._controls.$absolute.on('click', dotSelector, $.proxy(function(e) {
+			var index;
+			// Again, these will either be elements inside a dots container, that
+			// match `dotSelector`, or `.dotClass` or its children
+			var matchingDotElements = this._controls.$absolute.find(dotSelector);
+
+			index = matchingDotElements.index($(e.target).closest(matchingDotElements));
 
 			e.preventDefault();
 
