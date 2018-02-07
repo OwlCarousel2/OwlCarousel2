@@ -2850,10 +2850,7 @@
 	 */
 	Navigation.Defaults = {
 		nav: false,
-		navText: [
-			'<span aria-label="' + 'prev' + '">&#x2039;</span>',
-			'<span aria-label="' + 'next' + '">&#x203a;</span>'
-		],
+		navText:[ "<i class='fa fa-chevron-left'></i>","<i class='fa fa-chevron-right'></i>" ],
 		navSpeed: false,
 		navElement: 'button role="presentation"',
 		navContainer: false,
