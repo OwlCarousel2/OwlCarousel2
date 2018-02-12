@@ -32,7 +32,7 @@
 				}
 			}, this),
 			'translate.owl.carousel': $.proxy(function(e) {
-				if (e.namespace && this.swapping && (this.core.options.animateOut || this.core.options.animateIn)) {
+				if (e.namespace && this.swapping && (this.core.options.animateOut || this.core.options.animateIn || this.core.options.backAnimateIn || this.core.options.backAnimateOut)) {
 					this.swap();
 				}
 			}, this)
@@ -47,7 +47,9 @@
 	 */
 	Animate.Defaults = {
 		animateOut: false,
-		animateIn: false
+		animateIn: false,
+		backAnimateIn: false,
+		backAnimateOut: false,
 	};
 
 	/**
@@ -66,18 +68,22 @@
 		}
 
 		this.core.speed(0);
-
+		
+		// use forward animate classes if backward animations are not defined
+		this.core.settings.backAnimateIn = this.core.settings.backAnimateIn ? this.core.settings.backAnimateIn : this.core.settings.animateIn;
+		this.core.settings.backAnimateOut = this.core.settings.backAnimateOut ? this.core.settings.backAnimateOut : this.core.settings.animateOut;
+		
 		var left,
 			clear = $.proxy(this.clear, this),
 			previous = this.core.$stage.children().eq(this.previous),
 			next = this.core.$stage.children().eq(this.next),
-			incoming = this.core.settings.animateIn,
-			outgoing = this.core.settings.animateOut;
+			incoming = this.next > this.previous ? this.core.settings.animateIn : this.core.settings.backAnimateIn,
+			outgoing = this.next > this.previous ? this.core.settings.animateOut : this.core.settings.backAnimateOut;
 
 		if (this.core.current() === this.previous) {
 			return;
 		}
-
+		
 		if (outgoing) {
 			left = this.core.coordinates(this.previous) - this.core.coordinates(this.next);
 			previous.one($.support.animation.end, clear)
@@ -97,6 +103,8 @@
 		$(e.target).css( { 'left': '' } )
 			.removeClass('animated owl-animated-out owl-animated-in')
 			.removeClass(this.core.settings.animateIn)
+			.removeClass(this.core.settings.backAnimateIn)
+			.removeClass(this.core.settings.backAnimateOut)
 			.removeClass(this.core.settings.animateOut);
 		this.core.onTransitionEnd();
 	};
