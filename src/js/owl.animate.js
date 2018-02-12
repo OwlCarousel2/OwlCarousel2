@@ -49,7 +49,7 @@
 		animateOut: false,
 		animateIn: false,
 		backAnimateIn: false,
-		backAnimateOut: false,
+		backAnimateOut: false
 	};
 
 	/**
