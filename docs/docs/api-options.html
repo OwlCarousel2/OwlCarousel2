@@ -355,7 +355,13 @@
             <h4 id="dotscontainer">dotsContainer</h4>
             <p>Type: <code>String/Class/ID/Boolean</code>
               <br /> Default: <code>false</code></p>
-            <p>Set your own container for nav.</p>
+            <p>Set your own container for nav. If <strong>dotSelector</strong>  is also set, the carousel will be listening to clicks on this container&#x27;s descendants that satisfy the dotSelector selector. Otherwise, clicks on this container&#x27;s children
+              will be listened.</p>
+            <hr>
+            <h4 id="dotselector">dotSelector</h4>
+            <p>Type: <code>String/Class/ID/attribute/Boolean</code>
+              <br /> Default: <code>false</code></p>
+            <p>A selector for a dot navigation item in your custom nav container. Only takes effect if <strong>dotsContainer</strong>  is set.</p>
             <hr>
             <h3 id="next-step">Next Step</h3>
             <h4 id="-classes-api-classes-html-">
