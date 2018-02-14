@@ -1,11 +1,11 @@
 /**
- * Owl Carousel v2.3.0
- * Copyright 2013-2017 David Deutsch
- * Licensed under  ()
+ * Owl Carousel v2.3.1
+ * Copyright 2013-2018 David Deutsch
+ * Licensed under: SEE LICENSE IN https://github.com/OwlCarousel2/OwlCarousel2/blob/master/LICENSE
  */
 /**
  * Owl carousel
- * @version 2.1.6
+ * @version 2.3.1
  * @author Bartosz Wojciechowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -1701,7 +1701,7 @@
 
 /**
  * AutoRefresh Plugin
- * @version 2.1.0
+ * @version 2.3.1
  * @author Artus Kolanowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -1813,7 +1813,7 @@
 
 /**
  * Lazy Plugin
- * @version 2.1.0
+ * @version 2.3.1
  * @author Bartosz Wojciechowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -1949,7 +1949,7 @@
 
 /**
  * AutoHeight Plugin
- * @version 2.1.0
+ * @version 2.3.1
  * @author Bartosz Wojciechowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -2047,7 +2047,7 @@
 
 /**
  * Video Plugin
- * @version 2.1.0
+ * @version 2.3.1
  * @author Bartosz Wojciechowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -2367,7 +2367,7 @@
 
 /**
  * Animate Plugin
- * @version 2.1.0
+ * @version 2.3.1
  * @author Bartosz Wojciechowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -2489,7 +2489,7 @@
 
 /**
  * Autoplay Plugin
- * @version 2.1.0
+ * @version 2.3.1
  * @author Bartosz Wojciechowski
  * @author Artus Kolanowski
  * @author David Deutsch
@@ -2723,7 +2723,7 @@
 
 /**
  * Navigation Plugin
- * @version 2.1.0
+ * @version 2.3.1
  * @author Artus Kolanowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -2943,7 +2943,8 @@
 	 * @protected
 	 */
 	Navigation.prototype.destroy = function() {
-		var handler, control, property, override;
+		var handler, control, property, override, settings;
+		settings = this._core.settings;
 
 		for (handler in this._handlers) {
 			this.$element.off(handler, this._handlers[handler]);
@@ -3129,7 +3130,7 @@
 
 /**
  * Hash Plugin
- * @version 2.1.0
+ * @version 2.3.1
  * @author Artus Kolanowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -3253,7 +3254,7 @@
 /**
  * Support Plugin
  *
- * @version 2.1.0
+ * @version 2.3.1
  * @author Vivid Planet Software GmbH
  * @author Artus Kolanowski
  * @author David Deutsch

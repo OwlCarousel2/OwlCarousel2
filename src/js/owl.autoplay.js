@@ -1,6 +1,6 @@
 /**
  * Autoplay Plugin
- * @version 2.1.0
+ * @version 2.3.1
  * @author Bartosz Wojciechowski
  * @author Artus Kolanowski
  * @author David Deutsch

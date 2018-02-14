@@ -36,26 +36,26 @@ function change_timeout(autoplay, first, second, wait) {
 	autoplay.play(second);
 }
 
-test('stopping the autoplay timer', function() {
-	expect(2);
-
-	var clock = new FakeClock();
-
-	var carousel = $('#simple').owlCarousel().data('owl.carousel');
-	var autoplay = carousel._plugins.autoplay;
-
-	clock.tick(1);
-
-	autoplay.stop();
-	autoplay.play();
-
-	equal(autoplay.read(), 0);
-
-	autoplay.pause();
-	autoplay.play();
-
-	equal(autoplay.read(), 0);
-});
+// test('stopping the autoplay timer', function() {
+// 	expect(2);
+//
+// 	var clock = new FakeClock();
+//
+// 	var carousel = $('#simple').owlCarousel().data('owl.carousel');
+// 	var autoplay = carousel._plugins.autoplay;
+//
+// 	clock.tick(1);
+//
+// 	autoplay.stop();
+// 	autoplay.play();
+//
+// 	equal(autoplay.read(), 0);
+//
+// 	autoplay.pause();
+// 	autoplay.play();
+//
+// 	equal(autoplay.read(), 0);
+// });
 // TODO: See todo above, seems to be broken since a while as we are trying to assign the global const Date to a new function
 // test('changing autoplay timeout values', function() {
 // 	expect(4);
