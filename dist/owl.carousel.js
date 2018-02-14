@@ -2851,10 +2851,14 @@
 	Navigation.Defaults = {
 		nav: false,
 		navText: [
-			'<span aria-label="' + 'prev' + '">&#x2039;</span>',
-			'<span aria-label="' + 'next' + '">&#x203a;</span>'
+			'<i class="fas fa-chevron-right"></i>
+
+Desktop Use (Glyph)
+Unicode
+',
+			'<i class="fas fa-chevron-left"></i>'
 		],
-		navSpeed: false,
+		navSpeed: true,
 		navElement: 'button role="presentation"',
 		navContainer: false,
 		navContainerClass: 'owl-nav',
