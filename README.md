@@ -8,7 +8,7 @@ Touch enabled [jQuery](https://jquery.com/) plugin that lets you create a beauti
 
 This package can be installed with:
 
-- [npm](https://www.npmjs.com/package/owl.carousel): `npm install --save owl.carousel`
+- [npm](https://www.npmjs.com/package/owl.carousel): `npm install --save owl.carousel` or `yarn add owl.carousel jquery`
 - [bower](http://bower.io/search/?q=owl.carousel): `bower install --save owl.carousel`
 
 Or download the [latest release](https://github.com/OwlCarousel2/OwlCarousel2/releases).
@@ -17,12 +17,25 @@ Or download the [latest release](https://github.com/OwlCarousel2/OwlCarousel2/re
 
 #### Webpack
 
+Add jQuery via the "webpack.ProvidePlugin" to your webpack configuration:
+    
+    const webpack = require('webpack');
+    
+    //...
+    plugins: [
+        new webpack.ProvidePlugin({
+          $: 'jquery',
+          jQuery: 'jquery',
+          'window.jQuery': 'jquery'
+        }),
+    ],
+    //...
+
 Load the required stylesheet and JS:
 
 ```js
 import 'owl.carousel/dist/assets/owl.carousel.css';
-import $ from 'jquery';
-import 'imports?jQuery=jquery!owl.carousel';
+import 'owl.carousel';
 ```
 
 #### Static HTML
