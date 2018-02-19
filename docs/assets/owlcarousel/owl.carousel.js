@@ -215,6 +215,7 @@
 		fallbackEasing: 'swing',
 
 		info: false,
+		checkVisibility: true,
 
 		nestedItemSelector: false,
 		itemElement: 'div',
