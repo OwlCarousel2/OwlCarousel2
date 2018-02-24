@@ -49,6 +49,32 @@
 
 		// register event handlers
 		this._core.$element.on(this._handlers);
+		
+		this._intervalId = null;
+		var refThis = this;
+		
+		// Auto update carousel when images inside are loaded
+		// Otherwise the carousel is 1px height
+		$(window).load(function()
+		{
+		    if (refThis._core.settings.autoHeight) refThis.update();
+		});
+		
+		// Autoresize the height of the carousel when window is resized
+		// When carousel has images, the height is dependent on the width 
+		// and should also change on resize
+		$(window).resize(function()
+		{
+		    if (refThis._core.settings.autoHeight)
+		    {
+		        if(this._intervalId != null) clearTimeout(this._intervalId);
+		
+		        this._intervalId = setTimeout(function()
+		        {
+		            refThis.update();
+		        }, 250);
+		    }
+		});
 	};
 
 	/**
