@@ -444,6 +444,65 @@
 	} ];
 
 	/**
+	 * Create the stage DOM element
+	 */
+	Owl.prototype.initializeStage = function() {
+		this.$stage = this.$element.find('.' + this.settings.stageClass);
+
+		// if the stage is already in the DOM, grab it and skip stage initialization
+		if (this.$stage.length) {
+			return;
+		}
+
+		this.$element.addClass(this.options.loadingClass);
+
+		// create stage
+		this.$stage = $('<' + this.settings.stageElement + ' class="' + this.settings.stageClass + '"/>')
+			.wrap('<div class="' + this.settings.stageOuterClass + '"/>');
+
+		// append stage
+		this.$element.append(this.$stage.parent());
+	};
+
+	/**
+	 * Create item DOM elements
+	 */
+	Owl.prototype.initializeItems = function() {
+		var $items = this.$element.find('.owl-item');
+
+		// if the items are already in the DOM, grab them and skip item initialization
+		if ($items.length) {
+			this._items = $items.get().map(function(item) {
+				return $(item);
+			});
+
+			this._mergers = this._items.map(function() {
+				return 1;
+			});
+
+			this.refresh();
+
+			return;
+		}
+
+		// append content
+		this.replace(this.$element.children().not(this.$stage.parent()));
+
+		// check visibility
+		if (this.isVisible()) {
+			// update view
+			this.refresh();
+		} else {
+			// invalidate width
+			this.invalidate('width');
+		}
+
+		this.$element
+			.removeClass(this.options.loadingClass)
+			.addClass(this.options.loadedClass);
+	};
+
+	/**
 	 * Initializes the carousel.
 	 * @protected
 	 */
@@ -464,36 +523,25 @@
 			}
 		}
 
-		this.$element.addClass(this.options.loadingClass);
-
-		// create stage
-		this.$stage = $('<' + this.settings.stageElement + ' class="' + this.settings.stageClass + '"/>')
-			.wrap('<div class="' + this.settings.stageOuterClass + '"/>');
-
-		// append stage
-		this.$element.append(this.$stage.parent());
-
-		// append content
-		this.replace(this.$element.children().not(this.$stage.parent()));
-
-		// check visibility
-		if (this.$element.is(':visible')) {
-			// update view
-			this.refresh();
-		} else {
-			// invalidate width
-			this.invalidate('width');
-		}
-
-		this.$element
-			.removeClass(this.options.loadingClass)
-			.addClass(this.options.loadedClass);
+		this.initializeStage();
+		this.initializeItems();
 
 		// register event handlers
 		this.registerEventHandlers();
 
 		this.leave('initializing');
 		this.trigger('initialized');
+	};
+
+	/**
+	 * @returns {Boolean} visibility of $element
+	 *                    if you know the carousel will always be visible you can set `checkVisibility` to `false` to
+	 *                    prevent the expensive browser layout forced reflow the $element.is(':visible') does
+	 */
+	Owl.prototype.isVisible = function() {
+		return this.settings.checkVisibility
+			? this.$element.is(':visible')
+			: true;
 	};
 
 	/**
@@ -651,7 +699,7 @@
 			return false;
 		}
 
-		if (!this.$element.is(':visible')) {
+		if (!this.isVisible()) {
 			return false;
 		}
 
@@ -857,7 +905,7 @@
 				} else if (direction === 'right' && coordinate > value - width - pull && coordinate < value - width + pull) {
 					position = index + 1;
 				} else if (this.op(coordinate, '<', value)
-					&& this.op(coordinate, '>', coordinates[index + 1] || value - width)) {
+					&& this.op(coordinate, '>', coordinates[index + 1] !== undefined ? coordinates[index + 1] : value - width)) {
 					position = direction === 'left' ? index + 1 : index;
 				}
 				return position === -1;
@@ -1219,7 +1267,7 @@
 		this.speed(this.duration(current, position, speed));
 		this.current(position);
 
-		if (this.$element.is(':visible')) {
+		if (this.isVisible()) {
 			this.update();
 		}
 	};
@@ -1772,7 +1820,7 @@
 			return;
 		}
 
-		this._visible = this._core.$element.is(':visible');
+		this._visible = this._core.isVisible();
 		this._interval = window.setInterval($.proxy(this.refresh, this), this._core.settings.autoRefreshInterval);
 	};
 
@@ -1780,7 +1828,7 @@
 	 * Refreshes the element.
 	 */
 	AutoRefresh.prototype.refresh = function() {
-		if (this._core.$element.is(':visible') === this._visible) {
+		if (this._core.isVisible() === this._visible) {
 			return;
 		}
 
@@ -2851,11 +2899,11 @@
 	Navigation.Defaults = {
 		nav: false,
 		navText: [
-			'<span aria-label="' + 'prev' + '">&#x2039;</span>',
-			'<span aria-label="' + 'next' + '">&#x203a;</span>'
+			'<span aria-label="' + 'Previous' + '">&#x2039;</span>',
+			'<span aria-label="' + 'Next' + '">&#x203a;</span>'
 		],
 		navSpeed: false,
-		navElement: 'button role="presentation"',
+		navElement: 'button type="button" role="presentation"',
 		navContainer: false,
 		navContainerClass: 'owl-nav',
 		navClass: [
@@ -2901,7 +2949,7 @@
 
 		// create DOM structure for absolute navigation
 		if (!settings.dotsData) {
-			this._templates = [ $('<button>')
+			this._templates = [ $('<button role="button">')
 				.addClass(settings.dotClass)
 				.append($('<span>'))
 				.prop('outerHTML') ];
