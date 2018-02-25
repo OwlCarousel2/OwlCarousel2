@@ -99,7 +99,7 @@
 					$element.css('opacity', 1);
 					this._core.trigger('loaded', { element: $element, url: url }, 'lazy');
 				}, this)).attr('src', url);
-            } else if($element.is('source')) {
+            } else if ($element.is('source')) {
                 $element.one('load.owl.lazy', $.proxy(function() {
                     this._core.trigger('loaded', { element: $element, url: url }, 'lazy');
                 }, this)).attr('srcset', url);
