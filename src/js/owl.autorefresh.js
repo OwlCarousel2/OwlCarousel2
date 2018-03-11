@@ -1,6 +1,6 @@
 /**
  * AutoRefresh Plugin
- * @version 2.1.0
+ * @version 2.3.1
  * @author Artus Kolanowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -71,7 +71,7 @@
 			return;
 		}
 
-		this._visible = this._core.$element.is(':visible');
+		this._visible = this._core.isVisible();
 		this._interval = window.setInterval($.proxy(this.refresh, this), this._core.settings.autoRefreshInterval);
 	};
 
@@ -79,7 +79,7 @@
 	 * Refreshes the element.
 	 */
 	AutoRefresh.prototype.refresh = function() {
-		if (this._core.$element.is(':visible') === this._visible) {
+		if (this._core.isVisible() === this._visible) {
 			return;
 		}
 

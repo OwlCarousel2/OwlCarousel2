@@ -13,7 +13,11 @@ tags:
 <div class="owl-carousel owl-theme">
 	<img class="owl-lazy" data-src="https://placehold.it/350x250&text=1" data-src-retina="https://placehold.it/350x250&text=1-retina" alt="">
 	<img class="owl-lazy" data-src="https://placehold.it/350x250&text=2" data-src-retina="https://placehold.it/350x250&text=2-retina" alt="">
-	<img class="owl-lazy" data-src="https://placehold.it/350x250&text=3" alt="">
+    <picture>
+        <source class="owl-lazy" media="(min-width: 650px)" data-srcset="https://placehold.it/350x250&text=3-large">
+        <source class="owl-lazy" media="(min-width: 350px)" data-srcset="https://placehold.it/350x250&text=3-medium">
+        <img class="owl-lazy" data-src="https://placehold.it/350x250&text=3-fallback" alt="">
+    </picture>
 	<img class="owl-lazy" data-src="https://placehold.it/350x250&text=4" alt="">
 	<img class="owl-lazy" data-src="https://placehold.it/350x250&text=5" alt="">
 	<img class="owl-lazy" data-src="https://placehold.it/350x250&text=6" alt="">
@@ -34,6 +38,7 @@ lazyLoad: true
 ```
 LazyLoad HTML structure requires `class="owl-lazy"` and `data-src="url_to_img"` or/and `data-src-retina="url_to_highres_img"`.
 If you set above settings not on `<img>` but on other DOM element then Owl will load an image into css inline background style.
+You can even use picture tags with different sources by adding the `owl-lazy` class to the source tag and a data-srcset attribute.
 
 
 ### Setup
@@ -51,7 +56,11 @@ $('.owl-carousel').owlCarousel({
 <div class="owl-carousel owl-theme">
 	<img class="owl-lazy" data-src="https://placehold.it/350x250&text=1" data-src-retina="https://placehold.it/350x250&text=1-retina" alt="">
 	<img class="owl-lazy" data-src="https://placehold.it/350x250&text=2" data-src-retina="https://placehold.it/350x250&text=2-retina" alt="">
-	<img class="owl-lazy" data-src="https://placehold.it/350x250&text=3" alt="">
+    <picture>
+        <source class="owl-lazy" media="(min-width: 650px)" data-srcset="https://placehold.it/350x250&text=3-large">
+        <source class="owl-lazy" media="(min-width: 350px)" data-srcset="https://placehold.it/350x250&text=3-medium">
+        <img class="owl-lazy" data-src="https://placehold.it/350x250&text=3-fallback" alt="">
+    </picture>
 	<img class="owl-lazy" data-src="https://placehold.it/350x250&text=4" alt="">
 	<img class="owl-lazy" data-src="https://placehold.it/350x250&text=5" alt="">
 	<img class="owl-lazy" data-src="https://placehold.it/350x250&text=6" alt="">

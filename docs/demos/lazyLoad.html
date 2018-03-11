@@ -9,7 +9,7 @@
     <meta name="description" content="Lazy Load carousel">
     <meta name="author" content="David Deutsch">
     <title>
-      Lazy Load Demo | Owl Carousel | 2.3.0
+      Lazy Load Demo | Owl Carousel | 2.3.1
     </title>
 
     <!-- Stylesheets -->
@@ -60,7 +60,7 @@
               </li>
               <li> <a href="/OwlCarousel2/docs/started-welcome.html">Docs</a>  </li>
               <li>
-                <a href="https://github.com/OwlCarousel2/OwlCarousel2/archive/2.3.0.zip">Download</a> 
+                <a href="https://github.com/OwlCarousel2/OwlCarousel2/archive/2.3.1.zip">Download</a> 
                 <span class="download"></span> 
               </li>
             </ul>
@@ -85,7 +85,11 @@
           <div class="owl-carousel owl-theme">
             <img class="owl-lazy" data-src="https://placehold.it/350x250&text=1" data-src-retina="https://placehold.it/350x250&text=1-retina" alt="">
             <img class="owl-lazy" data-src="https://placehold.it/350x250&text=2" data-src-retina="https://placehold.it/350x250&text=2-retina" alt="">
-            <img class="owl-lazy" data-src="https://placehold.it/350x250&text=3" alt="">
+            <picture>
+              <source class="owl-lazy" media="(min-width: 650px)" data-srcset="https://placehold.it/350x250&text=3-large">
+              <source class="owl-lazy" media="(min-width: 350px)" data-srcset="https://placehold.it/350x250&text=3-medium">
+              <img class="owl-lazy" data-src="https://placehold.it/350x250&text=3-fallback" alt="">
+            </picture>
             <img class="owl-lazy" data-src="https://placehold.it/350x250&text=4" alt="">
             <img class="owl-lazy" data-src="https://placehold.it/350x250&text=5" alt="">
             <img class="owl-lazy" data-src="https://placehold.it/350x250&text=6" alt="">
