@@ -2,9 +2,7 @@
 
 You can discuss the roadmap here: [#1756](https://github.com/OwlCarousel2/OwlCarousel2/issues/1756).
 
-## 2.2 - current version
-
-## 2.3 - bugfixes, repo migration, minor features
+## 2.3 - bugfixes, repo migration, minor features - current version
 
  - [x] clean up contributor guides
  - [x] Work through a bunch of PRs

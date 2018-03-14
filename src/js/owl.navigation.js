@@ -1,6 +1,6 @@
 /**
  * Navigation Plugin
- * @version 2.3.1
+ * @version 2.3.2
  * @author Artus Kolanowski
  * @author David Deutsch
  * @license The MIT License (MIT)
