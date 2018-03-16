@@ -60,12 +60,6 @@
     "desc":     "Navigation buttons classes."
   },
   {
-    "name":     "controlsClass",
-    "type":     "String",
-    "Default":  "owl-controls",
-    "desc":     "Controls container class - wrapper for navs and dots."
-  },
-  {
     "name":     "dotClass",
     "type":     "String",
     "Default":  "owl-dot",
