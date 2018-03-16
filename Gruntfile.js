@@ -16,7 +16,7 @@ module.exports = function(grunt) {
 			app: grunt.file.readJSON('_config.json'),
 			banner: '/**\n' + ' * Owl Carousel v<%= pkg.version %>\n'
 				+ ' * Copyright 2013-<%= grunt.template.today("yyyy") %> <%= pkg.author.name %>\n'
-				+ ' * Licensed under <%= pkg.license.type %> (<%= pkg.license.url %>)\n' + ' */\n',
+				+ ' * Licensed under: <%= pkg.license %>\n' + ' */\n',
 
 			// assemble
 			assemble: {
