@@ -187,7 +187,7 @@
 		items: 3,
 		loop: false,
 		center: false,
-		rewind: false,
+		rewind: true,
 
 		mouseDrag: true,
 		touchDrag: true,
