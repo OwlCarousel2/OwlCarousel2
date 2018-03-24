@@ -126,7 +126,7 @@
     "desc":     "Show dots each x item."
   },
   {
-    "name":     "dotData",
+    "name":     "dotsData",
     "type":     "Boolean",
     "Default":  "false",
     "desc":     "Used by data-dot content."
