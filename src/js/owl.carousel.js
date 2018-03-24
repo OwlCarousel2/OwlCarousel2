@@ -1,6 +1,6 @@
 /**
  * Owl carousel
- * @version 2.3.2
+ * @version 2.3.3
  * @author Bartosz Wojciechowski
  * @author David Deutsch
  * @license The MIT License (MIT)
