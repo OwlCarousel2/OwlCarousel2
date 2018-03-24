@@ -1,5 +1,5 @@
 /**
- * Owl Carousel v2.3.1
+ * Owl Carousel v2.3.3
  * Copyright 2013-2018 David Deutsch
  * Licensed under: SEE LICENSE IN https://github.com/OwlCarousel2/OwlCarousel2/blob/master/LICENSE
  */
@@ -56,7 +56,6 @@
   .owl-carousel .owl-nav .owl-next,
   .owl-carousel .owl-dot {
     cursor: pointer;
-    cursor: hand;
     -webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: none;
@@ -152,7 +151,7 @@
   top: 50%;
   margin-left: -40px;
   margin-top: -40px;
-  background: url("{$owl-image-path}owl.video.play.png") no-repeat;
+  background: url("owl.video.play.png") no-repeat;
   cursor: pointer;
   z-index: 1;
   -webkit-backface-visibility: hidden;

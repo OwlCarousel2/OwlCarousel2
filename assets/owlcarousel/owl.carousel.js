@@ -1,11 +1,11 @@
 /**
- * Owl Carousel v2.3.1
+ * Owl Carousel v2.3.3
  * Copyright 2013-2018 David Deutsch
  * Licensed under: SEE LICENSE IN https://github.com/OwlCarousel2/OwlCarousel2/blob/master/LICENSE
  */
 /**
  * Owl carousel
- * @version 2.3.1
+ * @version 2.3.3
  * @author Bartosz Wojciechowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -188,6 +188,7 @@
 		loop: false,
 		center: false,
 		rewind: false,
+		checkVisibility: true,
 
 		mouseDrag: true,
 		touchDrag: true,
@@ -1749,7 +1750,7 @@
 
 /**
  * AutoRefresh Plugin
- * @version 2.3.1
+ * @version 2.3.3
  * @author Artus Kolanowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -1861,7 +1862,7 @@
 
 /**
  * Lazy Plugin
- * @version 2.3.1
+ * @version 2.3.3
  * @author Bartosz Wojciechowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -2001,7 +2002,7 @@
 
 /**
  * AutoHeight Plugin
- * @version 2.3.1
+ * @version 2.3.3
  * @author Bartosz Wojciechowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -2126,7 +2127,7 @@
 
 /**
  * Video Plugin
- * @version 2.3.1
+ * @version 2.3.3
  * @author Bartosz Wojciechowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -2446,7 +2447,7 @@
 
 /**
  * Animate Plugin
- * @version 2.3.1
+ * @version 2.3.3
  * @author Bartosz Wojciechowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -2568,7 +2569,7 @@
 
 /**
  * Autoplay Plugin
- * @version 2.3.1
+ * @version 2.3.3
  * @author Bartosz Wojciechowski
  * @author Artus Kolanowski
  * @author David Deutsch
@@ -2702,7 +2703,7 @@
 			this._timeout * (Math.round(this.read() / this._timeout) + 1) - this.read()
 		);
 
-		if (this._core.is('busy') || this._core.is('interacting') || document.hidden) {
+		if (this._core.is('interacting') || document.hidden) {
 			return;
 		}
 		this._core.next(speed || this._core.settings.autoplaySpeed);
@@ -2802,7 +2803,7 @@
 
 /**
  * Navigation Plugin
- * @version 2.3.1
+ * @version 2.3.3
  * @author Artus Kolanowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -3209,7 +3210,7 @@
 
 /**
  * Hash Plugin
- * @version 2.3.1
+ * @version 2.3.3
  * @author Artus Kolanowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -3333,7 +3334,7 @@
 /**
  * Support Plugin
  *
- * @version 2.3.1
+ * @version 2.3.3
  * @author Vivid Planet Software GmbH
  * @author Artus Kolanowski
  * @author David Deutsch
