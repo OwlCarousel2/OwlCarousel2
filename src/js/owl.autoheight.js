@@ -33,7 +33,6 @@
 			}, this),
 			'changed.owl.carousel': $.proxy(function(e) {
 				if (e.namespace && this._core.settings.autoHeight && e.property.name === 'position'){
-					console.log('update called');
 					this.update();
 				}
 			}, this),
