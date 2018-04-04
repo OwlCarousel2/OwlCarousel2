@@ -99,7 +99,7 @@
 	}
 
 	&.owl-drag .owl-item {
-		touch-action: none;
+		touch-action: pan-y;
 		-webkit-user-select: none;
 		-moz-user-select: none;
 		-ms-user-select: none;
