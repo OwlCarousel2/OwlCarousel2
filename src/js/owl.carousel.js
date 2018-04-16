@@ -457,7 +457,7 @@
 			"class": this.settings.stageClass
 		}).wrap( $( '<div/>', {
 			"class": this.settings.stageOuterClass
-		});
+		}));
 
 		// append stage
 		this.$element.append(this.$stage.parent());
