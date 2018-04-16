@@ -197,7 +197,7 @@
 		target.wrap( $( '<div/>', {
 			"class": "owl-video-wrapper",
 			"style": dimensions
-		});
+		}));
 
 		if (this._core.settings.lazyLoad) {
 			srcType = 'data-src';
