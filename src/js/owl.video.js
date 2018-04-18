@@ -254,7 +254,8 @@
 			video = this._videos[item.attr('data-video')],
 			width = video.width || '100%',
 			height = video.height || this._core.$stage.height(),
-			html;
+			html,
+			iframe;
 
 		if (this._playing) {
 			return;
@@ -266,7 +267,7 @@
 		item = this._core.items(this._core.relative(item.index()));
 
 		this._core.reset(item.index());
-		
+
 		html = $( '<iframe frameborder="0" allowfullscreen mozallowfullscreen webkitAllowFullScreen ></iframe>' );
 		html.attr( 'height', height );
 		html.attr( 'width', width );
@@ -277,8 +278,8 @@
 		} else if (video.type === 'vzaar') {
 			html.attr( 'src', '//view.vzaar.com/' + video.id + '/player?autoplay=true' );
 		}
-		
-		var iframe = $(html).wrap( '<div class="owl-video-frame" />' ).insertAfter(item.find('.owl-video'));
+
+		iframe = $(html).wrap( '<div class="owl-video-frame" />' ).insertAfter(item.find('.owl-video'));
 
 		this._playing = item.addClass('owl-video-playing');
 	};
