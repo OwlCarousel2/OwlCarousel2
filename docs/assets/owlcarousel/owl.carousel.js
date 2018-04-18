@@ -2022,6 +2022,8 @@
 		 */
 		this._core = carousel;
 
+		this._previousHeight = null;
+
 		/**
 		 * All event handlers.
 		 * @protected
@@ -2035,7 +2037,6 @@
 			}, this),
 			'changed.owl.carousel': $.proxy(function(e) {
 				if (e.namespace && this._core.settings.autoHeight && e.property.name === 'position'){
-					console.log('update called');
 					this.update();
 				}
 			}, this),
@@ -2095,6 +2096,7 @@
 	AutoHeight.prototype.update = function() {
 		var start = this._core._current,
 			end = start + this._core.settings.items,
+			lazyLoadEnabled = this._core.settings.lazyLoad,
 			visible = this._core.$stage.children().toArray().slice(start, end),
 			heights = [],
 			maxheight = 0;
@@ -2104,6 +2106,12 @@
 		});
 
 		maxheight = Math.max.apply(null, heights);
+
+		if (maxheight <= 1 && lazyLoadEnabled && this._previousHeight) {
+			maxheight = this._previousHeight;
+		}
+
+		this._previousHeight = maxheight;
 
 		this._core.$stage.parent()
 			.height(maxheight)
