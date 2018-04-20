@@ -1,11 +1,11 @@
 /**
- * Owl Carousel v2.3.3
+ * Owl Carousel v2.3.4
  * Copyright 2013-2018 David Deutsch
  * Licensed under: SEE LICENSE IN https://github.com/OwlCarousel2/OwlCarousel2/blob/master/LICENSE
  */
 /**
  * Owl carousel
- * @version 2.3.3
+ * @version 2.3.4
  * @author Bartosz Wojciechowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -1756,7 +1756,7 @@
 
 /**
  * AutoRefresh Plugin
- * @version 2.3.3
+ * @version 2.3.4
  * @author Artus Kolanowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -1868,7 +1868,7 @@
 
 /**
  * Lazy Plugin
- * @version 2.3.3
+ * @version 2.3.4
  * @author Bartosz Wojciechowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -2018,7 +2018,7 @@
 
 /**
  * AutoHeight Plugin
- * @version 2.3.3
+ * @version 2.3.4
  * @author Bartosz Wojciechowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -2151,7 +2151,7 @@
 
 /**
  * Video Plugin
- * @version 2.3.3
+ * @version 2.3.4
  * @author Bartosz Wojciechowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -2479,7 +2479,7 @@
 
 /**
  * Animate Plugin
- * @version 2.3.3
+ * @version 2.3.4
  * @author Bartosz Wojciechowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -2601,7 +2601,7 @@
 
 /**
  * Autoplay Plugin
- * @version 2.3.3
+ * @version 2.3.4
  * @author Bartosz Wojciechowski
  * @author Artus Kolanowski
  * @author David Deutsch
@@ -2835,7 +2835,7 @@
 
 /**
  * Navigation Plugin
- * @version 2.3.3
+ * @version 2.3.4
  * @author Artus Kolanowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -3242,7 +3242,7 @@
 
 /**
  * Hash Plugin
- * @version 2.3.3
+ * @version 2.3.4
  * @author Artus Kolanowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -3366,7 +3366,7 @@
 /**
  * Support Plugin
  *
- * @version 2.3.3
+ * @version 2.3.4
  * @author Vivid Planet Software GmbH
  * @author Artus Kolanowski
  * @author David Deutsch

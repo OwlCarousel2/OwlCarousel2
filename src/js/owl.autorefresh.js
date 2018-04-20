@@ -1,6 +1,6 @@
 /**
  * AutoRefresh Plugin
- * @version 2.3.3
+ * @version 2.3.4
  * @author Artus Kolanowski
  * @author David Deutsch
  * @license The MIT License (MIT)

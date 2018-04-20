@@ -1,7 +1,7 @@
 /**
  * Support Plugin
  *
- * @version 2.3.3
+ * @version 2.3.4
  * @author Vivid Planet Software GmbH
  * @author Artus Kolanowski
  * @author David Deutsch
