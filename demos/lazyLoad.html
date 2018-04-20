@@ -9,7 +9,7 @@
     <meta name="description" content="Lazy Load carousel">
     <meta name="author" content="David Deutsch">
     <title>
-      Lazy Load Demo | Owl Carousel | 2.3.3
+      Lazy Load Demo | Owl Carousel | 2.3.4
     </title>
 
     <!-- Stylesheets -->
@@ -60,7 +60,7 @@
               </li>
               <li> <a href="/OwlCarousel2/docs/started-welcome.html">Docs</a>  </li>
               <li>
-                <a href="https://github.com/OwlCarousel2/OwlCarousel2/archive/2.3.3.zip">Download</a> 
+                <a href="https://github.com/OwlCarousel2/OwlCarousel2/archive/2.3.4.zip">Download</a> 
                 <span class="download"></span> 
               </li>
             </ul>
@@ -84,7 +84,7 @@
         <div class="large-12 columns">
           <div class="owl-carousel owl-theme">
             <img class="owl-lazy" data-src="https://placehold.it/350x250&text=1" data-src-retina="https://placehold.it/350x250&text=1-retina" alt="">
-            <img class="owl-lazy" data-src="https://placehold.it/350x250&text=2" data-src-retina="https://placehold.it/350x250&text=2-retina" alt="">
+            <img class="owl-lazy" data-src="https://placehold.it/350x350&text=2" data-src-retina="https://placehold.it/350x250&text=2-retina" alt="">
             <picture>
               <source class="owl-lazy" media="(min-width: 650px)" data-srcset="https://placehold.it/350x250&text=3-large">
               <source class="owl-lazy" media="(min-width: 350px)" data-srcset="https://placehold.it/350x250&text=3-medium">
@@ -95,9 +95,9 @@
             <img class="owl-lazy" data-src="https://placehold.it/350x250&text=6" alt="">
             <img class="owl-lazy" data-src="https://placehold.it/350x250&text=7" alt="">
             <img class="owl-lazy" data-src="https://placehold.it/350x250&text=8" alt="">
-            <img class="owl-lazy" data-src="https://placehold.it/350x250&text=9" alt="">
-            <img class="owl-lazy" data-src="https://placehold.it/350x250&text=10" alt="">
-            <img class="owl-lazy" data-src="https://placehold.it/350x250&text=11" alt="">
+            <img class="owl-lazy" data-src="https://placehold.it/350x400&text=9" alt="">
+            <img class="owl-lazy" data-src="https://placehold.it/350x400&text=10" alt="">
+            <img class="owl-lazy" data-src="https://placehold.it/350x450&text=11" alt="">
           </div>
           <h3 id="overview">Overview</h3>
           <p>Add lazyLoad to plugin setup:</p>
@@ -110,31 +110,35 @@
     loop:true,
     margin:10
 });</code></pre>
+          <h3 id="option">Option</h3>
+          <p>If you want to preload images you can also add the option <code>lazyLoadEager</code> to the settings object, where the value indicates how many items to the right (and left, when loop is <code>true</code>) will be pre-loaded.</p>
           <h3 id="html-">HTML:</h3>
           <pre><code>&lt;div class=&quot;owl-carousel owl-theme&quot;&gt;
-    &lt;img class=&quot;owl-lazy&quot; data-src=&quot;https://placehold.it/350x250&amp;text=1&quot; data-src-retina=&quot;https://placehold.it/350x250&amp;text=1-retina&quot; alt=&quot;&quot;&gt;
-    &lt;img class=&quot;owl-lazy&quot; data-src=&quot;https://placehold.it/350x250&amp;text=2&quot; data-src-retina=&quot;https://placehold.it/350x250&amp;text=2-retina&quot; alt=&quot;&quot;&gt;
-    &lt;picture&gt;
-        &lt;source class=&quot;owl-lazy&quot; media=&quot;(min-width: 650px)&quot; data-srcset=&quot;https://placehold.it/350x250&amp;text=3-large&quot;&gt;
-        &lt;source class=&quot;owl-lazy&quot; media=&quot;(min-width: 350px)&quot; data-srcset=&quot;https://placehold.it/350x250&amp;text=3-medium&quot;&gt;
-        &lt;img class=&quot;owl-lazy&quot; data-src=&quot;https://placehold.it/350x250&amp;text=3-fallback&quot; alt=&quot;&quot;&gt;
-    &lt;/picture&gt;
+    &lt;img class=&quot;owl-lazy&quot; data-src=&quot;https://placehold.it/350x450&amp;text=1&quot; data-src-retina=&quot;https://placehold.it/350x250&amp;text=1-retina&quot; alt=&quot;&quot;&gt;
+    &lt;img class=&quot;owl-lazy&quot; data-src=&quot;https://placehold.it/350x650&amp;text=2&quot; data-src-retina=&quot;https://placehold.it/350x250&amp;text=2-retina&quot; alt=&quot;&quot;&gt;
+  &lt;picture&gt;
+      &lt;source class=&quot;owl-lazy&quot; media=&quot;(min-width: 650px)&quot; data-srcset=&quot;https://placehold.it/350x250&amp;text=3-large&quot;&gt;
+      &lt;source class=&quot;owl-lazy&quot; media=&quot;(min-width: 350px)&quot; data-srcset=&quot;https://placehold.it/350x250&amp;text=3-medium&quot;&gt;
+      &lt;img class=&quot;owl-lazy&quot; data-src=&quot;https://placehold.it/350x250&amp;text=3-fallback&quot; alt=&quot;&quot;&gt;
+  &lt;/picture&gt;
     &lt;img class=&quot;owl-lazy&quot; data-src=&quot;https://placehold.it/350x250&amp;text=4&quot; alt=&quot;&quot;&gt;
     &lt;img class=&quot;owl-lazy&quot; data-src=&quot;https://placehold.it/350x250&amp;text=5&quot; alt=&quot;&quot;&gt;
     &lt;img class=&quot;owl-lazy&quot; data-src=&quot;https://placehold.it/350x250&amp;text=6&quot; alt=&quot;&quot;&gt;
     &lt;img class=&quot;owl-lazy&quot; data-src=&quot;https://placehold.it/350x250&amp;text=7&quot; alt=&quot;&quot;&gt;
     &lt;img class=&quot;owl-lazy&quot; data-src=&quot;https://placehold.it/350x250&amp;text=8&quot; alt=&quot;&quot;&gt;
-    &lt;img class=&quot;owl-lazy&quot; data-src=&quot;https://placehold.it/350x250&amp;text=9&quot; alt=&quot;&quot;&gt;
-    &lt;img class=&quot;owl-lazy&quot; data-src=&quot;https://placehold.it/350x250&amp;text=10&quot; alt=&quot;&quot;&gt;
-    &lt;img class=&quot;owl-lazy&quot; data-src=&quot;https://placehold.it/350x250&amp;text=11&quot; alt=&quot;&quot;&gt;
+    &lt;img class=&quot;owl-lazy&quot; data-src=&quot;https://placehold.it/350x400&amp;text=9&quot; alt=&quot;&quot;&gt;
+    &lt;img class=&quot;owl-lazy&quot; data-src=&quot;https://placehold.it/350x400&amp;text=10&quot; alt=&quot;&quot;&gt;
+    &lt;img class=&quot;owl-lazy&quot; data-src=&quot;https://placehold.it/350x450&amp;text=11&quot; alt=&quot;&quot;&gt;
 &lt;/div&gt;</code></pre>
           <script>
             jQuery(document).ready(function($) {
               $('.owl-carousel').owlCarousel({
-                items: 4,
+                items: 1,
                 lazyLoad: true,
+                lazyLoadEager: 1,
                 loop: true,
-                margin: 10
+                margin: 10,
+                autoHeight: true
               });
             });
           </script>

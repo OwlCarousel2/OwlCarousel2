@@ -9,7 +9,7 @@
     <meta name="description" content="Owl Carousel Documentation">
     <meta name="author" content="David Deutsch">
     <title>
-      Options | Owl Carousel | 2.3.3
+      Options | Owl Carousel | 2.3.4
     </title>
 
     <!-- Stylesheets -->
@@ -60,7 +60,7 @@
                 <a href="/OwlCarousel2/docs/started-welcome.html">Docs</a> 
               </li>
               <li>
-                <a href="https://github.com/OwlCarousel2/OwlCarousel2/archive/2.3.3.zip">Download</a> 
+                <a href="https://github.com/OwlCarousel2/OwlCarousel2/archive/2.3.4.zip">Download</a> 
                 <span class="download"></span> 
               </li>
             </ul>
@@ -207,6 +207,11 @@
               <br /> Default: <code>1</code></p>
             <p>Navigation slide by x. &#x27;page&#x27; string can be set to slide by page.</p>
             <hr>
+            <h4 id="slidetransition">slideTransition</h4>
+            <p>Type: <code>String</code>
+              <br /> Default: ``</p>
+            <p>You can define the transition for the stage you want to use eg. linear.</p>
+            <hr>
             <h4 id="dots">dots</h4>
             <p>Type: <code>Boolean</code>
               <br /> Default: <code>true</code></p>
@@ -227,10 +232,10 @@
               <br /> Default: <code>false</code></p>
             <p>Lazy load images. data-src and data-src-retina for highres. Also load images into background inline style if element is not &lt;img&gt;</p>
             <hr>
-            <h4 id="lazycontent">lazyContent</h4>
-            <p>Type: <code>Boolean</code>
-              <br /> Default: <code>false</code></p>
-            <p>lazyContent was introduced during beta tests but i removed it from the final release due to bad implementation. It is a nice options so i will work on it in the nearest feature.</p>
+            <h4 id="lazyloadeager">lazyLoadEager</h4>
+            <p>Type: <code>Number</code>
+              <br /> Default: <code>0</code></p>
+            <p>Eagerly pre-loads images to the right (and left when loop is enabled) based on how many items you want to preload.</p>
             <hr>
             <h4 id="autoplay">autoplay</h4>
             <p>Type: <code>Boolean</code>
@@ -356,6 +361,11 @@
             <p>Type: <code>String/Class/ID/Boolean</code>
               <br /> Default: <code>false</code></p>
             <p>Set your own container for nav.</p>
+            <hr>
+            <h4 id="checkvisible">checkVisible</h4>
+            <p>Type: <code>Boolean</code>
+              <br /> Default: <code>true</code></p>
+            <p>If you know the carousel will always be visible you can set &#x60;checkVisibility&#x60; to &#x60;false&#x60; to prevent the expensive browser layout forced reflow the $element.is(&#x27;:visible&#x27;) does.</p>
             <hr>
             <h3 id="next-step">Next Step</h3>
             <h4 id="-classes-api-classes-html-">
