@@ -138,10 +138,10 @@
     "desc":     "Lazy load images. data-src and data-src-retina for highres. Also load images into background inline style if element is not <img>"
   },
   {
-    "name":     "lazyContent",
-    "type":     "Boolean",
-    "Default":  "false",
-    "desc":     "lazyContent was introduced during beta tests but i removed it from the final release due to bad implementation. It is a nice options so i will work on it in the nearest feature."
+    "name":     "lazyLoadEager",
+    "type":     "Number",
+    "Default":  "0",
+    "desc":     "Eagerly pre-loads images to the right (and left when loop is enabled) based on how many items you want to preload."
   },
   {
     "name":     "autoplay",

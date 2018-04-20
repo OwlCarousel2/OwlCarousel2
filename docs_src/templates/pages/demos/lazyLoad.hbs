@@ -40,7 +40,6 @@ LazyLoad HTML structure requires `class="owl-lazy"` and `data-src="url_to_img"` 
 If you set above settings not on `<img>` but on other DOM element then Owl will load an image into css inline background style.
 You can even use picture tags with different sources by adding the `owl-lazy` class to the source tag and a data-srcset attribute.
 
-
 ### Setup
 ```
 $('.owl-carousel').owlCarousel({
@@ -50,6 +49,12 @@ $('.owl-carousel').owlCarousel({
 	margin:10
 });
 ```
+
+### Option
+
+If you want to preload images you can also add the option ```lazyLoadEager``` to the settings object, where the value
+indicates how many items to the right (and left, when loop is ```true```) will be pre-loaded.
+
 ### HTML:
 
 ```
@@ -79,7 +84,8 @@ jQuery(document).ready(function($) {
 	$('.owl-carousel').owlCarousel({
 		items:1,
 		lazyLoad:true,
-		// loop:true,
+    lazyLoadEager: 1,
+		loop:true,
 		margin:10,
     autoHeight: true
 	});
