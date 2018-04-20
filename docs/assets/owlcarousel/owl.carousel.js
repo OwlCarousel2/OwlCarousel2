@@ -214,6 +214,7 @@
 		responsiveBaseElement: window,
 
 		fallbackEasing: 'swing',
+		slideTransition: '',
 
 		info: false,
 
@@ -458,8 +459,11 @@
 		this.$element.addClass(this.options.loadingClass);
 
 		// create stage
-		this.$stage = $('<' + this.settings.stageElement + ' class="' + this.settings.stageClass + '"/>')
-			.wrap('<div class="' + this.settings.stageOuterClass + '"/>');
+		this.$stage = $('<' + this.settings.stageElement + '>', {
+			"class": this.settings.stageClass
+		}).wrap( $( '<div/>', {
+			"class": this.settings.stageOuterClass
+		}));
 
 		// append stage
 		this.$element.append(this.$stage.parent());
@@ -944,7 +948,9 @@
 		if ($.support.transform3d && $.support.transition) {
 			this.$stage.css({
 				transform: 'translate3d(' + coordinate + 'px,0px,0px)',
-				transition: (this.speed() / 1000) + 's'
+				transition: (this.speed() / 1000) + 's' + (
+					this.settings.slideTransition ? ' ' + this.settings.slideTransition : ''
+				)
 			});
 		} else if (animate) {
 			this.$stage.animate({
@@ -2315,7 +2321,7 @@
 		var tnLink,
 			icon,
 			path,
-			dimensions = video.width && video.height ? 'style="width:' + video.width + 'px;height:' + video.height + 'px;"' : '',
+			dimensions = video.width && video.height ? 'width:' + video.width + 'px;height:' + video.height + 'px;' : '',
 			customTn = target.find('img'),
 			srcType = 'src',
 			lazyClass = '',
@@ -2324,16 +2330,25 @@
 				icon = '<div class="owl-video-play-icon"></div>';
 
 				if (settings.lazyLoad) {
-					tnLink = '<div class="owl-video-tn ' + lazyClass + '" ' + srcType + '="' + path + '"></div>';
+					tnLink = $('<div/>',{
+						"class": 'owl-video-tn ' + lazyClass,
+						"srcType": path
+					});
 				} else {
-					tnLink = '<div class="owl-video-tn" style="opacity:1;background-image:url(' + path + ')"></div>';
+					tnLink = $( '<div/>', {
+						"class": "owl-video-tn",
+						"style": 'opacity:1;background-image:url(' + path + ')'
+					});
 				}
 				target.after(tnLink);
 				target.after(icon);
 			};
 
 		// wrap video content into owl-video-wrapper div
-		target.wrap('<div class="owl-video-wrapper"' + dimensions + '></div>');
+		target.wrap( $( '<div/>', {
+			"class": "owl-video-wrapper",
+			"style": dimensions
+		}));
 
 		if (this._core.settings.lazyLoad) {
 			srcType = 'data-src';
@@ -2399,7 +2414,8 @@
 			video = this._videos[item.attr('data-video')],
 			width = video.width || '100%',
 			height = video.height || this._core.$stage.height(),
-			html;
+			html,
+			iframe;
 
 		if (this._playing) {
 			return;
@@ -2412,20 +2428,18 @@
 
 		this._core.reset(item.index());
 
+		html = $( '<iframe frameborder="0" allowfullscreen mozallowfullscreen webkitAllowFullScreen ></iframe>' );
+		html.attr( 'height', height );
+		html.attr( 'width', width );
 		if (video.type === 'youtube') {
-			html = '<iframe width="' + width + '" height="' + height + '" src="//www.youtube.com/embed/' +
-				video.id + '?autoplay=1&rel=0&v=' + video.id + '" frameborder="0" allowfullscreen></iframe>';
+			html.attr( 'src', '//www.youtube.com/embed/' + video.id + '?autoplay=1&rel=0&v=' + video.id );
 		} else if (video.type === 'vimeo') {
-			html = '<iframe src="//player.vimeo.com/video/' + video.id +
-				'?autoplay=1" width="' + width + '" height="' + height +
-				'" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+			html.attr( 'src', '//player.vimeo.com/video/' + video.id + '?autoplay=1' );
 		} else if (video.type === 'vzaar') {
-			html = '<iframe frameborder="0"' + 'height="' + height + '"' + 'width="' + width +
-				'" allowfullscreen mozallowfullscreen webkitAllowFullScreen ' +
-				'src="//view.vzaar.com/' + video.id + '/player?autoplay=true"></iframe>';
+			html.attr( 'src', '//view.vzaar.com/' + video.id + '/player?autoplay=true' );
 		}
 
-		$('<div class="owl-video-frame">' + html + '</div>').insertAfter(item.find('.owl-video'));
+		iframe = $(html).wrap( '<div class="owl-video-frame" />' ).insertAfter(item.find('.owl-video'));
 
 		this._playing = item.addClass('owl-video-playing');
 	};
