@@ -114,6 +114,12 @@
     "desc":     "Navigation slide by x. 'page' string can be set to slide by page."
   },
   {
+    "name":     "slideTransition",
+    "type":     "String",
+    "Default":  "",
+    "desc":     "You can define the transition for the stage you want to use eg. linear."
+  },
+  {
     "name":     "dots",
     "type":     "Boolean",
     "Default":  "true",
