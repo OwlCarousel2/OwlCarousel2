@@ -1438,7 +1438,7 @@
 				element.css('opacity', 1);
 				this.leave('pre-loading');
 				!this.is('pre-loading') && !this.is('initializing') && this.refresh();
-			}, this)).attr('src', element.attr('src') || element.attr('data-src') || element.attr('data-src-retina'));
+			}, this)).attr('src', (window.devicePixelRatio > 1) ? element.attr('data-src-retina') : element.attr('data-src') || element.attr('src'));
 		}, this));
 	};
 
