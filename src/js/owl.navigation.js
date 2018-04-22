@@ -98,6 +98,8 @@
 					this._core.trigger('initialize', null, 'navigation');
 					this.initialize();
 					this.update();
+					if(this._core.options.keyControl)
+						this.keyControl(this._core);
 					this.draw();
 					this._initialized = true;
 					this._core.trigger('initialized', null, 'navigation');
@@ -146,7 +148,8 @@
 		dotsEach: false,
 		dotsData: false,
 		dotsSpeed: false,
-		dotsContainer: false
+		dotsContainer: false,
+		keyControl: false
 	};
 
 	/**
@@ -214,6 +217,17 @@
 			this._core[override] = $.proxy(this[override], this);
 		}
 	};
+
+	Navigation.prototype.keyControl = function(_core){
+		$(document.documentElement).keyup( function (event) {
+			var keyMap = {
+				37 : function(){ _core.prev(_core.settings.navSpeed); },
+				39 : function(){ _core.next(_core.settings.navSpeed); }
+			},
+			key = event.keyCode;
+			$.isFunction(keyMap[key]) ? keyMap[key]() : undefined;
+		});
+	}
 
 	/**
 	 * Destroys the plugin.
