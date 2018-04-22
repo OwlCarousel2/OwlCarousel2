@@ -224,7 +224,7 @@
 		responsiveClass: 'owl-responsive',
 		dragClass: 'owl-drag',
 		itemClass: 'owl-item',
-		activeClass: 'owl-active',
+		activeClass: 'active',
 		stageClass: 'owl-stage',
 		stageOuterClass: 'owl-stage-outer',
 		grabClass: 'owl-grab'
