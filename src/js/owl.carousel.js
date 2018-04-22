@@ -655,7 +655,9 @@
 	 * Refreshes the carousel primarily for adaptive purposes.
 	 * @public
 	 */
-	Owl.prototype.refresh = function() {
+	Owl.prototype.refresh = function(resizing) {
+		resizing = resizing || false;
+
 		this.enter('refreshing');
 		this.trigger('refresh');
 
@@ -666,6 +668,10 @@
 		this.$element.addClass(this.options.refreshClass);
 
 		this.update();
+
+		if (!resizing) {
+			this.onResize();
+		}
 
 		this.$element.removeClass(this.options.refreshClass);
 
@@ -687,6 +693,8 @@
 	 * @protected
 	 */
 	Owl.prototype.onResize = function() {
+		var resizing = true;
+
 		if (!this._items.length) {
 			return false;
 		}
@@ -708,7 +716,7 @@
 
 		this.invalidate('width');
 
-		this.refresh();
+		this.refresh(resizing);
 
 		this.leave('resizing');
 		this.trigger('resized');
