@@ -30,6 +30,7 @@
 		overflow: hidden;
 		/* fix for flashing background */
 		-webkit-transform: translate3d(0px, 0px, 0px);
+		transform: translate3d(0px, 0px, 0px);
 	}
 
 	.owl-wrapper,
@@ -47,6 +48,7 @@
 		min-height: 1px;
 		float: left;
 		-webkit-backface-visibility: hidden;
+		backface-visibility: hidden;
 		-webkit-tap-highlight-color: transparent;
 		-webkit-touch-callout: none;
 	}
