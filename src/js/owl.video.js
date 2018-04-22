@@ -1,6 +1,6 @@
 /**
  * Video Plugin
- * @version 2.1.0
+ * @version 2.3.4
  * @author Bartosz Wojciechowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -131,7 +131,7 @@
 					Visual example: https://regexper.com/#(http%3A%7Chttps%3A%7C)%5C%2F%5C%2F(player.%7Cwww.%7Capp.)%3F(vimeo%5C.com%7Cyoutu(be%5C.com%7C%5C.be%7Cbe%5C.googleapis%5C.com)%7Cvzaar%5C.com)%5C%2F(video%5C%2F%7Cvideos%5C%2F%7Cembed%5C%2F%7Cchannels%5C%2F.%2B%5C%2F%7Cgroups%5C%2F.%2B%5C%2F%7Cwatch%5C%3Fv%3D%7Cv%5C%2F)%3F(%5BA-Za-z0-9._%25-%5D*)(%5C%26%5CS%2B)%3F
 			*/
 
-			id = url.match(/(http:|https:|)\/\/(player.|www.|app.)?(vimeo\.com|youtu(be\.com|\.be|be\.googleapis\.com)|vzaar\.com)\/(video\/|videos\/|embed\/|channels\/.+\/|groups\/.+\/|watch\?v=|v\/)?([A-Za-z0-9._%-]*)(\&\S+)?/);
+			id = url.match(/(http:|https:|)\/\/(player.|www.|app.)?(vimeo\.com|youtu(be\.com|\.be|be\.googleapis\.com|be\-nocookie\.com)|vzaar\.com)\/(video\/|videos\/|embed\/|channels\/.+\/|groups\/.+\/|watch\?v=|v\/)?([A-Za-z0-9._%-]*)(\&\S+)?/);
 
 			if (id[3].indexOf('youtu') > -1) {
 				type = 'youtube';
@@ -170,7 +170,7 @@
 		var tnLink,
 			icon,
 			path,
-			dimensions = video.width && video.height ? 'style="width:' + video.width + 'px;height:' + video.height + 'px;"' : '',
+			dimensions = video.width && video.height ? 'width:' + video.width + 'px;height:' + video.height + 'px;' : '',
 			customTn = target.find('img'),
 			srcType = 'src',
 			lazyClass = '',
@@ -179,16 +179,25 @@
 				icon = '<div class="owl-video-play-icon"></div>';
 
 				if (settings.lazyLoad) {
-					tnLink = '<div class="owl-video-tn ' + lazyClass + '" ' + srcType + '="' + path + '"></div>';
+					tnLink = $('<div/>',{
+						"class": 'owl-video-tn ' + lazyClass,
+						"srcType": path
+					});
 				} else {
-					tnLink = '<div class="owl-video-tn" style="opacity:1;background-image:url(' + path + ')"></div>';
+					tnLink = $( '<div/>', {
+						"class": "owl-video-tn",
+						"style": 'opacity:1;background-image:url(' + path + ')'
+					});
 				}
 				target.after(tnLink);
 				target.after(icon);
 			};
 
 		// wrap video content into owl-video-wrapper div
-		target.wrap('<div class="owl-video-wrapper"' + dimensions + '></div>');
+		target.wrap( $( '<div/>', {
+			"class": "owl-video-wrapper",
+			"style": dimensions
+		}));
 
 		if (this._core.settings.lazyLoad) {
 			srcType = 'data-src';
@@ -254,7 +263,8 @@
 			video = this._videos[item.attr('data-video')],
 			width = video.width || '100%',
 			height = video.height || this._core.$stage.height(),
-			html;
+			html,
+			iframe;
 
 		if (this._playing) {
 			return;
@@ -267,20 +277,18 @@
 
 		this._core.reset(item.index());
 
+		html = $( '<iframe frameborder="0" allowfullscreen mozallowfullscreen webkitAllowFullScreen ></iframe>' );
+		html.attr( 'height', height );
+		html.attr( 'width', width );
 		if (video.type === 'youtube') {
-			html = '<iframe width="' + width + '" height="' + height + '" src="//www.youtube.com/embed/' +
-				video.id + '?autoplay=1&v=' + video.id + '" frameborder="0" allowfullscreen></iframe>';
+			html.attr( 'src', '//www.youtube.com/embed/' + video.id + '?autoplay=1&rel=0&v=' + video.id );
 		} else if (video.type === 'vimeo') {
-			html = '<iframe src="//player.vimeo.com/video/' + video.id +
-				'?autoplay=1" width="' + width + '" height="' + height +
-				'" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+			html.attr( 'src', '//player.vimeo.com/video/' + video.id + '?autoplay=1' );
 		} else if (video.type === 'vzaar') {
-			html = '<iframe frameborder="0"' + 'height="' + height + '"' + 'width="' + width +
-				'" allowfullscreen mozallowfullscreen webkitAllowFullScreen ' +
-				'src="//view.vzaar.com/' + video.id + '/player?autoplay=true"></iframe>';
+			html.attr( 'src', '//view.vzaar.com/' + video.id + '/player?autoplay=true' );
 		}
 
-		$('<div class="owl-video-frame">' + html + '</div>').insertAfter(item.find('.owl-video'));
+		iframe = $(html).wrap( '<div class="owl-video-frame" />' ).insertAfter(item.find('.owl-video'));
 
 		this._playing = item.addClass('owl-video-playing');
 	};

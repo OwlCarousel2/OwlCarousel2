@@ -3,11 +3,9 @@
 .bowerrc
 .idea
 /bower_components
-/docs
 /node_modules
 *.sublime*
 *.zip
-/download
 /jscs.report.txt
 
 .DS_Store

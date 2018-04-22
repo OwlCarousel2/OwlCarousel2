@@ -114,6 +114,12 @@
     "desc":     "Navigation slide by x. 'page' string can be set to slide by page."
   },
   {
+    "name":     "slideTransition",
+    "type":     "String",
+    "Default":  "",
+    "desc":     "You can define the transition for the stage you want to use eg. linear."
+  },
+  {
     "name":     "dots",
     "type":     "Boolean",
     "Default":  "true",
@@ -126,7 +132,7 @@
     "desc":     "Show dots each x item."
   },
   {
-    "name":     "dotData",
+    "name":     "dotsData",
     "type":     "Boolean",
     "Default":  "false",
     "desc":     "Used by data-dot content."
@@ -138,10 +144,10 @@
     "desc":     "Lazy load images. data-src and data-src-retina for highres. Also load images into background inline style if element is not <img>"
   },
   {
-    "name":     "lazyContent",
-    "type":     "Boolean",
-    "Default":  "false",
-    "desc":     "lazyContent was introduced during beta tests but i removed it from the final release due to bad implementation. It is a nice options so i will work on it in the nearest feature."
+    "name":     "lazyLoadEager",
+    "type":     "Number",
+    "Default":  "0",
+    "desc":     "Eagerly pre-loads images to the right (and left when loop is enabled) based on how many items you want to preload."
   },
   {
     "name":     "autoplay",
@@ -246,7 +252,7 @@
     "desc":     "Class for CSS3 animation out."
   },
   {
-    "name":     "animateInClass",
+    "name":     "animateIn",
     "type":     "String/Boolean",
     "Default":  "false",
     "desc":     "Class for CSS3 animation in."
@@ -292,5 +298,11 @@
     "type":     "String/Class/ID/Boolean",
     "Default":  "false",
     "desc":     "Set your own container for nav."
+  },
+  {
+    "name":     "checkVisible",
+    "type":     "Boolean",
+    "Default":  "true",
+    "desc":     "If you know the carousel will always be visible you can set `checkVisibility` to `false` to prevent the expensive browser layout forced reflow the $element.is(':visible') does."
   }
 ]

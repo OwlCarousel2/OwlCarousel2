@@ -1,12 +1,8 @@
-# OwlCarousel2 is currently being transferred to a new owner
-
-Stay tuned while the new owner sorts through some stuff. (Oh, hi, I'm [David](https://github.com/daviddeutsch)!)
-
-## Owl Carousel 2 Beta
+# Owl Carousel 2
 
 Touch enabled [jQuery](https://jquery.com/) plugin that lets you create a beautiful, responsive carousel slider. **To get started, check out https://owlcarousel2.github.io/OwlCarousel2/.**
 
-Please consider that the project is still in beta. The current status of the milestones can be found [here](https://github.com/owlcarousel2/OwlCarousel2/milestones). If you want to use the [latest development](https://github.com/owlcarousel2/OwlCarousel2/archive/develop.zip) see [building](#building).
+**Notice:** The old Owl Carousel site (owlgraphic [dot] com) is no longer in use. Please delete all references to this in bookmarks and your own products' documentation as it's being used for malicious purposes.
 
 ## Quick start
 
@@ -14,7 +10,7 @@ Please consider that the project is still in beta. The current status of the mil
 
 This package can be installed with:
 
-- [npm](https://www.npmjs.com/package/owl.carousel): `npm install --save owl.carousel`
+- [npm](https://www.npmjs.com/package/owl.carousel): `npm install --save owl.carousel` or `yarn add owl.carousel jquery`
 - [bower](http://bower.io/search/?q=owl.carousel): `bower install --save owl.carousel`
 
 Or download the [latest release](https://github.com/OwlCarousel2/OwlCarousel2/releases).
@@ -23,12 +19,25 @@ Or download the [latest release](https://github.com/OwlCarousel2/OwlCarousel2/re
 
 #### Webpack
 
+Add jQuery via the "webpack.ProvidePlugin" to your webpack configuration:
+    
+    const webpack = require('webpack');
+    
+    //...
+    plugins: [
+        new webpack.ProvidePlugin({
+          $: 'jquery',
+          jQuery: 'jquery',
+          'window.jQuery': 'jquery'
+        }),
+    ],
+    //...
+
 Load the required stylesheet and JS:
 
 ```js
 import 'owl.carousel/dist/assets/owl.carousel.css';
-import $ from 'jquery';
-import 'imports?jQuery=jquery!owl.carousel';
+import 'owl.carousel';
 ```
 
 #### Static HTML
@@ -102,6 +111,11 @@ To define which plugins are build into the distribution just edit `/_config.json
 ## Contributing
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Roadmap
+
+Please make sure to check out our [Roadmap Discussion](https://github.com/OwlCarousel2/OwlCarousel2/issues/1756).
+
 
 ## License
 

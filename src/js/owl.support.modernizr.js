@@ -1,7 +1,7 @@
 /**
  * Modernizr Support Plugin
  *
- * @version 2.1.0
+ * @version 2.3.4
  * @author Vivid Planet Software GmbH
  * @author Artus Kolanowski
  * @author David Deutsch

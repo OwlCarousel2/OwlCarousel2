@@ -1,6 +1,6 @@
 /**
  * Lazy Plugin
- * @version 2.1.0
+ * @version 2.3.4
  * @author Bartosz Wojciechowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -43,13 +43,27 @@
 					return;
 				}
 
-				if ((e.property && e.property.name == 'position') || e.type == 'initialized') {
+				if ((e.property && e.property.name === 'position') || e.type === 'initialized' || e.type === 'resized') {
 					var settings = this._core.settings,
 						n = (settings.center && Math.ceil(settings.items / 2) || settings.items),
 						i = ((settings.center && n * -1) || 0),
 						position = (e.property && e.property.value !== undefined ? e.property.value : this._core.current()) + i,
 						clones = this._core.clones().length,
 						load = $.proxy(function(i, v) { this.load(v) }, this);
+
+					if (settings.lazyLoadEager > 0) {
+						n += settings.lazyLoadEager;
+						// If the carousel is looping also preload images that are to the "left"
+						if (settings.loop) {
+              position -= settings.lazyLoadEager;
+              n++;
+            }
+					}
+
+          if (!settings.center && settings.stagePadding) {
+						position--;
+						n += 2;
+          }
 
 					while (i++ < n) {
 						this.load(clones / 2 + this._core.relative(position));
@@ -72,7 +86,8 @@
 	 * @public
 	 */
 	Lazy.Defaults = {
-		lazyLoad: false
+		lazyLoad: false,
+		lazyLoadEager: 0
 	};
 
 	/**
@@ -90,7 +105,7 @@
 
 		$elements.each($.proxy(function(index, element) {
 			var $element = $(element), image,
-				url = (window.devicePixelRatio > 1 && $element.attr('data-src-retina')) || $element.attr('data-src');
+                url = (window.devicePixelRatio > 1 && $element.attr('data-src-retina')) || $element.attr('data-src') || $element.attr('data-srcset');
 
 			this._core.trigger('load', { element: $element, url: url }, 'lazy');
 
@@ -99,11 +114,15 @@
 					$element.css('opacity', 1);
 					this._core.trigger('loaded', { element: $element, url: url }, 'lazy');
 				}, this)).attr('src', url);
+            } else if ($element.is('source')) {
+                $element.one('load.owl.lazy', $.proxy(function() {
+                    this._core.trigger('loaded', { element: $element, url: url }, 'lazy');
+                }, this)).attr('srcset', url);
 			} else {
 				image = new Image();
 				image.onload = $.proxy(function() {
 					$element.css({
-						'background-image': 'url(' + url + ')',
+						'background-image': 'url("' + url + '")',
 						'opacity': '1'
 					});
 					this._core.trigger('loaded', { element: $element, url: url }, 'lazy');
