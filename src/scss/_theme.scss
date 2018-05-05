@@ -6,7 +6,7 @@
 		text-align: center;
 		-webkit-tap-highlight-color: transparent;
 
-		[class*='owl-'] {
+		button.owl-prev, button.owl-next {
 			color: $owl-nav-color;
 			font-size: $owl-nav-font-size;
 			margin: $owl-nav-margin;
@@ -37,7 +37,7 @@
 		text-align: center;
 		-webkit-tap-highlight-color: transparent;
 
-		.owl-dot {
+		button.owl-dot {
 			display: inline-block;
 			zoom: 1;
 			*display: inline;
