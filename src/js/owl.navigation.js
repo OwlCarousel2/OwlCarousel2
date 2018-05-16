@@ -142,6 +142,7 @@
 		slideBy: 1,
 		dotClass: 'owl-dot',
 		dotsClass: 'owl-dots',
+		activeDotClass: 'active',
 		dots: true,
 		dotsEach: false,
 		dotsData: false,
@@ -309,8 +310,8 @@
 				this._controls.$absolute.children().slice(difference).remove();
 			}
 
-			this._controls.$absolute.find('.active').removeClass('active');
-			this._controls.$absolute.children().eq($.inArray(this.current(), this._pages)).addClass('active');
+			this._controls.$absolute.find('.' + settings.activeDotClass).removeClass(settings.activeDotClass);
+			this._controls.$absolute.children().eq($.inArray(this.current(), this._pages)).addClass(settings.activeDotClass);
 		}
 	};
 
