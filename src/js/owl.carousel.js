@@ -1245,16 +1245,11 @@
 		var current = this.current(),
 			revert = null,
 			distance = position - this.relative(current),
-			direction = (distance > 0) - (distance < 0),
 			items = this._items.length,
 			minimum = this.minimum(),
 			maximum = this.maximum();
 
 		if (this.settings.loop) {
-			if (!this.settings.rewind && Math.abs(distance) > items / 2) {
-				distance += direction * -1 * items;
-			}
-
 			position = current + distance;
 			revert = ((position - minimum) % items + items) % items + minimum;
 
