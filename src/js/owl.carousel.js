@@ -332,6 +332,10 @@
 
 			repeat /= 2;
 
+			if (settings.loop && items.length && settings.stagePadding) {
+				repeat += 1;
+			}
+
 			while (repeat > 0) {
 				// Switch to only using appended clones
 				clones.push(this.normalize(clones.length / 2, true));
@@ -1253,9 +1257,22 @@
 			position = current + distance;
 			revert = ((position - minimum) % items + items) % items + minimum;
 
+			if (Math.abs(distance) > items / 2)	{
+				maximum += 1;
+			}
+
 			if (revert !== position && revert - distance <= maximum && revert - distance > 0) {
 				current = revert - distance;
 				position = revert;
+				this.reset(current);
+			} else if ( revert !== position && position < 0) {
+				current = revert - Math.floor(items / 2);
+
+				if (Math.abs(distance) > items / 2) {
+					current += Math.abs(distance) - Math.ceil(items / 2);
+				}
+
+				position = current + distance;
 				this.reset(current);
 			}
 		} else if (this.settings.rewind) {
