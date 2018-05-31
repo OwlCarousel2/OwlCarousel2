@@ -8,7 +8,6 @@
  * @todo prevent animationend bubling
  * @todo itemsScaleUp
  * @todo Test Zepto
- * @todo stagePadding calculate wrong active classes
  */
 ;(function($, window, document, undefined) {
 
@@ -411,7 +410,7 @@
 		filter: [ 'width', 'position', 'items', 'settings' ],
 		run: function() {
 			var rtl = this.settings.rtl ? 1 : -1,
-				padding = this.settings.stagePadding * 2,
+                padding = !this.settings.autoWidth ? this.settings.stagePadding * 2 : 0,
 				begin = this.coordinates(this.current()) + padding,
 				end = begin + this.width() * rtl,
 				inner, outer, matches = [], i, n;
