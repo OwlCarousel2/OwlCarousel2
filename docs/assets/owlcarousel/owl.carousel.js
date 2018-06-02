@@ -3129,7 +3129,7 @@
 	Navigation.prototype.draw = function() {
 		var difference,
 			settings = this._core.settings,
-			disabled = (settings.forceNav ? false : this._core.items().length <= settings.items),
+			disabled = (!settings.loop && this._core.items().length <= settings.items),
 			index = this._core.relative(this._core.current()),
 			loop = settings.loop || settings.rewind;
 
