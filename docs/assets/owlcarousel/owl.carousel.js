@@ -871,10 +871,7 @@
 			this.update();
 
 			this._drag.direction = direction;
-
-			if (Math.abs(delta.x) > 3 || new Date().getTime() - this._drag.time > 300) {
-				this._drag.target.one('click.owl.core', function() { return false; });
-			}
+			this._drag.target.one('click.owl.core', function() { return false; });
 		}
 
 		if (!this.is('dragging')) {
