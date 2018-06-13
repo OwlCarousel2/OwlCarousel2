@@ -890,7 +890,7 @@
 	 */
 	Owl.prototype.closest = function(coordinate, direction) {
 		var position = -1,
-			pull = 30,
+			pull = 0,
 			width = this.width(),
 			coordinates = this.coordinates();
 
