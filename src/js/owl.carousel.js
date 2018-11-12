@@ -336,7 +336,7 @@
 				// Switch to only using appended clones
 				clones.push(this.normalize(clones.length / 2, true));
 				$(items[clones[clones.length - 1]][0]).clone(true).addClass('cloned').appendTo(this.$stage);
-                clones.push(this.normalize(items.length - 1 - (clones.length - 1) / 2, true));
+				clones.push(this.normalize(items.length - 1 - (clones.length - 1) / 2, true));
 				$(items[clones[clones.length - 1]][0]).clone(true).addClass('cloned').prependTo(this.$stage);
 				repeat -= 1;
 			}
@@ -895,7 +895,9 @@
 	Owl.prototype.closest = function(coordinate, direction) {
 		var position = -1,
 			pull = 30,
-			width = this.width(),
+			width = this.width(), // visible carousel width
+			count = this.settings.items,
+			itemWidth = Math.round(width / count),
 			coordinates = this.coordinates();
 
 		if (!this.settings.freeDrag) {
@@ -906,7 +908,7 @@
 					position = index;
 				// on a right pull, check on previous index
 				// to do so, subtract width from value and set position = index + 1
-				} else if (direction === 'right' && coordinate > value - width - pull && coordinate < value - width + pull) {
+				} else if (direction === 'right' && coordinate > value - itemWidth - pull && coordinate < value - itemWidth + pull) {
 					position = index + 1;
 				} else if (this.op(coordinate, '<', value)
 					&& this.op(coordinate, '>', coordinates[index + 1] !== undefined ? coordinates[index + 1] : value - width)) {
