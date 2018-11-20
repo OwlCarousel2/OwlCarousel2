@@ -143,6 +143,7 @@
 		dotClass: 'owl-dot',
 		dotsClass: 'owl-dots',
 		dots: true,
+		dotElement: 'button role="button"',
 		dotsEach: false,
 		dotsData: false,
 		dotsSpeed: false,
@@ -178,7 +179,7 @@
 
 		// create DOM structure for absolute navigation
 		if (!settings.dotsData) {
-			this._templates = [ $('<button role="button">')
+			this._templates = [ $('<' + settings.dotElement + '>')
 				.addClass(settings.dotClass)
 				.append($('<span>'))
 				.prop('outerHTML') ];
@@ -304,7 +305,9 @@
 			if (settings.dotsData && difference !== 0) {
 				this._controls.$absolute.html(this._templates.join(''));
 			} else if (difference > 0) {
-				this._controls.$absolute.append(new Array(difference + 1).join(this._templates[0]));
+				for (var i = 1, l = difference; i <= l; i++) {
+					this._controls.$absolute.append(this._templates[0].replace('{n}', i));
+				}
 			} else if (difference < 0) {
 				this._controls.$absolute.children().slice(difference).remove();
 			}
