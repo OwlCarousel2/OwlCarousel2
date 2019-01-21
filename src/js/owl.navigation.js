@@ -89,7 +89,7 @@
 				}
 			}, this),
 			'changed.owl.carousel': $.proxy(function(e) {
-				if (e.namespace && e.property.name == 'position') {
+				if (e.namespace && e.property.name === 'position') {
 					this.draw();
 				}
 			}, this),
@@ -180,6 +180,7 @@
 		if (!settings.dotsData) {
 			this._templates = [ $('<button role="button">')
 				.addClass(settings.dotClass)
+				.attr("aria-selected", "false")
 				.append($('<span>'))
 				.prop('outerHTML') ];
 		}
@@ -310,7 +311,10 @@
 			}
 
 			this._controls.$absolute.find('.active').removeClass('active');
-			this._controls.$absolute.children().eq($.inArray(this.current(), this._pages)).addClass('active');
+			// Reset all dots to aria-selected=false
+			this._controls.$absolute.find('.' + settings.dotClass).attr("aria-selected", "false");
+			// Add active class and aria-selected=true to active navigation dot
+			this._controls.$absolute.children().eq($.inArray(this.current(), this._pages)).addClass('active').attr("aria-selected", "true");
 		}
 	};
 
@@ -351,14 +355,13 @@
 		var position, length,
 			settings = this._core.settings;
 
-		if (settings.slideBy == 'page') {
+		if (settings.slideBy === 'page') {
 			position = $.inArray(this.current(), this._pages);
 			length = this._pages.length;
 			successor ? ++position : --position;
 			position = this._pages[((position % length) + length) % length].start;
 		} else {
 			position = this._core.relative(this._core.current());
-			length = this._core.items().length;
 			successor ? position += settings.slideBy : position -= settings.slideBy;
 		}
 
