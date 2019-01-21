@@ -136,5 +136,15 @@ test('destroy', function() {
 	equal(simple.get(0).outerHTML.replace(/\s{2,}/g, ''), expected, 'Outer HTML before create and after destroy is equal.');
 });
 
+test('accessibility options', function() {
+	expect(1);
+
+	$('#simple').owlCarousel().data('owl.carousel');
+
+	var activeNavElement = $('#simple').find('.owl-dot.active');
+
+	equal(activeNavElement.attr("aria-selected"),"true","Aria attribute is present and correct on the active navigation element");
+});
+
 start();
 
