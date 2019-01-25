@@ -1179,9 +1179,6 @@
 			maximum = this.maximum();
 
 		if (this.settings.loop) {
-			if (!this.settings.rewind && Math.abs(distance) > items / 2) {
-				distance += direction * -1 * items;
-			}
 
 			position = current + distance;
 			revert = ((position - minimum) % items + items) % items + minimum;
