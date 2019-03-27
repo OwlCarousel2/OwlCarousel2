@@ -76,13 +76,13 @@
         if (e.namespace && this._core.settings.dotsData) {
           this._templates.push(
             '<div class="' +
-              this._core.settings.dotClass +
-              '">' +
-              $(e.content)
-                .find("[data-dot]")
-                .addBack("[data-dot]")
-                .attr("data-dot") +
-              "</div>"
+            this._core.settings.dotClass +
+            '">' +
+            $(e.content)
+              .find("[data-dot]")
+              .addBack("[data-dot]")
+              .attr("data-dot") +
+            "</div>"
           );
         }
       }, this),
@@ -143,7 +143,7 @@
     navElement: 'button type="button" role="presentation"',
     navContainer: false,
     navContainerClass: "owl-nav",
-    navClass: ["owl-prev", "owl-next"],
+    navClass: [ "owl-prev", "owl-next" ],
     slideBy: 1,
     dotClass: "owl-dot",
     dotsClass: "owl-dots",
@@ -166,8 +166,8 @@
     this._controls.$relative = (settings.navContainer
       ? $(settings.navContainer)
       : $("<div>")
-          .addClass(settings.navContainerClass)
-          .appendTo(this.$element)
+        .addClass(settings.navContainerClass)
+        .appendTo(this.$element)
     ).addClass("disabled");
 
     this._controls.$previous = $("<" + settings.navElement + ">")
@@ -204,8 +204,8 @@
     this._controls.$absolute = (settings.dotsContainer
       ? $(settings.dotsContainer)
       : $("<div>")
-          .addClass(settings.dotsClass)
-          .appendTo(this.$element)
+        .addClass(settings.dotsClass)
+        .appendTo(this.$element)
     ).addClass("disabled");
 
     this._controls.$absolute.on(
@@ -217,8 +217,8 @@
           .is(this._controls.$absolute)
           ? $(e.target).index()
           : $(e.target)
-              .parent()
-              .index();
+            .parent()
+            .index();
 
         e.preventDefault();
 
