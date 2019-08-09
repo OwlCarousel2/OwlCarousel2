@@ -224,6 +224,7 @@
 		responsiveClass: 'owl-responsive',
 		dragClass: 'owl-drag',
 		itemClass: 'owl-item',
+		activeClass: 'active',
 		stageClass: 'owl-stage',
 		stageOuterClass: 'owl-stage-outer',
 		grabClass: 'owl-grab'
@@ -426,8 +427,8 @@
 				}
 			}
 
-			this.$stage.children('.active').removeClass('active');
-			this.$stage.children(':eq(' + matches.join('), :eq(') + ')').addClass('active');
+			this.$stage.children('.' + this.options.activeClass).removeClass(this.options.activeClass);
+			this.$stage.children(':eq(' + matches.join('), :eq(') + ')').addClass(this.options.activeClass);
 
 			this.$stage.children('.center').removeClass('center');
 			if (this.settings.center) {
