@@ -352,10 +352,8 @@
 			settings = this._core.settings;
 
 		if (settings.slideBy == 'page') {
-			position = $.inArray(this.current(), this._pages);
-			length = this._pages.length;
-			successor ? ++position : --position;
-			position = this._pages[((position % length) + length) % length].start;
+			position = this._core.relative(this._core.current());
+			successor ? position += settings.items : position -= settings.items;
 		} else {
 			position = this._core.relative(this._core.current());
 			length = this._core.items().length;
