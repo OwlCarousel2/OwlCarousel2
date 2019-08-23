@@ -206,7 +206,6 @@
 
 		responsive: {},
 		responsiveRefreshRate: 200,
-		responsiveBaseElement: window,
 
 		fallbackEasing: 'swing',
 		slideTransition: '',
@@ -221,7 +220,6 @@
 		loadedClass: 'owl-loaded',
 		loadingClass: 'owl-loading',
 		rtlClass: 'owl-rtl',
-		responsiveClass: 'owl-responsive',
 		dragClass: 'owl-drag',
 		itemClass: 'owl-item',
 		stageClass: 'owl-stage',
@@ -542,7 +540,6 @@
 
 	/**
 	 * Setups the current settings.
-	 * @todo Remove responsive classes. Why should adaptive designs be brought into IE8?
 	 * @todo Support for media queries by using `matchMedia` would be nice.
 	 * @public
 	 */
@@ -556,9 +553,9 @@
 			settings = $.extend({}, this.options);
 		} else {
 			$.each(overwrites, function(breakpoint) {
-				if (breakpoint <= viewport && breakpoint > match) {
-					match = Number(breakpoint);
-				}
+        if (window.matchMedia(breakpoint).matches) {
+          match = breakpoint;
+        }
 			});
 
 			settings = $.extend({}, this.options, overwrites[match]);
@@ -566,13 +563,6 @@
 				settings.stagePadding = settings.stagePadding();
 			}
 			delete settings.responsive;
-
-			// responsive class
-			if (settings.responsiveClass) {
-				this.$element.attr('class',
-					this.$element.attr('class').replace(new RegExp('(' + this.options.responsiveClass + '-)\\S+\\s', 'g'), '$1' + match)
-				);
-			}
 		}
 
 		this.trigger('change', { property: { name: 'settings', value: settings } });
@@ -1328,9 +1318,7 @@
 	 */
 	Owl.prototype.viewport = function() {
 		var width;
-		if (this.options.responsiveBaseElement !== window) {
-			width = $(this.options.responsiveBaseElement).width();
-		} else if (window.innerWidth) {
+		if (window.innerWidth) {
 			width = window.innerWidth;
 		} else if (document.documentElement && document.documentElement.clientWidth) {
 			width = document.documentElement.clientWidth;
@@ -1480,7 +1468,6 @@
 			.removeClass(this.options.rtlClass)
 			.removeClass(this.options.dragClass)
 			.removeClass(this.options.grabClass)
-			.attr('class', this.$element.attr('class').replace(new RegExp(this.options.responsiveClass + '-\\S+\\s', 'g'), ''))
 			.removeData('owl.carousel');
 	};
 
