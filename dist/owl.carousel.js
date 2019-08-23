@@ -340,16 +340,12 @@
 			while (repeat > 0) {
 				// Switch to only using appended clones
 				clones.push(this.normalize(clones.length / 2, true));
-				append = append + items[clones[clones.length - 1]][0].outerHTML;
-				clones.push(this.normalize(items.length - 1 - (clones.length - 1) / 2, true));
-				prepend = items[clones[clones.length - 1]][0].outerHTML + prepend;
+				$(items[clones[clones.length - 1]][0]).clone(true).addClass('cloned').appendTo(this.$stage);
+                clones.push(this.normalize(items.length - 1 - (clones.length - 1) / 2, true));
+				$(items[clones[clones.length - 1]][0]).clone(true).addClass('cloned').prependTo(this.$stage);
 				repeat -= 1;
 			}
-
 			this._clones = clones;
-
-			$(append).addClass('cloned').appendTo(this.$stage);
-			$(prepend).addClass('cloned').prependTo(this.$stage);
 		}
 	}, {
 		filter: [ 'width', 'items', 'settings' ],
@@ -664,7 +660,9 @@
 	 * Refreshes the carousel primarily for adaptive purposes.
 	 * @public
 	 */
-	Owl.prototype.refresh = function() {
+	Owl.prototype.refresh = function(resizing) {
+		resizing = resizing || false;
+
 		this.enter('refreshing');
 		this.trigger('refresh');
 
@@ -675,6 +673,10 @@
 		this.$element.addClass(this.options.refreshClass);
 
 		this.update();
+
+		if (!resizing) {
+			this.onResize();
+		}
 
 		this.$element.removeClass(this.options.refreshClass);
 
@@ -696,6 +698,8 @@
 	 * @protected
 	 */
 	Owl.prototype.onResize = function() {
+		var resizing = true;
+
 		if (!this._items.length) {
 			return false;
 		}
@@ -717,7 +721,7 @@
 
 		this.invalidate('width');
 
-		this.refresh();
+		this.refresh(resizing);
 
 		this.leave('resizing');
 		this.trigger('resized');
@@ -1443,7 +1447,7 @@
 				element.css('opacity', 1);
 				this.leave('pre-loading');
 				!this.is('pre-loading') && !this.is('initializing') && this.refresh();
-			}, this)).attr('src', element.attr('src') || element.attr('data-src') || element.attr('data-src-retina'));
+			}, this)).attr('src', (window.devicePixelRatio > 1) ? element.attr('data-src-retina') : element.attr('data-src') || element.attr('src'));
 		}, this));
 	};
 
@@ -1911,14 +1915,14 @@
 					return;
 				}
 
-				if ((e.property && e.property.name == 'position') || e.type == 'initialized') {
+				if ((e.property && e.property.name === 'position') || e.type === 'initialized' || e.type === 'resized') {
 					var settings = this._core.settings,
 						n = (settings.center && Math.ceil(settings.items / 2) || settings.items),
 						i = ((settings.center && n * -1) || 0),
 						position = (e.property && e.property.value !== undefined ? e.property.value : this._core.current()) + i,
 						clones = this._core.clones().length,
 						load = $.proxy(function(i, v) { this.load(v) }, this);
-					//TODO: Need documentation for this new option
+
 					if (settings.lazyLoadEager > 0) {
 						n += settings.lazyLoadEager;
 						// If the carousel is looping also preload images that are to the "left"
@@ -1927,6 +1931,11 @@
               n++;
             }
 					}
+
+          if (!settings.center && settings.stagePadding) {
+						position--;
+						n += 2;
+          }
 
 					while (i++ < n) {
 						this.load(clones / 2 + this._core.relative(position));
@@ -3120,7 +3129,7 @@
 	Navigation.prototype.draw = function() {
 		var difference,
 			settings = this._core.settings,
-			disabled = this._core.items().length <= settings.items,
+			disabled = (!settings.loop && this._core.items().length <= settings.items),
 			index = this._core.relative(this._core.current()),
 			loop = settings.loop || settings.rewind;
 
