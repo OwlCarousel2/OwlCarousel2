@@ -45,7 +45,7 @@
 
 				if ((e.property && e.property.name === 'position') || e.type === 'initialized' || e.type === 'resized') {
 					var settings = this._core.settings,
-						n = (settings.center && Math.ceil(settings.items / 2) || settings.items),
+						n = (settings.center && Math.ceil(settings.items / 2)  || (settings.stagePadding > 0 && settings.items + 1) || settings.items),
 						i = ((settings.center && n * -1) || 0),
 						position = (e.property && e.property.value !== undefined ? e.property.value : this._core.current()) + i,
 						clones = this._core.clones().length,
