@@ -1569,7 +1569,7 @@
 			});
 
 			this.register({ type: Owl.Type.Event, name: name });
-			this.$element.trigger(event);
+			this.$element.triggerHandler(event);
 
 			if (this.settings && typeof this.settings[handler] === 'function') {
 				this.settings[handler].call(this, event);
