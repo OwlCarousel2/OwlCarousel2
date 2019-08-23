@@ -603,8 +603,11 @@
 		var event = this.trigger('prepare', { content: item });
 
 		if (!event.data) {
-			event.data = $('<' + this.settings.itemElement + '/>')
-				.addClass(this.options.itemClass).append(item)
+            if (!$(item).is(this.settings.itemElement + '.' + this.options.itemClass)) {
+                item = $('<' + this.settings.itemElement + '/>')
+                    .addClass(this.options.itemClass).append(item);
+            }
+			event.data = item;
 		}
 
 		this.trigger('prepared', { content: event.data });
