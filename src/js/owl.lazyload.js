@@ -151,4 +151,4 @@
 
 	$.fn.owlCarousel.Constructor.Plugins.Lazy = Lazy;
 
-})(window.Zepto || window.jQuery, window, document);
+})(owlCarousel.$, window, document);

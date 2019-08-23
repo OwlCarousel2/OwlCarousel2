@@ -1753,4 +1753,4 @@
 	 */
 	$.fn.owlCarousel.Constructor = Owl;
 
-})(window.Zepto || window.jQuery, window, document);
+})(owlCarousel.$, window, document);

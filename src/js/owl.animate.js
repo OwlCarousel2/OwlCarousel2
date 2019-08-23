@@ -118,4 +118,4 @@
 
 	$.fn.owlCarousel.Constructor.Plugins.Animate = Animate;
 
-})(window.Zepto || window.jQuery, window, document);
+})(owlCarousel.$, window, document);

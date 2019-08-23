@@ -403,4 +403,4 @@
 
 	$.fn.owlCarousel.Constructor.Plugins.Navigation = Navigation;
 
-})(window.Zepto || window.jQuery, window, document);
+})(owlCarousel.$, window, document);
