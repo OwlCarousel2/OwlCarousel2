@@ -736,6 +736,7 @@
 
 		if (this.settings.responsive !== false) {
 			this.on(window, 'resize', this._handlers.onThrottledResize);
+			this.on(window, 'drop', this._handlers.onThrottledResize);
 		}
 
 		if (this.settings.mouseDrag) {
