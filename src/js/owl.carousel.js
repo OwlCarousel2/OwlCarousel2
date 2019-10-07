@@ -583,13 +583,30 @@
 	};
 
 	/**
-	 * Updates option logic if necessery.
+	 * Updates option logic.
 	 * @protected
 	 */
-	Owl.prototype.optionsLogic = function() {
+	Owl.prototype.updateOptionsLogic = function() {
 		if (this.settings.autoWidth) {
 			this.settings.stagePadding = false;
 			this.settings.merge = false;
+		}
+		if (this.settings.mouseDrag) {
+			this.$element.addClass(this.options.dragClass);
+			this.$stage.on('mousedown.owl.core', $.proxy(this.onDragStart, this));
+			this.$stage.on('dragstart.owl.core selectstart.owl.core', function() { return false });
+		} else {
+			this.$element.removeClass(this.options.dragClass);
+			this.$element.removeClass(this.options.grabClass);
+			this.$stage.off('mousedown.owl.core');
+			this.$stage.off('dragstart.owl.core selectstart.owl.core');
+		}
+		if (this.settings.touchDrag){
+			this.$stage.on('touchstart.owl.core', $.proxy(this.onDragStart, this));
+			this.$stage.on('touchcancel.owl.core', $.proxy(this.onDragEnd, this));
+		} else {
+			this.$stage.off('mousedown.owl.core');
+			this.$stage.off('touchcancel.owl.core');
 		}
 	};
 
@@ -663,7 +680,7 @@
 
 		this.setup();
 
-		this.optionsLogic();
+		this.updateOptionsLogic();
 
 		this.$element.addClass(this.options.refreshClass);
 
