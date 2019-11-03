@@ -300,7 +300,7 @@
     "desc":     "Set your own container for nav."
   },
   {
-    "name":     "checkVisible",
+    "name":     "checkVisibility",
     "type":     "Boolean",
     "Default":  "true",
     "desc":     "If you know the carousel will always be visible you can set `checkVisibility` to `false` to prevent the expensive browser layout forced reflow the $element.is(':visible') does."
