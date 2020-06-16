@@ -1032,6 +1032,7 @@
 			return;
 		}
 
+		let _speed = this._speed;
 		this._speed = 0;
 		this._current = position;
 
@@ -1040,6 +1041,7 @@
 		this.animate(this.coordinates(position));
 
 		this.release([ 'translate', 'translated' ]);
+		this._speed = _speed;
 	};
 
 	/**
