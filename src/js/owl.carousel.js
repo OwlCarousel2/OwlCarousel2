@@ -745,7 +745,7 @@
 
 		if (this.settings.touchDrag){
 			this.$stage.on('touchstart.owl.core', $.proxy(this.onDragStart, this));
-			this.$stage.on('touchcancel.owl.core', $.proxy(this.onDragEnd, this));
+			this.$stage.on('touchend.owl.core', $.proxy(this.onDragEnd, this));
 		}
 	};
 
