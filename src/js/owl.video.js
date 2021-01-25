@@ -219,7 +219,7 @@
 				type: 'GET',
 				url: '//vimeo.com/api/v2/video/' + video.id + '.json',
 				jsonp: 'callback',
-				dataType: 'jsonp',
+				dataType: 'json',
 				success: function(data) {
 					path = data[0].thumbnail_large;
 					create(path);
