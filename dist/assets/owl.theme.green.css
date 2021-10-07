@@ -36,13 +36,14 @@
   .owl-theme .owl-dots .owl-dot {
     display: inline-block;
     zoom: 1;
-    *display: inline; }
+    }
     .owl-theme .owl-dots .owl-dot span {
       width: 10px;
       height: 10px;
       margin: 5px 7px;
       background: #D6D6D6;
       display: block;
+      backface-visibility: visible;
       -webkit-backface-visibility: visible;
       transition: opacity 200ms ease;
       border-radius: 30px; }
