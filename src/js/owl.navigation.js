@@ -299,18 +299,20 @@
 		this._controls.$absolute.toggleClass('disabled', !settings.dots || disabled);
 
 		if (settings.dots) {
-			difference = this._pages.length - this._controls.$absolute.children().length;
+			var dotSelector = '.' + settings.dotClass;
+
+			difference = this._pages.length - this._controls.$absolute.children(dotSelector).length;
 
 			if (settings.dotsData && difference !== 0) {
 				this._controls.$absolute.html(this._templates.join(''));
 			} else if (difference > 0) {
 				this._controls.$absolute.append(new Array(difference + 1).join(this._templates[0]));
 			} else if (difference < 0) {
-				this._controls.$absolute.children().slice(difference).remove();
+				this._controls.$absolute.children(dotSelector).slice(difference).remove();
 			}
 
 			this._controls.$absolute.find('.active').removeClass('active');
-			this._controls.$absolute.children().eq($.inArray(this.current(), this._pages)).addClass('active');
+			this._controls.$absolute.children(dotSelector).eq($.inArray(this.current(), this._pages)).addClass('active');
 		}
 	};
 
