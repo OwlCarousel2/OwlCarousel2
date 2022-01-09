@@ -2992,6 +2992,18 @@
 		var override,
 			settings = this._core.settings;
 
+		// Auto switch paused when manually switching between Previous and next
+		var timer,
+			element = this.$element,
+			autoPlayPaused = function() {
+			if (timer) clearTimeout(timer);
+
+			element.trigger('stop.owl.autoplay');
+			timer = setTimeout(function() {
+				element.trigger('refresh.owl.carousel');
+			}, 10);
+		}
+
 		// create DOM structure for relative navigation
 		this._controls.$relative = (settings.navContainer ? $(settings.navContainer)
 			: $('<div>').addClass(settings.navContainerClass).appendTo(this.$element)).addClass('disabled');
@@ -3002,6 +3014,7 @@
 			.prependTo(this._controls.$relative)
 			.on('click', $.proxy(function(e) {
 				this.prev(settings.navSpeed);
+				autoPlayPaused();
 			}, this));
 		this._controls.$next = $('<' + settings.navElement + '>')
 			.addClass(settings.navClass[1])
@@ -3009,6 +3022,7 @@
 			.appendTo(this._controls.$relative)
 			.on('click', $.proxy(function(e) {
 				this.next(settings.navSpeed);
+				autoPlayPaused();
 			}, this));
 
 		// create DOM structure for absolute navigation
