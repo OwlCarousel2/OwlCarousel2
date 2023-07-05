@@ -10,7 +10,7 @@
  * @todo Test Zepto
  * @todo stagePadding calculate wrong active classes
  */
-;(function($, window, document, undefined) {
+function owlCarousel($, window, document, undefined) {
 
 	/**
 	 * Creates a carousel.
@@ -764,7 +764,7 @@
 		}
 
 		if ($.support.transform) {
-			stage = this.$stage.css('transform').replace(/.*\(|\)| /g, '').split(',');
+			stage = this.$stage.css($.support.transform + "").replace(/.*\(|\)| /g, '').split(',');
 			stage = {
 				x: stage[stage.length === 16 ? 12 : 4],
 				y: stage[stage.length === 16 ? 13 : 5]
@@ -1753,4 +1753,6 @@
 	 */
 	$.fn.owlCarousel.Constructor = Owl;
 
-})(window.Zepto || window.jQuery, window, document);
+}
+
+module.exports = owlCarousel;

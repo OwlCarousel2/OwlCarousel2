@@ -22,6 +22,7 @@
   "dependencies": {
     "jquery": ">=1.8.3"
   },
+  "main": "src/js/owl.carousel.js",
   "devDependencies": {
     "assemble": "~0.4.37",
     "blanket": "^1.1.7",
