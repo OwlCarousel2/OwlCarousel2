@@ -1,7 +1,8 @@
 /**
  * Navigation Plugin
- * @version 2.0.0
+ * @version 2.3.4
  * @author Artus Kolanowski
+ * @author David Deutsch
  * @license The MIT License (MIT)
  */
 ;(function($, window, document, undefined) {
@@ -74,7 +75,7 @@
 			'prepared.owl.carousel': $.proxy(function(e) {
 				if (e.namespace && this._core.settings.dotsData) {
 					this._templates.push('<div class="' + this._core.settings.dotClass + '">' +
-						$(e.content).find('[data-dot]').andSelf('[data-dot]').attr('data-dot') + '</div>');
+						$(e.content).find('[data-dot]').addBack('[data-dot]').attr('data-dot') + '</div>');
 				}
 			}, this),
 			'added.owl.carousel': $.proxy(function(e) {
@@ -126,12 +127,18 @@
 	 */
 	Navigation.Defaults = {
 		nav: false,
-		navText: [ 'prev', 'next' ],
+		navText: [
+			'<span aria-label="' + 'Previous' + '">&#x2039;</span>',
+			'<span aria-label="' + 'Next' + '">&#x203a;</span>'
+		],
 		navSpeed: false,
-		navElement: 'div',
+		navElement: 'button type="button" role="presentation"',
 		navContainer: false,
 		navContainerClass: 'owl-nav',
-		navClass: [ 'owl-prev', 'owl-next' ],
+		navClass: [
+			'owl-prev',
+			'owl-next'
+		],
 		slideBy: 1,
 		dotClass: 'owl-dot',
 		dotsClass: 'owl-dots',
@@ -171,7 +178,7 @@
 
 		// create DOM structure for absolute navigation
 		if (!settings.dotsData) {
-			this._templates = [ $('<div>')
+			this._templates = [ $('<button role="button">')
 				.addClass(settings.dotClass)
 				.append($('<span>'))
 				.prop('outerHTML') ];
@@ -180,7 +187,7 @@
 		this._controls.$absolute = (settings.dotsContainer ? $(settings.dotsContainer)
 			: $('<div>').addClass(settings.dotsClass).appendTo(this.$element)).addClass('disabled');
 
-		this._controls.$absolute.on('click', 'div', $.proxy(function(e) {
+		this._controls.$absolute.on('click', 'button', $.proxy(function(e) {
 			var index = $(e.target).parent().is(this._controls.$absolute)
 				? $(e.target).index() : $(e.target).parent().index();
 
@@ -188,6 +195,19 @@
 
 			this.to(index, settings.dotsSpeed);
 		}, this));
+
+		/*$el.on('focusin', function() {
+			$(document).off(".carousel");
+
+			$(document).on('keydown.carousel', function(e) {
+				if(e.keyCode == 37) {
+					$el.trigger('prev.owl')
+				}
+				if(e.keyCode == 39) {
+					$el.trigger('next.owl')
+				}
+			});
+		});*/
 
 		// override public methods of the carousel
 		for (override in this._overrides) {
@@ -200,13 +220,18 @@
 	 * @protected
 	 */
 	Navigation.prototype.destroy = function() {
-		var handler, control, property, override;
+		var handler, control, property, override, settings;
+		settings = this._core.settings;
 
 		for (handler in this._handlers) {
 			this.$element.off(handler, this._handlers[handler]);
 		}
 		for (control in this._controls) {
-			this._controls[control].remove();
+			if (control === '$relative' && settings.navContainer) {
+				this._controls[control].html('');
+			} else {
+				this._controls[control].remove();
+			}
 		}
 		for (override in this.overides) {
 			this._core[override] = this._overrides[override];
@@ -368,7 +393,7 @@
 	Navigation.prototype.to = function(position, speed, standard) {
 		var length;
 
-		if (!standard) {
+		if (!standard && this._pages.length) {
 			length = this._pages.length;
 			$.proxy(this._overrides.to, this._core)(this._pages[((position % length) + length) % length].start, speed);
 		} else {

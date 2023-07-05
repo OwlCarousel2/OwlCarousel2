@@ -101,11 +101,23 @@
     "Default":  "['next','prev']",
     "desc":     "HTML allowed."
   },
+    {
+    "name":     "navElement",
+    "type":     "String",
+    "Default":  "div",
+    "desc":     "DOM element type for a single directional navigation link."
+  },
   {
     "name":     "slideBy",
     "type":     "Number/String",
     "Default":  "1",
     "desc":     "Navigation slide by x. 'page' string can be set to slide by page."
+  },
+  {
+    "name":     "slideTransition",
+    "type":     "String",
+    "Default":  "",
+    "desc":     "You can define the transition for the stage you want to use eg. linear."
   },
   {
     "name":     "dots",
@@ -120,7 +132,7 @@
     "desc":     "Show dots each x item."
   },
   {
-    "name":     "dotData",
+    "name":     "dotsData",
     "type":     "Boolean",
     "Default":  "false",
     "desc":     "Used by data-dot content."
@@ -132,10 +144,10 @@
     "desc":     "Lazy load images. data-src and data-src-retina for highres. Also load images into background inline style if element is not <img>"
   },
   {
-    "name":     "lazyContent",
-    "type":     "Boolean",
-    "Default":  "false",
-    "desc":     "lazyContent was introduced during beta tests but i removed it from the final release due to bad implementation. It is a nice options so i will work on it in the nearest feature."
+    "name":     "lazyLoadEager",
+    "type":     "Number",
+    "Default":  "0",
+    "desc":     "Eagerly pre-loads images to the right (and left when loop is enabled) based on how many items you want to preload."
   },
   {
     "name":     "autoplay",
@@ -219,7 +231,7 @@
     "name":     "video",
     "type":     "Boolean",
     "Default":  "false",
-    "desc":     "Enable fetching YouTube/Vimeo videos."
+    "desc":     "Enable fetching YouTube/Vimeo/Vzaar videos."
   },
   {
     "name":     "videoHeight",
@@ -235,13 +247,13 @@
   },
   {
     "name":     "animateOut",
-    "type":     "String/Bolean",
+    "type":     "String/Boolean",
     "Default":  "false",
     "desc":     "Class for CSS3 animation out."
   },
   {
-    "name":     "animateInClass",
-    "type":     "String/Bolean",
+    "name":     "animateIn",
+    "type":     "String/Boolean",
     "Default":  "false",
     "desc":     "Class for CSS3 animation in."
   },
@@ -261,7 +273,7 @@
     "name":     "nestedItemSelector",
     "type":     "String/Class",
     "Default":  "false",
-    "desc":     "Use it if owl items are deep nasted inside some generated content. E.g 'youritem'. Dont use dot before class name."
+    "desc":     "Use it if owl items are deep nested inside some generated content. E.g 'youritem'. Dont use dot before class name."
   },
   {
     "name":     "itemElement",
@@ -277,14 +289,20 @@
   },
   {
     "name":     "navContainer",
-    "type":     "String/Class/ID/Bolean",
+    "type":     "String/Class/ID/Boolean",
     "Default":  "false",
     "desc":     "Set your own container for nav."
   },
   {
     "name":     "dotsContainer",
-    "type":     "String/Class/ID/Bolean",
+    "type":     "String/Class/ID/Boolean",
     "Default":  "false",
     "desc":     "Set your own container for nav."
+  },
+  {
+    "name":     "checkVisibility",
+    "type":     "Boolean",
+    "Default":  "true",
+    "desc":     "If you know the carousel will always be visible you can set `checkVisibility` to `false` to prevent the expensive browser layout forced reflow the $element.is(':visible') does."
   }
 ]

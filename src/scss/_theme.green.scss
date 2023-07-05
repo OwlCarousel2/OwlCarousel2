@@ -1,0 +1,30 @@
+/*
+ * 	Green theme - Owl Carousel CSS File
+ */
+
+$owl-color-base:			#4DC7A0 !default;
+$owl-color-white:			#FFF !default;
+$owl-color-gray:			#D6D6D6 !default;
+
+//nav
+
+$owl-nav-color: 			$owl-color-white !default;
+$owl-nav-color-hover:		$owl-color-white !default;
+$owl-nav-font-size: 		14px !default;
+$owl-nav-rounded: 			3px !default;
+$owl-nav-margin: 			5px !default;
+$owl-nav-padding: 			4px 7px !default;
+$owl-nav-background: 		$owl-color-gray !default;
+$owl-nav-background-hover:	$owl-color-base !default;
+$owl-nav-disabled-opacity: 	0.5 !default;
+
+//dots
+
+$owl-dot-width:				10px !default;
+$owl-dot-height:			10px !default;
+$owl-dot-rounded:			30px !default;
+$owl-dot-margin: 			5px 7px !default;
+$owl-dot-background:		$owl-color-gray !default;
+$owl-dot-background-active:	$owl-color-base !default;
+
+@import 'theme';

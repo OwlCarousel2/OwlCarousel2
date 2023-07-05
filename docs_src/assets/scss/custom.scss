@@ -5,9 +5,9 @@ $owl-gray-color: #f7f7f7;
 
 $medium-down: "#{$screen} and (max-width:#{lower-bound($medium-range)})" !default;
 
-/* Custom mixins */ 
+/* Custom mixins */
 
-@mixin transition($p:all, $t:300ms) {
+@mixin owl-transition($p:all, $t:300ms) {
 	-webkit-transition: $p $t ease-in-out;
 	-moz-transition: $p $t ease-in-out;
 	-ms-transition: $p $t ease-in-out;
@@ -15,7 +15,7 @@ $medium-down: "#{$screen} and (max-width:#{lower-bound($medium-range)})" !defaul
 	transition: $p $t ease-in-out;
 }
 
-@mixin radius($r:3px) {
+@mixin owl-radius($r:3px) {
 	-webkit-border-radius: $r;
 	-moz-border-radius: $r;
 	border-radius: $r;
@@ -68,7 +68,7 @@ $medium-down: "#{$screen} and (max-width:#{lower-bound($medium-range)})" !defaul
 				display: block;
 				color: #fff;
 				line-height: 1;
-				@include transition(opacity,200ms);
+				@include owl-transition(opacity,200ms);
 
 				&:hover{
 					opacity: 1;
@@ -84,7 +84,7 @@ $medium-down: "#{$screen} and (max-width:#{lower-bound($medium-range)})" !defaul
 				right: 0;
 				border: 2px solid #FFF;
 				background: url(../img/download.png) $owl-success-color no-repeat 50% 55%;
-				@include radius(100%);
+				@include owl-radius(100%);
 			}
 		}
 	}
@@ -109,7 +109,7 @@ $medium-down: "#{$screen} and (max-width:#{lower-bound($medium-range)})" !defaul
 		display: none;
 	}
 }
-@media #{$small-only} { 
+@media #{$small-only} {
 	.nav-bar {
 		display: none;
 	}
@@ -158,8 +158,8 @@ $medium-down: "#{$screen} and (max-width:#{lower-bound($medium-range)})" !defaul
 		background: #FFF;
 		color: $owl-primary-color;
 		border: 1px solid #FFF;
-		@include radius(2px);
-		@include transition(all,200ms);
+		@include owl-radius(2px);
+		@include owl-transition(all,200ms);
 
 		&.outline{
 			background: transparent;
@@ -195,7 +195,7 @@ $medium-down: "#{$screen} and (max-width:#{lower-bound($medium-range)})" !defaul
 		}
 	}
 }
-@media #{$small-only} { 
+@media #{$small-only} {
 	#hero{
 		.owl-logo{
 			display: none;
@@ -209,7 +209,7 @@ $medium-down: "#{$screen} and (max-width:#{lower-bound($medium-range)})" !defaul
 
 .owl-carousel{
 	.item{
-		
+
 	}
 }
 .home-demo{
@@ -251,7 +251,7 @@ $medium-down: "#{$screen} and (max-width:#{lower-bound($medium-range)})" !defaul
 		margin: 0 auto;
 	}
 }
-@media #{$small-only} { 
+@media #{$small-only} {
 	#features{
 		.feature{
 			margin: 1rem 0;
@@ -326,7 +326,7 @@ blockquote p {
 	padding: 1rem;
 	margin-bottom: 1rem;
 	display: block;
-	@include transition(background,200ms);
+	@include owl-transition(background,200ms);
 
 	&:hover{
 		background: $owl-primary-color;
@@ -348,7 +348,7 @@ code {
 	font-size: 90%;
 	font-weight: normal;
 	padding: 1px 5px;
-	@include radius(2px)
+	@include owl-radius(2px)
 }
 
 blockquote{
